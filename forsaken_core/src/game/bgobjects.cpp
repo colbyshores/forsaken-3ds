@@ -198,6 +198,568 @@ void KillUsedBGObject( BGOBJECT * Object )
 	Input		:	bool	Collide with objects?
 	Output		:	nothing
 ===================================================================*/
+/* BGOTYPE_Door */
+[[gnu::always_inline]] static inline void BGObjectDoor( bool & Collide, float & Damage, BGOBJECT *& Object, VECTOR & PushVector, bool & UndoAnim )
+{
+	if( Object->StateChangeDelay )
+	{
+		Object->StateChangeDelay -= framelag;
+		if( Object->StateChangeDelay < 0.0F ) Object->StateChangeDelay = 0.0F;
+	}
+
+	Object->OldOldTime = Object->OldTime;
+	Object->OldTime = Object->Time;
+
+	switch( Object->State )
+	{
+	case DOOR_OPENING:
+		Object->Time += ( framelag * Object->AnimSpeed );
+		if( Object->Time > Object->MidTime )
+		{
+			Object->State = DOOR_OPEN;
+			Object->Timer = ( ANIM_SECOND * 3.0F ) - ( Object->Time - Object->MidTime );
+			Object->Time = Object->MidTime;
+			StartOrChangeDoorSoundFX( Object );
+
+			if( Object->OpenTrigModPtr != nullptr )
+			{
+				ApplyTriggerMod( Object->OpenTrigModPtr );
+			}
+		}
+		else
+		{
+			break;
+		}
+		break;
+
+	case DOOR_REVERSEOPENING:
+		Object->Time -= ( framelag * Object->AnimSpeed );
+		if( Object->Time < 0.0F )
+		{
+			Object->State = DOOR_CLOSED;
+			Object->Time = 0.0F;
+			StartOrChangeDoorSoundFX( Object );
+
+			if( Object->CloseTrigModPtr != nullptr )
+			{
+				ApplyTriggerMod( Object->CloseTrigModPtr );
+			}
+		}
+		else
+		{
+			break;
+		}
+		break;
+
+	case DOOR_OPEN:
+		Object->Timer -= ( framelag * Object->AnimSpeed );
+
+		if( Object->Timer < 0.0F )
+		{
+			Object->Time = Object->MidTime + ( 0.0F - Object->Timer );
+			Object->Timer = 0.0F;
+			Object->State = DOOR_CLOSING;
+			StartOrChangeDoorSoundFX( Object );
+		}
+		else
+		{
+			Object->Time = Object->MidTime;
+			break;
+		}
+		break;
+
+	case DOOR_CLOSING:
+		Object->Time += ( framelag * Object->AnimSpeed );
+		if( Object->Time > Object->OverallTime )
+		{
+			Object->State = DOOR_CLOSED;
+			Object->Time = 0.0F;
+			StartOrChangeDoorSoundFX( Object );
+
+			if( Object->CloseTrigModPtr != nullptr )
+			{
+				ApplyTriggerMod( Object->CloseTrigModPtr );
+			}
+		}
+		break;
+
+	case DOOR_REVERSECLOSING:
+		Object->Time -= ( framelag * Object->AnimSpeed );
+		if( Object->Time < Object->MidTime )
+		{
+			Object->State = DOOR_OPEN;
+			Object->Timer = ( ANIM_SECOND * 3.0F ) - ( Object->MidTime - Object->Time );
+			Object->Time = Object->MidTime;
+			StartOrChangeDoorSoundFX( Object );
+
+			if( Object->OpenTrigModPtr != nullptr )
+			{
+				ApplyTriggerMod( Object->OpenTrigModPtr );
+			}
+		}
+		break;
+
+	case DOOR_CLOSED:
+		Object->Time = 0.0F;
+		break;
+
+	default:
+		break;
+	}
+
+	if( Object->UpdateCount || ( Object->Time != Object->OldTime ) )
+	{
+		UpdateCompObjChildren( Object->Children, Object->NumChildren, &Object->Matrix, &Object->Pos, Object->Time, Object->Group, &Object->Center );
+
+		if( Object->Time != Object->OldTime )
+		{
+			Object->UpdateCount = 3;
+
+			UndoAnim = false;
+
+			if( Collide )
+			{
+				if( Ships[ WhoIAm ].Object.Mode != LIMBO_MODE )
+				{
+					if( CheckBGObjectCollision( &Ships[ WhoIAm ].Object.Pos, Object, &PushVector, &Damage, SHIP_RADIUS ) )
+					{
+						ChangeBGState( Object, OWNER_SHIP, WhoIAm, BUMP, 0.0F );
+
+						{
+							HitMe( OWNER_NOBODY, 0, ( Damage * framelag ), WEPTYPE_Various, 0 );
+						}
+						ForceExternalOneOff( WhoIAm, &PushVector );
+						UndoAnim = true;
+					}
+				}
+
+				if( CheckBGObjectToEnemies( Object ) )
+				{
+					ChangeBGState( Object, OWNER_ENEMY, 0, BUMP, 0.0F );
+					UndoAnim = true;
+				}
+
+				if( CheckBGObjectToPickups( Object ) )
+				{
+					UndoAnim = true;
+				}
+
+				CheckBGObjectToMines( Object );
+			}
+
+			if( UndoAnim )
+			{
+				UndoBGObjectAnim( Object );
+				UpdateBGObjectSend( Object->Index, Object->State, Object->Time );
+			}
+		}
+		else
+		{
+			if( Object->UpdateCount ) Object->UpdateCount--;
+		}
+	}
+}
+
+/* BGOTYPE_Looping_Anim */
+[[gnu::always_inline]] static inline void BGObjectLoopingAnim( bool & Collide, float & Damage, BGOBJECT *& Object, VECTOR & PushVector, bool & UndoAnim )
+{
+	Object->OldOldTime = Object->OldTime;
+	Object->OldTime = Object->Time;
+
+	switch( Object->State )
+	{
+	case LOOPANIM_WaitForDelay:
+		Object->Delay -= framelag;
+		if( Object->Delay < 0.0F )
+		{
+			Object->Delay = 0.0F;
+			Object->State = LOOPANIM_Animating;
+		}
+		break;
+
+	case LOOPANIM_WaitForTrigger:
+		break;
+
+	case LOOPANIM_Animating:
+		if( Object->OverallTime > 0.001F )
+		{
+			Object->Time += framelag;
+
+			if( Object->Time >= Object->OverallTime )
+			{
+				Object->Time -= ( (float) fast_floorf( Object->Time / Object->OverallTime ) * Object->OverallTime );
+			}
+		}
+		break;
+	}
+
+	if( Object->UpdateCount || ( Object->Time != Object->OldTime ) )
+	{
+		UpdateCompObjChildren( Object->Children, Object->NumChildren, &Object->Matrix, &Object->Pos, Object->Time, Object->Group, &Object->Center );
+
+		if( Object->Time != Object->OldTime )
+		{
+			Object->UpdateCount = 3;
+
+			UndoAnim = false;
+
+			if( Collide )
+			{
+				if( Ships[ WhoIAm ].Object.Mode != LIMBO_MODE )
+				{
+					if( CheckBGObjectCollision( &Ships[ WhoIAm ].Object.Pos, Object, &PushVector, &Damage, SHIP_RADIUS ) )
+					{
+						{
+							HitMe( OWNER_NOBODY, 0, ( Damage * framelag ), WEPTYPE_Various, 0 );
+						}
+
+						ForceExternalOneOff( WhoIAm, &PushVector );
+						UndoAnim = true;
+					}
+				}
+
+				if( CheckBGObjectToEnemies( Object ) )
+				{
+					UndoAnim = true;
+				}
+
+				if( CheckBGObjectToPickups( Object ) )
+				{
+					UndoAnim = true;
+				}
+
+				CheckBGObjectToMines( Object );
+			}
+
+			if( UndoAnim )
+			{
+				UndoBGObjectAnim( Object );
+				UpdateBGObjectSend( Object->Index, Object->State, Object->Time );
+			}
+		}
+		else
+		{
+			if( Object->UpdateCount ) Object->UpdateCount--;
+		}
+	}
+}
+
+/* BGOTYPE_OneOff_Anim */
+[[gnu::always_inline]] static inline void BGObjectOneOffAnim( bool & Collide, float & Damage, BGOBJECT *& Object, VECTOR & PushVector, bool & UndoAnim )
+{
+	Object->OldOldTime = Object->OldTime;
+	Object->OldTime = Object->Time;
+
+	switch( Object->State )
+	{
+	case ONEOFFANIM_WaitForDelay:
+		Object->Delay -= framelag;
+		if( Object->Delay < 0.0F )
+		{
+			Object->Delay = 0.0F;
+			Object->State = ONEOFFANIM_Animating;
+		}
+		break;
+
+	case ONEOFFANIM_WaitForTrigger:
+		break;
+
+	case ONEOFFANIM_Animating:
+		if( Object->Time < Object->OverallTime )
+		{
+			Object->Time += framelag;
+#ifdef EDITION_REMASTER
+			/* Sync any CargoDrone waiting at a lift-base node (0x40)
+			 * with this BGO's animation progress so the drone rides
+			 * the platform rather than being passed through.
+			 *
+			 * Gate on Object->IsCargoDroneLift so the Y-lerp only
+			 * fires for actual lift BGOs (filename "lift*.cob") —
+			 * not for lever/door/decoration BGOs that happen to be
+			 * animating while the drone sits at a wait node. */
+			if( Object->IsCargoDroneLift )
+			{
+				ENEMY * drone;
+				for( drone = FirstEnemyUsed; drone; drone = drone->NextUsed )
+				{
+					float dx, dz;
+					NODE * wait_node;
+					NODE * upper_node;
+					if( drone->Type != ENEMY_CargoDrone ) continue;
+					if( !drone->TNode ) continue;
+					wait_node = (NODE*)drone->TNode;
+					if( !( wait_node->Flags & 0x40 ) )
+					{
+						continue;
+					}
+					/* Gate on drone-to-wait-node XZ distance — the drone is
+					 * parked at the wait node when the lift fires, and the
+					 * wait node lives in world coords.  BGO origins are
+					 * level-designer-placed and can be far from their wait
+					 * node (lift 2's BGO is at world origin (0,0,0); lift 5's
+					 * BGO is 380u from its wait node; only lift 1 happens to
+					 * be near its wait at 213u).  A tight wait-node-based
+					 * gate works uniformly for every lift. */
+					dx = drone->Object.Pos.x - wait_node->Pos.x;
+					dz = drone->Object.Pos.z - wait_node->Pos.z;
+					if( dx*dx + dz*dz > 200.0F*200.0F )
+					{
+						continue;
+					}
+					/* Lerp drone Y from wait node to its IMMEDIATE upper
+					 * neighbor (NodeLink[0]) — Y only, not XZ.  Lerping
+					 * X/Z too is geometrically correct for slanted shafts,
+					 * but it breaks the wait suppressor's XZ-distance
+					 * check (drone moves away from wait_node XZ → wait
+					 * disengages → drone tries AI movement → chaos).
+					 *
+					 * Trade-off: drone Y-rises straight up at wait_node's
+					 * XZ; lift platform mesh may visually pull away on
+					 * slanted shafts.  Better to look slightly off than
+					 * to break parking.  When the animation ends, the
+					 * block below advances the drone's TNode to the
+					 * upper node. */
+					upper_node = ( wait_node->NumOfLinks > 0 ) ? wait_node->NodeLink[0] : nullptr;
+					if( upper_node )
+					{
+						float progress = Object->Time / Object->OverallTime;
+						if( progress > 1.0F ) progress = 1.0F;
+						drone->Object.Pos.y = wait_node->Pos.y + ( upper_node->Pos.y - wait_node->Pos.y ) * progress;
+					}
+				}
+			}
+#endif
+		}
+		else
+		{
+			if( Object->EndTrigModPtr != nullptr )
+			{
+				ApplyTriggerMod( Object->EndTrigModPtr );
+			}
+#ifdef EDITION_REMASTER
+			/* Lift just finished animating.  EndTrigMod fired the
+			 * Lift<N>Done state change, which fires NodeEnable on
+			 * the upper node and NodeDisable on the wait.  Drone is
+			 * sitting at wait_node.XZ with Y at the lerped top; we
+			 * need to (a) snap drone position to upper_node and
+			 * (b) advance drone TNode to upper_node so its
+			 * subsequent AI behavior aims at the next forward
+			 * neighbor instead of the now-disabled wait below it.
+			 *
+			 * Without this, drone TNode stays at the (now 0x60-
+			 * disabled) wait and AI tries to navigate back down
+			 * to wait.Pos.y, undoing the lift visually. */
+			if( Object->IsCargoDroneLift )
+			{
+				ENEMY * drone;
+				for( drone = FirstEnemyUsed; drone; drone = drone->NextUsed )
+				{
+					NODE * wait_node;
+					NODE * upper_node;
+					float dx, dz;
+					bool upper_is_intermediate_wait;
+					if( drone->Type != ENEMY_CargoDrone ) continue;
+					if( !drone->TNode ) continue;
+					wait_node = (NODE*)drone->TNode;
+					/* Drone must have been parked at wait associated
+					 * with this lift (XZ-close). */
+					dx = drone->Object.Pos.x - wait_node->Pos.x;
+					dz = drone->Object.Pos.z - wait_node->Pos.z;
+					if( dx*dx + dz*dz > 200.0F*200.0F ) continue;
+					upper_node = ( wait_node->NumOfLinks > 0 ) ? wait_node->NodeLink[0] : nullptr;
+					if( !upper_node ) continue;
+					/* Always advance the drone's TNode forward — the post-
+					 * lift NodeDisable(wait) + NodeEnable(upper) trigger pair
+					 * has already fired by now, so wait_node is 0x60-disabled
+					 * and upper_node is either 0x40 (intermediate shaft wait)
+					 * or 0x00 (regular track). */
+					drone->TNode         = upper_node;
+					drone->NextTNode     = nullptr;
+					drone->LastTNode     = wait_node;
+					drone->PickNewNodeNow = true;
+
+					/* Only teleport drone POSITION when upper_node is now an
+					 * intermediate shaft wait (0x40 set, e.g. lift 2 shaft).
+					 * For those, the drone must "be there" so the wait
+					 * suppressor parks it and the next switch's
+					 * Drone<N>Wait zone-enter fires.
+					 *
+					 * For single-segment lifts (1, 5, 6, 7, 8 + lift 2's top
+					 * segment) upper_node ends up 0x00 — regular track.
+					 * Don't teleport position there.  Just advancing TNode
+					 * is enough; the AI will walk the drone from the
+					 * wait's XZ over to upper_node naturally, no visible
+					 * jump on lift end. */
+					upper_is_intermediate_wait = (upper_node->Flags & 0x40) != 0;
+					if( upper_is_intermediate_wait )
+					{
+						VECTOR oldPos = drone->Object.Pos;
+						drone->Object.Pos.x = upper_node->SolidPos.x;
+						drone->Object.Pos.y = upper_node->SolidPos.y;
+						drone->Object.Pos.z = upper_node->SolidPos.z;
+						drone->Object.Group = (u_int16_t)upper_node->Group;
+						TriggerAreaEnemyCheck( &oldPos, &drone->Object.Pos, (u_int16_t)upper_node->Group );
+					}
+				}
+			}
+#endif
+			Object->Time = Object->OverallTime;
+			if( Object->DestroyAtEnd )
+			{
+				ExplodeChildren( Object->Children, 1 );
+				KillUsedBGObject( Object );
+				Object = nullptr;
+			}
+			else
+			{
+				Object->State = ONEOFFANIM_WaitForTrigger;
+			}
+		}
+		break;
+	}
+
+	if( Object )
+	{
+		if( Object->UpdateCount || ( Object->Time != Object->OldTime ) )
+		{
+			UpdateCompObjChildren( Object->Children, Object->NumChildren, &Object->Matrix, &Object->Pos, Object->Time, Object->Group, &Object->Center );
+
+			if( Object->Time != Object->OldTime )
+			{
+				Object->UpdateCount = 3;
+
+				UndoAnim = false;
+
+				if( Collide )
+				{
+					if( Ships[ WhoIAm ].Object.Mode != LIMBO_MODE )
+					{
+						if( CheckBGObjectCollision( &Ships[ WhoIAm ].Object.Pos, Object, &PushVector, &Damage, SHIP_RADIUS ) )
+						{
+							{
+								HitMe( OWNER_NOBODY, 0, ( Damage * framelag ), WEPTYPE_Various, 0 );
+							}
+
+							ForceExternalOneOff( WhoIAm, &PushVector );
+							UndoAnim = true;
+						}
+					}
+
+					if( CheckBGObjectToEnemies( Object ) )
+					{
+						UndoAnim = true;
+					}
+
+					if( CheckBGObjectToPickups( Object ) )
+					{
+						UndoAnim = true;
+					}
+
+					CheckBGObjectToMines( Object );
+				}
+
+				if( UndoAnim )
+				{
+					UndoBGObjectAnim( Object );
+					UpdateBGObjectSend( Object->Index, Object->State, Object->Time );
+				}
+			}
+			else
+			{
+				if( Object->UpdateCount ) Object->UpdateCount--;
+			}
+		}
+	}
+}
+
+/* BGOTYPE_MultipleStep_Anim */
+[[gnu::always_inline]] static inline void BGObjectMultipleStepAnim( bool & Collide, float & Damage, BGOBJECT *& Object, VECTOR & PushVector, bool & UndoAnim )
+{
+	Object->OldOldTime = Object->OldTime;
+	Object->OldTime = Object->Time;
+
+	if( Object->Time < Object->WantedTime )
+	{
+		Object->Time += framelag;
+
+		if( Object->Time > Object->WantedTime )
+		{
+			Object->Time = Object->WantedTime;
+		}
+
+		if( Object->Time >= Object->OverallTime )
+		{
+			Object->Time = Object->OverallTime;
+
+			if( Object->EndTrigModPtr != nullptr )
+			{
+				ApplyTriggerMod( Object->EndTrigModPtr );
+			}
+
+			if( Object->DestroyAtEnd )
+			{
+				ExplodeChildren( Object->Children, 1 );
+				KillUsedBGObject( Object );
+				Object = nullptr;
+			}
+		}
+	}
+
+	if( Object != nullptr )
+	{
+		if( Object->UpdateCount || ( Object->Time != Object->OldTime ) )
+		{
+			UpdateCompObjChildren( Object->Children, Object->NumChildren, &Object->Matrix, &Object->Pos, Object->Time, Object->Group, &Object->Center );
+
+			if( Object->Time != Object->OldTime )
+			{
+				Object->UpdateCount = 3;
+
+				UndoAnim = false;
+
+				if( Collide )
+				{
+					if( Ships[ WhoIAm ].Object.Mode != LIMBO_MODE )
+					{
+						if( CheckBGObjectCollision( &Ships[ WhoIAm ].Object.Pos, Object, &PushVector, &Damage, SHIP_RADIUS ) )
+						{
+							if( WouldObjectCollide( &Ships[ WhoIAm ].Object, &PushVector, SHIP_RADIUS, nullptr ) )
+							{
+								HitMe( OWNER_NOBODY, 0, ( Damage * framelag ), WEPTYPE_Various, 0 );
+							}
+
+							ForceExternalOneOff( WhoIAm, &PushVector );
+							UndoAnim = true;
+						}
+					}
+
+					if( CheckBGObjectToEnemies( Object ) )
+					{
+						UndoAnim = true;
+					}
+
+					if( CheckBGObjectToPickups( Object ) )
+					{
+						UndoAnim = true;
+					}
+
+					CheckBGObjectToMines( Object );
+				}
+
+				if( UndoAnim )
+				{
+					UndoBGObjectAnim( Object );
+					UpdateBGObjectSend( Object->Index, Object->State, Object->Time );
+				}
+			}
+			else
+			{
+				if( Object->UpdateCount ) Object->UpdateCount--;
+			}
+		}
+	}
+}
+
 void ProcessBGObjects( bool Collide )
 {
 	float			Damage = 0.0F;
@@ -225,566 +787,28 @@ void ProcessBGObjects( bool Collide )
 						DOOR
 			===================================================================*/
 		case BGOTYPE_Door:
-			if( Object->StateChangeDelay )
-			{
-				Object->StateChangeDelay -= framelag;
-				if( Object->StateChangeDelay < 0.0F ) Object->StateChangeDelay = 0.0F;
-			}
-
-			Object->OldOldTime = Object->OldTime;
-			Object->OldTime = Object->Time;
-
-			switch( Object->State )
-			{
-			case DOOR_OPENING:
-				Object->Time += ( framelag * Object->AnimSpeed );
-				if( Object->Time > Object->MidTime )
-				{
-					Object->State = DOOR_OPEN;
-					Object->Timer = ( ANIM_SECOND * 3.0F ) - ( Object->Time - Object->MidTime );
-					Object->Time = Object->MidTime;
-					StartOrChangeDoorSoundFX( Object );
-
-					if( Object->OpenTrigModPtr != nullptr )
-					{
-						ApplyTriggerMod( Object->OpenTrigModPtr );
-					}
-				}
-				else
-				{
-					break;
-				}
-				break;
-
-			case DOOR_REVERSEOPENING:
-				Object->Time -= ( framelag * Object->AnimSpeed );
-				if( Object->Time < 0.0F )
-				{
-					Object->State = DOOR_CLOSED;
-					Object->Time = 0.0F;
-					StartOrChangeDoorSoundFX( Object );
-
-					if( Object->CloseTrigModPtr != nullptr )
-					{
-						ApplyTriggerMod( Object->CloseTrigModPtr );
-					}
-				}
-				else
-				{
-					break;
-				}
-				break;
-
-			case DOOR_OPEN:
-				Object->Timer -= ( framelag * Object->AnimSpeed );
-
-				if( Object->Timer < 0.0F )
-				{
-					Object->Time = Object->MidTime + ( 0.0F - Object->Timer );
-					Object->Timer = 0.0F;
-					Object->State = DOOR_CLOSING;
-					StartOrChangeDoorSoundFX( Object );
-				}
-				else
-				{
-					Object->Time = Object->MidTime;
-					break;
-				}
-				break;
-
-			case DOOR_CLOSING:
-				Object->Time += ( framelag * Object->AnimSpeed );
-				if( Object->Time > Object->OverallTime )
-				{
-					Object->State = DOOR_CLOSED;
-					Object->Time = 0.0F;
-					StartOrChangeDoorSoundFX( Object );
-
-					if( Object->CloseTrigModPtr != nullptr )
-					{
-						ApplyTriggerMod( Object->CloseTrigModPtr );
-					}
-				}
-				break;
-
-			case DOOR_REVERSECLOSING:
-				Object->Time -= ( framelag * Object->AnimSpeed );
-				if( Object->Time < Object->MidTime )
-				{
-					Object->State = DOOR_OPEN;
-					Object->Timer = ( ANIM_SECOND * 3.0F ) - ( Object->MidTime - Object->Time );
-					Object->Time = Object->MidTime;
-					StartOrChangeDoorSoundFX( Object );
-
-					if( Object->OpenTrigModPtr != nullptr )
-					{
-						ApplyTriggerMod( Object->OpenTrigModPtr );
-					}
-				}
-				break;
-
-			case DOOR_CLOSED:
-				Object->Time = 0.0F;
-				break;
-
-			default:
-				break;
-			}
-
-			if( Object->UpdateCount || ( Object->Time != Object->OldTime ) )
-			{
-				UpdateCompObjChildren( Object->Children, Object->NumChildren, &Object->Matrix, &Object->Pos, Object->Time, Object->Group, &Object->Center );
-
-				if( Object->Time != Object->OldTime )
-				{
-					Object->UpdateCount = 3;
-
-					UndoAnim = false;
-
-					if( Collide )
-					{
-						if( Ships[ WhoIAm ].Object.Mode != LIMBO_MODE )
-						{
-							if( CheckBGObjectCollision( &Ships[ WhoIAm ].Object.Pos, Object, &PushVector, &Damage, SHIP_RADIUS ) )
-							{
-								ChangeBGState( Object, OWNER_SHIP, WhoIAm, BUMP, 0.0F );
-
-								{
-									HitMe( OWNER_NOBODY, 0, ( Damage * framelag ), WEPTYPE_Various, 0 );
-								}
-								ForceExternalOneOff( WhoIAm, &PushVector );
-								UndoAnim = true;
-							}
-						}
-
-						if( CheckBGObjectToEnemies( Object ) )
-						{
-							ChangeBGState( Object, OWNER_ENEMY, 0, BUMP, 0.0F );
-							UndoAnim = true;
-						}
-
-						if( CheckBGObjectToPickups( Object ) )
-						{
-							UndoAnim = true;
-						}
-
-						CheckBGObjectToMines( Object );
-					}
-
-					if( UndoAnim )
-					{
-						UndoBGObjectAnim( Object );
-						UpdateBGObjectSend( Object->Index, Object->State, Object->Time );
-					}
-				}
-				else
-				{
-					if( Object->UpdateCount ) Object->UpdateCount--;
-				}
-			}
+			BGObjectDoor( Collide, Damage, Object, PushVector, UndoAnim );
 			break;
 
 			/*===================================================================
 						LOOPING
 			===================================================================*/
 		case BGOTYPE_Looping_Anim:
-			Object->OldOldTime = Object->OldTime;
-			Object->OldTime = Object->Time;
-
-			switch( Object->State )
-			{
-			case LOOPANIM_WaitForDelay:
-				Object->Delay -= framelag;
-				if( Object->Delay < 0.0F )
-				{
-					Object->Delay = 0.0F;
-					Object->State = LOOPANIM_Animating;
-				}
-				break;
-
-			case LOOPANIM_WaitForTrigger:
-				break;
-
-			case LOOPANIM_Animating:
-				if( Object->OverallTime > 0.001F )
-				{
-					Object->Time += framelag;
-
-					if( Object->Time >= Object->OverallTime )
-					{
-						Object->Time -= ( (float) fast_floorf( Object->Time / Object->OverallTime ) * Object->OverallTime );
-					}
-				}
-				break;
-			}
-
-			if( Object->UpdateCount || ( Object->Time != Object->OldTime ) )
-			{
-				UpdateCompObjChildren( Object->Children, Object->NumChildren, &Object->Matrix, &Object->Pos, Object->Time, Object->Group, &Object->Center );
-
-				if( Object->Time != Object->OldTime )
-				{
-					Object->UpdateCount = 3;
-
-					UndoAnim = false;
-
-					if( Collide )
-					{
-						if( Ships[ WhoIAm ].Object.Mode != LIMBO_MODE )
-						{
-							if( CheckBGObjectCollision( &Ships[ WhoIAm ].Object.Pos, Object, &PushVector, &Damage, SHIP_RADIUS ) )
-							{
-								{
-									HitMe( OWNER_NOBODY, 0, ( Damage * framelag ), WEPTYPE_Various, 0 );
-								}
-
-								ForceExternalOneOff( WhoIAm, &PushVector );
-								UndoAnim = true;
-							}
-						}
-
-						if( CheckBGObjectToEnemies( Object ) )
-						{
-							UndoAnim = true;
-						}
-
-						if( CheckBGObjectToPickups( Object ) )
-						{
-							UndoAnim = true;
-						}
-
-						CheckBGObjectToMines( Object );
-					}
-
-					if( UndoAnim )
-					{
-						UndoBGObjectAnim( Object );
-						UpdateBGObjectSend( Object->Index, Object->State, Object->Time );
-					}
-				}
-				else
-				{
-					if( Object->UpdateCount ) Object->UpdateCount--;
-				}
-			}
+			BGObjectLoopingAnim( Collide, Damage, Object, PushVector, UndoAnim );
 			break;
 
 			/*===================================================================
 						ANIMATE AND STOP AT END
 			===================================================================*/
 		case BGOTYPE_OneOff_Anim:
-			Object->OldOldTime = Object->OldTime;
-			Object->OldTime = Object->Time;
-
-			switch( Object->State )
-			{
-			case ONEOFFANIM_WaitForDelay:
-				Object->Delay -= framelag;
-				if( Object->Delay < 0.0F )
-				{
-					Object->Delay = 0.0F;
-					Object->State = ONEOFFANIM_Animating;
-				}
-				break;
-
-			case ONEOFFANIM_WaitForTrigger:
-				break;
-
-			case ONEOFFANIM_Animating:
-				if( Object->Time < Object->OverallTime )
-				{
-					Object->Time += framelag;
-#ifdef EDITION_REMASTER
-					/* Sync any CargoDrone waiting at a lift-base node (0x40)
-					 * with this BGO's animation progress so the drone rides
-					 * the platform rather than being passed through.
-					 *
-					 * Gate on Object->IsCargoDroneLift so the Y-lerp only
-					 * fires for actual lift BGOs (filename "lift*.cob") —
-					 * not for lever/door/decoration BGOs that happen to be
-					 * animating while the drone sits at a wait node. */
-					if( Object->IsCargoDroneLift )
-					{
-						ENEMY * drone;
-						for( drone = FirstEnemyUsed; drone; drone = drone->NextUsed )
-						{
-							float dx, dz;
-							NODE * wait_node;
-							NODE * upper_node;
-							if( drone->Type != ENEMY_CargoDrone ) continue;
-							if( !drone->TNode ) continue;
-							wait_node = (NODE*)drone->TNode;
-							if( !( wait_node->Flags & 0x40 ) )
-							{
-								continue;
-							}
-							/* Gate on drone-to-wait-node XZ distance — the drone is
-							 * parked at the wait node when the lift fires, and the
-							 * wait node lives in world coords.  BGO origins are
-							 * level-designer-placed and can be far from their wait
-							 * node (lift 2's BGO is at world origin (0,0,0); lift 5's
-							 * BGO is 380u from its wait node; only lift 1 happens to
-							 * be near its wait at 213u).  A tight wait-node-based
-							 * gate works uniformly for every lift. */
-							dx = drone->Object.Pos.x - wait_node->Pos.x;
-							dz = drone->Object.Pos.z - wait_node->Pos.z;
-							if( dx*dx + dz*dz > 200.0F*200.0F )
-							{
-								continue;
-							}
-							/* Lerp drone Y from wait node to its IMMEDIATE upper
-							 * neighbor (NodeLink[0]) — Y only, not XZ.  Lerping
-							 * X/Z too is geometrically correct for slanted shafts,
-							 * but it breaks the wait suppressor's XZ-distance
-							 * check (drone moves away from wait_node XZ → wait
-							 * disengages → drone tries AI movement → chaos).
-							 *
-							 * Trade-off: drone Y-rises straight up at wait_node's
-							 * XZ; lift platform mesh may visually pull away on
-							 * slanted shafts.  Better to look slightly off than
-							 * to break parking.  When the animation ends, the
-							 * block below advances the drone's TNode to the
-							 * upper node. */
-							upper_node = ( wait_node->NumOfLinks > 0 ) ? wait_node->NodeLink[0] : nullptr;
-							if( upper_node )
-							{
-								float progress = Object->Time / Object->OverallTime;
-								if( progress > 1.0F ) progress = 1.0F;
-								drone->Object.Pos.y = wait_node->Pos.y + ( upper_node->Pos.y - wait_node->Pos.y ) * progress;
-							}
-						}
-					}
-#endif
-				}
-				else
-				{
-					if( Object->EndTrigModPtr != nullptr )
-					{
-						ApplyTriggerMod( Object->EndTrigModPtr );
-					}
-#ifdef EDITION_REMASTER
-					/* Lift just finished animating.  EndTrigMod fired the
-					 * Lift<N>Done state change, which fires NodeEnable on
-					 * the upper node and NodeDisable on the wait.  Drone is
-					 * sitting at wait_node.XZ with Y at the lerped top; we
-					 * need to (a) snap drone position to upper_node and
-					 * (b) advance drone TNode to upper_node so its
-					 * subsequent AI behavior aims at the next forward
-					 * neighbor instead of the now-disabled wait below it.
-					 *
-					 * Without this, drone TNode stays at the (now 0x60-
-					 * disabled) wait and AI tries to navigate back down
-					 * to wait.Pos.y, undoing the lift visually. */
-					if( Object->IsCargoDroneLift )
-					{
-						ENEMY * drone;
-						for( drone = FirstEnemyUsed; drone; drone = drone->NextUsed )
-						{
-							NODE * wait_node;
-							NODE * upper_node;
-							float dx, dz;
-							bool upper_is_intermediate_wait;
-							if( drone->Type != ENEMY_CargoDrone ) continue;
-							if( !drone->TNode ) continue;
-							wait_node = (NODE*)drone->TNode;
-							/* Drone must have been parked at wait associated
-							 * with this lift (XZ-close). */
-							dx = drone->Object.Pos.x - wait_node->Pos.x;
-							dz = drone->Object.Pos.z - wait_node->Pos.z;
-							if( dx*dx + dz*dz > 200.0F*200.0F ) continue;
-							upper_node = ( wait_node->NumOfLinks > 0 ) ? wait_node->NodeLink[0] : nullptr;
-							if( !upper_node ) continue;
-							/* Always advance the drone's TNode forward — the post-
-							 * lift NodeDisable(wait) + NodeEnable(upper) trigger pair
-							 * has already fired by now, so wait_node is 0x60-disabled
-							 * and upper_node is either 0x40 (intermediate shaft wait)
-							 * or 0x00 (regular track). */
-							drone->TNode         = upper_node;
-							drone->NextTNode     = nullptr;
-							drone->LastTNode     = wait_node;
-							drone->PickNewNodeNow = true;
-
-							/* Only teleport drone POSITION when upper_node is now an
-							 * intermediate shaft wait (0x40 set, e.g. lift 2 shaft).
-							 * For those, the drone must "be there" so the wait
-							 * suppressor parks it and the next switch's
-							 * Drone<N>Wait zone-enter fires.
-							 *
-							 * For single-segment lifts (1, 5, 6, 7, 8 + lift 2's top
-							 * segment) upper_node ends up 0x00 — regular track.
-							 * Don't teleport position there.  Just advancing TNode
-							 * is enough; the AI will walk the drone from the
-							 * wait's XZ over to upper_node naturally, no visible
-							 * jump on lift end. */
-							upper_is_intermediate_wait = (upper_node->Flags & 0x40) != 0;
-							if( upper_is_intermediate_wait )
-							{
-								VECTOR oldPos = drone->Object.Pos;
-								drone->Object.Pos.x = upper_node->SolidPos.x;
-								drone->Object.Pos.y = upper_node->SolidPos.y;
-								drone->Object.Pos.z = upper_node->SolidPos.z;
-								drone->Object.Group = (u_int16_t)upper_node->Group;
-								TriggerAreaEnemyCheck( &oldPos, &drone->Object.Pos, (u_int16_t)upper_node->Group );
-							}
-						}
-					}
-#endif
-					Object->Time = Object->OverallTime;
-					if( Object->DestroyAtEnd )
-					{
-						ExplodeChildren( Object->Children, 1 );
-						KillUsedBGObject( Object );
-						Object = nullptr;
-					}
-					else
-					{
-						Object->State = ONEOFFANIM_WaitForTrigger;
-					}
-				}
-				break;
-			}
-
-			if( Object )
-			{
-				if( Object->UpdateCount || ( Object->Time != Object->OldTime ) )
-				{
-					UpdateCompObjChildren( Object->Children, Object->NumChildren, &Object->Matrix, &Object->Pos, Object->Time, Object->Group, &Object->Center );
-
-					if( Object->Time != Object->OldTime )
-					{
-						Object->UpdateCount = 3;
-
-						UndoAnim = false;
-
-						if( Collide )
-						{
-							if( Ships[ WhoIAm ].Object.Mode != LIMBO_MODE )
-							{
-								if( CheckBGObjectCollision( &Ships[ WhoIAm ].Object.Pos, Object, &PushVector, &Damage, SHIP_RADIUS ) )
-								{
-									{
-										HitMe( OWNER_NOBODY, 0, ( Damage * framelag ), WEPTYPE_Various, 0 );
-									}
-
-									ForceExternalOneOff( WhoIAm, &PushVector );
-									UndoAnim = true;
-								}
-							}
-
-							if( CheckBGObjectToEnemies( Object ) )
-							{
-								UndoAnim = true;
-							}
-
-							if( CheckBGObjectToPickups( Object ) )
-							{
-								UndoAnim = true;
-							}
-
-							CheckBGObjectToMines( Object );
-						}
-
-						if( UndoAnim )
-						{
-							UndoBGObjectAnim( Object );
-							UpdateBGObjectSend( Object->Index, Object->State, Object->Time );
-						}
-					}
-					else
-					{
-						if( Object->UpdateCount ) Object->UpdateCount--;
-					}
-				}
-			}
+			BGObjectOneOffAnim( Collide, Damage, Object, PushVector, UndoAnim );
 			break;
 
 			/*===================================================================
 						STEPPED ANIM CAUSED BY EXTERNAL CONDITIONS
 			===================================================================*/
 		case BGOTYPE_MultipleStep_Anim:
-			Object->OldOldTime = Object->OldTime;
-			Object->OldTime = Object->Time;
-
-			if( Object->Time < Object->WantedTime )
-			{
-				Object->Time += framelag;
-
-				if( Object->Time > Object->WantedTime )
-				{
-					Object->Time = Object->WantedTime;
-				}
-
-				if( Object->Time >= Object->OverallTime )
-				{
-					Object->Time = Object->OverallTime;
-
-					if( Object->EndTrigModPtr != nullptr )
-					{
-						ApplyTriggerMod( Object->EndTrigModPtr );
-					}
-
-					if( Object->DestroyAtEnd )
-					{
-						ExplodeChildren( Object->Children, 1 );
-						KillUsedBGObject( Object );
-						Object = nullptr;
-					}
-				}
-			}
-
-			if( Object != nullptr )
-			{
-				if( Object->UpdateCount || ( Object->Time != Object->OldTime ) )
-				{
-					UpdateCompObjChildren( Object->Children, Object->NumChildren, &Object->Matrix, &Object->Pos, Object->Time, Object->Group, &Object->Center );
-
-					if( Object->Time != Object->OldTime )
-					{
-						Object->UpdateCount = 3;
-
-						UndoAnim = false;
-
-						if( Collide )
-						{
-							if( Ships[ WhoIAm ].Object.Mode != LIMBO_MODE )
-							{
-								if( CheckBGObjectCollision( &Ships[ WhoIAm ].Object.Pos, Object, &PushVector, &Damage, SHIP_RADIUS ) )
-								{
-									if( WouldObjectCollide( &Ships[ WhoIAm ].Object, &PushVector, SHIP_RADIUS, nullptr ) )
-									{
-										HitMe( OWNER_NOBODY, 0, ( Damage * framelag ), WEPTYPE_Various, 0 );
-									}
-
-									ForceExternalOneOff( WhoIAm, &PushVector );
-									UndoAnim = true;
-								}
-							}
-
-							if( CheckBGObjectToEnemies( Object ) )
-							{
-								UndoAnim = true;
-							}
-
-							if( CheckBGObjectToPickups( Object ) )
-							{
-								UndoAnim = true;
-							}
-
-							CheckBGObjectToMines( Object );
-						}
-
-						if( UndoAnim )
-						{
-							UndoBGObjectAnim( Object );
-							UpdateBGObjectSend( Object->Index, Object->State, Object->Time );
-						}
-					}
-					else
-					{
-						if( Object->UpdateCount ) Object->UpdateCount--;
-					}
-				}
-			}
+			BGObjectMultipleStepAnim( Collide, Damage, Object, PushVector, UndoAnim );
 			break;
 
 			/*===================================================================
