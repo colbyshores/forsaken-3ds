@@ -57,15 +57,15 @@ int lua_dofile(lua_State *L, const char *name)
 
 static int lua_debug_str(lua_State *state)
 {
-	char * str = (char*) lua_tostring(state,1); // get argument
-	DebugPrintf(str);
+	const char * str = lua_tostring(state,1); // get argument
+	DebugPrintf( "%s", str ? str : "" ); // the script's text is data, not a format
 	return 0; // number of results
 }
 
 static int lua_alert(lua_State *state)
 {
-	char * str = (char*) lua_tostring(state,1); // get argument
-	Msg( str );
+	const char * str = lua_tostring(state,1); // get argument
+	Msg( "%s", str ? str : "" ); // the script's text is data, not a format
 	return 0; // number of results
 }
 
