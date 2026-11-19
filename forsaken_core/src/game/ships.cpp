@@ -560,6 +560,473 @@ void (* RemoteCameraModeControl[ ])( GLOBALSHIP * ShipPnt , BYTE i ) = {
 		RemoteCameraMode1		// nor 3 (demo playback, removed)
 };
 
+/* flag chase: the ship carrying the flag reached a goal */
+[[gnu::always_inline]] static inline void ShipFlagChaseGoal( BYTE & i, VECTOR & StartPos, OBJECT *& ShipObjPnt, int & goalcheck )
+{
+	if ( CaptureTheFlag && ShipObjPnt->Flags & SHIP_CarryingFlag )
+	{
+		goalcheck = GoalCheckTeam( &StartPos, &ShipObjPnt->Pos, ShipObjPnt->Group, TeamNumber[ i ] );
+		if ( goalcheck == GOAL_SCORED )
+		{
+			PickupsGot[ PICKUP_Flag ] = 0;
+			Ships[ i ].Object.Flags &= ~SHIP_CarryingFlag;
+			FlagsToGenerate++;
+			// update bonus 2 (stats.cpp) -- flag chase scored
+			UpdateBonusStats(i,GoalScore);
+			AddColourMessageToQue(FlagMessageColour, TEAM_SCORED,
+				TeamName[ TeamNumber[ i ] ] );
+
+			SendGameMessage(MSG_TEXTMSG, 0, 0, TEXTMSGTYPE_ScoredWithFlag, 0);
+		}
+		else if ( goalcheck == GOAL_WRONG )
+		{
+			AddColourMessageToQue(FlagMessageColour, TAKE_FLAG_TO_GOAL,
+				TeamName[ TeamNumber[ i ] ] );
+		}
+	}
+}
+
+/* capture the flag: the ship carrying the enemy flag reached its goal */
+[[gnu::always_inline]] static inline void ShipCaptureTheFlagGoal( BYTE & i, VECTOR & StartPos, OBJECT *& ShipObjPnt, int & goalcheck )
+{
+	if ( CTF && ShipObjPnt->Flags & SHIP_CarryingFlags )
+	{
+		static bool IKnowINeedFlag = false;
+
+		goalcheck = GoalCheckTeam( &StartPos, &ShipObjPnt->Pos, ShipObjPnt->Group, TeamNumber[ i ] );
+		if ( goalcheck == GOAL_SCORED )
+		{
+			if ( !NeedFlagAtHome
+				|| TeamFlagAtHome[ TeamNumber[ i ] ]
+				|| ShipObjPnt->Flags & TeamFlagMask[ TeamNumber[ i ] ] )
+			{
+				int team;
+				int score;
+
+				score = 0;
+				for ( team = 0; team < MAX_TEAMS; team++ )
+				{
+					if ( ShipObjPnt->Flags & TeamFlagMask[ team ] )
+					{
+						PickupsGot[ TeamFlagPickup[ team ] ] = 0;
+						Ships[ i ].Object.Flags &= ~TeamFlagMask[ team ];
+						if ( team != TeamNumber[ i ] )
+						{
+							score += GoalScore;
+						}
+						GenerateFlagAtHome( team );
+					}
+				}
+				if ( score )
+				{
+					// update bonus 3 (stats.cpp) -- CTF scored
+					UpdateBonusStats(i,score);
+					AddColourMessageToQue(FlagMessageColour, TEAM_SCORED,
+						TeamName[ TeamNumber[ i ] ] );
+
+					SendGameMessage(MSG_TEXTMSG, 0, 0, TEXTMSGTYPE_ScoredWithFlag, 0);
+				}
+				else
+				{
+					AddColourMessageToQue(FlagMessageColour, OTHER_TEAM_FLAG_RETURNED,
+						TeamName[ TeamNumber[ i ] ] );
+					SendGameMessage(MSG_TEXTMSG, 0, 0, TEXTMSGTYPE_ReturnedFlag, 0);
+				}
+
+				IKnowINeedFlag = false;
+			}
+			else
+			{
+				if ( !IKnowINeedFlag )
+				{
+					AddColourMessageToQue(FlagMessageColour, YOU_NEED_FLAG,
+						TeamName[ TeamNumber[ i ] ] );
+					IKnowINeedFlag = true;
+				}
+			}
+		}
+		else
+		{
+			if ( goalcheck == GOAL_WRONG )
+			{
+				/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
+				AddColourMessageToQue(FlagMessageColour, TAKE_FLAG_TO_GOAL,
+					TeamName[ TeamNumber[ i ] ] );
+			}
+			IKnowINeedFlag = false;
+		}
+	}
+}
+
+/* the ship entering, leaving and moving through water (shield drain, splashes, wake) */
+[[gnu::always_inline]] static inline void ShipWater( VECTOR & ImpactPoint, VECTOR & Move_Off, VECTOR & StartPos, u_int16_t & OldGroup, float & ShieldModifier, OBJECT *& ShipObjPnt, bool & OldWaterOneshot )
+{
+	ShipObjPnt->Flags &= ~SHIP_InWater;
+	if( InWater( ShipObjPnt->Group , &ShipObjPnt->Pos , &ShieldModifier) )
+	{
+		ShipObjPnt->Flags |= SHIP_InWater;
+	}
+	else
+	{
+		// not in water, therefore stop underwater looping sfx if currently playing
+		if ( UnderwaterSfxID )
+		{
+			StopSfx( UnderwaterSfxID );
+		}
+	}
+
+	if( (ShipObjPnt->Flags&SHIP_InWater) )
+	{
+		SetBikeMods( 1 );
+	}
+	if( !(ShipObjPnt->Flags&SHIP_InWater) )
+	{
+		if( MyGameStatus == STATUS_SinglePlayer )
+		{
+			SetBikeMods( (u_int16_t) (SelectedBike+2) );
+		}
+		else
+		{
+			SetBikeMods( 0 );
+		}
+	}
+
+	// make a wake in any water....
+	if( WaterObjectCollide( OldGroup , &StartPos, &Move_Off, &ImpactPoint , 4 ) )
+	{
+		// We hit the water....
+		if( (ShipObjPnt->Flags&SHIP_InWater) )
+		{
+			// entered the water....
+			PlaySfx( SFX_Submerge , 1.0F );
+			// kill off any existing water sfx ( shouldn't be needed )
+			if ( UnderwaterSfxID )
+			{
+				StopSfx( UnderwaterSfxID );
+			}
+			UnderwaterSfxID = PlaySfx( SFX_UnderWaterAmb , 1.0F );
+		}
+		else
+		{
+			// exited the water....
+			/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
+			PlaySfx( SFX_Surface , 1.0F );
+		}
+	}
+
+	if( (ShipObjPnt->Flags&SHIP_InWater) )
+	{
+		// random Bubble noise.....
+		/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
+		OldWaterOneshot = RandomBubbleTimer >= (60.0F * 5.0F );
+		RandomBubbleTimer -= framelag;
+
+		if( OldWaterOneshot && RandomBubbleTimer < (60.0F * 5.0F ) )
+		{
+			PlaySfx( SFX_UnderwaterOneShot , 0.5F + Random_Range_Float( 0.5F ) );
+		}
+		if( RandomBubbleTimer < 0.0F )
+		{
+			RandomBubbleTimer = (60.0F * 5.0F ) + Random_Range_Float( 60.0F * 10.0F );
+			PlaySfx( SFX_Bubbles , 0.5F + Random_Range_Float( 0.5F ) );
+		}
+
+	}
+}
+
+/* the local ship against the level and its background objects */
+[[gnu::always_inline]] static inline void ShipBackgroundCollision( BYTE & i, VECTOR & Move_Off, BGOBJECT *& BGObject, bool & Object2Object, OBJECT *& ShipObjPnt, GLOBALSHIP *& ShipPnt )
+{
+	if( !no_collision )
+	{
+		NumCollides = 0;
+		if ( ShipObjPnt->Group != INDEX_NONE )
+		{
+			BGObject = nullptr;
+
+			if( !Object2Object )
+			{
+				ObjectCollide( &ShipPnt->Object, &Move_Off, SHIP_RADIUS, &BGObject );
+				if( BGObject ) ChangeBGState( BGObject, OWNER_SHIP, WhoIAm, BUMP, 0.0F );
+			}
+			else
+			{
+				ObjectCollideNoBounce( &ShipPnt->Object, &Move_Off, SHIP_RADIUS, &BGObject );
+				if( BGObject ) ChangeBGState( BGObject, OWNER_SHIP, WhoIAm, BUMP, 0.0F );
+			}
+			outside_map = !PointInsideSkin( &ShipObjPnt->Pos, ShipObjPnt->Group );
+			if ( outside_map )
+			{
+				if ( !DebugInfo )
+				{
+					// player has somehow managed to get outside the map
+					// so we "teleport" him back to his last start position
+					// (BiaS strikes again...!)
+					InitShipStartPos( i, 0 );
+					PlaySfx( SFX_Teleport, 1.0F );
+				}
+				else
+				{
+					u_int16_t g;
+
+					for ( g = 0; g < Mloadheader.num_groups; g++ )
+					{
+						if ( PointInsideSkin( &ShipObjPnt->Pos, g ) )
+						{
+							ShipObjPnt->Group = g;
+							AddColourMessageToQue(SystemMessageColour, "You are now in %s", Mloadheader.Group[ g ].name );
+							break;
+						}
+					}
+				}
+			}
+		}
+	}
+	else
+	{
+		ShipObjPnt->Group = MoveGroup( &Mloadheader, &ShipObjPnt->Pos, ShipObjPnt->Group, &Move_Off );
+		ShipObjPnt->Pos.x += Move_Off.x;
+		ShipObjPnt->Pos.y += Move_Off.y;
+		ShipObjPnt->Pos.z += Move_Off.z;
+	}
+}
+
+/* the local ship's flight this frame: stealth, nitro, movement, external forces, collisions, flags and water */
+[[gnu::always_inline]] static inline void ShipFly( BYTE & i, VECTOR & ImpactPoint, float & Speed, VECTOR & Move_Off, VECTOR & Move_Dir, QUAT & StepQuat, VECTOR & Bob, VECTOR & StartPos, BGOBJECT *& BGObject, u_int16_t & OldGroup, VECTOR & ExtForce, bool & HasBeenExternal, float & ShieldModifier, bool & Object2Object, OBJECT *& ShipObjPnt, GLOBALSHIP *& ShipPnt, int & goalcheck, bool & OldWaterOneshot )
+{
+	if( (i==MAX_PLAYERS) || (ShipObjPnt->Mode != DEATH_MODE && ShipObjPnt->Mode != LIMBO_MODE && ShipObjPnt->Mode != GAMEOVER_MODE) )
+	{
+
+		if( ( ShipObjPnt->Flags & SHIP_Stealth ) )
+		{
+			ShipPnt->StealthTime -= framelag;
+			/* @vfp-exempt R3 — stealth mantle countdown on a float timer; integerizing changes when the cloak drops. measured n/a. Verified 2026-11-19. */
+			if( ShipPnt->StealthTime <= 0.0F )
+			{
+				PlaySfx( SFX_DeCloaking, 1.0F );
+				ShipPnt->StealthTime = 0.0F;
+				ShipObjPnt->Flags &= ~SHIP_Stealth;
+				NumStealths++;
+			}
+		}
+
+		AccellDecell( &ShipObjPnt->Angle.y , TurnDecell );
+		AccellDecell( &ShipObjPnt->Angle.x , TurnDecell );
+		AccellDecell( &ShipObjPnt->Angle.z , RollDecell );
+		/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
+		ShipObjPnt->Autolevel = AutoLevelRot( i, AutoLevel * player_config->autolevel_rate * framelag );
+		AccellDecell( &ShipObjPnt->Bank , BankDecell );
+		AccellDecell( &ShipObjPnt->Speed.x , MoveDecell );
+		AccellDecell( &ShipObjPnt->Speed.y , MoveDecell );
+
+		if ( ( control.turbo || ( !control.forward && ShipObjPnt->CruiseControl == CRUISE_NITRO ) ) && NitroFuel > 0.0F )
+		{
+			if( !GodMode && !( ShipObjPnt->Flags & SHIP_SuperNashram ) )
+			{
+				if( NitroFuel <= ( NITROLOSS * framelag ) )
+				{
+					NitroFuelUsed += NitroFuel;
+					NitroFuel = 0.0F;
+				}
+				else
+				{
+					NitroFuel -= ( NITROLOSS * framelag );
+					NitroFuelUsed += ( NITROLOSS * framelag );
+				}
+			}
+			ShipObjPnt->Flags |= SHIP_Turbo;
+
+			AccellDecell( &ShipObjPnt->Speed.z , TurboDecell );
+		}
+		else
+		{
+			ShipObjPnt->Flags &= ~SHIP_Turbo;
+			AccellDecell( &ShipObjPnt->Speed.z , MoveDecell );
+		}
+
+		StepQuat.MakeEuler(ShipObjPnt->Angle.x * framelag, ShipObjPnt->Angle.y * framelag, ShipObjPnt->Angle.z * framelag + ShipObjPnt->Autolevel);
+		ShipObjPnt->Quat.Multiply(&StepQuat, &ShipObjPnt->Quat);
+		ShipObjPnt->RotationForce.Multiply(&ShipObjPnt->Quat, &ShipObjPnt->Quat);
+		/* Without this, each QuatMultiply bleeds tiny float
+		 * error into the quaternion's length. Unnormalized,
+		 * QuatToMatrix produces a non-orthonormal matrix —
+		 * visible as direction-dependent view stretching +
+		 * ship-velocity scaling after many rotations on
+		 * twist-heavy levels (e.g. asubchb subway). */
+		ShipObjPnt->Quat.Normalise();
+		ShipObjPnt->Quat.ToMatrix(&ShipObjPnt->Mat);
+		ShipObjPnt->RotationForce.MakeEuler(0.0F, 0.0F, 0.0F);
+		/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
+
+		// carry out movements
+		BobShip( i, &Bob );
+		Move_Off.x = Bob.x - ShipObjPnt->LastBob.x;
+		Move_Off.y = Bob.y - ShipObjPnt->LastBob.y;
+		Move_Off.z = Bob.z - ShipObjPnt->LastBob.z;
+		ShipObjPnt->LastBob = Bob;
+
+		if ( ShipObjPnt->Speed.x )
+		{
+			Speed = ShipObjPnt->Speed.x * framelag;
+			/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
+			ApplyMatrix( &ShipObjPnt->Mat, &SlideRight, &Move_Dir );			/* Calc Direction Vector */
+			Move_Off.x += ( Move_Dir.x * Speed );
+			Move_Off.y += ( Move_Dir.y * Speed );
+			Move_Off.z += ( Move_Dir.z * Speed );
+		}
+		if ( ShipObjPnt->Speed.y )
+		{
+			/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
+			Speed = ShipObjPnt->Speed.y * framelag;
+			ApplyMatrix( &ShipObjPnt->Mat, &SlideUp, &Move_Dir );			/* Calc Direction Vector */
+			Move_Off.x += ( Move_Dir.x * Speed );
+			Move_Off.y += ( Move_Dir.y * Speed );
+			Move_Off.z += ( Move_Dir.z * Speed );
+		}
+		if ( ShipObjPnt->Speed.z )
+		{
+			Speed = ShipObjPnt->Speed.z * framelag;
+			ApplyMatrix( &ShipObjPnt->Mat, &Forward, &Move_Dir );			/* Calc Direction Vector */
+			Move_Off.x += ( Move_Dir.x * Speed );
+			Move_Off.y += ( Move_Dir.y * Speed );
+			Move_Off.z += ( Move_Dir.z * Speed );
+		}
+
+		// apply external and internal force vectors to ship movement
+		AccellDecell( &ShipObjPnt->ExternalForce.x , MoveDecell );
+		AccellDecell( &ShipObjPnt->ExternalForce.y , MoveDecell );
+		AccellDecell( &ShipObjPnt->ExternalForce.z , MoveDecell );
+
+		Move_Off.x += ShipObjPnt->ExternalForce.x * framelag;
+		Move_Off.y += ShipObjPnt->ExternalForce.y * framelag;
+		Move_Off.z += ShipObjPnt->ExternalForce.z * framelag;
+
+		Object2Object = false;
+		if( (i != MAX_PLAYERS) && (ShipObjPnt->Mode != LIMBO_MODE) )
+		{
+			Object2Object |= Ship2ShipCollide( i , &Move_Off );
+		}
+
+		// Collide with the enemies....
+		Object2Object |= Ship2EnemyCollide( i , &Move_Off );
+
+		// do collisions to background
+		ShipBackgroundCollision( i, Move_Off, BGObject, Object2Object, ShipObjPnt, ShipPnt );
+
+		ExtForce.x = 0.0F;
+		ExtForce.y = 0.0F;
+		ExtForce.z = 0.0F;
+		ShieldModifier = 0.0F;
+		HasBeenExternal = ExternalForcesAreaCheck( &ShipObjPnt->Pos , &StartPos , ShipObjPnt->Group, &ExtForce , &ShieldModifier);
+		TriggerAreaPlayerCheck( &StartPos , &ShipObjPnt->Pos , ShipObjPnt->Group);
+
+		if( OldGroup != ShipObjPnt->Group )
+		{
+			TriggerAreaPlayerCheck( &StartPos , &ShipObjPnt->Pos , OldGroup);
+		}
+
+		ShipFlagChaseGoal( i, StartPos, ShipObjPnt, goalcheck );
+
+		ShipCaptureTheFlagGoal( i, StartPos, ShipObjPnt, goalcheck );
+
+		// this is where we go into and out of water
+		ShipWater( ImpactPoint, Move_Off, StartPos, OldGroup, ShieldModifier, ShipObjPnt, OldWaterOneshot );
+
+		if( HasBeenExternal )
+		{
+			ForceExternalOneOff( i, &ExtForce );
+		}
+
+		if( ShieldModifier )
+		{
+			ShipPnt->Damage = ShieldModifier;
+
+			// this never gets called in multiplayer?
+			if( DoDamage( DONT_OVERRIDE_INVUL ) )
+			{
+				ShipPnt->ShipThatLastKilledMe = i;
+				ShipObjPnt->Mode = DEATH_MODE;
+				ShipPnt->Timer = 0.0F;
+				// print up I killed Myself
+				AddColourMessageToQue(KillMessageColour, YOU_KILLED_YOURSELF );
+				PlaySfx( SFX_BIKECOMP_DY, 1.0F );
+			}
+		}
+
+
+		TeleportsAreaCheck( &ShipObjPnt->Pos , &StartPos , OldGroup, ShipObjPnt );
+
+		if ( framelag )
+		{
+			ShipPnt->Move_Off.x = Move_Off.x / framelag;
+			ShipPnt->Move_Off.y = Move_Off.y / framelag;
+			ShipPnt->Move_Off.z = Move_Off.z / framelag;
+		}
+
+		CheckPickup();
+	}
+}
+
+/* another player's ship between network packets: carry on along its last known course */
+[[gnu::always_inline]] static inline void ShipRemoteMovement( BYTE & i, VECTOR & Move_Off, QUAT & StepQuat, VECTOR & StartPos, OBJECT *& ShipObjPnt, GLOBALSHIP *& ShipPnt )
+{
+	if( !ShipPnt->JustRecievedPacket )
+	{
+
+		StartPos = ShipObjPnt->Pos;
+		if( ShipObjPnt->Mode != LIMBO_MODE && ShipObjPnt->Mode != WATCH_MODE)
+		{
+
+			{
+				// carry out movements
+				Move_Off.x = ShipPnt->Move_Off.x * framelag;
+				Move_Off.y = ShipPnt->Move_Off.y * framelag;
+				Move_Off.z = ShipPnt->Move_Off.z * framelag;
+				ShipObjPnt->Pos.x += Move_Off.x;
+				ShipObjPnt->Pos.y += Move_Off.y;
+				ShipObjPnt->Pos.z += Move_Off.z;
+				/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
+				StepQuat.MakeEuler(ShipPnt->LastAngle.x * framelag, ShipPnt->LastAngle.y * framelag, (ShipPnt->LastAngle.z * framelag) + ShipObjPnt->Autolevel);
+				ShipObjPnt->Quat.Multiply(&StepQuat, &ShipObjPnt->Quat);
+
+				ShipPnt->PacketDelay -= framelag;
+				if( ShipPnt->PacketDelay <= 0.0F )
+				{
+					ShipPnt->PacketDelay = 0.0F;
+					AccellDecell( &ShipPnt->Move_Off.x , MoveDecell );
+					AccellDecell( &ShipPnt->Move_Off.y , MoveDecell );
+					AccellDecell( &ShipPnt->Move_Off.z , MoveDecell );
+					AccellDecell( &ShipPnt->LastAngle.y , TurnDecell );
+					AccellDecell( &ShipPnt->LastAngle.x , TurnDecell );
+					AccellDecell( &ShipPnt->LastAngle.z , RollDecell );
+				}
+			}
+
+			// Still need to update the group....
+			Move_Off.x = ShipObjPnt->Pos.x - StartPos.x;
+			Move_Off.y = ShipObjPnt->Pos.y - StartPos.y;
+			Move_Off.z = ShipObjPnt->Pos.z - StartPos.z;
+			ShipObjPnt->Group = MoveGroup( &Mloadheader, &StartPos, ShipObjPnt->Group, &Move_Off );
+
+			// update other player's bounty points
+			if ( BountyHunt && ShipObjPnt->Flags & SHIP_CarryingBounty )
+			{
+				BountyTime += framelag / 60.0F;
+				if ( BountyBonusInterval > 0 && BountyTime >= BountyBonusInterval )
+				{
+					// update bonus 7 (stats.cpp) -- bounty hunt points
+					UpdateBonusStats(i,(int16_t) fast_floorf( BountyTime / BountyBonusInterval ));
+					BountyTime = FMOD( BountyTime, BountyBonusInterval );
+				}
+			}
+		}
+	}
+	else
+	{
+		ShipPnt->JustRecievedPacket = false;
+	}
+}
+
 bool ProcessShips()
 {
 	BYTE	i;
@@ -762,383 +1229,7 @@ bool ProcessShips()
 				/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 				( * ModeControl[ ShipObjPnt->Mode ] )( ShipPnt , i );		//go off and do his thing...
 
-				if( (i==MAX_PLAYERS) || (ShipObjPnt->Mode != DEATH_MODE && ShipObjPnt->Mode != LIMBO_MODE && ShipObjPnt->Mode != GAMEOVER_MODE) )
-				{
-
-					if( ( ShipObjPnt->Flags & SHIP_Stealth ) )
-					{
-						ShipPnt->StealthTime -= framelag;
-						if( ShipPnt->StealthTime <= 0.0F )
-						{
-							PlaySfx( SFX_DeCloaking, 1.0F );
-							ShipPnt->StealthTime = 0.0F;
-							ShipObjPnt->Flags &= ~SHIP_Stealth;
-							NumStealths++;
-						}
-					}
-
-					AccellDecell( &ShipObjPnt->Angle.y , TurnDecell );
-					AccellDecell( &ShipObjPnt->Angle.x , TurnDecell );
-					AccellDecell( &ShipObjPnt->Angle.z , RollDecell );
-					/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
-					ShipObjPnt->Autolevel = AutoLevelRot( i, AutoLevel * player_config->autolevel_rate * framelag );
-					AccellDecell( &ShipObjPnt->Bank , BankDecell );
-					AccellDecell( &ShipObjPnt->Speed.x , MoveDecell );
-					AccellDecell( &ShipObjPnt->Speed.y , MoveDecell );
-
-					if ( ( control.turbo || ( !control.forward && ShipObjPnt->CruiseControl == CRUISE_NITRO ) ) && NitroFuel > 0.0F )
-					{
-						if( !GodMode && !( ShipObjPnt->Flags & SHIP_SuperNashram ) )
-						{
-							if( NitroFuel <= ( NITROLOSS * framelag ) )
-							{
-								NitroFuelUsed += NitroFuel;
-								NitroFuel = 0.0F;
-							}
-							else
-							{
-								NitroFuel -= ( NITROLOSS * framelag );
-								NitroFuelUsed += ( NITROLOSS * framelag );
-							}
-						}
-						ShipObjPnt->Flags |= SHIP_Turbo;
-
-						AccellDecell( &ShipObjPnt->Speed.z , TurboDecell );
-					}
-					else
-					{
-						ShipObjPnt->Flags &= ~SHIP_Turbo;
-						AccellDecell( &ShipObjPnt->Speed.z , MoveDecell );
-					}
-
-					StepQuat.MakeEuler(ShipObjPnt->Angle.x * framelag, ShipObjPnt->Angle.y * framelag, ShipObjPnt->Angle.z * framelag + ShipObjPnt->Autolevel);
-					ShipObjPnt->Quat.Multiply(&StepQuat, &ShipObjPnt->Quat);
-					ShipObjPnt->RotationForce.Multiply(&ShipObjPnt->Quat, &ShipObjPnt->Quat);
-					/* Without this, each QuatMultiply bleeds tiny float
-					 * error into the quaternion's length. Unnormalized,
-					 * QuatToMatrix produces a non-orthonormal matrix —
-					 * visible as direction-dependent view stretching +
-					 * ship-velocity scaling after many rotations on
-					 * twist-heavy levels (e.g. asubchb subway). */
-					ShipObjPnt->Quat.Normalise();
-					ShipObjPnt->Quat.ToMatrix(&ShipObjPnt->Mat);
-					ShipObjPnt->RotationForce.MakeEuler(0.0F, 0.0F, 0.0F);
-					/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
-
-					// carry out movements
-					BobShip( i, &Bob );
-					Move_Off.x = Bob.x - ShipObjPnt->LastBob.x;
-					Move_Off.y = Bob.y - ShipObjPnt->LastBob.y;
-					Move_Off.z = Bob.z - ShipObjPnt->LastBob.z;
-					ShipObjPnt->LastBob = Bob;
-
-					if ( ShipObjPnt->Speed.x )
-					{
-						Speed = ShipObjPnt->Speed.x * framelag;
-						/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
-						ApplyMatrix( &ShipObjPnt->Mat, &SlideRight, &Move_Dir );			/* Calc Direction Vector */
-						Move_Off.x += ( Move_Dir.x * Speed );
-						Move_Off.y += ( Move_Dir.y * Speed );
-						Move_Off.z += ( Move_Dir.z * Speed );
-					}
-					if ( ShipObjPnt->Speed.y )
-					{
-						/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
-						Speed = ShipObjPnt->Speed.y * framelag;
-						ApplyMatrix( &ShipObjPnt->Mat, &SlideUp, &Move_Dir );			/* Calc Direction Vector */
-						Move_Off.x += ( Move_Dir.x * Speed );
-						Move_Off.y += ( Move_Dir.y * Speed );
-						Move_Off.z += ( Move_Dir.z * Speed );
-					}
-					if ( ShipObjPnt->Speed.z )
-					{
-						Speed = ShipObjPnt->Speed.z * framelag;
-						ApplyMatrix( &ShipObjPnt->Mat, &Forward, &Move_Dir );			/* Calc Direction Vector */
-						Move_Off.x += ( Move_Dir.x * Speed );
-						Move_Off.y += ( Move_Dir.y * Speed );
-						Move_Off.z += ( Move_Dir.z * Speed );
-					}
-
-					// apply external and internal force vectors to ship movement
-					AccellDecell( &ShipObjPnt->ExternalForce.x , MoveDecell );
-					AccellDecell( &ShipObjPnt->ExternalForce.y , MoveDecell );
-					AccellDecell( &ShipObjPnt->ExternalForce.z , MoveDecell );
-
-					Move_Off.x += ShipObjPnt->ExternalForce.x * framelag;
-					Move_Off.y += ShipObjPnt->ExternalForce.y * framelag;
-					Move_Off.z += ShipObjPnt->ExternalForce.z * framelag;
-
-					Object2Object = false;
-					if( (i != MAX_PLAYERS) && (ShipObjPnt->Mode != LIMBO_MODE) )
-					{
-						Object2Object |= Ship2ShipCollide( i , &Move_Off );
-					}
-
-					// Collide with the enemies....
-					Object2Object |= Ship2EnemyCollide( i , &Move_Off );
-
-					// do collisions to background
-					if( !no_collision )
-					{
-						NumCollides = 0;
-						if ( ShipObjPnt->Group != INDEX_NONE )
-						{
-							BGObject = nullptr;
-
-							if( !Object2Object )
-							{
-								ObjectCollide( &ShipPnt->Object, &Move_Off, SHIP_RADIUS, &BGObject );
-								if( BGObject ) ChangeBGState( BGObject, OWNER_SHIP, WhoIAm, BUMP, 0.0F );
-							}
-							else
-							{
-								ObjectCollideNoBounce( &ShipPnt->Object, &Move_Off, SHIP_RADIUS, &BGObject );
-								if( BGObject ) ChangeBGState( BGObject, OWNER_SHIP, WhoIAm, BUMP, 0.0F );
-							}
-							outside_map = !PointInsideSkin( &ShipObjPnt->Pos, ShipObjPnt->Group );
-							if ( outside_map )
-							{
-								if ( !DebugInfo )
-								{
-									// player has somehow managed to get outside the map
-									// so we "teleport" him back to his last start position
-									// (BiaS strikes again...!)
-									InitShipStartPos( i, 0 );
-									PlaySfx( SFX_Teleport, 1.0F );
-								}
-								else
-								{
-									u_int16_t g;
-
-									for ( g = 0; g < Mloadheader.num_groups; g++ )
-									{
-										if ( PointInsideSkin( &ShipObjPnt->Pos, g ) )
-										{
-											ShipObjPnt->Group = g;
-											AddColourMessageToQue(SystemMessageColour, "You are now in %s", Mloadheader.Group[ g ].name );
-											break;
-										}
-									}
-								}
-							}
-						}
-					}
-					else
-					{
-						ShipObjPnt->Group = MoveGroup( &Mloadheader, &ShipObjPnt->Pos, ShipObjPnt->Group, &Move_Off );
-						ShipObjPnt->Pos.x += Move_Off.x;
-						ShipObjPnt->Pos.y += Move_Off.y;
-						ShipObjPnt->Pos.z += Move_Off.z;
-					}
-
-					ExtForce.x = 0.0F;
-					ExtForce.y = 0.0F;
-					ExtForce.z = 0.0F;
-					ShieldModifier = 0.0F;
-					HasBeenExternal = ExternalForcesAreaCheck( &ShipObjPnt->Pos , &StartPos , ShipObjPnt->Group, &ExtForce , &ShieldModifier);
-					TriggerAreaPlayerCheck( &StartPos , &ShipObjPnt->Pos , ShipObjPnt->Group);
-
-					if( OldGroup != ShipObjPnt->Group )
-					{
-						TriggerAreaPlayerCheck( &StartPos , &ShipObjPnt->Pos , OldGroup);
-					}
-
-					if ( CaptureTheFlag && ShipObjPnt->Flags & SHIP_CarryingFlag )
-					{
-						goalcheck = GoalCheckTeam( &StartPos, &ShipObjPnt->Pos, ShipObjPnt->Group, TeamNumber[ i ] );
-						if ( goalcheck == GOAL_SCORED )
-						{
-							PickupsGot[ PICKUP_Flag ] = 0;
-							Ships[ i ].Object.Flags &= ~SHIP_CarryingFlag;
-							FlagsToGenerate++;
-							// update bonus 2 (stats.cpp) -- flag chase scored
-							UpdateBonusStats(i,GoalScore);
-							AddColourMessageToQue(FlagMessageColour, TEAM_SCORED,
-								TeamName[ TeamNumber[ i ] ] );
-
-							SendGameMessage(MSG_TEXTMSG, 0, 0, TEXTMSGTYPE_ScoredWithFlag, 0);
-						}
-						else if ( goalcheck == GOAL_WRONG )
-						{
-							AddColourMessageToQue(FlagMessageColour, TAKE_FLAG_TO_GOAL,
-								TeamName[ TeamNumber[ i ] ] );
-						}
-					}
-
-					if ( CTF && ShipObjPnt->Flags & SHIP_CarryingFlags )
-					{
-						static bool IKnowINeedFlag = false;
-
-						goalcheck = GoalCheckTeam( &StartPos, &ShipObjPnt->Pos, ShipObjPnt->Group, TeamNumber[ i ] );
-						if ( goalcheck == GOAL_SCORED )
-						{
-							if ( !NeedFlagAtHome
-								|| TeamFlagAtHome[ TeamNumber[ i ] ]
-								|| ShipObjPnt->Flags & TeamFlagMask[ TeamNumber[ i ] ] )
-							{
-								int team;
-								int score;
-
-								score = 0;
-								for ( team = 0; team < MAX_TEAMS; team++ )
-								{
-									if ( ShipObjPnt->Flags & TeamFlagMask[ team ] )
-									{
-										PickupsGot[ TeamFlagPickup[ team ] ] = 0;
-										Ships[ i ].Object.Flags &= ~TeamFlagMask[ team ];
-										if ( team != TeamNumber[ i ] )
-										{
-											score += GoalScore;
-										}
-										GenerateFlagAtHome( team );
-									}
-								}
-								if ( score )
-								{
-									// update bonus 3 (stats.cpp) -- CTF scored
-									UpdateBonusStats(i,score);
-									AddColourMessageToQue(FlagMessageColour, TEAM_SCORED,
-										TeamName[ TeamNumber[ i ] ] );
-
-									SendGameMessage(MSG_TEXTMSG, 0, 0, TEXTMSGTYPE_ScoredWithFlag, 0);
-								}
-								else
-								{
-									AddColourMessageToQue(FlagMessageColour, OTHER_TEAM_FLAG_RETURNED,
-										TeamName[ TeamNumber[ i ] ] );
-									SendGameMessage(MSG_TEXTMSG, 0, 0, TEXTMSGTYPE_ReturnedFlag, 0);
-								}
-
-								IKnowINeedFlag = false;
-							}
-							else
-							{
-								if ( !IKnowINeedFlag )
-								{
-									AddColourMessageToQue(FlagMessageColour, YOU_NEED_FLAG,
-										TeamName[ TeamNumber[ i ] ] );
-									IKnowINeedFlag = true;
-								}
-							}
-						}
-						else
-						{
-							if ( goalcheck == GOAL_WRONG )
-							{
-								/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
-								AddColourMessageToQue(FlagMessageColour, TAKE_FLAG_TO_GOAL,
-									TeamName[ TeamNumber[ i ] ] );
-							}
-							IKnowINeedFlag = false;
-						}
-					}
-
-					// this is where we go into and out of water
-					ShipObjPnt->Flags &= ~SHIP_InWater;
-					if( InWater( ShipObjPnt->Group , &ShipObjPnt->Pos , &ShieldModifier) )
-					{
-						ShipObjPnt->Flags |= SHIP_InWater;
-					}
-					else
-					{
-						// not in water, therefore stop underwater looping sfx if currently playing
-						if ( UnderwaterSfxID )
-						{
-							StopSfx( UnderwaterSfxID );
-						}
-					}
-
-					if( (ShipObjPnt->Flags&SHIP_InWater) )
-					{
-						SetBikeMods( 1 );
-					}
-					if( !(ShipObjPnt->Flags&SHIP_InWater) )
-					{
-						if( MyGameStatus == STATUS_SinglePlayer )
-						{
-							SetBikeMods( (u_int16_t) (SelectedBike+2) );
-						}
-						else
-						{
-							SetBikeMods( 0 );
-						}
-					}
-
-					// make a wake in any water....
-					if( WaterObjectCollide( OldGroup , &StartPos, &Move_Off, &ImpactPoint , 4 ) )
-					{
-						// We hit the water....
-						if( (ShipObjPnt->Flags&SHIP_InWater) )
-						{
-							// entered the water....
-							PlaySfx( SFX_Submerge , 1.0F );
-							// kill off any existing water sfx ( shouldn't be needed )
-							if ( UnderwaterSfxID )
-							{
-								StopSfx( UnderwaterSfxID );
-							}
-							UnderwaterSfxID = PlaySfx( SFX_UnderWaterAmb , 1.0F );
-						}
-						else
-						{
-							// exited the water....
-							/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
-							PlaySfx( SFX_Surface , 1.0F );
-						}
-					}
-
-					if( (ShipObjPnt->Flags&SHIP_InWater) )
-					{
-						// random Bubble noise.....
-						/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
-						OldWaterOneshot = RandomBubbleTimer >= (60.0F * 5.0F );
-						RandomBubbleTimer -= framelag;
-
-						if( OldWaterOneshot && RandomBubbleTimer < (60.0F * 5.0F ) )
-						{
-							PlaySfx( SFX_UnderwaterOneShot , 0.5F + Random_Range_Float( 0.5F ) );
-						}
-						if( RandomBubbleTimer < 0.0F )
-						{
-							RandomBubbleTimer = (60.0F * 5.0F ) + Random_Range_Float( 60.0F * 10.0F );
-							PlaySfx( SFX_Bubbles , 0.5F + Random_Range_Float( 0.5F ) );
-						}
-
-					}
-
-					if( HasBeenExternal )
-					{
-						ForceExternalOneOff( i, &ExtForce );
-					}
-
-					if( ShieldModifier )
-					{
-						ShipPnt->Damage = ShieldModifier;
-
-						// this never gets called in multiplayer?
-						if( DoDamage( DONT_OVERRIDE_INVUL ) )
-						{
-							ShipPnt->ShipThatLastKilledMe = i;
-							ShipObjPnt->Mode = DEATH_MODE;
-							ShipPnt->Timer = 0.0F;
-							// print up I killed Myself
-							AddColourMessageToQue(KillMessageColour, YOU_KILLED_YOURSELF );
-							PlaySfx( SFX_BIKECOMP_DY, 1.0F );
-						}
-					}
-
-
-					TeleportsAreaCheck( &ShipObjPnt->Pos , &StartPos , OldGroup, ShipObjPnt );
-
-					if ( framelag )
-					{
-						ShipPnt->Move_Off.x = Move_Off.x / framelag;
-						ShipPnt->Move_Off.y = Move_Off.y / framelag;
-						ShipPnt->Move_Off.z = Move_Off.z / framelag;
-					}
-
-					CheckPickup();
-				}
+				ShipFly( i, ImpactPoint, Speed, Move_Off, Move_Dir, StepQuat, Bob, StartPos, BGObject, OldGroup, ExtForce, HasBeenExternal, ShieldModifier, Object2Object, ShipObjPnt, ShipPnt, goalcheck, OldWaterOneshot );
 
 
 			} // end of processing 'you'
@@ -1146,61 +1237,7 @@ bool ProcessShips()
 			// Start of Special Stuff for other players Ship Movement..Carries on even if no new packet arrives..
 			else
 			{
-				if( !ShipPnt->JustRecievedPacket )
-				{
-
-					StartPos = ShipObjPnt->Pos;
-					if( ShipObjPnt->Mode != LIMBO_MODE && ShipObjPnt->Mode != WATCH_MODE)
-					{
-
-						{
-							// carry out movements
-							Move_Off.x = ShipPnt->Move_Off.x * framelag;
-							Move_Off.y = ShipPnt->Move_Off.y * framelag;
-							Move_Off.z = ShipPnt->Move_Off.z * framelag;
-							ShipObjPnt->Pos.x += Move_Off.x;
-							ShipObjPnt->Pos.y += Move_Off.y;
-							ShipObjPnt->Pos.z += Move_Off.z;
-							/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
-							StepQuat.MakeEuler(ShipPnt->LastAngle.x * framelag, ShipPnt->LastAngle.y * framelag, (ShipPnt->LastAngle.z * framelag) + ShipObjPnt->Autolevel);
-							ShipObjPnt->Quat.Multiply(&StepQuat, &ShipObjPnt->Quat);
-
-							ShipPnt->PacketDelay -= framelag;
-							if( ShipPnt->PacketDelay <= 0.0F )
-							{
-								ShipPnt->PacketDelay = 0.0F;
-								AccellDecell( &ShipPnt->Move_Off.x , MoveDecell );
-								AccellDecell( &ShipPnt->Move_Off.y , MoveDecell );
-								AccellDecell( &ShipPnt->Move_Off.z , MoveDecell );
-								AccellDecell( &ShipPnt->LastAngle.y , TurnDecell );
-								AccellDecell( &ShipPnt->LastAngle.x , TurnDecell );
-								AccellDecell( &ShipPnt->LastAngle.z , RollDecell );
-							}
-						}
-
-						// Still need to update the group....
-						Move_Off.x = ShipObjPnt->Pos.x - StartPos.x;
-						Move_Off.y = ShipObjPnt->Pos.y - StartPos.y;
-						Move_Off.z = ShipObjPnt->Pos.z - StartPos.z;
-						ShipObjPnt->Group = MoveGroup( &Mloadheader, &StartPos, ShipObjPnt->Group, &Move_Off );
-
-						// update other player's bounty points
-						if ( BountyHunt && ShipObjPnt->Flags & SHIP_CarryingBounty )
-						{
-							BountyTime += framelag / 60.0F;
-							if ( BountyBonusInterval > 0 && BountyTime >= BountyBonusInterval )
-							{
-								// update bonus 7 (stats.cpp) -- bounty hunt points
-								UpdateBonusStats(i,(int16_t) fast_floorf( BountyTime / BountyBonusInterval ));
-								BountyTime = FMOD( BountyTime, BountyBonusInterval );
-							}
-						}
-					}
-				}
-				else
-				{
-					ShipPnt->JustRecievedPacket = false;
-				}
+				ShipRemoteMovement( i, Move_Off, StepQuat, StartPos, ShipObjPnt, ShipPnt );
 			}
 			// End of Special Stuff for other players Ship Movement..Carries on even if no new packet arrives..
 			/*===================================================================
