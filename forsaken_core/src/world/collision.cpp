@@ -380,33 +380,6 @@ bool OneGroupPolyCol( MCLOADHEADER * MCloadheaderp ,MLOADHEADER * /*Mloadheader*
 			CollFace = &BSPFace;
 		}
 	}
-	else if( (MCloadheaderp == &MCloadheader) && Bsp_Header[ 1 ].State )
-	{
-		/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
-		CollisionRadius = 0.0F;
-		collided = RayCollide( &Bsp_Header[ 1 ], &Origin, &ODir, ImpactPoint, &ImpactNormal, &ImpactOffset , group );
-		if ( collided )
-		{
-			e.x = ImpactPoint->x - Pos->x;
-			e.y = ImpactPoint->y - Pos->y;
-			e.z = ImpactPoint->z - Pos->z;
-			Distance = VectorLength( &e );
-			BSPFace.nx = ImpactNormal.x;
-			BSPFace.ny = ImpactNormal.y;
-			BSPFace.nz = ImpactNormal.z;
-			BSPFace.D = ImpactOffset;
-			CollFace = &BSPFace;
-		}
-	}
-	else
-	{
-		static int not_bsp = 0;
-
-		if ( !not_bsp++ )
-		{
-		}
-
-	}
 
 
 	if( BGCol )

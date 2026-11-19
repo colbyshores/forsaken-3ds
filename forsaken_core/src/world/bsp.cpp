@@ -25,7 +25,7 @@ constexpr int BSP_PORTAL_VERSION_NUMBER = (1);
 ===================================================================*/
 bool FindCollision( BSP_NODE * node_ptr, VECTOR * start_point_ptr, VECTOR * end_point_ptr );
 
-BSP_HEADER Bsp_Header[ 2 ];
+BSP_HEADER Bsp_Header[ MAX_BSP_MODELS ];
 
 BSP_NODE *	BSP_Nodes[256];
 BSP_PORTAL_HEADER Bsp_Portal_Header = { false, 0, {} };

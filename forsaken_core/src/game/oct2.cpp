@@ -2635,7 +2635,6 @@ bool RenderScene( void )
 	  Msg( "Bspload failed\n" );
 	  return false;   // the collision data
 	}
-	Bsp_Header[ 1 ].State = false; // no non-zero .BSP any more
 
 	// might not be any water...
 	WaterLoad();

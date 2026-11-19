@@ -7,9 +7,9 @@
  * loaded per level). MCload is a stub that returns true, so MCLOADHEADER's
  * fields stay zero; the header passed to BackgroundCollide / OneGroupPolyCol
  * only selects behaviour. &MCloadheadert0 casts against Bsp_Header[0] and
- * tests BGObject / enemy zones with a zero radius. &MCloadheader would cast
- * against Bsp_Header[1], which the level loader always leaves unloaded, so it
- * tests only BGObject / enemy zones, with a 300 * GLOBAL_SCALE radius.
+ * tests BGObject / enemy zones with a zero radius. &MCloadheader casts
+ * against no BSP: it tests only BGObject / enemy zones, with a
+ * 300 * GLOBAL_SCALE radius.
  *
  * BackgroundCollide sweeps a point from StartPos by MoveOffset, following
  * portals (Bsp_Portal_Header) from group to group, and on a hit returns the
