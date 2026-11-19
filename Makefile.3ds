@@ -40,7 +40,11 @@ include $(DEVKITARM)/3ds_rules
 # Root of the project sources
 SRCDIR     := $(CURDIR)
 TARGET     := forsaken3ds
-BUILD      := build_3ds
+# Everything the build writes goes under build/3ds/: the artifacts
+# (.3dsx, .elf, .map, .smdh, .bnr, .cia) in OUTDIR, objects in BUILD,
+# the romfs staging trees beside them.
+OUTDIR     := $(SRCDIR)/build/3ds
+BUILD      := build/3ds/obj
 
 # portlibs
 PORTLIBS   := $(DEVKITPRO)/portlibs/3ds
@@ -115,7 +119,7 @@ CFLAGS += -I$(CORE_SRCDIR) -I$(PLAT_SRCDIR) \
 	-I$(DEVKITPRO)/libctru/include
 
 LDFLAGS := $(ARCH) -specs=3dsx.specs \
-	-Wl,-Map,$(TARGET).map \
+	-Wl,-Map,$(OUTDIR)/$(TARGET).map \
 	-L$(PORTLIBS)/lib \
 	-L$(DEVKITPRO)/libctru/lib
 
@@ -135,12 +139,12 @@ endif
 # Targets
 #---------------------------------------------------------------------------------
 
-OUTPUT_ELF  := $(SRCDIR)/$(TARGET).elf
-OUTPUT_3DSX := $(SRCDIR)/$(TARGET).3dsx
-OUTPUT_SMDH := $(SRCDIR)/$(TARGET).smdh
+OUTPUT_ELF  := $(OUTDIR)/$(TARGET).elf
+OUTPUT_3DSX := $(OUTDIR)/$(TARGET).3dsx
+OUTPUT_SMDH := $(OUTDIR)/$(TARGET).smdh
 
 # Physical romfs directory (no symlinks - 3dsxtool can't follow them)
-ROMFS_STAGING := $(SRCDIR)/.romfs_staging
+ROMFS_STAGING := $(OUTDIR)/romfs
 ROMFS_STAMP   := $(ROMFS_STAGING)/.stamp
 
 # CIA-specific romfs staging excludes dspfirm.cdc. Nintendo's DSP
@@ -151,7 +155,7 @@ ROMFS_STAMP   := $(ROMFS_STAGING)/.stamp
 # the standard DSP1 dump step, and shipping the blob in a redistributable
 # archive is a licensing grey area.
 # Hardlinked from ROMFS_STAGING so there's ~zero disk overhead.
-CIA_ROMFS       := $(SRCDIR)/.romfs_staging_cia
+CIA_ROMFS       := $(OUTDIR)/romfs_cia
 CIA_ROMFS_STAMP := $(CIA_ROMFS)/.stamp
 
 .PHONY: all clean romfs-clean
@@ -322,6 +326,7 @@ $(CIA_ROMFS_STAMP): $(ROMFS_STAMP)
 
 $(OUTPUT_SMDH):
 	@echo "Creating SMDH..."
+	@mkdir -p $(OUTDIR)
 	smdhtool --create "Forsaken" "3DS port of ForsakenX" "ForsakenX" $(SMDH_ICON) $@
 
 $(OUTPUT_3DSX): $(OUTPUT_ELF) $(OUTPUT_SMDH) $(ROMFS_STAMP)
@@ -330,6 +335,7 @@ $(OUTPUT_3DSX): $(OUTPUT_ELF) $(OUTPUT_SMDH) $(ROMFS_STAMP)
 
 $(OUTPUT_ELF): $(addprefix $(BUILD)/,$(OFILES))
 	@echo "Linking $(notdir $@)..."
+	@mkdir -p $(OUTDIR)
 	$(LINK_CC) $(LDFLAGS) $^ $(LIBS) -o $@
 
 # C++ translation units (phase 2). Same numeric flags as C -- the contract
@@ -344,7 +350,7 @@ $(BUILD)/%.o: %.cpp $(STAMP)
 
 clean:
 	@echo "Cleaning 3DS build..."
-	@rm -rf $(BUILD) $(OUTPUT_ELF) $(OUTPUT_3DSX) $(OUTPUT_SMDH) $(TARGET).map $(OUTPUT_BNR) $(OUTPUT_CIA) $(OUTPUT_CIA_ALT) $(OUTPUT_CIA_HIMEM) $(OUTPUT_CIA_HIMEM_ALT)
+	@rm -rf $(BUILD) $(OUTPUT_ELF) $(OUTPUT_3DSX) $(OUTPUT_SMDH) $(OUTDIR)/$(TARGET).map $(OUTPUT_BNR) $(OUTPUT_CIA) $(OUTPUT_CIA_ALT) $(OUTPUT_CIA_HIMEM) $(OUTPUT_CIA_HIMEM_ALT)
 
 romfs-clean:
 	@echo "Cleaning romfs staging..."
@@ -373,8 +379,8 @@ BANNER_PNG   := $(ASSETS_DIR)/banner.png
 BANNER_WAV   := $(ASSETS_DIR)/banner.wav
 RSF_FILE     := $(ASSETS_DIR)/forsaken.rsf
 
-OUTPUT_BNR   := $(SRCDIR)/$(TARGET).bnr
-OUTPUT_CIA   := $(SRCDIR)/$(TARGET).cia
+OUTPUT_BNR   := $(OUTDIR)/$(TARGET).bnr
+OUTPUT_CIA   := $(OUTDIR)/$(TARGET).cia
 
 .PHONY: cia tools-fetch
 
@@ -399,6 +405,7 @@ tools-fetch:
 
 $(OUTPUT_BNR): $(BANNER_PNG) $(BANNER_WAV) | tools-fetch
 	@echo "Creating banner..."
+	@mkdir -p $(OUTDIR)
 	$(BANNERTOOL) makebanner -i $(BANNER_PNG) -a $(BANNER_WAV) -o $@
 
 $(OUTPUT_CIA): $(OUTPUT_ELF) $(OUTPUT_SMDH) $(OUTPUT_BNR) $(RSF_FILE) $(CIA_ROMFS_STAMP) | tools-fetch
@@ -453,7 +460,7 @@ $(if $(STALE_DFILES),$(shell rm -f $(STALE_DFILES)))
 
 FORBIDDEN_FLAGS := VERIFY_CFLAGS
 
-OUTPUT_CIA_ALT      := $(SRCDIR)/$(TARGET)_alt.cia
+OUTPUT_CIA_ALT      := $(OUTDIR)/$(TARGET)_alt.cia
 RSF_FILE_ALT        := $(BUILD)/forsaken_alt.rsf
 
 .PHONY: release release-check $(OUTPUT_CIA_ALT)
@@ -503,8 +510,8 @@ $(OUTPUT_CIA_ALT): $(OUTPUT_ELF) $(OUTPUT_SMDH) $(OUTPUT_BNR) $(RSF_FILE_ALT) $(
 # sizes + texture pack based on the granted region.
 # UniqueIds 0xff4be (primary) / 0xff4bf (alt).
 #---------------------------------------------------------------------------------
-OUTPUT_CIA_HIMEM     := $(SRCDIR)/$(TARGET)_himem.cia
-OUTPUT_CIA_HIMEM_ALT := $(SRCDIR)/$(TARGET)_himem_alt.cia
+OUTPUT_CIA_HIMEM     := $(OUTDIR)/$(TARGET)_himem.cia
+OUTPUT_CIA_HIMEM_ALT := $(OUTDIR)/$(TARGET)_himem_alt.cia
 RSF_FILE_HIMEM       := $(ASSETS_DIR)/forsaken_himem.rsf
 RSF_FILE_HIMEM_ALT   := $(BUILD)/forsaken_himem_alt.rsf
 

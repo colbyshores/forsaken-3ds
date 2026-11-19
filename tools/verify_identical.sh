@@ -63,9 +63,13 @@ build() {
 	case $cfg in
 	3ds-*)
 		local ed=${cfg#3ds-}
+		# The ELF is build/3ds/forsaken3ds.elf; commits before the build/
+		# directory linked it at the tree root.
+		local elf="$tree/build/3ds/forsaken3ds.elf"
+		grep -q '^OUTDIR ' "$tree/Makefile.3ds" || elf="$tree/forsaken3ds.elf"
 		(cd "$tree" && make -f Makefile.3ds EDITION="$ed" BUILD="$out/$cfg" \
-			VERIFY_CFLAGS="$vf" "$tree/forsaken3ds.elf" -j"$JOBS") > "$log" 2>&1 \
-			&& cp "$tree/forsaken3ds.elf" "$out/$cfg/linked.elf"
+			VERIFY_CFLAGS="$vf" "$elf" -j"$JOBS") > "$log" 2>&1 \
+			&& cp "$elf" "$out/$cfg/linked.elf"
 		;;
 	host|host-release)
 		local dbg=; [ "$cfg" = host-release ] && dbg="DEBUG=0"

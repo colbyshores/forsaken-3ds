@@ -153,7 +153,11 @@ tools/           build_matrix.sh, verify_identical.sh, perf/ (gates),
 assets/          icons, banners, RSFs, level orderings, 1998 engine files
 scripts/         the game's Lua scripts (shipped in romfs)
 docs/            notes/, OPTIMIZATION-LOG.md
-configs/ data/ pilots/ Demos/ romfs/   game data (not in git)
+configs/ data/ pilots/ romfs/   game data (not in git)
+build/           everything make writes: 3ds/ (.3dsx .elf .map .cia ...,
+                 obj/, romfs staging), pc/ (projectx, obj/), matrix/
+cd/              the 1998 CD's own files: audio/ (track rips),
+                 install/ (data1.cab, DATA.TAG), demos/ (not in git)
 ```
 
 ## Quick start
@@ -168,7 +172,7 @@ export DEVKITARM=$DEVKITPRO/devkitARM
 # The renderer is citro3d (native, hardware stereo).
 make -f Makefile.3ds
 
-# Output: forsaken3ds.3dsx
+# Output: build/3ds/forsaken3ds.3dsx
 ```
 
 ### Build a CIA (installable home-menu title)
@@ -187,7 +191,7 @@ make -f Makefile.3ds tools-fetch
 
 make -f Makefile.3ds cia
 
-# Output: forsaken3ds.cia (~279 MB; install via FBI on your 3DS)
+# Output: build/3ds/forsaken3ds.cia (~279 MB; install via FBI on your 3DS)
 ```
 
 See [`assets/README.md`](assets/README.md) for asset / CIA pipeline details.

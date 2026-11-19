@@ -1407,14 +1407,14 @@ def scan_tree(
 def gate_r9(build_dir: Path) -> tuple[list[Finding], str | None]:
     """R9 -- VFP register pressure, from a disassembly. OPTIONAL, SHOULD only.
 
-    Pointed at build_3ds/*.o. Skips with a note when there are no objects or no
+    Pointed at build/3ds/obj/*.o. Skips with a note when there are no objects or no
     arm-none-eabi-objdump (the host objdump cannot read ARM objects). Never fails.
     """
     if not build_dir.exists():
-        return [], "R9 omitted (no build_3ds/*.o)"
+        return [], "R9 omitted (no build/3ds/obj/*.o)"
     objects = sorted(build_dir.glob("*.o"))
     if not objects:
-        return [], "R9 omitted (no build_3ds/*.o)"
+        return [], "R9 omitted (no build/3ds/obj/*.o)"
     objdump = shutil.which("arm-none-eabi-objdump")
     if not objdump:
         # devkitARM is not always on PATH (e.g. non-login shells); the installed
@@ -1510,7 +1510,7 @@ def run_audit(
     if scan_sources:
         scanned, source = scan_tree(root, corpus, ingest_profile=ingest_profile)
         findings.extend(scanned)
-    r9, r9note = gate_r9(root / "build_3ds")
+    r9, r9note = gate_r9(root / "build" / "3ds" / "obj")
     findings.extend(r9)
     if r9note:
         notes.append(r9note)

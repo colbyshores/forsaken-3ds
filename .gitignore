@@ -17,16 +17,11 @@
 *.cia
 gmon.out
 
-# ---- 3DS build artifacts ----
-build_3ds/
-forsaken3ds.*
-.romfs_staging/
-.romfs_staging_cia/
-forsaken.romfs
+# ---- Build output: everything make writes (3DS, PC, build matrix) ----
+/build/
 forsaken_*.log
 
 # ---- PC build artifacts ----
-projectx*
 libs*
 unix*
 mingw*
@@ -34,13 +29,12 @@ mingw*
 # ---- Game data / assets (large binaries, not code) ----
 # Retail game data directories (textures, models, sounds, levels)
 /data/
-Demos/
 /pilots/
 romfs/
 savegame/
 logs/
-DATA.TAG
-data1.cab
+# The original 1998 CD's files (audio rips, installer data, demos)
+/cd/
 
 # Level lists live in assets/level_orderings/ (Remaster) and
 # assets/level_orderings/original/ (1998), tracked normally; both
@@ -177,8 +171,6 @@ data/**/*.ktx2
 tools/texture/etc2enc
 forsaken_pc/shaders/*.spv
 forsaken_pc/src/rendering/vulkan_shaders.h
-.build-matrix/
-build_pc/
 
 # Host test binaries and their outputs (tests/Makefile builds them in place).
 tests/*

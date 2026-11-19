@@ -14,7 +14,7 @@ set -u
 cd "$(dirname "$0")/.."
 JOBS=${JOBS:-$(nproc)}
 LOGDIR=${LOGDIR:-/tmp/build-matrix}
-BUILDDIR=${BUILDDIR:-$PWD/.build-matrix}
+BUILDDIR=${BUILDDIR:-$PWD/build/matrix}
 mkdir -p "$LOGDIR"
 fail=0
 
@@ -29,8 +29,8 @@ run() {
 	fi
 }
 
-run 3ds-original        make -f Makefile.3ds EDITION=original BUILD="$BUILDDIR/3ds-original" "$PWD/forsaken3ds.elf" -j"$JOBS"
-run 3ds-remaster        make -f Makefile.3ds EDITION=remaster BUILD="$BUILDDIR/3ds-remaster" "$PWD/forsaken3ds.elf" -j"$JOBS"
+run 3ds-original        make -f Makefile.3ds EDITION=original BUILD="$BUILDDIR/3ds-original" "$PWD/build/3ds/forsaken3ds.elf" -j"$JOBS"
+run 3ds-remaster        make -f Makefile.3ds EDITION=remaster BUILD="$BUILDDIR/3ds-remaster" "$PWD/build/3ds/forsaken3ds.elf" -j"$JOBS"
 run host-original       make EDITION=original -j"$JOBS"
 run host-remaster       make EDITION=remaster -j"$JOBS"
 run tests               make -C tests

@@ -302,4 +302,4 @@ R7|visi.cpp|FindVisible|float division in hot loop
 R7|visi.cpp|FindVisible|float division in hot loop
 R7|visi.cpp|FindVisible|float division in hot loop
 R7|visi.cpp|FindVisible|float division inner_loop=false
-R9|build_3ds/2dpolys.o|2dpolys|live VFP s-regs N > N
+R9|build/3ds/obj/2dpolys.o|2dpolys|live VFP s-regs N > N

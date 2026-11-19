@@ -80,7 +80,7 @@ endif
 
 
 # Objects go to $(BUILD_PC)/<basename>.o; basenames are unique across trees.
-BUILD_PC=build_pc
+BUILD_PC=build/pc/obj
 vpath %.cpp $(SRC_DIRS)
 INC=$(foreach d,$(SRC_DIRS),$(wildcard $(d)/*.h))
 # Every translation unit is C++ (C with classes, AGENTS.md S9); the
@@ -117,7 +117,9 @@ LEVEL_LISTS_SRC := assets/level_orderings/original
 LEVEL_LISTS := mission.dat
 endif
 
-BIN=projectx
+# Run it from the repository root (the game reads data/, configs/ ... from
+# the working directory): build/pc/projectx
+BIN=build/pc/projectx
 CXX?=g++
 .DEFAULT_GOAL := all
 
@@ -165,6 +167,7 @@ level-lists:
 	done
 
 $(BIN): $(OBJ)
+	@mkdir -p $(dir $(BIN))
 	$(CXX) -o $(BIN) $(OBJ) $(LDFLAGS) $(LIB)
 
 $(BUILD_PC)/%.o: %.cpp $(INC)

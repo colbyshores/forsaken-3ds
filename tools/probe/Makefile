@@ -70,12 +70,12 @@ $(TARGET).cia: $(TARGET).elf $(TARGET).smdh probe.rsf | check-banner
 		-target t -exefslogo \
 		-elf $(TARGET).elf \
 		-icon $(TARGET).smdh \
-		-banner ../../forsaken3ds.bnr
+		-banner ../../build/3ds/forsaken3ds.bnr
 
 .PHONY: check-banner
 check-banner:
-	@test -f ../../forsaken3ds.bnr || { \
-		echo "ERROR: ../../forsaken3ds.bnr missing."; \
+	@test -f ../../build/3ds/forsaken3ds.bnr || { \
+		echo "ERROR: ../../build/3ds/forsaken3ds.bnr missing."; \
 		echo "Run 'make -f Makefile.3ds cia' from the project root first (it builds the banner)."; \
 		exit 1; \
 	}
