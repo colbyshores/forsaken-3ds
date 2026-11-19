@@ -102,8 +102,7 @@ static bool weapon_is_assisted( int8_t w )
 /* Try a candidate target. Returns true if accepted (and updates
  * best_cos + sets *out_dir + *out_dist). */
 static bool consider_target( const VECTOR *bullet_pos, const VECTOR *bullet_dir,
-							 u_int16_t /*bullet_group*/,
-							 const VECTOR *target_pos, u_int16_t target_group,
+							 const VECTOR *target_pos,
 							 float *best_cos, VECTOR *out_target_dir, float *out_dist )
 {
 	VECTOR dir_to_target;
@@ -138,9 +137,7 @@ static bool consider_target( const VECTOR *bullet_pos, const VECTOR *bullet_dir,
 	if( cos <= *best_cos )
 		return false;
 
-	(void)target_group;  /* unused: the caller LOS-checks only the winning candidate */
-
-	/* Defer LOS check to caller — only test the best candidate at the end */
+	/* No line-of-sight test here: the caller tests only the winner */
 	*best_cos = cos;
 	*out_target_dir = norm;
 	*out_dist = sqrtf( dist_sq );
@@ -185,8 +182,7 @@ bool aim_assist_steer( VECTOR *bullet_pos, VECTOR *bullet_dir,
 	{
 		if( enemy->Status & ENEMY_STATUS_Enable )
 		{
-			if( consider_target( bullet_pos, bullet_dir, bullet_group,
-								 &enemy->Object.Pos, enemy->Object.Group,
+			if( consider_target( bullet_pos, bullet_dir, &enemy->Object.Pos,
 								 &best_cos, &target_dir, &target_dist ) )
 			{
 				found_any = true;
@@ -204,8 +200,7 @@ bool aim_assist_steer( VECTOR *bullet_pos, VECTOR *bullet_dir,
 		if( !( GameStatus[ship_idx] == STATUS_Normal ||
 			   GameStatus[ship_idx] == STATUS_SinglePlayer ) ) continue;
 
-		if( consider_target( bullet_pos, bullet_dir, bullet_group,
-							 &Ships[ship_idx].Object.Pos, Ships[ship_idx].Object.Group,
+		if( consider_target( bullet_pos, bullet_dir, &Ships[ship_idx].Object.Pos,
 							 &best_cos, &target_dir, &target_dist ) )
 		{
 			found_any = true;
