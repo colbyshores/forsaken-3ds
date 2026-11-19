@@ -380,7 +380,7 @@ FILE * LoadTeleports( FILE * fp )
 
 	if( fp )
 	{
-		fread( &NumTeleports, sizeof( int16_t ), 1, fp );
+		file_read( &NumTeleports, sizeof( int16_t ), 1, fp );
 
 		if( NumTeleports != NumOfTeleports )
 		{
@@ -392,7 +392,7 @@ FILE * LoadTeleports( FILE * fp )
 
 		for( i = 0; i < NumOfTeleports; i++ )
 		{
-			fread( &TeleportPtr->Status, sizeof( u_int16_t ), 1, fp );
+			file_read( &TeleportPtr->Status, sizeof( u_int16_t ), 1, fp );
 			TeleportPtr++;
 		}
 	}

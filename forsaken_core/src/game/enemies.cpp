@@ -3,6 +3,7 @@
 #include <math.h>
 
 #include "game/main.h"
+#include "data/file.h"
 #include "math/new3d.h"
 #include "math/quat.h"
 #include "data/mload.h"
@@ -4510,8 +4511,8 @@ bool PreLoadEnemies( void )
 
 	if( fp != nullptr )
 	{
-		fread( &MagicNumber, sizeof( u_int32_t ), 1, fp );
-		fread( &VersionNumber, sizeof( u_int32_t ), 1, fp );
+		file_read( &MagicNumber, sizeof( u_int32_t ), 1, fp );
+		file_read( &VersionNumber, sizeof( u_int32_t ), 1, fp );
 
 		if( ( MagicNumber != MAGIC_NUMBER ) || ( VersionNumber != NME_VERSION_NUMBER  ) )
 		{
@@ -4520,22 +4521,22 @@ bool PreLoadEnemies( void )
 			return( false );
 		}
 
-		fread( &NumInitEnemies, sizeof( int16_t ), 1, fp );
+		file_read( &NumInitEnemies, sizeof( int16_t ), 1, fp );
 		NumKilledEnemies = 0;
 
 		for( Count = 0; Count < NumInitEnemies; Count++ )
 		{
-			fread( &Group, sizeof( u_int16_t ), 1, fp );
-			fread( &ModelNum, sizeof( u_int16_t ), 1, fp );
-			fread( &GenType, sizeof( u_int16_t ), 1, fp );
-			fread( &Pos, sizeof( VECTOR ), 1, fp );
-			fread( &DirVector, sizeof( VECTOR ), 1, fp );
-			fread( &UpVector, sizeof( VECTOR ), 1, fp );
-			fread( &TriggerMod, sizeof( u_int16_t ), 1, fp );
-			fread( &Network, sizeof( u_int32_t ), 1, fp );
-			fread( &Pickup, sizeof( int16_t ), 1, fp );
-			fread( &Formationlink, sizeof( int16_t ), 1, fp );
-			fread( &GenerationDelay, sizeof( float ), 1, fp );
+			file_read( &Group, sizeof( u_int16_t ), 1, fp );
+			file_read( &ModelNum, sizeof( u_int16_t ), 1, fp );
+			file_read( &GenType, sizeof( u_int16_t ), 1, fp );
+			file_read( &Pos, sizeof( VECTOR ), 1, fp );
+			file_read( &DirVector, sizeof( VECTOR ), 1, fp );
+			file_read( &UpVector, sizeof( VECTOR ), 1, fp );
+			file_read( &TriggerMod, sizeof( u_int16_t ), 1, fp );
+			file_read( &Network, sizeof( u_int32_t ), 1, fp );
+			file_read( &Pickup, sizeof( int16_t ), 1, fp );
+			file_read( &Formationlink, sizeof( int16_t ), 1, fp );
+			file_read( &GenerationDelay, sizeof( float ), 1, fp );
 
 
 			/* Forsaken Remastered's .nme files reference enemy IDs from
@@ -4753,8 +4754,8 @@ bool LoadEnemies( void )
 
 	if( fp != nullptr )
 	{
-		fread( &MagicNumber, sizeof( u_int32_t ), 1, fp );
-		fread( &VersionNumber, sizeof( u_int32_t ), 1, fp );
+		file_read( &MagicNumber, sizeof( u_int32_t ), 1, fp );
+		file_read( &VersionNumber, sizeof( u_int32_t ), 1, fp );
 
 		if( ( MagicNumber != MAGIC_NUMBER ) || ( VersionNumber != NME_VERSION_NUMBER  ) )
 		{
@@ -4763,21 +4764,21 @@ bool LoadEnemies( void )
 			return( false );
 		}
 
-		fread( &NumInitEnemies, sizeof( int16_t ), 1, fp );
+		file_read( &NumInitEnemies, sizeof( int16_t ), 1, fp );
 
 		for( Count = 0; Count < NumInitEnemies; Count++ )
 		{
-			fread( &Group, sizeof( u_int16_t ), 1, fp );
-			fread( &EnemyType, sizeof( u_int16_t ), 1, fp );
-			fread( &GenType, sizeof( u_int16_t ), 1, fp );
-			fread( &Pos, sizeof( VECTOR ), 1, fp );
-			fread( &DirVector, sizeof( VECTOR ), 1, fp );
-			fread( &UpVector, sizeof( VECTOR ), 1, fp );
-			fread( &TriggerMod, sizeof( u_int16_t ), 1, fp );
-			fread( &Network, sizeof( u_int32_t ), 1, fp );
-			fread( &Pickup, sizeof( int16_t ), 1, fp );
-			fread( &Formationlink, sizeof( int16_t ), 1, fp );
-			fread( &GenerationDelay, sizeof( float ), 1, fp );
+			file_read( &Group, sizeof( u_int16_t ), 1, fp );
+			file_read( &EnemyType, sizeof( u_int16_t ), 1, fp );
+			file_read( &GenType, sizeof( u_int16_t ), 1, fp );
+			file_read( &Pos, sizeof( VECTOR ), 1, fp );
+			file_read( &DirVector, sizeof( VECTOR ), 1, fp );
+			file_read( &UpVector, sizeof( VECTOR ), 1, fp );
+			file_read( &TriggerMod, sizeof( u_int16_t ), 1, fp );
+			file_read( &Network, sizeof( u_int32_t ), 1, fp );
+			file_read( &Pickup, sizeof( int16_t ), 1, fp );
+			file_read( &Formationlink, sizeof( int16_t ), 1, fp );
+			file_read( &GenerationDelay, sizeof( float ), 1, fp );
 
 			ModelNum = EnemyType;
 
@@ -9214,7 +9215,7 @@ bool Enemy_Load( FILE * fp )
 	int16_t		TempNumInitEnemies;
 
 
-	fread( &TempNumInitEnemies, sizeof( TempNumInitEnemies ), 1, fp );
+	file_read( &TempNumInitEnemies, sizeof( TempNumInitEnemies ), 1, fp );
 
 	if( NumInitEnemies != TempNumInitEnemies )
 	{
@@ -9230,17 +9231,17 @@ bool Enemy_Load( FILE * fp )
 	}
 
 
-	fread( &NumKilledEnemies, sizeof( NumKilledEnemies ), 1, fp );
-	fread( &DifficultyLevel, sizeof( DifficultyLevel ), 1, fp );
+	file_read( &NumKilledEnemies, sizeof( NumKilledEnemies ), 1, fp );
+	file_read( &DifficultyLevel, sizeof( DifficultyLevel ), 1, fp );
 
-	fread( &e, sizeof( e ), 1, fp );
+	file_read( &e, sizeof( e ), 1, fp );
 	if( e == -1 )
 	{
 		FirstEnemyUsed = nullptr;
 	}else{
 		FirstEnemyUsed = &Enemies[e];
 	}
-	fread( &e, sizeof( e ), 1, fp );
+	file_read( &e, sizeof( e ), 1, fp );
 	if( e == -1 )
 	{
 		FirstEnemyFree = nullptr;
@@ -9248,19 +9249,19 @@ bool Enemy_Load( FILE * fp )
 		FirstEnemyFree = &Enemies[e];
 	}
 
-	fread( &FleshMorphTimer, sizeof( FleshMorphTimer ), 1, fp );
+	file_read( &FleshMorphTimer, sizeof( FleshMorphTimer ), 1, fp );
 
 	for( i = 0 ; i < NumInitEnemies ; i++ )
 	{
-		fread( &Enemies[i].Used, sizeof( Enemies[i].Used ), 1, fp );
-		fread( &Enemies[i].Alive, sizeof( Enemies[i].Alive ), 1, fp );
-		fread( &Enemies[i].CompCollision, sizeof( Enemies[i].CompCollision ), 1, fp );
+		file_read( &Enemies[i].Used, sizeof( Enemies[i].Used ), 1, fp );
+		file_read( &Enemies[i].Alive, sizeof( Enemies[i].Alive ), 1, fp );
+		file_read( &Enemies[i].CompCollision, sizeof( Enemies[i].CompCollision ), 1, fp );
 
 		if( !Object_Load( fp, &Enemies[i].Object ) )
 			return false;
 
-		fread( &Enemies[i].Type, sizeof( Enemies[i].Type ), 1, fp );
-		fread( &Enemies[i].AIMoveFlags, sizeof( Enemies[i].AIMoveFlags ), 1, fp );
+		file_read( &Enemies[i].Type, sizeof( Enemies[i].Type ), 1, fp );
+		file_read( &Enemies[i].AIMoveFlags, sizeof( Enemies[i].AIMoveFlags ), 1, fp );
 
 		/* Re-apply per-enemy GunType from the current EnemyTypes
 		 * template after Gun_Load.  Old saves preserve GunObject->Type
@@ -9279,14 +9280,14 @@ bool Enemy_Load( FILE * fp )
 				_g = _g->Next;
 			}
 		}
-		fread( &Enemies[i].AIFlags, sizeof( Enemies[i].AIFlags ), 1, fp );
-		fread( &Enemies[i].AI_Angle, sizeof( Enemies[i].AI_Angle ), 1, fp );
-		fread( &Enemies[i].Timer, sizeof( Enemies[i].Timer ), 1, fp );
-		fread( &Enemies[i].ThinkTimer, sizeof( Enemies[i].ThinkTimer ), 1, fp );
-		fread( &Enemies[i].AIMoveRestrictClearTime, sizeof( Enemies[i].AIMoveRestrictClearTime ), 1, fp );
-		fread( &Enemies[i].IveBeenHitTimer, sizeof( Enemies[i].IveBeenHitTimer ), 1, fp );
+		file_read( &Enemies[i].AIFlags, sizeof( Enemies[i].AIFlags ), 1, fp );
+		file_read( &Enemies[i].AI_Angle, sizeof( Enemies[i].AI_Angle ), 1, fp );
+		file_read( &Enemies[i].Timer, sizeof( Enemies[i].Timer ), 1, fp );
+		file_read( &Enemies[i].ThinkTimer, sizeof( Enemies[i].ThinkTimer ), 1, fp );
+		file_read( &Enemies[i].AIMoveRestrictClearTime, sizeof( Enemies[i].AIMoveRestrictClearTime ), 1, fp );
+		file_read( &Enemies[i].IveBeenHitTimer, sizeof( Enemies[i].IveBeenHitTimer ), 1, fp );
 
-		fread( &e, sizeof( e ), 1, fp );
+		file_read( &e, sizeof( e ), 1, fp );
 		if( e == -1 )
 		{
 			Enemies[i].TShip = nullptr;
@@ -9294,7 +9295,7 @@ bool Enemy_Load( FILE * fp )
 			Enemies[i].TShip = &Ships[e];
 		}
 
-		fread( &e, sizeof( e ), 1, fp );
+		file_read( &e, sizeof( e ), 1, fp );
 		if( e == -1 )
 		{
 			Enemies[i].TNode = nullptr;
@@ -9302,7 +9303,7 @@ bool Enemy_Load( FILE * fp )
 			Enemies[i].TNode = NodeNetworkHeader.FirstNode + e;
 		}
 
-		fread( &e, sizeof( e ), 1, fp );
+		file_read( &e, sizeof( e ), 1, fp );
 		if( e == -1 )
 		{
 			Enemies[i].NextTNode = nullptr;
@@ -9310,7 +9311,7 @@ bool Enemy_Load( FILE * fp )
 			Enemies[i].NextTNode = NodeNetworkHeader.FirstNode + e;
 		}
 
-		fread( &e, sizeof( e ), 1, fp );
+		file_read( &e, sizeof( e ), 1, fp );
 		if( e == -1 )
 		{
 			Enemies[i].LastTNode = nullptr;
@@ -9318,39 +9319,39 @@ bool Enemy_Load( FILE * fp )
 			Enemies[i].LastTNode = NodeNetworkHeader.FirstNode + e;
 		}
 
-		fread( &Enemies[i].LastDistance, sizeof( Enemies[i].LastDistance ), 1, fp );
-		fread( &Enemies[i].LastPrimaryFiredAtMe, sizeof( Enemies[i].LastPrimaryFiredAtMe ), 1, fp );
-		fread( &Enemies[i].LastSecondaryFiredAtMe, sizeof( Enemies[i].LastSecondaryFiredAtMe ), 1, fp );
-		fread( &Enemies[i].Viewcone, sizeof( Enemies[i].Viewcone ), 1, fp );
-		fread( &Enemies[i].PickupHeld, sizeof( Enemies[i].PickupHeld ), 1, fp );
-		fread( &Enemies[i].TargetingPos, sizeof( Enemies[i].TargetingPos ), 1, fp );
-		fread( &Enemies[i].TargetingDir, sizeof( Enemies[i].TargetingDir ), 1, fp );
+		file_read( &Enemies[i].LastDistance, sizeof( Enemies[i].LastDistance ), 1, fp );
+		file_read( &Enemies[i].LastPrimaryFiredAtMe, sizeof( Enemies[i].LastPrimaryFiredAtMe ), 1, fp );
+		file_read( &Enemies[i].LastSecondaryFiredAtMe, sizeof( Enemies[i].LastSecondaryFiredAtMe ), 1, fp );
+		file_read( &Enemies[i].Viewcone, sizeof( Enemies[i].Viewcone ), 1, fp );
+		file_read( &Enemies[i].PickupHeld, sizeof( Enemies[i].PickupHeld ), 1, fp );
+		file_read( &Enemies[i].TargetingPos, sizeof( Enemies[i].TargetingPos ), 1, fp );
+		file_read( &Enemies[i].TargetingDir, sizeof( Enemies[i].TargetingDir ), 1, fp );
 
-		fread( &Enemies[i].MinePos, sizeof( Enemies[i].MinePos ), 1, fp );
-		fread( &Enemies[i].MineDistance, sizeof( Enemies[i].MineDistance ), 1, fp );
-		fread( &Enemies[i].MineNum, sizeof( Enemies[i].MineNum ), 1, fp );
+		file_read( &Enemies[i].MinePos, sizeof( Enemies[i].MinePos ), 1, fp );
+		file_read( &Enemies[i].MineDistance, sizeof( Enemies[i].MineDistance ), 1, fp );
+		file_read( &Enemies[i].MineNum, sizeof( Enemies[i].MineNum ), 1, fp );
 
-		fread( &Enemies[i].AvoidTimer, sizeof( Enemies[i].AvoidTimer), 1, fp );
-		fread( &Enemies[i].AvoidType, sizeof( Enemies[i].AvoidType ), 1, fp );
+		file_read( &Enemies[i].AvoidTimer, sizeof( Enemies[i].AvoidTimer), 1, fp );
+		file_read( &Enemies[i].AvoidType, sizeof( Enemies[i].AvoidType ), 1, fp );
 
-		fread( &Enemies[i].Status, sizeof( Enemies[i].Status ), 1, fp );
-		fread( &Enemies[i].GenType, sizeof( Enemies[i].GenType ), 1, fp );
-		fread( &Enemies[i].BulletID, sizeof( Enemies[i].BulletID ), 1, fp );
-		fread( &Enemies[i].ModelNum, sizeof( Enemies[i].ModelNum ), 1, fp );
-		fread( &Enemies[i].ModelIndex, sizeof( Enemies[i].ModelIndex ), 1, fp );
-		fread( &Enemies[i].TriggerMod, sizeof( Enemies[i].TriggerMod ), 1, fp );
-		fread( &Enemies[i].Delay, sizeof( Enemies[i].Delay ), 1, fp );
+		file_read( &Enemies[i].Status, sizeof( Enemies[i].Status ), 1, fp );
+		file_read( &Enemies[i].GenType, sizeof( Enemies[i].GenType ), 1, fp );
+		file_read( &Enemies[i].BulletID, sizeof( Enemies[i].BulletID ), 1, fp );
+		file_read( &Enemies[i].ModelNum, sizeof( Enemies[i].ModelNum ), 1, fp );
+		file_read( &Enemies[i].ModelIndex, sizeof( Enemies[i].ModelIndex ), 1, fp );
+		file_read( &Enemies[i].TriggerMod, sizeof( Enemies[i].TriggerMod ), 1, fp );
+		file_read( &Enemies[i].Delay, sizeof( Enemies[i].Delay ), 1, fp );
 
 
 
-		fread( &e, sizeof( e ), 1, fp );
+		file_read( &e, sizeof( e ), 1, fp );
 		if( e == -1 )
 		{
 			Enemies[i].PrevUsed = nullptr;
 		}else{
 			Enemies[i].PrevUsed = &Enemies[e];
 		}
-		fread( &e, sizeof( e ), 1, fp );
+		file_read( &e, sizeof( e ), 1, fp );
 		if( e == -1 )
 		{
 			Enemies[i].NextUsed = nullptr;
@@ -9358,14 +9359,14 @@ bool Enemy_Load( FILE * fp )
 			Enemies[i].NextUsed = &Enemies[e];
 		}
 
-		fread( &e, sizeof( e ), 1, fp );
+		file_read( &e, sizeof( e ), 1, fp );
 		if( e == -1 )
 		{
 			Enemies[i].PrevFree = nullptr;
 		}else{
 			Enemies[i].PrevFree = &Enemies[e];
 		}
-		fread( &e, sizeof( e ), 1, fp );
+		file_read( &e, sizeof( e ), 1, fp );
 		if( e == -1 )
 		{
 			Enemies[i].NextFree = nullptr;
@@ -9373,14 +9374,14 @@ bool Enemy_Load( FILE * fp )
 			Enemies[i].NextFree = &Enemies[e];
 		}
 
-		fread( &e, sizeof( e ), 1, fp );
+		file_read( &e, sizeof( e ), 1, fp );
 		if( e == -1 )
 		{
 			Enemies[i].NextInGroup = nullptr;
 		}else{
 			Enemies[i].NextInGroup = &Enemies[e];
 		}
-		fread( &e, sizeof( e ), 1, fp );
+		file_read( &e, sizeof( e ), 1, fp );
 		if( e == -1 )
 		{
 			Enemies[i].PrevInGroup = nullptr;
@@ -9388,13 +9389,13 @@ bool Enemy_Load( FILE * fp )
 			Enemies[i].PrevInGroup = &Enemies[e];
 		}
 
-		fread( &Enemies[i].PrimaryFireTimer, sizeof( Enemies[i].PrimaryFireTimer ), 1, fp );
-		fread( &Enemies[i].SecondaryFireTimer, sizeof( Enemies[i].SecondaryFireTimer ), 1, fp );
-		fread( &Enemies[i].ImInNodeTransition, sizeof( Enemies[i].ImInNodeTransition ), 1, fp );
-		fread( &Enemies[i].PickNewNodeNow, sizeof( Enemies[i].PickNewNodeNow ), 1, fp );
-		fread( &Enemies[i].DistanceToPointOnSlope, sizeof( Enemies[i].DistanceToPointOnSlope ), 1, fp );
+		file_read( &Enemies[i].PrimaryFireTimer, sizeof( Enemies[i].PrimaryFireTimer ), 1, fp );
+		file_read( &Enemies[i].SecondaryFireTimer, sizeof( Enemies[i].SecondaryFireTimer ), 1, fp );
+		file_read( &Enemies[i].ImInNodeTransition, sizeof( Enemies[i].ImInNodeTransition ), 1, fp );
+		file_read( &Enemies[i].PickNewNodeNow, sizeof( Enemies[i].PickNewNodeNow ), 1, fp );
+		file_read( &Enemies[i].DistanceToPointOnSlope, sizeof( Enemies[i].DistanceToPointOnSlope ), 1, fp );
 
-		fread( &e, sizeof( e ), 1, fp );
+		file_read( &e, sizeof( e ), 1, fp );
 		if( e == -1 )
 		{
 			Enemies[i].FormationLink = nullptr;
@@ -9403,10 +9404,10 @@ bool Enemy_Load( FILE * fp )
 		}
 
 
-		fread( &Enemies[i].FormationOffset, sizeof( Enemies[i].FormationOffset ), 1, fp );
+		file_read( &Enemies[i].FormationOffset, sizeof( Enemies[i].FormationOffset ), 1, fp );
 
 
-		fread( &e, sizeof( e ), 1, fp );
+		file_read( &e, sizeof( e ), 1, fp );
 		if( e == -1 )
 		{
 			Enemies[i].SplineNode1 = nullptr;
@@ -9415,7 +9416,7 @@ bool Enemy_Load( FILE * fp )
 		}else{
 			Enemies[i].SplineNode1 = NodeNetworkHeader.FirstNode + e;
 		}
-		fread( &e, sizeof( e ), 1, fp );
+		file_read( &e, sizeof( e ), 1, fp );
 		if( e == -1 )
 		{
 			Enemies[i].SplineNode2 = nullptr;
@@ -9424,7 +9425,7 @@ bool Enemy_Load( FILE * fp )
 		}else{
 			Enemies[i].SplineNode2 = NodeNetworkHeader.FirstNode + e;
 		}
-		fread( &e, sizeof( e ), 1, fp );
+		file_read( &e, sizeof( e ), 1, fp );
 		if( e == -1 )
 		{
 			Enemies[i].SplineNode3 = nullptr;
@@ -9433,7 +9434,7 @@ bool Enemy_Load( FILE * fp )
 		}else{
 			Enemies[i].SplineNode3 = NodeNetworkHeader.FirstNode + e;
 		}
-		fread( &e, sizeof( e ), 1, fp );
+		file_read( &e, sizeof( e ), 1, fp );
 		if( e == -1 )
 		{
 			Enemies[i].SplineNode4 = nullptr;
@@ -9443,18 +9444,18 @@ bool Enemy_Load( FILE * fp )
 			Enemies[i].SplineNode4 = NodeNetworkHeader.FirstNode + e;
 		}
 
-		fread( &Enemies[i].TempSplineNode, sizeof( Enemies[i].TempSplineNode ), 1, fp );
+		file_read( &Enemies[i].TempSplineNode, sizeof( Enemies[i].TempSplineNode ), 1, fp );
 
-		fread( &Enemies[i].LastDamagePos, sizeof( Enemies[i].LastDamagePos ), 1, fp );
-		fread( &Enemies[i].LastDamageImpactPos, sizeof( Enemies[i].LastDamageImpactPos ), 1, fp );
-		fread( &Enemies[i].LastDamageDir, sizeof( Enemies[i].LastDamageDir ), 1, fp );
-		fread( &Enemies[i].LastDamage, sizeof( Enemies[i].LastDamage ), 1, fp );
-		fread( &Enemies[i].LastDamageSpeed, sizeof( Enemies[i].LastDamageSpeed ), 1, fp );
-		fread( &Enemies[i].CloakTimer, sizeof( Enemies[i].CloakTimer ), 1, fp );
-		fread( &Enemies[i].GenerationDelay, sizeof( Enemies[i].GenerationDelay ), 1, fp );
-		fread( &Enemies[i].MasterGenerationDelay, sizeof( Enemies[i].MasterGenerationDelay ), 1, fp );
-		fread( &Enemies[i].SmokeTime, sizeof( Enemies[i].SmokeTime ), 1, fp );
-		fread( &Enemies[i].FirePosCount, sizeof( Enemies[i].FirePosCount ), 1, fp );
+		file_read( &Enemies[i].LastDamagePos, sizeof( Enemies[i].LastDamagePos ), 1, fp );
+		file_read( &Enemies[i].LastDamageImpactPos, sizeof( Enemies[i].LastDamageImpactPos ), 1, fp );
+		file_read( &Enemies[i].LastDamageDir, sizeof( Enemies[i].LastDamageDir ), 1, fp );
+		file_read( &Enemies[i].LastDamage, sizeof( Enemies[i].LastDamage ), 1, fp );
+		file_read( &Enemies[i].LastDamageSpeed, sizeof( Enemies[i].LastDamageSpeed ), 1, fp );
+		file_read( &Enemies[i].CloakTimer, sizeof( Enemies[i].CloakTimer ), 1, fp );
+		file_read( &Enemies[i].GenerationDelay, sizeof( Enemies[i].GenerationDelay ), 1, fp );
+		file_read( &Enemies[i].MasterGenerationDelay, sizeof( Enemies[i].MasterGenerationDelay ), 1, fp );
+		file_read( &Enemies[i].SmokeTime, sizeof( Enemies[i].SmokeTime ), 1, fp );
+		file_read( &Enemies[i].FirePosCount, sizeof( Enemies[i].FirePosCount ), 1, fp );
 
 		if( Enemies[i].Alive || (Enemies[i].Status & ENEMY_STATUS_Enable) )
 		{
@@ -9621,10 +9622,10 @@ bool Object_Load( FILE * fp , OBJECT * Obj )
 	int e;
 	int16_t	NumChildren;
 
-	fread( &Obj->Flags, sizeof( Obj->Flags ), 1, fp );
-	fread( &Obj->Type, sizeof( Obj->Type ), 1, fp );
+	file_read( &Obj->Flags, sizeof( Obj->Flags ), 1, fp );
+	file_read( &Obj->Type, sizeof( Obj->Type ), 1, fp );
 
-	fread( &e, sizeof( e ), 1, fp );
+	file_read( &e, sizeof( e ), 1, fp );
 	if( Obj->Type == OBJECT_TYPE_ENEMY )
 	{
 		Obj->ID = &Enemies[e];
@@ -9636,47 +9637,47 @@ bool Object_Load( FILE * fp , OBJECT * Obj )
 		DebugPrintf( "LoadShips() Unknown Type %d, ID %d\n", Obj->Type, e );
 		return false;
 	}
-	fread( &Obj->AI_Mode, sizeof( Obj->AI_Mode ), 1, fp );
-	fread( &Obj->Mode, sizeof( Obj->Mode ), 1, fp );
-	fread( &Obj->ControlType, sizeof( Obj->ControlType ), 1, fp );
+	file_read( &Obj->AI_Mode, sizeof( Obj->AI_Mode ), 1, fp );
+	file_read( &Obj->Mode, sizeof( Obj->Mode ), 1, fp );
+	file_read( &Obj->ControlType, sizeof( Obj->ControlType ), 1, fp );
 
-	fread( &Obj->Pos, sizeof( Obj->Pos ), 1, fp );
-	fread( &Obj->Quat, sizeof( Obj->Quat ), 1, fp );
-	fread( &Obj->Bank, sizeof( Obj->Bank ), 1, fp );
-	fread( &Obj->Mat, sizeof( Obj->Mat ), 1, fp );
-	fread( &Obj->FinalMat, sizeof( Obj->FinalMat ), 1, fp );
-	fread( &Obj->FinalQuat, sizeof( Obj->FinalQuat ), 1, fp );
+	file_read( &Obj->Pos, sizeof( Obj->Pos ), 1, fp );
+	file_read( &Obj->Quat, sizeof( Obj->Quat ), 1, fp );
+	file_read( &Obj->Bank, sizeof( Obj->Bank ), 1, fp );
+	file_read( &Obj->Mat, sizeof( Obj->Mat ), 1, fp );
+	file_read( &Obj->FinalMat, sizeof( Obj->FinalMat ), 1, fp );
+	file_read( &Obj->FinalQuat, sizeof( Obj->FinalQuat ), 1, fp );
 
 	MatrixTranspose( &Obj->Mat, &Obj->InvMat );
 	MatrixTranspose( &Obj->FinalMat, &Obj->FinalInvMat );
 
-	fread( &Obj->Group, sizeof( Obj->Group ), 1, fp );
-	fread( &Obj->Speed, sizeof( Obj->Speed ), 1, fp );
-	fread( &Obj->Angle, sizeof( Obj->Angle ), 1, fp );
-	fread( &Obj->CruiseControl, sizeof( Obj->CruiseControl ), 1, fp );
-	fread( &Obj->Shield, sizeof( Obj->Shield ), 1, fp );
-	fread( &Obj->Hull, sizeof( Obj->Hull ), 1, fp );
-	fread( &Obj->Energy, sizeof( Obj->Energy ), 1, fp );
-	fread( &Obj->PowerLevel, sizeof( Obj->PowerLevel ), 1, fp );
-	fread( &Obj->ExternalForce, sizeof( Obj->ExternalForce ), 1, fp );
-	fread( &Obj->InternalForce, sizeof( Obj->InternalForce ), 1, fp );
-	fread( &Obj->RotationForce, sizeof( Obj->RotationForce ), 1, fp );
-	fread( &Obj->Autolevel, sizeof( Obj->Autolevel ), 1, fp );
-	fread( &Obj->BobCount, sizeof( Obj->BobCount ), 1, fp );
-	fread( &Obj->LastBob, sizeof( Obj->LastBob ), 1, fp );
-	fread( &Obj->light, sizeof( Obj->light ), 1, fp );
-	fread( &Obj->Noise, sizeof( Obj->Noise ), 1, fp );
-	fread( &Obj->NodeNetwork, sizeof( Obj->NodeNetwork ), 1, fp );
+	file_read( &Obj->Group, sizeof( Obj->Group ), 1, fp );
+	file_read( &Obj->Speed, sizeof( Obj->Speed ), 1, fp );
+	file_read( &Obj->Angle, sizeof( Obj->Angle ), 1, fp );
+	file_read( &Obj->CruiseControl, sizeof( Obj->CruiseControl ), 1, fp );
+	file_read( &Obj->Shield, sizeof( Obj->Shield ), 1, fp );
+	file_read( &Obj->Hull, sizeof( Obj->Hull ), 1, fp );
+	file_read( &Obj->Energy, sizeof( Obj->Energy ), 1, fp );
+	file_read( &Obj->PowerLevel, sizeof( Obj->PowerLevel ), 1, fp );
+	file_read( &Obj->ExternalForce, sizeof( Obj->ExternalForce ), 1, fp );
+	file_read( &Obj->InternalForce, sizeof( Obj->InternalForce ), 1, fp );
+	file_read( &Obj->RotationForce, sizeof( Obj->RotationForce ), 1, fp );
+	file_read( &Obj->Autolevel, sizeof( Obj->Autolevel ), 1, fp );
+	file_read( &Obj->BobCount, sizeof( Obj->BobCount ), 1, fp );
+	file_read( &Obj->LastBob, sizeof( Obj->LastBob ), 1, fp );
+	file_read( &Obj->light, sizeof( Obj->light ), 1, fp );
+	file_read( &Obj->Noise, sizeof( Obj->Noise ), 1, fp );
+	file_read( &Obj->NodeNetwork, sizeof( Obj->NodeNetwork ), 1, fp );
 
 
-	fread( &e, sizeof( e ), 1, fp );
+	file_read( &e, sizeof( e ), 1, fp );
 	if( e == -1 )
 	{
 		Obj->NearestNode = nullptr;
 	}else{
 		Obj->NearestNode = NodeNetworkHeader.FirstNode + e;
 	}
-	fread( &e, sizeof( e ), 1, fp );
+	file_read( &e, sizeof( e ), 1, fp );
 	if( e == -1 )
 	{
 		Obj->LastNearestNode = nullptr;
@@ -9684,7 +9685,7 @@ bool Object_Load( FILE * fp , OBJECT * Obj )
 		Obj->LastNearestNode = NodeNetworkHeader.FirstNode + e;
 	}
 
-	fread( &Obj->HowManyGuns, sizeof( Obj->HowManyGuns ), 1, fp );
+	file_read( &Obj->HowManyGuns, sizeof( Obj->HowManyGuns ), 1, fp );
 
 	if( Obj->HowManyGuns )
 	{
@@ -9695,17 +9696,17 @@ bool Object_Load( FILE * fp , OBJECT * Obj )
 		}
 	}
 
-	fread( &Obj->Time, sizeof( Obj->Time ), 1, fp );
-	fread( &Obj->OverallTime, sizeof( Obj->OverallTime ), 1, fp );
-	fread( &Obj->AnimSpeed, sizeof( Obj->AnimSpeed ), 1, fp );
+	file_read( &Obj->Time, sizeof( Obj->Time ), 1, fp );
+	file_read( &Obj->OverallTime, sizeof( Obj->OverallTime ), 1, fp );
+	file_read( &Obj->AnimSpeed, sizeof( Obj->AnimSpeed ), 1, fp );
 
-	fread( &Obj->TopLeft, sizeof( Obj->TopLeft ), 1, fp );
-	fread( &Obj->BottomRight, sizeof( Obj->BottomRight ), 1, fp );
+	file_read( &Obj->TopLeft, sizeof( Obj->TopLeft ), 1, fp );
+	file_read( &Obj->BottomRight, sizeof( Obj->BottomRight ), 1, fp );
 
-	fread( &Obj->CurAnimSeq, sizeof( Obj->CurAnimSeq ), 1, fp );
-	fread( &Obj->Animating, sizeof( Obj->Animating ), 1, fp );
+	file_read( &Obj->CurAnimSeq, sizeof( Obj->CurAnimSeq ), 1, fp );
+	file_read( &Obj->Animating, sizeof( Obj->Animating ), 1, fp );
 
-	fread( &NumChildren, sizeof( NumChildren ), 1, fp );
+	file_read( &NumChildren, sizeof( NumChildren ), 1, fp );
 
 	if( NumChildren )
 	{
@@ -9721,9 +9722,9 @@ bool Object_Load( FILE * fp , OBJECT * Obj )
 		}
 	}
 
-	fread( &Obj->Red, sizeof( Obj->Red ), 1, fp );
-	fread( &Obj->Green, sizeof( Obj->Green ), 1, fp );
-	fread( &Obj->Blue, sizeof( Obj->Blue ), 1, fp );
+	file_read( &Obj->Red, sizeof( Obj->Red ), 1, fp );
+	file_read( &Obj->Green, sizeof( Obj->Green ), 1, fp );
+	file_read( &Obj->Blue, sizeof( Obj->Blue ), 1, fp );
 	return true;
 }
 
@@ -9738,20 +9739,20 @@ bool Gun_Load( BYTE HowManyGuns , GUNOBJECT * GO , FILE * fp )
 
 	for( i = 0 ; i < HowManyGuns ; i++ )
 	{
-		fread( &GO->Type, sizeof( GO->Type ), 1, fp );
-		fread( &GO->AIMoveFlags, sizeof( GO->AIMoveFlags ), 1, fp );
-		fread( &GO->AI_Angle, sizeof( GO->AI_Angle ), 1, fp );
-		fread( &GO->Mat, sizeof( GO->Mat ), 1, fp );
+		file_read( &GO->Type, sizeof( GO->Type ), 1, fp );
+		file_read( &GO->AIMoveFlags, sizeof( GO->AIMoveFlags ), 1, fp );
+		file_read( &GO->AI_Angle, sizeof( GO->AI_Angle ), 1, fp );
+		file_read( &GO->Mat, sizeof( GO->Mat ), 1, fp );
 		MatrixTranspose( &GO->Mat, &GO->InvMat );
-		fread( &GO->Dir, sizeof( GO->Dir ), 1, fp );
-		fread( &GO->FirePos, sizeof( GO->FirePos ), 1, fp );
-		fread( &GO->FirePosCount, sizeof( GO->FirePosCount ), 1, fp );
-		fread( &GO->Angle, sizeof( GO->Angle ), 1, fp );
-		fread( &GO->BurstTime, sizeof( GO->BurstTime ), 1, fp );
-		fread( &GO->BurstCount, sizeof( GO->BurstCount ), 1, fp );
-		fread( &GO->ReloadTime, sizeof( GO->ReloadTime ), 1, fp );
-		fread( &GO->BurstStartSign, sizeof( GO->BurstStartSign ), 1, fp );
-		fread( &GO->GunNum, sizeof( GO->GunNum ), 1, fp );
+		file_read( &GO->Dir, sizeof( GO->Dir ), 1, fp );
+		file_read( &GO->FirePos, sizeof( GO->FirePos ), 1, fp );
+		file_read( &GO->FirePosCount, sizeof( GO->FirePosCount ), 1, fp );
+		file_read( &GO->Angle, sizeof( GO->Angle ), 1, fp );
+		file_read( &GO->BurstTime, sizeof( GO->BurstTime ), 1, fp );
+		file_read( &GO->BurstCount, sizeof( GO->BurstCount ), 1, fp );
+		file_read( &GO->ReloadTime, sizeof( GO->ReloadTime ), 1, fp );
+		file_read( &GO->BurstStartSign, sizeof( GO->BurstStartSign ), 1, fp );
+		file_read( &GO->GunNum, sizeof( GO->GunNum ), 1, fp );
 		GO++;
 	}
 	return true;

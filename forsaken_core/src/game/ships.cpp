@@ -1,6 +1,7 @@
 /* ships.cpp -- player ship movement, modes, collision and damage; see ships.h. */
 #include <stdio.h>
 #include "game/main.h"
+#include "data/file.h"
 
 #include "math/new3d.h"
 #include "math/quat.h"
@@ -2919,37 +2920,37 @@ FILE * LoadShips( FILE * fp )
 			return( nullptr );
 		}
 
-		fread( &Ships[ i ].enable, sizeof( Ships[ i ].enable ), 1, fp );
-		fread( &Ships[ i ].ShipThatLastKilledMe, sizeof( Ships[ i ].ShipThatLastKilledMe ), 1, fp );
-		fread( &Ships[ i ].ShipThatLastHitMe, sizeof( Ships[ i ].ShipThatLastHitMe ), 1, fp );
-		fread( &Ships[ i ].NumMultiples, sizeof( Ships[ i ].NumMultiples ), 1, fp );
-		fread( &Ships[ i ].StealthTime, sizeof( Ships[ i ].StealthTime ), 1, fp );
-		fread( &Ships[ i ].Timer, sizeof( Ships[ i ].Timer ), 1, fp );
-		fread( &Ships[ i ].InvulTimer, sizeof( Ships[ i ].InvulTimer ), 1, fp );
-		fread( &Ships[ i ].Invul, sizeof( Ships[ i ].Invul ), 1, fp );
-		fread( &Ships[ i ].LastAngle, sizeof( Ships[ i ].LastAngle ), 1, fp );
-		fread( &Ships[ i ].PrimBullIdCount, sizeof( Ships[ i ].PrimBullIdCount ), 1, fp );
-		fread( &Ships[ i ].SecBullIdCount, sizeof( Ships[ i ].SecBullIdCount ), 1, fp );
-		fread( &Ships[ i ].PickupIdCount, sizeof( Ships[ i ].PickupIdCount ), 1, fp );
-		fread( &Ships[ i ].Damage, sizeof( Ships[ i ].Damage ), 1, fp );
-		fread( &Ships[ i ].Primary, sizeof( Ships[ i ].Primary ), 1, fp );
-		fread( &Ships[ i ].Secondary, sizeof( Ships[ i ].Secondary ), 1, fp );
-		fread( &Ships[ i ].ModelNum, sizeof( Ships[ i ].ModelNum ), 1, fp );
-		fread( &Ships[ i ].BikeNum, sizeof( Ships[ i ].BikeNum ), 1, fp );
-		fread( &Ships[ i ].Pickups, sizeof( Ships[ i ].Pickups ), 1, fp );
-		fread( &Ships[ i ].RegenSlots, sizeof( Ships[ i ].RegenSlots ), 1, fp );
-		fread( &Ships[ i ].LastMove, sizeof( Ships[ i ].LastMove ), 1, fp );
-		fread( &Ships[ i ].Move_Off, sizeof( Ships[ i ].Move_Off ), 1, fp );
-		fread( &Ships[ i ].OrbModels, sizeof( Ships[ i ].OrbModels ), 1, fp );
-		fread( &Ships[ i ].OrbAmmo, sizeof( Ships[ i ].OrbAmmo ), 1, fp );
-		fread( &Ships[ i ].PrimPowerLevel, sizeof( Ships[ i ].PrimPowerLevel ), 1, fp );
-		fread( &Ships[ i ].PrimID, sizeof( Ships[ i ].PrimID ), 1, fp );
-		fread( &Ships[ i ].SecID, sizeof( Ships[ i ].SecID ), 1, fp );
-		fread( &Ships[ i ].SecWeapon, sizeof( Ships[ i ].SecWeapon ), 1, fp );
-		fread( &Ships[ i ].SuperNashramTimer, sizeof( Ships[ i ].SuperNashramTimer ), 1, fp );
-		fread( &Ships[ i ].ShakeTimer, sizeof( Ships[ i ].ShakeTimer ), 1, fp );
-		fread( &Ships[ i ].ShakeDirTimer, sizeof( Ships[ i ].ShakeDirTimer ), 1, fp );
-		fread( &Ships[ i ].ShakeForce, sizeof( Ships[ i ].ShakeForce ), 1, fp );
+		file_read( &Ships[ i ].enable, sizeof( Ships[ i ].enable ), 1, fp );
+		file_read( &Ships[ i ].ShipThatLastKilledMe, sizeof( Ships[ i ].ShipThatLastKilledMe ), 1, fp );
+		file_read( &Ships[ i ].ShipThatLastHitMe, sizeof( Ships[ i ].ShipThatLastHitMe ), 1, fp );
+		file_read( &Ships[ i ].NumMultiples, sizeof( Ships[ i ].NumMultiples ), 1, fp );
+		file_read( &Ships[ i ].StealthTime, sizeof( Ships[ i ].StealthTime ), 1, fp );
+		file_read( &Ships[ i ].Timer, sizeof( Ships[ i ].Timer ), 1, fp );
+		file_read( &Ships[ i ].InvulTimer, sizeof( Ships[ i ].InvulTimer ), 1, fp );
+		file_read( &Ships[ i ].Invul, sizeof( Ships[ i ].Invul ), 1, fp );
+		file_read( &Ships[ i ].LastAngle, sizeof( Ships[ i ].LastAngle ), 1, fp );
+		file_read( &Ships[ i ].PrimBullIdCount, sizeof( Ships[ i ].PrimBullIdCount ), 1, fp );
+		file_read( &Ships[ i ].SecBullIdCount, sizeof( Ships[ i ].SecBullIdCount ), 1, fp );
+		file_read( &Ships[ i ].PickupIdCount, sizeof( Ships[ i ].PickupIdCount ), 1, fp );
+		file_read( &Ships[ i ].Damage, sizeof( Ships[ i ].Damage ), 1, fp );
+		file_read( &Ships[ i ].Primary, sizeof( Ships[ i ].Primary ), 1, fp );
+		file_read( &Ships[ i ].Secondary, sizeof( Ships[ i ].Secondary ), 1, fp );
+		file_read( &Ships[ i ].ModelNum, sizeof( Ships[ i ].ModelNum ), 1, fp );
+		file_read( &Ships[ i ].BikeNum, sizeof( Ships[ i ].BikeNum ), 1, fp );
+		file_read( &Ships[ i ].Pickups, sizeof( Ships[ i ].Pickups ), 1, fp );
+		file_read( &Ships[ i ].RegenSlots, sizeof( Ships[ i ].RegenSlots ), 1, fp );
+		file_read( &Ships[ i ].LastMove, sizeof( Ships[ i ].LastMove ), 1, fp );
+		file_read( &Ships[ i ].Move_Off, sizeof( Ships[ i ].Move_Off ), 1, fp );
+		file_read( &Ships[ i ].OrbModels, sizeof( Ships[ i ].OrbModels ), 1, fp );
+		file_read( &Ships[ i ].OrbAmmo, sizeof( Ships[ i ].OrbAmmo ), 1, fp );
+		file_read( &Ships[ i ].PrimPowerLevel, sizeof( Ships[ i ].PrimPowerLevel ), 1, fp );
+		file_read( &Ships[ i ].PrimID, sizeof( Ships[ i ].PrimID ), 1, fp );
+		file_read( &Ships[ i ].SecID, sizeof( Ships[ i ].SecID ), 1, fp );
+		file_read( &Ships[ i ].SecWeapon, sizeof( Ships[ i ].SecWeapon ), 1, fp );
+		file_read( &Ships[ i ].SuperNashramTimer, sizeof( Ships[ i ].SuperNashramTimer ), 1, fp );
+		file_read( &Ships[ i ].ShakeTimer, sizeof( Ships[ i ].ShakeTimer ), 1, fp );
+		file_read( &Ships[ i ].ShakeDirTimer, sizeof( Ships[ i ].ShakeDirTimer ), 1, fp );
+		file_read( &Ships[ i ].ShakeForce, sizeof( Ships[ i ].ShakeForce ), 1, fp );
 
 		i = MAX_PLAYERS;
 
@@ -2959,39 +2960,39 @@ FILE * LoadShips( FILE * fp )
 			return( nullptr );
 		}
 
-		fread( &Ships[ i ].enable, sizeof( Ships[ i ].enable ), 1, fp );
-		fread( &Ships[ i ].ShipThatLastKilledMe, sizeof( Ships[ i ].ShipThatLastKilledMe ), 1, fp );
-		fread( &Ships[ i ].ShipThatLastHitMe, sizeof( Ships[ i ].ShipThatLastHitMe ), 1, fp );
-		fread( &Ships[ i ].NumMultiples, sizeof( Ships[ i ].NumMultiples ), 1, fp );
-		fread( &Ships[ i ].StealthTime, sizeof( Ships[ i ].StealthTime ), 1, fp );
-		fread( &Ships[ i ].Timer, sizeof( Ships[ i ].Timer ), 1, fp );
-		fread( &Ships[ i ].InvulTimer, sizeof( Ships[ i ].InvulTimer ), 1, fp );
-		fread( &Ships[ i ].Invul, sizeof( Ships[ i ].Invul ), 1, fp );
-		fread( &Ships[ i ].LastAngle, sizeof( Ships[ i ].LastAngle ), 1, fp );
-		fread( &Ships[ i ].PrimBullIdCount, sizeof( Ships[ i ].PrimBullIdCount ), 1, fp );
-		fread( &Ships[ i ].SecBullIdCount, sizeof( Ships[ i ].SecBullIdCount ), 1, fp );
-		fread( &Ships[ i ].PickupIdCount, sizeof( Ships[ i ].PickupIdCount ), 1, fp );
-		fread( &Ships[ i ].Damage, sizeof( Ships[ i ].Damage ), 1, fp );
-		fread( &Ships[ i ].Primary, sizeof( Ships[ i ].Primary ), 1, fp );
-		fread( &Ships[ i ].Secondary, sizeof( Ships[ i ].Secondary ), 1, fp );
-		fread( &Ships[ i ].ModelNum, sizeof( Ships[ i ].ModelNum ), 1, fp );
-		fread( &Ships[ i ].BikeNum, sizeof( Ships[ i ].BikeNum ), 1, fp );
-		fread( &Ships[ i ].Pickups, sizeof( Ships[ i ].Pickups ), 1, fp );
-		fread( &Ships[ i ].RegenSlots, sizeof( Ships[ i ].RegenSlots ), 1, fp );
-		fread( &Ships[ i ].LastMove, sizeof( Ships[ i ].LastMove ), 1, fp );
-		fread( &Ships[ i ].Move_Off, sizeof( Ships[ i ].Move_Off ), 1, fp );
-		fread( &Ships[ i ].OrbModels, sizeof( Ships[ i ].OrbModels ), 1, fp );
-		fread( &Ships[ i ].OrbAmmo, sizeof( Ships[ i ].OrbAmmo ), 1, fp );
-		fread( &Ships[ i ].PrimPowerLevel, sizeof( Ships[ i ].PrimPowerLevel ), 1, fp );
-		fread( &Ships[ i ].PrimID, sizeof( Ships[ i ].PrimID ), 1, fp );
-		fread( &Ships[ i ].SecID, sizeof( Ships[ i ].SecID ), 1, fp );
-		fread( &Ships[ i ].SecWeapon, sizeof( Ships[ i ].SecWeapon ), 1, fp );
-		fread( &Ships[ i ].SuperNashramTimer, sizeof( Ships[ i ].SuperNashramTimer ), 1, fp );
-		fread( &Ships[ i ].ShakeTimer, sizeof( Ships[ i ].ShakeTimer ), 1, fp );
-		fread( &Ships[ i ].ShakeDirTimer, sizeof( Ships[ i ].ShakeDirTimer ), 1, fp );
-		fread( &Ships[ i ].ShakeForce, sizeof( Ships[ i ].ShakeForce ), 1, fp );
+		file_read( &Ships[ i ].enable, sizeof( Ships[ i ].enable ), 1, fp );
+		file_read( &Ships[ i ].ShipThatLastKilledMe, sizeof( Ships[ i ].ShipThatLastKilledMe ), 1, fp );
+		file_read( &Ships[ i ].ShipThatLastHitMe, sizeof( Ships[ i ].ShipThatLastHitMe ), 1, fp );
+		file_read( &Ships[ i ].NumMultiples, sizeof( Ships[ i ].NumMultiples ), 1, fp );
+		file_read( &Ships[ i ].StealthTime, sizeof( Ships[ i ].StealthTime ), 1, fp );
+		file_read( &Ships[ i ].Timer, sizeof( Ships[ i ].Timer ), 1, fp );
+		file_read( &Ships[ i ].InvulTimer, sizeof( Ships[ i ].InvulTimer ), 1, fp );
+		file_read( &Ships[ i ].Invul, sizeof( Ships[ i ].Invul ), 1, fp );
+		file_read( &Ships[ i ].LastAngle, sizeof( Ships[ i ].LastAngle ), 1, fp );
+		file_read( &Ships[ i ].PrimBullIdCount, sizeof( Ships[ i ].PrimBullIdCount ), 1, fp );
+		file_read( &Ships[ i ].SecBullIdCount, sizeof( Ships[ i ].SecBullIdCount ), 1, fp );
+		file_read( &Ships[ i ].PickupIdCount, sizeof( Ships[ i ].PickupIdCount ), 1, fp );
+		file_read( &Ships[ i ].Damage, sizeof( Ships[ i ].Damage ), 1, fp );
+		file_read( &Ships[ i ].Primary, sizeof( Ships[ i ].Primary ), 1, fp );
+		file_read( &Ships[ i ].Secondary, sizeof( Ships[ i ].Secondary ), 1, fp );
+		file_read( &Ships[ i ].ModelNum, sizeof( Ships[ i ].ModelNum ), 1, fp );
+		file_read( &Ships[ i ].BikeNum, sizeof( Ships[ i ].BikeNum ), 1, fp );
+		file_read( &Ships[ i ].Pickups, sizeof( Ships[ i ].Pickups ), 1, fp );
+		file_read( &Ships[ i ].RegenSlots, sizeof( Ships[ i ].RegenSlots ), 1, fp );
+		file_read( &Ships[ i ].LastMove, sizeof( Ships[ i ].LastMove ), 1, fp );
+		file_read( &Ships[ i ].Move_Off, sizeof( Ships[ i ].Move_Off ), 1, fp );
+		file_read( &Ships[ i ].OrbModels, sizeof( Ships[ i ].OrbModels ), 1, fp );
+		file_read( &Ships[ i ].OrbAmmo, sizeof( Ships[ i ].OrbAmmo ), 1, fp );
+		file_read( &Ships[ i ].PrimPowerLevel, sizeof( Ships[ i ].PrimPowerLevel ), 1, fp );
+		file_read( &Ships[ i ].PrimID, sizeof( Ships[ i ].PrimID ), 1, fp );
+		file_read( &Ships[ i ].SecID, sizeof( Ships[ i ].SecID ), 1, fp );
+		file_read( &Ships[ i ].SecWeapon, sizeof( Ships[ i ].SecWeapon ), 1, fp );
+		file_read( &Ships[ i ].SuperNashramTimer, sizeof( Ships[ i ].SuperNashramTimer ), 1, fp );
+		file_read( &Ships[ i ].ShakeTimer, sizeof( Ships[ i ].ShakeTimer ), 1, fp );
+		file_read( &Ships[ i ].ShakeDirTimer, sizeof( Ships[ i ].ShakeDirTimer ), 1, fp );
+		file_read( &Ships[ i ].ShakeForce, sizeof( Ships[ i ].ShakeForce ), 1, fp );
 
-		fread( &LevelTimeTaken, sizeof( float ), 1, fp );
+		file_read( &LevelTimeTaken, sizeof( float ), 1, fp );
 	}
 
 	return( fp );

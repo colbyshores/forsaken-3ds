@@ -17,6 +17,7 @@
 #include "net/networking.h"
 #include "game/ships.h"
 #include "game/main.h"
+#include "data/file.h"
 #include "ui/title.h"
 #include "rendering/text.h"
 #include "rendering/screenpolys.h"
@@ -1055,12 +1056,12 @@ FILE *	LoadAllText( FILE * fp )
 	u_int16_t TempNumOfTextMessages = 0;
 
 
-	fread( &TempNumOfTextMessages, sizeof( NumOfTextMessages ), 1, fp );
+	file_read( &TempNumOfTextMessages, sizeof( NumOfTextMessages ), 1, fp );
 	if( TempNumOfTextMessages != NumOfTextMessages )
 		return nullptr;
 
-	fread( &TextActivatedOrder, sizeof( TextActivatedOrder ), 1, fp );
-	fread( &CurrentTextActivated, sizeof( CurrentTextActivated ), 1, fp );
+	file_read( &TextActivatedOrder, sizeof( TextActivatedOrder ), 1, fp );
+	file_read( &CurrentTextActivated, sizeof( CurrentTextActivated ), 1, fp );
 
 	Tmi = TextMsgInfo;
 	if( !Tmi )
@@ -1068,8 +1069,8 @@ FILE *	LoadAllText( FILE * fp )
 
 	for( i = 0 ; i < NumOfTextMessages ; i++ )
 	{
-		fread( &Tmi->Activated, sizeof( Tmi->Activated ), 1, fp );
-		fread( &Tmi->ActivatedOrder, sizeof( Tmi->ActivatedOrder ), 1, fp );
+		file_read( &Tmi->Activated, sizeof( Tmi->Activated ), 1, fp );
+		file_read( &Tmi->ActivatedOrder, sizeof( Tmi->ActivatedOrder ), 1, fp );
 		Tmi++;
 	}
 	return fp;

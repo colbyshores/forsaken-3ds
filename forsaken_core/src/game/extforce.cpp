@@ -402,7 +402,7 @@ FILE * LoadExternalForces( FILE * fp )
 
 	if( fp )
 	{
-		fread( &NumExtForces, sizeof( int16_t ), 1, fp );
+		file_read( &NumExtForces, sizeof( int16_t ), 1, fp );
 
 		if( NumExtForces != NumOfExternalForces )
 		{
@@ -414,7 +414,7 @@ FILE * LoadExternalForces( FILE * fp )
 
 		for( i = 0; i < NumOfExternalForces; i++ )
 		{
-			fread( &ExtForcesPtr->Status, sizeof( u_int16_t ), 1, fp );
+			file_read( &ExtForcesPtr->Status, sizeof( u_int16_t ), 1, fp );
 			ExtForcesPtr++;
 		}
 	}

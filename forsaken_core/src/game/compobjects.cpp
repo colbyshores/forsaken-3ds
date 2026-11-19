@@ -182,8 +182,8 @@ COMP_OBJ * LoadCompObj( int8_t * path, VECTOR * Pos, VECTOR * Dir, u_int16_t Gro
 
 	if( fp != nullptr )
 	{
-		fread( &MagicNumber, sizeof( u_int32_t ), 1, fp );
-		fread( &VersionNumber, sizeof( u_int32_t ), 1, fp );
+		file_read( &MagicNumber, sizeof( u_int32_t ), 1, fp );
+		file_read( &VersionNumber, sizeof( u_int32_t ), 1, fp );
 
 		if( ( MagicNumber != MAGIC_NUMBER ) || ( VersionNumber != COB_VERSION_NUMBER  ) )
 		{
@@ -196,13 +196,13 @@ COMP_OBJ * LoadCompObj( int8_t * path, VECTOR * Pos, VECTOR * Dir, u_int16_t Gro
 
 		if( CompsPtr )
 		{
-			fread( &NumModels, sizeof( int16_t ), 1, fp );
+			file_read( &NumModels, sizeof( int16_t ), 1, fp );
 
 			for( Count = 0; Count < NumModels; Count++ )
 			{
 				do
 				{
-					fread( &TempChar, sizeof( int8_t ), 1, fp );		// Skip model filenames
+					file_read( &TempChar, sizeof( int8_t ), 1, fp );		// Skip model filenames
 				}
 				while( TempChar );
 			}
@@ -292,7 +292,7 @@ FILE * LoadCompObjChildren( FILE * fp, COMP_OBJ * Comp, int16_t NumComp,
 
 	for( CompCount = 0; CompCount < NumComp; CompCount++ )
 	{
-		fread( &ID, sizeof( int16_t ), 1, fp );
+		file_read( &ID, sizeof( int16_t ), 1, fp );
 
 		Comp->Flags = COMPFLAG_Enable;
 		Comp->ID = ID;
@@ -410,7 +410,7 @@ FILE * LoadCompObjChildren( FILE * fp, COMP_OBJ * Comp, int16_t NumComp,
 			Comp->ModelIndex = INDEX_NONE;
 		}
 
-		fread( &NumTrans, sizeof( int16_t ), 1, fp );
+		file_read( &NumTrans, sizeof( int16_t ), 1, fp );
 
 		NumMorphs = 0;
 
@@ -426,9 +426,9 @@ FILE * LoadCompObjChildren( FILE * fp, COMP_OBJ * Comp, int16_t NumComp,
 
 				for( Count = 0; Count < NumTrans; Count++ )
 				{
-					fread( &TransPtr[ Count ].Type, sizeof( int16_t ), 1, fp );
-					fread( &TransStart, sizeof( float ), 1, fp );
-					fread( &TransDuration, sizeof( float ), 1, fp );
+					file_read( &TransPtr[ Count ].Type, sizeof( int16_t ), 1, fp );
+					file_read( &TransStart, sizeof( float ), 1, fp );
+					file_read( &TransDuration, sizeof( float ), 1, fp );
 
 					if( ( TransStart + TransDuration ) > *Time ) *Time = ( TransStart + TransDuration );
 
@@ -442,10 +442,10 @@ FILE * LoadCompObjChildren( FILE * fp, COMP_OBJ * Comp, int16_t NumComp,
 						if( TransPtr[ Count ].Data != nullptr )
 						{
 							AniTransPtr = (ANI_TRANSLATE *) TransPtr[ Count ].Data;
-							fread( &AniTransPtr->Trans.x, sizeof( float ), 1, fp );
-							fread( &AniTransPtr->Trans.y, sizeof( float ), 1, fp );
-							fread( &AniTransPtr->Trans.z, sizeof( float ), 1, fp );
-							fread( &AniTransPtr->Local, sizeof( int16_t ), 1, fp );
+							file_read( &AniTransPtr->Trans.x, sizeof( float ), 1, fp );
+							file_read( &AniTransPtr->Trans.y, sizeof( float ), 1, fp );
+							file_read( &AniTransPtr->Trans.z, sizeof( float ), 1, fp );
+							file_read( &AniTransPtr->Local, sizeof( int16_t ), 1, fp );
 #ifdef DEBUG_COMP
 							DebugPrintf("	TRANSLATION	:%f:%f: %f, %f, %f\n", TransStart, ( TransStart + TransDuration ),
 											AniTransPtr->Trans.x, AniTransPtr->Trans.y, AniTransPtr->Trans.z );
@@ -464,14 +464,14 @@ FILE * LoadCompObjChildren( FILE * fp, COMP_OBJ * Comp, int16_t NumComp,
 						if( TransPtr[ Count ].Data != nullptr )
 						{
 							AniRotPtr = (ANI_ROTATE *) TransPtr[ Count ].Data;
-							fread( &AniRotPtr->Axis.x, sizeof( float ), 1, fp );
-							fread( &AniRotPtr->Axis.y, sizeof( float ), 1, fp );
-							fread( &AniRotPtr->Axis.z, sizeof( float ), 1, fp );
-							fread( &AniRotPtr->Origin.x, sizeof( float ), 1, fp );
-							fread( &AniRotPtr->Origin.y, sizeof( float ), 1, fp );
-							fread( &AniRotPtr->Origin.z, sizeof( float ), 1, fp );
-							fread( &AniRotPtr->Angle, sizeof( float ), 1, fp );
-							fread( &AniRotPtr->Local, sizeof( int16_t ), 1, fp );
+							file_read( &AniRotPtr->Axis.x, sizeof( float ), 1, fp );
+							file_read( &AniRotPtr->Axis.y, sizeof( float ), 1, fp );
+							file_read( &AniRotPtr->Axis.z, sizeof( float ), 1, fp );
+							file_read( &AniRotPtr->Origin.x, sizeof( float ), 1, fp );
+							file_read( &AniRotPtr->Origin.y, sizeof( float ), 1, fp );
+							file_read( &AniRotPtr->Origin.z, sizeof( float ), 1, fp );
+							file_read( &AniRotPtr->Angle, sizeof( float ), 1, fp );
+							file_read( &AniRotPtr->Local, sizeof( int16_t ), 1, fp );
 							AniRotPtr->Angle = D2R( AniRotPtr->Angle );
 
 							AniRotPtr->Origin.x = -AniRotPtr->Origin.x;
@@ -516,12 +516,12 @@ FILE * LoadCompObjChildren( FILE * fp, COMP_OBJ * Comp, int16_t NumComp,
 						if( TransPtr[ Count ].Data != nullptr )
 						{
 							AniPropPtr = (ANI_PROPERTY *) TransPtr[ Count ].Data;
-							fread( &AniPropPtr->Type, sizeof( int16_t ), 1, fp );
+							file_read( &AniPropPtr->Type, sizeof( int16_t ), 1, fp );
 
 							switch( AniPropPtr->Type )
 							{
 							case PROPTYPE_State:
-								fread( &AniPropPtr->Value, sizeof( int16_t ), 1, fp );
+								file_read( &AniPropPtr->Value, sizeof( int16_t ), 1, fp );
 								break;
 							case PROPTYPE_SFX:
 								file_read_cstring( fp, SFXFilename, sizeof( SFXFilename ) );
@@ -530,12 +530,12 @@ FILE * LoadCompObjChildren( FILE * fp, COMP_OBJ * Comp, int16_t NumComp,
 								break;
 
 							case PROPTYPE_Unknown:
-								fread( &AniPropPtr->Value, sizeof( int16_t ), 1, fp );
+								file_read( &AniPropPtr->Value, sizeof( int16_t ), 1, fp );
 								break;
 
 							default:
 								Msg( "Unknown AnimProperty Type %hd\n", AniPropPtr->Type );
-								fread( &AniPropPtr->Value, sizeof( int16_t ), 1, fp );
+								file_read( &AniPropPtr->Value, sizeof( int16_t ), 1, fp );
 								break;
 							}
 
@@ -599,7 +599,7 @@ FILE * LoadCompObjChildren( FILE * fp, COMP_OBJ * Comp, int16_t NumComp,
 			Comp->Trans = nullptr;
 		}
 
-		fread( &NumColZones, sizeof( int16_t ), 1, fp );
+		file_read( &NumColZones, sizeof( int16_t ), 1, fp );
 
 		if( NumColZones )
 		{
@@ -609,22 +609,22 @@ FILE * LoadCompObjChildren( FILE * fp, COMP_OBJ * Comp, int16_t NumComp,
 			{
 				for( Zone = 0; Zone < NumColZones; Zone++ )
 				{
-					fread( &ColZoneType, sizeof( int16_t ), 1, fp );			// 0-sphere 1-Box 2-Convex Shape
-					fread( &ColZoneSensitive, sizeof( int16_t ), 1, fp );		// 1 = touching it bumps the owning BGObject
-					fread( &ColZoneDamage, sizeof( float ), 1, fp );		// Damage per second
+					file_read( &ColZoneType, sizeof( int16_t ), 1, fp );			// 0-sphere 1-Box 2-Convex Shape
+					file_read( &ColZoneSensitive, sizeof( int16_t ), 1, fp );		// 1 = touching it bumps the owning BGObject
+					file_read( &ColZoneDamage, sizeof( float ), 1, fp );		// Damage per second
 					ColZoneDamage /= ANIM_SECOND;
 
 					ZonesPtr[ Zone ].Type = ColZoneType;
 					ZonesPtr[ Zone ].Sensitive = ColZoneSensitive;
 					ZonesPtr[ Zone ].Damage = ColZoneDamage;
 
-					fread( &BoxCenter.x, sizeof( float ), 1, fp );
-					fread( &BoxCenter.y, sizeof( float ), 1, fp );
-					fread( &BoxCenter.z, sizeof( float ), 1, fp );
+					file_read( &BoxCenter.x, sizeof( float ), 1, fp );
+					file_read( &BoxCenter.y, sizeof( float ), 1, fp );
+					file_read( &BoxCenter.z, sizeof( float ), 1, fp );
 
-					fread( &BoxHalfSize.x, sizeof( float ), 1, fp );
-					fread( &BoxHalfSize.y, sizeof( float ), 1, fp );
-					fread( &BoxHalfSize.z, sizeof( float ), 1, fp );
+					file_read( &BoxHalfSize.x, sizeof( float ), 1, fp );
+					file_read( &BoxHalfSize.y, sizeof( float ), 1, fp );
+					file_read( &BoxHalfSize.z, sizeof( float ), 1, fp );
 
 					switch( ColZoneType )
 					{
@@ -653,7 +653,7 @@ FILE * LoadCompObjChildren( FILE * fp, COMP_OBJ * Comp, int16_t NumComp,
 							AniZoneBoxPtr->Center = BoxCenter;
 							AniZoneBoxPtr->HalfSize = BoxHalfSize;
 
-							fread( &NumSides, sizeof( int16_t ), 1, fp );
+							file_read( &NumSides, sizeof( int16_t ), 1, fp );
 
 							AniZoneBoxPtr->NumSides = NumSides;
 							AniZoneBoxPtr->Sides = (ZONESIDE*)malloc( sizeof( ZONESIDE ) * NumSides );
@@ -664,12 +664,12 @@ FILE * LoadCompObjChildren( FILE * fp, COMP_OBJ * Comp, int16_t NumComp,
 
 								for( Side = 0; Side < NumSides; Side++ )
 								{
-									fread( &SidesPtr->Normal.x, sizeof( float ), 1, fp );
-									fread( &SidesPtr->Normal.y, sizeof( float ), 1, fp );
-									fread( &SidesPtr->Normal.z, sizeof( float ), 1, fp );
-									fread( &SidesPtr->PlaneOffset, sizeof( float ), 1, fp );
-									fread( &SidesPtr->Sensitive, sizeof( int16_t ), 1, fp );
-									fread( &SidesPtr->Damage, sizeof( float ), 1, fp );
+									file_read( &SidesPtr->Normal.x, sizeof( float ), 1, fp );
+									file_read( &SidesPtr->Normal.y, sizeof( float ), 1, fp );
+									file_read( &SidesPtr->Normal.z, sizeof( float ), 1, fp );
+									file_read( &SidesPtr->PlaneOffset, sizeof( float ), 1, fp );
+									file_read( &SidesPtr->Sensitive, sizeof( int16_t ), 1, fp );
+									file_read( &SidesPtr->Damage, sizeof( float ), 1, fp );
 									SidesPtr->Damage /= ANIM_SECOND;
 									SidesPtr++;
 								}
@@ -696,7 +696,7 @@ FILE * LoadCompObjChildren( FILE * fp, COMP_OBJ * Comp, int16_t NumComp,
 							AniZonePolyPtr->Center = BoxCenter;
 							AniZonePolyPtr->HalfSize = BoxHalfSize;
 
-							fread( &NumSides, sizeof( int16_t ), 1, fp );
+							file_read( &NumSides, sizeof( int16_t ), 1, fp );
 
 							AniZonePolyPtr->NumSides = NumSides;
 							AniZonePolyPtr->Sides = (ZONESIDE*)malloc( sizeof( ZONESIDE ) * NumSides );
@@ -707,12 +707,12 @@ FILE * LoadCompObjChildren( FILE * fp, COMP_OBJ * Comp, int16_t NumComp,
 
 								for( Side = 0; Side < NumSides; Side++ )
 								{
-									fread( &SidesPtr->Normal.x, sizeof( float ), 1, fp );
-									fread( &SidesPtr->Normal.y, sizeof( float ), 1, fp );
-									fread( &SidesPtr->Normal.z, sizeof( float ), 1, fp );
-									fread( &SidesPtr->PlaneOffset, sizeof( float ), 1, fp );
-									fread( &SidesPtr->Sensitive, sizeof( int16_t ), 1, fp );
-									fread( &SidesPtr->Damage, sizeof( float ), 1, fp );
+									file_read( &SidesPtr->Normal.x, sizeof( float ), 1, fp );
+									file_read( &SidesPtr->Normal.y, sizeof( float ), 1, fp );
+									file_read( &SidesPtr->Normal.z, sizeof( float ), 1, fp );
+									file_read( &SidesPtr->PlaneOffset, sizeof( float ), 1, fp );
+									file_read( &SidesPtr->Sensitive, sizeof( int16_t ), 1, fp );
+									file_read( &SidesPtr->Damage, sizeof( float ), 1, fp );
 									SidesPtr->Damage /= ANIM_SECOND;
 									SidesPtr++;
 								}
@@ -747,7 +747,7 @@ FILE * LoadCompObjChildren( FILE * fp, COMP_OBJ * Comp, int16_t NumComp,
 			Comp->ColZones = nullptr;
 		}
 
-		fread( &Comp->NumChildren, sizeof( int16_t ), 1, fp );
+		file_read( &Comp->NumChildren, sizeof( int16_t ), 1, fp );
 
 		if( Comp->NumChildren )
 		{
@@ -1978,35 +1978,35 @@ FILE * LoadAllCompObj( FILE * fp, COMP_OBJ * Children, int16_t NumChildren )
 	{
 		for( Count = 0; Count < NumChildren; Count++ )
 		{
-			fread( &Children->Flags, sizeof( int16_t ), 1, fp );
-			fread( &Children->ID, sizeof( int16_t ), 1, fp );
-			fread( &Children->DisplayPos, sizeof( VECTOR ), 1, fp );
-			fread( &Children->OffPos, sizeof( VECTOR ), 1, fp );
-			fread( &Children->Dir, sizeof( VECTOR ), 1, fp );
-			fread( &Children->Up, sizeof( VECTOR ), 1, fp );
-			fread( &Children->RotPoint, sizeof( VECTOR ), 1, fp );
-			fread( &Children->RotAxis, sizeof( VECTOR ), 1, fp );
-			fread( &Children->RotAngle, sizeof( float ), 1, fp );
-			fread( &Children->InitMatrix, sizeof( MATRIX ), 1, fp );
-			fread( &Children->LocalMatrix, sizeof( MATRIX ), 1, fp );
-			fread( &Children->DisplayMatrix, sizeof( MATRIX ), 1, fp );
-			fread( &Children->InvDisplayMatrix, sizeof( MATRIX ), 1, fp );
-			fread( &Children->Frame, sizeof( int16_t ), 1, fp );
-			fread( &Children->InterpFrame, sizeof( int16_t ), 1, fp );
-			fread( &Children->InterpTime, sizeof( float ), 1, fp );
-			fread( &Children->OldOldTime, sizeof( float ), 1, fp );
-			fread( &Children->OldOldDisplayPos, sizeof( VECTOR ), 1, fp );
-			fread( &Children->OldOldDisplayMatrix, sizeof( MATRIX ), 1, fp );
-			fread( &Children->OldOldInvDisplayMatrix, sizeof( MATRIX ), 1, fp );
-			fread( &Children->OldTime, sizeof( float ), 1, fp );
-			fread( &Children->OldDisplayPos, sizeof( VECTOR ), 1, fp );
-			fread( &Children->OldDisplayMatrix, sizeof( MATRIX ), 1, fp );
-			fread( &Children->OldInvDisplayMatrix, sizeof( MATRIX ), 1, fp );
-			fread( &Children->UserControl, sizeof( bool ), 1, fp );
-			fread( &Children->UserAxis, sizeof( VECTOR ), 1, fp );
-			fread( &Children->UserAxisPoint, sizeof( VECTOR ), 1, fp );
-			fread( &Children->UserAngle, sizeof( float ), 1, fp );
-			fread( &Children->ModelIndex, sizeof( u_int16_t ), 1, fp );
+			file_read( &Children->Flags, sizeof( int16_t ), 1, fp );
+			file_read( &Children->ID, sizeof( int16_t ), 1, fp );
+			file_read( &Children->DisplayPos, sizeof( VECTOR ), 1, fp );
+			file_read( &Children->OffPos, sizeof( VECTOR ), 1, fp );
+			file_read( &Children->Dir, sizeof( VECTOR ), 1, fp );
+			file_read( &Children->Up, sizeof( VECTOR ), 1, fp );
+			file_read( &Children->RotPoint, sizeof( VECTOR ), 1, fp );
+			file_read( &Children->RotAxis, sizeof( VECTOR ), 1, fp );
+			file_read( &Children->RotAngle, sizeof( float ), 1, fp );
+			file_read( &Children->InitMatrix, sizeof( MATRIX ), 1, fp );
+			file_read( &Children->LocalMatrix, sizeof( MATRIX ), 1, fp );
+			file_read( &Children->DisplayMatrix, sizeof( MATRIX ), 1, fp );
+			file_read( &Children->InvDisplayMatrix, sizeof( MATRIX ), 1, fp );
+			file_read( &Children->Frame, sizeof( int16_t ), 1, fp );
+			file_read( &Children->InterpFrame, sizeof( int16_t ), 1, fp );
+			file_read( &Children->InterpTime, sizeof( float ), 1, fp );
+			file_read( &Children->OldOldTime, sizeof( float ), 1, fp );
+			file_read( &Children->OldOldDisplayPos, sizeof( VECTOR ), 1, fp );
+			file_read( &Children->OldOldDisplayMatrix, sizeof( MATRIX ), 1, fp );
+			file_read( &Children->OldOldInvDisplayMatrix, sizeof( MATRIX ), 1, fp );
+			file_read( &Children->OldTime, sizeof( float ), 1, fp );
+			file_read( &Children->OldDisplayPos, sizeof( VECTOR ), 1, fp );
+			file_read( &Children->OldDisplayMatrix, sizeof( MATRIX ), 1, fp );
+			file_read( &Children->OldInvDisplayMatrix, sizeof( MATRIX ), 1, fp );
+			file_read( &Children->UserControl, sizeof( bool ), 1, fp );
+			file_read( &Children->UserAxis, sizeof( VECTOR ), 1, fp );
+			file_read( &Children->UserAxisPoint, sizeof( VECTOR ), 1, fp );
+			file_read( &Children->UserAngle, sizeof( float ), 1, fp );
+			file_read( &Children->ModelIndex, sizeof( u_int16_t ), 1, fp );
 
 			if( Children->NumChildren )
 			{

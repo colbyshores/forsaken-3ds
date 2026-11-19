@@ -1,5 +1,6 @@
 /* 2dpolys.cpp -- FmPoly camera-facing sprites: sequences and batches; see 2dpolys.h. */
 #include "game/main.h"
+#include "data/file.h"
 #include <stdio.h>
 #include "math/new3d.h"
 #include "math/quat.h"
@@ -2516,50 +2517,50 @@ FILE * LoadFmPolys( FILE * fp )
 
 	if( fp )
 	{
-		fread( &TotalFmPolysInUse, sizeof( u_int32_t ),1 ,fp );
-		fread( &FirstFmPolyUsed, sizeof( FirstFmPolyUsed ), 1, fp );
-		fread( &FirstFmPolyFree, sizeof( FirstFmPolyFree ), 1, fp );
+		file_read( &TotalFmPolysInUse, sizeof( u_int32_t ),1 ,fp );
+		file_read( &FirstFmPolyUsed, sizeof( FirstFmPolyUsed ), 1, fp );
+		file_read( &FirstFmPolyFree, sizeof( FirstFmPolyFree ), 1, fp );
 
 		for( i = 0; i < ( MAXTPAGESPERTLOAD + 1 ); i++ )
 		{
-			fread( &FmPolyTPages[ i ].FirstPoly, sizeof( u_int16_t ), 1, fp );
+			file_read( &FmPolyTPages[ i ].FirstPoly, sizeof( u_int16_t ), 1, fp );
 		}
 
 		i = FirstFmPolyUsed;
 
 		while( i != INDEX_NONE )
 		{
-			fread( &FmPolys[ i ].Next, sizeof( u_int16_t ), 1, fp );
-			fread( &FmPolys[ i ].Prev, sizeof( u_int16_t ), 1, fp );
-			fread( &FmPolys[ i ].NextInTPage, sizeof( u_int16_t ), 1, fp );
-			fread( &FmPolys[ i ].PrevInTPage, sizeof( u_int16_t ), 1, fp );
-			fread( &FmPolys[ i ].LifeCount, sizeof( float ), 1, fp );
-			fread( &FmPolys[ i ].Pos, sizeof( VECTOR ), 1, fp );
-			fread( &FmPolys[ i ].Start_R, sizeof( u_int8_t ), 1, fp );
-			fread( &FmPolys[ i ].Start_G, sizeof( u_int8_t ), 1, fp );
-			fread( &FmPolys[ i ].Start_B, sizeof( u_int8_t ), 1, fp );
-			fread( &FmPolys[ i ].R, sizeof( u_int8_t ), 1, fp );
-			fread( &FmPolys[ i ].G, sizeof( u_int8_t ), 1, fp );
-			fread( &FmPolys[ i ].B, sizeof( u_int8_t ), 1, fp );
-			fread( &FmPolys[ i ].Trans, sizeof( u_int8_t ), 1, fp );
-			fread( &FmPolys[ i ].OnceOnly, sizeof( u_int8_t ), 1, fp );
-			fread( &FmPolys[ i ].Rot, sizeof( float ), 1, fp );
-			fread( &FmPolys[ i ].RotSpeed, sizeof( float ), 1, fp );
-			fread( &FmPolys[ i ].Frame, sizeof( float ), 1, fp );
-			fread( &FmPolys[ i ].AnimSpeed, sizeof( float ), 1, fp );
-			fread( &FmPolys[ i ].Flags, sizeof( int16_t ), 1, fp );
-			fread( &Frm_Info_Index, sizeof( int16_t ), 1, fp );
+			file_read( &FmPolys[ i ].Next, sizeof( u_int16_t ), 1, fp );
+			file_read( &FmPolys[ i ].Prev, sizeof( u_int16_t ), 1, fp );
+			file_read( &FmPolys[ i ].NextInTPage, sizeof( u_int16_t ), 1, fp );
+			file_read( &FmPolys[ i ].PrevInTPage, sizeof( u_int16_t ), 1, fp );
+			file_read( &FmPolys[ i ].LifeCount, sizeof( float ), 1, fp );
+			file_read( &FmPolys[ i ].Pos, sizeof( VECTOR ), 1, fp );
+			file_read( &FmPolys[ i ].Start_R, sizeof( u_int8_t ), 1, fp );
+			file_read( &FmPolys[ i ].Start_G, sizeof( u_int8_t ), 1, fp );
+			file_read( &FmPolys[ i ].Start_B, sizeof( u_int8_t ), 1, fp );
+			file_read( &FmPolys[ i ].R, sizeof( u_int8_t ), 1, fp );
+			file_read( &FmPolys[ i ].G, sizeof( u_int8_t ), 1, fp );
+			file_read( &FmPolys[ i ].B, sizeof( u_int8_t ), 1, fp );
+			file_read( &FmPolys[ i ].Trans, sizeof( u_int8_t ), 1, fp );
+			file_read( &FmPolys[ i ].OnceOnly, sizeof( u_int8_t ), 1, fp );
+			file_read( &FmPolys[ i ].Rot, sizeof( float ), 1, fp );
+			file_read( &FmPolys[ i ].RotSpeed, sizeof( float ), 1, fp );
+			file_read( &FmPolys[ i ].Frame, sizeof( float ), 1, fp );
+			file_read( &FmPolys[ i ].AnimSpeed, sizeof( float ), 1, fp );
+			file_read( &FmPolys[ i ].Flags, sizeof( int16_t ), 1, fp );
+			file_read( &Frm_Info_Index, sizeof( int16_t ), 1, fp );
 			FmPolys[ i ].Frm_Info = Get_Frm_Info_Address( Frm_Info_Index );
-			fread( &FmPolys[ i ].SeqNum, sizeof( int16_t ), 1, fp );
-			fread( &FmPolys[ i ].Dir, sizeof( VECTOR ), 1, fp );
-			fread( &FmPolys[ i ].DirVector, sizeof( VECTOR ), 1, fp );
-			fread( &FmPolys[ i ].UpVector, sizeof( VECTOR ), 1, fp );
-			fread( &FmPolys[ i ].Mat, sizeof( MATRIX ), 1, fp );
-			fread( &FmPolys[ i ].Group, sizeof( u_int16_t ), 1, fp );
-			fread( &FmPolys[ i ].Speed, sizeof( float ), 1, fp );
-			fread( &FmPolys[ i ].UpSpeed, sizeof( float ), 1, fp );
-			fread( &FmPolys[ i ].xsize, sizeof( float ), 1, fp );
-			fread( &FmPolys[ i ].ysize, sizeof( float ), 1, fp );
+			file_read( &FmPolys[ i ].SeqNum, sizeof( int16_t ), 1, fp );
+			file_read( &FmPolys[ i ].Dir, sizeof( VECTOR ), 1, fp );
+			file_read( &FmPolys[ i ].DirVector, sizeof( VECTOR ), 1, fp );
+			file_read( &FmPolys[ i ].UpVector, sizeof( VECTOR ), 1, fp );
+			file_read( &FmPolys[ i ].Mat, sizeof( MATRIX ), 1, fp );
+			file_read( &FmPolys[ i ].Group, sizeof( u_int16_t ), 1, fp );
+			file_read( &FmPolys[ i ].Speed, sizeof( float ), 1, fp );
+			file_read( &FmPolys[ i ].UpSpeed, sizeof( float ), 1, fp );
+			file_read( &FmPolys[ i ].xsize, sizeof( float ), 1, fp );
+			file_read( &FmPolys[ i ].ysize, sizeof( float ), 1, fp );
 			i = FmPolys[ i ].Prev;
 		}
 
@@ -2584,7 +2585,7 @@ FILE * LoadFmPolys( FILE * fp )
 			FmPolys[i].PrevInTPage = INDEX_NONE;
 			FmPolys[i].Prev = INDEX_NONE;
 
-			fread( &FmPolys[ i ].Next, sizeof( u_int16_t ), 1, fp );
+			file_read( &FmPolys[ i ].Next, sizeof( u_int16_t ), 1, fp );
 			i = FmPolys[ i ].Next;
 		}
 	}

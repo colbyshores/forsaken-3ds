@@ -7349,8 +7349,8 @@ void GetSavedGameData( void )
 
 	if( fp )
 	{
-		fread( &MagicNumber, sizeof( u_int32_t ), 1, fp );
-		fread( &VersionNumber, sizeof( u_int32_t ), 1, fp );
+		file_read( &MagicNumber, sizeof( u_int32_t ), 1, fp );
+		file_read( &VersionNumber, sizeof( u_int32_t ), 1, fp );
 
 		if( ( MagicNumber != MAGIC_NUMBER ) || ( VersionNumber != LOADSAVE_VERSION_NUMBER  ) )
 			Msg("Save file is in an old format.\nYou will most likely crash...\n\n");
@@ -7358,21 +7358,21 @@ void GetSavedGameData( void )
 		i = 0;
 		do
 		{
-			fread( &buf[i], sizeof(char), 1, fp );
+			file_read( &buf[i], sizeof(char), 1, fp );
 		}
 		while( buf[ i++ ] != 0 );
 		i = 0;
 		do
 		{
-			fread( &biker[i], sizeof(char), 1, fp );
+			file_read( &biker[i], sizeof(char), 1, fp );
 		}
 		while( biker[ i++ ] != 0 );
 
-		fread( &Hours, sizeof( Hours ), 1, fp );
-		fread( &Minutes, sizeof( Minutes ), 1, fp );
-		fread( &Seconds, sizeof( Seconds ), 1, fp );
-		fread( &InitEnemiesNum, sizeof( InitEnemiesNum ), 1, fp );
-		fread( &KilledEnemiesNum, sizeof( KilledEnemiesNum ), 1, fp );
+		file_read( &Hours, sizeof( Hours ), 1, fp );
+		file_read( &Minutes, sizeof( Minutes ), 1, fp );
+		file_read( &Seconds, sizeof( Seconds ), 1, fp );
+		file_read( &InitEnemiesNum, sizeof( InitEnemiesNum ), 1, fp );
+		file_read( &KilledEnemiesNum, sizeof( KilledEnemiesNum ), 1, fp );
 
 		fclose( fp );
 

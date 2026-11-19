@@ -1573,7 +1573,7 @@ FILE * LoadAllTriggers( FILE * fp )
 		/*===================================================================
 				TrigVars
 		===================================================================*/
-		fread( &NumTrigVars, sizeof( int ), 1, fp );
+		file_read( &NumTrigVars, sizeof( int ), 1, fp );
 
 		if( NumOfTrigVars != NumTrigVars )
 		{
@@ -1584,14 +1584,14 @@ FILE * LoadAllTriggers( FILE * fp )
 
 		for( i = 0; i < NumOfTrigVars; i++ )
 		{
-			fread( &TrigVar->State, sizeof( int ), 1, fp );
+			file_read( &TrigVar->State, sizeof( int ), 1, fp );
 			TrigVar++;
 		}
 
 		/*===================================================================
 				Triggers
 		===================================================================*/
-		fread( &NumTrigs, sizeof( int ), 1, fp );
+		file_read( &NumTrigs, sizeof( int ), 1, fp );
 
 		if( NumOfTriggers != NumTrigs )
 		{
@@ -1603,14 +1603,14 @@ FILE * LoadAllTriggers( FILE * fp )
 
 		for( i = 0; i < NumOfTriggers; i++ )
 		{
-			fread( &Trig->Active, sizeof( int ), 1, fp );
+			file_read( &Trig->Active, sizeof( int ), 1, fp );
 			Trig++;
 		}
 
 		/*===================================================================
 				TrigMods ( Qued )
 		===================================================================*/
-		fread( &NumTrigMods, sizeof( int ), 1, fp );
+		file_read( &NumTrigMods, sizeof( int ), 1, fp );
 
 		if( NumOfTrigModQues != NumTrigMods )
 		{
@@ -1622,8 +1622,8 @@ FILE * LoadAllTriggers( FILE * fp )
 
 		for( i = 0; i < NumOfTrigModQues; i++ )
 		{
-			fread( &TrigQue->Time, sizeof( float ), 1, fp );
-			fread( &Index, sizeof( int32_t ), 1, fp );
+			file_read( &TrigQue->Time, sizeof( float ), 1, fp );
+			file_read( &Index, sizeof( int32_t ), 1, fp );
 			TrigQue->TriggerMod = ( TrigMods + Index );
 			TrigQue++;
 		}

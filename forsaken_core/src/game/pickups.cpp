@@ -2978,10 +2978,10 @@ bool LoadPickupsPositions( void )
 	{
 
 		/* read in the magic number */
-		fread( &MagicNumber, sizeof( u_int32_t ), 1, fp );
+		file_read( &MagicNumber, sizeof( u_int32_t ), 1, fp );
 
 		/* read in the pic version number */
-		fread( &VersionNumber, sizeof( u_int32_t ), 1, fp );
+		file_read( &VersionNumber, sizeof( u_int32_t ), 1, fp );
 
 		/* fail if the magic/version numbers are not proper */
 		if( ( MagicNumber != MAGIC_NUMBER ) || ( VersionNumber != PIC_VERSION_NUMBER  ) )
@@ -2992,7 +2992,7 @@ bool LoadPickupsPositions( void )
 		}
 
 		/* read in the number of regen points contained in the file */
-		fread( &NumRegenPoints, sizeof( int16_t ), 1, fp );
+		file_read( &NumRegenPoints, sizeof( int16_t ), 1, fp );
 
 		/* if global RegenPoints list of regen points IS set */
 		if( RegenPoints != nullptr )
@@ -3029,16 +3029,16 @@ bool LoadPickupsPositions( void )
 				RegenPoints[ Count ].Wait = 0.0F;
 
 				/* extract each field for the regen point */
-				fread( &RegenPoints[ Count ].GenType,  sizeof( u_int16_t ), 1, fp );
-				fread( &RegenPoints[ Count ].RegenType,  sizeof( u_int16_t ), 1, fp );
-				fread( &RegenPoints[ Count ].GenDelay,   sizeof( float ),  1, fp );
-				fread( &RegenPoints[ Count ].Lifespan,   sizeof( float ),  1, fp );
-				fread( &RegenPoints[ Count ].Pos.x,    sizeof( float ),  1, fp );
-				fread( &RegenPoints[ Count ].Pos.y,    sizeof( float ),  1, fp );
-				fread( &RegenPoints[ Count ].Pos.z,    sizeof( float ),  1, fp );
-				fread( &RegenPoints[ Count ].Group,    sizeof( u_int16_t ), 1, fp );
-				fread( &RegenPoints[ Count ].Type,     sizeof( u_int16_t ), 1, fp );
-				fread( &RegenPoints[ Count ].TriggerMod, sizeof( u_int16_t ), 1, fp );
+				file_read( &RegenPoints[ Count ].GenType,  sizeof( u_int16_t ), 1, fp );
+				file_read( &RegenPoints[ Count ].RegenType,  sizeof( u_int16_t ), 1, fp );
+				file_read( &RegenPoints[ Count ].GenDelay,   sizeof( float ),  1, fp );
+				file_read( &RegenPoints[ Count ].Lifespan,   sizeof( float ),  1, fp );
+				file_read( &RegenPoints[ Count ].Pos.x,    sizeof( float ),  1, fp );
+				file_read( &RegenPoints[ Count ].Pos.y,    sizeof( float ),  1, fp );
+				file_read( &RegenPoints[ Count ].Pos.z,    sizeof( float ),  1, fp );
+				file_read( &RegenPoints[ Count ].Group,    sizeof( u_int16_t ), 1, fp );
+				file_read( &RegenPoints[ Count ].Type,     sizeof( u_int16_t ), 1, fp );
+				file_read( &RegenPoints[ Count ].TriggerMod, sizeof( u_int16_t ), 1, fp );
 
 				/* if pickup is not valid */
 				if(
@@ -4412,105 +4412,105 @@ FILE * LoadAllPickups( FILE * fp )
 	{
 		for( i = 0; i < MAXGROUPS; i++ )
 		{
-			fread( &NumPickupsPerGroup[ i ], sizeof( int16_t ), 1, fp );
-			fread( &TempIndex, sizeof( u_int16_t ), 1, fp );
+			file_read( &NumPickupsPerGroup[ i ], sizeof( int16_t ), 1, fp );
+			file_read( &TempIndex, sizeof( u_int16_t ), 1, fp );
 			if( TempIndex != INDEX_NONE ) PickupGroups[ i ] = &Pickups[ TempIndex ];
 			else PickupGroups[ i ] = nullptr;
 		}
 
 		for( i = 0; i < MAXPICKUPTYPES; i++ )
 		{
-			fread( &NumPickupType[ i ], sizeof( int16_t ), 1, fp );
-			fread( &MaxPickupType[ i ], sizeof( int16_t ), 1, fp );
-			fread( &PickupsGot[ i ], sizeof( int16_t ), 1, fp );
-			fread( &PickupValid[ i ], sizeof( bool ), 1, fp );
+			file_read( &NumPickupType[ i ], sizeof( int16_t ), 1, fp );
+			file_read( &MaxPickupType[ i ], sizeof( int16_t ), 1, fp );
+			file_read( &PickupsGot[ i ], sizeof( int16_t ), 1, fp );
+			file_read( &PickupValid[ i ], sizeof( bool ), 1, fp );
 		}
 
 		for( i = 0; i < MAXPRIMARYWEAPONS; i++ )
 		{
-			fread( &NumPrimWeapons[ i ], sizeof( int16_t ), 1, fp );
+			file_read( &NumPrimWeapons[ i ], sizeof( int16_t ), 1, fp );
 		}
 
-		fread( &NitroFuel, sizeof( NitroFuel ), 1, fp );
-		fread( &NitroFuelUsed, sizeof( NitroFuelUsed ), 1, fp );
-		fread( &NumStealths, sizeof( int16_t ), 1, fp );
-		fread( &NumInvuls, sizeof( int16_t ), 1, fp );
-		fread( &NumSuperNashrams, sizeof( int16_t ), 1, fp );
-		fread( &NumOrbs, sizeof( int16_t ), 1, fp );
-		fread( &NumPowerPods, sizeof( int16_t ), 1, fp );
-		fread( &PickupInvulnerability, sizeof( bool ), 1, fp );
-		fread( &NumGoldBars, sizeof( int16_t ), 1, fp );
-		fread( &FirstPickupUsed, sizeof( u_int16_t ), 1, fp );
-		fread( &FirstPickupFree, sizeof( u_int16_t ), 1, fp );
-		fread( &NumRegenPoints, sizeof( int16_t ), 1, fp );
-		fread( &CrystalsFound, sizeof( CrystalsFound ), 1, fp );
+		file_read( &NitroFuel, sizeof( NitroFuel ), 1, fp );
+		file_read( &NitroFuelUsed, sizeof( NitroFuelUsed ), 1, fp );
+		file_read( &NumStealths, sizeof( int16_t ), 1, fp );
+		file_read( &NumInvuls, sizeof( int16_t ), 1, fp );
+		file_read( &NumSuperNashrams, sizeof( int16_t ), 1, fp );
+		file_read( &NumOrbs, sizeof( int16_t ), 1, fp );
+		file_read( &NumPowerPods, sizeof( int16_t ), 1, fp );
+		file_read( &PickupInvulnerability, sizeof( bool ), 1, fp );
+		file_read( &NumGoldBars, sizeof( int16_t ), 1, fp );
+		file_read( &FirstPickupUsed, sizeof( u_int16_t ), 1, fp );
+		file_read( &FirstPickupFree, sizeof( u_int16_t ), 1, fp );
+		file_read( &NumRegenPoints, sizeof( int16_t ), 1, fp );
+		file_read( &CrystalsFound, sizeof( CrystalsFound ), 1, fp );
 
 		for( i = 0; i < NumRegenPoints; i++ )
 		{
-			fread( &RegenPoints[ i ].GenType, sizeof( u_int16_t ), 1, fp );
-			fread( &RegenPoints[ i ].RegenType, sizeof( u_int16_t ), 1, fp );
-			fread( &RegenPoints[ i ].GenDelay, sizeof( float ), 1, fp );
-			fread( &RegenPoints[ i ].Lifespan, sizeof( float ), 1, fp );
-			fread( &RegenPoints[ i ].Wait, sizeof( float ), 1, fp );
-			fread( &RegenPoints[ i ].Status, sizeof( int16_t ), 1, fp );
-			fread( &RegenPoints[ i ].Group, sizeof( int16_t ), 1, fp );
-			fread( &RegenPoints[ i ].Pos, sizeof( VECTOR ), 1, fp );
-			fread( &RegenPoints[ i ].Type, sizeof( u_int16_t ), 1, fp );
-			fread( &RegenPoints[ i ].TriggerMod, sizeof( u_int16_t ), 1, fp );
-			fread( &RegenPoints[ i ].PickupIndex, sizeof( u_int16_t ), 1, fp );
-			fread( &RegenPoints[ i ].PickupID, sizeof( u_int16_t ), 1, fp );
+			file_read( &RegenPoints[ i ].GenType, sizeof( u_int16_t ), 1, fp );
+			file_read( &RegenPoints[ i ].RegenType, sizeof( u_int16_t ), 1, fp );
+			file_read( &RegenPoints[ i ].GenDelay, sizeof( float ), 1, fp );
+			file_read( &RegenPoints[ i ].Lifespan, sizeof( float ), 1, fp );
+			file_read( &RegenPoints[ i ].Wait, sizeof( float ), 1, fp );
+			file_read( &RegenPoints[ i ].Status, sizeof( int16_t ), 1, fp );
+			file_read( &RegenPoints[ i ].Group, sizeof( int16_t ), 1, fp );
+			file_read( &RegenPoints[ i ].Pos, sizeof( VECTOR ), 1, fp );
+			file_read( &RegenPoints[ i ].Type, sizeof( u_int16_t ), 1, fp );
+			file_read( &RegenPoints[ i ].TriggerMod, sizeof( u_int16_t ), 1, fp );
+			file_read( &RegenPoints[ i ].PickupIndex, sizeof( u_int16_t ), 1, fp );
+			file_read( &RegenPoints[ i ].PickupID, sizeof( u_int16_t ), 1, fp );
 		}
 
 		i = FirstPickupUsed;
 
 		while( i != INDEX_NONE )
 		{
-			fread( &Pickups[ i ].Next, sizeof( u_int16_t ), 1, fp );
-			fread( &Pickups[ i ].Prev, sizeof( u_int16_t ), 1, fp );
-			fread( &TempIndex, sizeof( u_int16_t ), 1, fp );
+			file_read( &Pickups[ i ].Next, sizeof( u_int16_t ), 1, fp );
+			file_read( &Pickups[ i ].Prev, sizeof( u_int16_t ), 1, fp );
+			file_read( &TempIndex, sizeof( u_int16_t ), 1, fp );
 			if( TempIndex != INDEX_NONE ) Pickups[ i ].NextInGroup = &Pickups[ TempIndex ];
 			else Pickups[ i ].NextInGroup = nullptr;
-			fread( &TempIndex, sizeof( u_int16_t ), 1, fp );
+			file_read( &TempIndex, sizeof( u_int16_t ), 1, fp );
 			if( TempIndex != INDEX_NONE ) Pickups[ i ].PrevInGroup = &Pickups[ TempIndex ];
 			else Pickups[ i ].PrevInGroup = nullptr;
-			fread( &Pickups[ i ].Index, sizeof( u_int16_t ), 1, fp );
-			fread( &Pickups[ i ].Type, sizeof( u_int16_t ), 1, fp );
-			fread( &Pickups[ i ].Owner, sizeof( u_int16_t ), 1, fp );
-			fread( &Pickups[ i ].ID, sizeof( u_int16_t ), 1, fp );
-			fread( &Pickups[ i ].Mode, sizeof( int16_t ), 1, fp );
-			fread( &Pickups[ i ].LifeCount, sizeof( float ), 1, fp );
-			fread( &Pickups[ i ].PickupCount, sizeof( float ), 1, fp );
-			fread( &Pickups[ i ].Rot, sizeof( VECTOR ), 1, fp );
-			fread( &Pickups[ i ].Pos, sizeof( VECTOR ), 1, fp );
-			fread( &Pickups[ i ].Dir, sizeof( VECTOR ), 1, fp );
-			fread( &Pickups[ i ].Speed, sizeof( float ), 1, fp );
-			fread( &Pickups[ i ].ExternalSpeed, sizeof( float ), 1, fp );
-			fread( &Pickups[ i ].Group, sizeof( u_int16_t ), 1, fp );
-			fread( &Pickups[ i ].ModelType, sizeof( u_int16_t ), 1, fp );
-			fread( &Pickups[ i ].ModelNum, sizeof( u_int16_t ), 1, fp );
-			fread( &Pickups[ i ].Mat, sizeof( MATRIX ), 1, fp );
-			fread( &Pickups[ i ].Fmpoly, sizeof( u_int16_t ), 1, fp );
-			fread( &Pickups[ i ].Xsize, sizeof( float ), 1, fp );
-			fread( &Pickups[ i ].Ysize, sizeof( float ), 1, fp );
-			fread( &Pickups[ i ].Light, sizeof( u_int16_t ), 1, fp );
-			fread( &Pickups[ i ].Lightsize, sizeof( float ), 1, fp );
-			fread( &Pickups[ i ].R, sizeof( float ), 1, fp );
-			fread( &Pickups[ i ].G, sizeof( float ), 1, fp );
-			fread( &Pickups[ i ].B, sizeof( float ), 1, fp );
-			fread( &Pickups[ i ].DirQuat, sizeof( QUAT ), 1, fp );
-			fread( &Pickups[ i ].DirVector, sizeof( VECTOR ), 1, fp );
-			fread( &Pickups[ i ].UpVector, sizeof( VECTOR ), 1, fp );
-			fread( &Pickups[ i ].RegenSlot, sizeof( int16_t ), 1, fp );
-			fread( &Pickups[ i ].TriggerMod, sizeof( u_int16_t ), 1, fp );
+			file_read( &Pickups[ i ].Index, sizeof( u_int16_t ), 1, fp );
+			file_read( &Pickups[ i ].Type, sizeof( u_int16_t ), 1, fp );
+			file_read( &Pickups[ i ].Owner, sizeof( u_int16_t ), 1, fp );
+			file_read( &Pickups[ i ].ID, sizeof( u_int16_t ), 1, fp );
+			file_read( &Pickups[ i ].Mode, sizeof( int16_t ), 1, fp );
+			file_read( &Pickups[ i ].LifeCount, sizeof( float ), 1, fp );
+			file_read( &Pickups[ i ].PickupCount, sizeof( float ), 1, fp );
+			file_read( &Pickups[ i ].Rot, sizeof( VECTOR ), 1, fp );
+			file_read( &Pickups[ i ].Pos, sizeof( VECTOR ), 1, fp );
+			file_read( &Pickups[ i ].Dir, sizeof( VECTOR ), 1, fp );
+			file_read( &Pickups[ i ].Speed, sizeof( float ), 1, fp );
+			file_read( &Pickups[ i ].ExternalSpeed, sizeof( float ), 1, fp );
+			file_read( &Pickups[ i ].Group, sizeof( u_int16_t ), 1, fp );
+			file_read( &Pickups[ i ].ModelType, sizeof( u_int16_t ), 1, fp );
+			file_read( &Pickups[ i ].ModelNum, sizeof( u_int16_t ), 1, fp );
+			file_read( &Pickups[ i ].Mat, sizeof( MATRIX ), 1, fp );
+			file_read( &Pickups[ i ].Fmpoly, sizeof( u_int16_t ), 1, fp );
+			file_read( &Pickups[ i ].Xsize, sizeof( float ), 1, fp );
+			file_read( &Pickups[ i ].Ysize, sizeof( float ), 1, fp );
+			file_read( &Pickups[ i ].Light, sizeof( u_int16_t ), 1, fp );
+			file_read( &Pickups[ i ].Lightsize, sizeof( float ), 1, fp );
+			file_read( &Pickups[ i ].R, sizeof( float ), 1, fp );
+			file_read( &Pickups[ i ].G, sizeof( float ), 1, fp );
+			file_read( &Pickups[ i ].B, sizeof( float ), 1, fp );
+			file_read( &Pickups[ i ].DirQuat, sizeof( QUAT ), 1, fp );
+			file_read( &Pickups[ i ].DirVector, sizeof( VECTOR ), 1, fp );
+			file_read( &Pickups[ i ].UpVector, sizeof( VECTOR ), 1, fp );
+			file_read( &Pickups[ i ].RegenSlot, sizeof( int16_t ), 1, fp );
+			file_read( &Pickups[ i ].TriggerMod, sizeof( u_int16_t ), 1, fp );
 			if( Pickups[ i ].TriggerMod == INDEX_NONE ) Pickups[ i ].TriggerModPtr = nullptr;
 			else Pickups[ i ].TriggerModPtr = &TrigMods[ Pickups[ i ].TriggerMod ];
-			fread( &Pickups[ i ].ColStart, sizeof( VECTOR ), 1, fp );
-			fread( &Pickups[ i ].ColDist, sizeof( float ), 1, fp );
-			fread( &Pickups[ i ].ColFlag, sizeof( u_int16_t ), 1, fp );
-			fread( &Pickups[ i ].ColGroup, sizeof( u_int16_t ), 1, fp );
-			fread( &Pickups[ i ].ColPoint, sizeof( VERT ), 1, fp );
-			fread( &Pickups[ i ].ColPointNormal, sizeof( NORMAL ), 1, fp );
-			fread( &Pickups[ i ].CouldNotPickup, sizeof( bool ), 1, fp );
+			file_read( &Pickups[ i ].ColStart, sizeof( VECTOR ), 1, fp );
+			file_read( &Pickups[ i ].ColDist, sizeof( float ), 1, fp );
+			file_read( &Pickups[ i ].ColFlag, sizeof( u_int16_t ), 1, fp );
+			file_read( &Pickups[ i ].ColGroup, sizeof( u_int16_t ), 1, fp );
+			file_read( &Pickups[ i ].ColPoint, sizeof( VERT ), 1, fp );
+			file_read( &Pickups[ i ].ColPointNormal, sizeof( NORMAL ), 1, fp );
+			file_read( &Pickups[ i ].CouldNotPickup, sizeof( bool ), 1, fp );
 			i = Pickups[ i ].Prev;
 		}
 
@@ -4538,7 +4538,7 @@ FILE * LoadAllPickups( FILE * fp )
 			Pickups[ i ].DirQuat.From2Vectors(&Forward, &Pickups[ i ].DirVector);
 			Pickups[ i ].DirQuat.ToMatrix(&Pickups[ i ].Mat);
 
-			fread( &Pickups[ i ].Next, sizeof( u_int16_t ), 1, fp );
+			file_read( &Pickups[ i ].Next, sizeof( u_int16_t ), 1, fp );
 			i = Pickups[ i ].Next;
 		}
 	}

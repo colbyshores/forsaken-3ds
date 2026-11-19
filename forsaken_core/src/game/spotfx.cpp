@@ -88,8 +88,8 @@ bool LoadSpotFX( void )
 
 	if( fp != nullptr )
 	{
-		fread( &MagicNumber, sizeof( u_int32_t ), 1, fp );
-		fread( &VersionNumber, sizeof( u_int32_t ), 1, fp );
+		file_read( &MagicNumber, sizeof( u_int32_t ), 1, fp );
+		file_read( &VersionNumber, sizeof( u_int32_t ), 1, fp );
 
 		if( ( MagicNumber != MAGIC_NUMBER ) || ( VersionNumber != FX_VERSION_NUMBER  ) )
 		{
@@ -98,7 +98,7 @@ bool LoadSpotFX( void )
 			return( false );
 		}
 
-		fread( &NumSpotFX, sizeof( int32_t ), 1, fp );
+		file_read( &NumSpotFX, sizeof( int32_t ), 1, fp );
 
 		if( NumSpotFX > MAXSPOTFX )
 		{
@@ -109,30 +109,30 @@ bool LoadSpotFX( void )
 
 		for( Count = 0; Count < NumSpotFX; Count++ )
 		{
-			fread( &Type, sizeof( u_int16_t ), 1, fp );
-			fread( &Group, sizeof( u_int16_t ), 1, fp );
-			fread( &Colour, sizeof( u_int32_t ), 1, fp );
-			fread( &Pos.x, sizeof( float ), 1, fp );
-			fread( &Pos.y, sizeof( float ), 1, fp );
-			fread( &Pos.z, sizeof( float ), 1, fp );
-			fread( &Dir.x, sizeof( float ), 1, fp );
-			fread( &Dir.y, sizeof( float ), 1, fp );
-			fread( &Dir.z, sizeof( float ), 1, fp );
-			fread( &Up.x, sizeof( float ), 1, fp );
-			fread( &Up.y, sizeof( float ), 1, fp );
-			fread( &Up.z, sizeof( float ), 1, fp );
-			fread( &ActiveDelay, sizeof( float ), 1, fp );
-			fread( &InactiveDelay, sizeof( float ), 1, fp );
-			fread( &GenType, sizeof( u_int16_t ), 1, fp );
-			fread( &GenDelay, sizeof( float ), 1, fp );
-			fread( &Primary, sizeof( int16_t ), 1, fp );
-			fread( &Secondary, sizeof( int16_t ), 1, fp );
+			file_read( &Type, sizeof( u_int16_t ), 1, fp );
+			file_read( &Group, sizeof( u_int16_t ), 1, fp );
+			file_read( &Colour, sizeof( u_int32_t ), 1, fp );
+			file_read( &Pos.x, sizeof( float ), 1, fp );
+			file_read( &Pos.y, sizeof( float ), 1, fp );
+			file_read( &Pos.z, sizeof( float ), 1, fp );
+			file_read( &Dir.x, sizeof( float ), 1, fp );
+			file_read( &Dir.y, sizeof( float ), 1, fp );
+			file_read( &Dir.z, sizeof( float ), 1, fp );
+			file_read( &Up.x, sizeof( float ), 1, fp );
+			file_read( &Up.y, sizeof( float ), 1, fp );
+			file_read( &Up.z, sizeof( float ), 1, fp );
+			file_read( &ActiveDelay, sizeof( float ), 1, fp );
+			file_read( &InactiveDelay, sizeof( float ), 1, fp );
+			file_read( &GenType, sizeof( u_int16_t ), 1, fp );
+			file_read( &GenDelay, sizeof( float ), 1, fp );
+			file_read( &Primary, sizeof( int16_t ), 1, fp );
+			file_read( &Secondary, sizeof( int16_t ), 1, fp );
 
 			file_read_cstring( fp, SFXFilename, sizeof( SFXFilename ) );
 
-			fread( &Volume, sizeof( float ), 1, fp );
-			fread( &Speed, sizeof( float ), 1, fp );
-			fread( &SFXType, sizeof( int16_t ), 1, fp );
+			file_read( &Volume, sizeof( float ), 1, fp );
+			file_read( &Speed, sizeof( float ), 1, fp );
+			file_read( &SFXType, sizeof( int16_t ), 1, fp );
 
 			if( Type == SPOTFX_SoundFX )
 			{
@@ -2304,7 +2304,7 @@ FILE * LoadAllSpotFX( FILE * fp )
 
 	if( fp )
 	{
-		fread( &TempNumSpotFX, sizeof( TempNumSpotFX ), 1, fp );
+		file_read( &TempNumSpotFX, sizeof( TempNumSpotFX ), 1, fp );
 
 		if( TempNumSpotFX != NumSpotFX )
 		{
@@ -2314,63 +2314,63 @@ FILE * LoadAllSpotFX( FILE * fp )
 
 		for( i = 0; i < MAXGROUPS; i++ )
 		{
-			fread( &TempIndex, sizeof( u_int16_t ), 1, fp );
+			file_read( &TempIndex, sizeof( u_int16_t ), 1, fp );
 			if( TempIndex != INDEX_NONE ) SpotFXGroups[ i ] = &SpotFX[ TempIndex ];
 			else SpotFXGroups[ i ] = nullptr;
-			fread( &NumSpotFXPerGroup[ i ], sizeof( u_int16_t ), 1, fp );
+			file_read( &NumSpotFXPerGroup[ i ], sizeof( u_int16_t ), 1, fp );
 		}
 
-		fread( &TempIndex, sizeof( u_int16_t ), 1, fp );
+		file_read( &TempIndex, sizeof( u_int16_t ), 1, fp );
 		if( TempIndex != INDEX_NONE ) FirstSpotFXUsed = &SpotFX[ TempIndex ];
 		else FirstSpotFXUsed = nullptr;
-		fread( &TempIndex, sizeof( u_int16_t ), 1, fp );
+		file_read( &TempIndex, sizeof( u_int16_t ), 1, fp );
 		if( TempIndex != INDEX_NONE ) FirstSpotFXFree = &SpotFX[ TempIndex ];
 		else FirstSpotFXFree = nullptr;
 
 		for( i = 0; i < NumSpotFX; i++ )
 		{
-			fread( &SpotFX[ i ].Type, sizeof( u_int16_t ), 1, fp );
-			fread( &SpotFX[ i ].Flags, sizeof( u_int16_t ), 1, fp );
-			fread( &SpotFX[ i ].State, sizeof( u_int16_t ), 1, fp );
-			fread( &SpotFX[ i ].Index, sizeof( u_int16_t ), 1, fp );
-			fread( &SpotFX[ i ].Group, sizeof( u_int16_t ), 1, fp );
-			fread( &SpotFX[ i ].Light, sizeof( u_int16_t ), 1, fp );
-			fread( &SpotFX[ i ].SoundFX, sizeof( int16_t ), 1, fp );
-			fread( &SpotFX[ i ].SoundFXVolume, sizeof( float ), 1, fp );
-			fread( &SpotFX[ i ].SoundFXSpeed, sizeof( float ), 1, fp );
-			fread( &SpotFX[ i ].SoundFXType, sizeof( int16_t ), 1, fp );
-			fread( &SpotFX[ i ].SoundFX_ID, sizeof( u_int32_t ), 1, fp );
-			fread( &SpotFX[ i ].Primary, sizeof( int8_t ), 1, fp );
-			fread( &SpotFX[ i ].Secondary, sizeof( int8_t ), 1, fp );
-			fread( &SpotFX[ i ].Red, sizeof( u_int8_t ), 1, fp );
-			fread( &SpotFX[ i ].Green, sizeof( u_int8_t ), 1, fp );
-			fread( &SpotFX[ i ].Blue, sizeof( u_int8_t ), 1, fp );
-			fread( &SpotFX[ i ].Pos, sizeof( VECTOR ), 1, fp );
-			fread( &SpotFX[ i ].DirVector, sizeof( VECTOR ), 1, fp );
-			fread( &SpotFX[ i ].UpVector, sizeof( VECTOR ), 1, fp );
-			fread( &SpotFX[ i ].Delay, sizeof( float ), 1, fp );
-			fread( &SpotFX[ i ].ActiveDelay, sizeof( float ), 1, fp );
-			fread( &SpotFX[ i ].InactiveDelay, sizeof( float ), 1, fp );
-			fread( &SpotFX[ i ].Time, sizeof( float ), 1, fp );
-			fread( &SpotFX[ i ].TimeInterval, sizeof( float ), 1, fp );
-			fread( &SpotFX[ i ].GenDelay, sizeof( float ), 1, fp );
-			fread( &SpotFX[ i ].MaxHeight, sizeof( float ), 1, fp );
-			fread( &TempIndex, sizeof( u_int16_t ), 1, fp );
+			file_read( &SpotFX[ i ].Type, sizeof( u_int16_t ), 1, fp );
+			file_read( &SpotFX[ i ].Flags, sizeof( u_int16_t ), 1, fp );
+			file_read( &SpotFX[ i ].State, sizeof( u_int16_t ), 1, fp );
+			file_read( &SpotFX[ i ].Index, sizeof( u_int16_t ), 1, fp );
+			file_read( &SpotFX[ i ].Group, sizeof( u_int16_t ), 1, fp );
+			file_read( &SpotFX[ i ].Light, sizeof( u_int16_t ), 1, fp );
+			file_read( &SpotFX[ i ].SoundFX, sizeof( int16_t ), 1, fp );
+			file_read( &SpotFX[ i ].SoundFXVolume, sizeof( float ), 1, fp );
+			file_read( &SpotFX[ i ].SoundFXSpeed, sizeof( float ), 1, fp );
+			file_read( &SpotFX[ i ].SoundFXType, sizeof( int16_t ), 1, fp );
+			file_read( &SpotFX[ i ].SoundFX_ID, sizeof( u_int32_t ), 1, fp );
+			file_read( &SpotFX[ i ].Primary, sizeof( int8_t ), 1, fp );
+			file_read( &SpotFX[ i ].Secondary, sizeof( int8_t ), 1, fp );
+			file_read( &SpotFX[ i ].Red, sizeof( u_int8_t ), 1, fp );
+			file_read( &SpotFX[ i ].Green, sizeof( u_int8_t ), 1, fp );
+			file_read( &SpotFX[ i ].Blue, sizeof( u_int8_t ), 1, fp );
+			file_read( &SpotFX[ i ].Pos, sizeof( VECTOR ), 1, fp );
+			file_read( &SpotFX[ i ].DirVector, sizeof( VECTOR ), 1, fp );
+			file_read( &SpotFX[ i ].UpVector, sizeof( VECTOR ), 1, fp );
+			file_read( &SpotFX[ i ].Delay, sizeof( float ), 1, fp );
+			file_read( &SpotFX[ i ].ActiveDelay, sizeof( float ), 1, fp );
+			file_read( &SpotFX[ i ].InactiveDelay, sizeof( float ), 1, fp );
+			file_read( &SpotFX[ i ].Time, sizeof( float ), 1, fp );
+			file_read( &SpotFX[ i ].TimeInterval, sizeof( float ), 1, fp );
+			file_read( &SpotFX[ i ].GenDelay, sizeof( float ), 1, fp );
+			file_read( &SpotFX[ i ].MaxHeight, sizeof( float ), 1, fp );
+			file_read( &TempIndex, sizeof( u_int16_t ), 1, fp );
 			if( TempIndex != INDEX_NONE ) SpotFX[ i ].PrevUsed = &SpotFX[ TempIndex ];
 			else SpotFX[ i ].PrevUsed = nullptr;
-			fread( &TempIndex, sizeof( u_int16_t ), 1, fp );
+			file_read( &TempIndex, sizeof( u_int16_t ), 1, fp );
 			if( TempIndex != INDEX_NONE ) SpotFX[ i ].NextUsed = &SpotFX[ TempIndex ];
 			else SpotFX[ i ].NextUsed = nullptr;
-			fread( &TempIndex, sizeof( u_int16_t ), 1, fp );
+			file_read( &TempIndex, sizeof( u_int16_t ), 1, fp );
 			if( TempIndex != INDEX_NONE ) SpotFX[ i ].PrevFree = &SpotFX[ TempIndex ];
 			else SpotFX[ i ].PrevFree = nullptr;
-			fread( &TempIndex, sizeof( u_int16_t ), 1, fp );
+			file_read( &TempIndex, sizeof( u_int16_t ), 1, fp );
 			if( TempIndex != INDEX_NONE ) SpotFX[ i ].NextFree = &SpotFX[ TempIndex ];
 			else SpotFX[ i ].NextFree = nullptr;
-			fread( &TempIndex, sizeof( u_int16_t ), 1, fp );
+			file_read( &TempIndex, sizeof( u_int16_t ), 1, fp );
 			if( TempIndex != INDEX_NONE ) SpotFX[ i ].PrevInGroup = &SpotFX[ TempIndex ];
 			else SpotFX[ i ].PrevInGroup = nullptr;
-			fread( &TempIndex, sizeof( u_int16_t ), 1, fp );
+			file_read( &TempIndex, sizeof( u_int16_t ), 1, fp );
 			if( TempIndex != INDEX_NONE ) SpotFX[ i ].NextInGroup = &SpotFX[ TempIndex ];
 			else SpotFX[ i ].NextInGroup = nullptr;
 		}

@@ -1,6 +1,7 @@
 /* primary.cpp -- primary weapons: bullet pool, firing, hits; see primary.h. */
 #include <stdio.h>
 #include "game/main.h"
+#include "data/file.h"
 
 #include "math/new3d.h"
 #include "math/quat.h"
@@ -8409,37 +8410,37 @@ FILE * LoadPrimBulls( FILE * fp )
 	{
 		for( i = 0; i < MAXPRIMARYWEAPONS; i++ )
 		{
-			fread( &PrimaryWeaponsGot[ i ], sizeof( int16_t ), 1, fp );
+			file_read( &PrimaryWeaponsGot[ i ], sizeof( int16_t ), 1, fp );
 		}
 
-		fread( &FirstPrimBullUsed, sizeof( FirstPrimBullUsed ), 1, fp );
-		fread( &FirstPrimBullFree, sizeof( FirstPrimBullFree ), 1, fp );
-		fread( &PrimaryFireDelay, sizeof( PrimaryFireDelay ), 1, fp );
-		fread( &OrbitFireDelay, sizeof( OrbitFireDelay ), 1, fp );
-		fread( &GeneralAmmo, sizeof( GeneralAmmo ), 1, fp );
-		fread( &SussGunAmmo, sizeof( SussGunAmmo ), 1, fp );
-		fread( &PyroliteAmmo, sizeof( PyroliteAmmo ), 1, fp );
-		fread( &GeneralAmmoUsed, sizeof( GeneralAmmoUsed ), 1, fp );
-		fread( &SussGunAmmoUsed, sizeof( SussGunAmmoUsed ), 1, fp );
-		fread( &PyroliteAmmoUsed, sizeof( PyroliteAmmoUsed ), 1, fp );
-		fread( &LaserTemperature, sizeof( LaserTemperature ), 1, fp );
-		fread( &LaserOverheated, sizeof( LaserOverheated ), 1, fp );
-		fread( &PowerLevel, sizeof( PowerLevel ), 1, fp );
-		fread( &Toggle, sizeof( Toggle ), 1, fp );
-		fread( &GlobalPrimBullsID, sizeof( GlobalPrimBullsID ), 1, fp );
+		file_read( &FirstPrimBullUsed, sizeof( FirstPrimBullUsed ), 1, fp );
+		file_read( &FirstPrimBullFree, sizeof( FirstPrimBullFree ), 1, fp );
+		file_read( &PrimaryFireDelay, sizeof( PrimaryFireDelay ), 1, fp );
+		file_read( &OrbitFireDelay, sizeof( OrbitFireDelay ), 1, fp );
+		file_read( &GeneralAmmo, sizeof( GeneralAmmo ), 1, fp );
+		file_read( &SussGunAmmo, sizeof( SussGunAmmo ), 1, fp );
+		file_read( &PyroliteAmmo, sizeof( PyroliteAmmo ), 1, fp );
+		file_read( &GeneralAmmoUsed, sizeof( GeneralAmmoUsed ), 1, fp );
+		file_read( &SussGunAmmoUsed, sizeof( SussGunAmmoUsed ), 1, fp );
+		file_read( &PyroliteAmmoUsed, sizeof( PyroliteAmmoUsed ), 1, fp );
+		file_read( &LaserTemperature, sizeof( LaserTemperature ), 1, fp );
+		file_read( &LaserOverheated, sizeof( LaserOverheated ), 1, fp );
+		file_read( &PowerLevel, sizeof( PowerLevel ), 1, fp );
+		file_read( &Toggle, sizeof( Toggle ), 1, fp );
+		file_read( &GlobalPrimBullsID, sizeof( GlobalPrimBullsID ), 1, fp );
 
 		i = FirstPrimBullUsed;
 
 		while( i != INDEX_NONE )
 		{
-			fread( &PrimBulls[ i ].Used, sizeof( bool ), 1, fp );
-			fread( &PrimBulls[ i ].Next, sizeof( u_int16_t ), 1, fp );
-			fread( &PrimBulls[ i ].Prev, sizeof( u_int16_t ), 1, fp );
-			fread( &PrimBulls[ i ].Type, sizeof( u_int16_t ), 1, fp );
-			fread( &PrimBulls[ i ].OwnerType, sizeof( u_int16_t ), 1, fp );
-			fread( &PrimBulls[ i ].Owner, sizeof( u_int16_t ), 1, fp );
+			file_read( &PrimBulls[ i ].Used, sizeof( bool ), 1, fp );
+			file_read( &PrimBulls[ i ].Next, sizeof( u_int16_t ), 1, fp );
+			file_read( &PrimBulls[ i ].Prev, sizeof( u_int16_t ), 1, fp );
+			file_read( &PrimBulls[ i ].Type, sizeof( u_int16_t ), 1, fp );
+			file_read( &PrimBulls[ i ].OwnerType, sizeof( u_int16_t ), 1, fp );
+			file_read( &PrimBulls[ i ].Owner, sizeof( u_int16_t ), 1, fp );
 
-			fread( &TempIndex, sizeof( TempIndex ), 1, fp );
+			file_read( &TempIndex, sizeof( TempIndex ), 1, fp );
 			if( TempIndex != INDEX_NONE )
 			{
 				PrimBulls[ i ].EnemyGun = ( Enemies[ PrimBulls[ i ].Owner ].Object.FirstGun + TempIndex );
@@ -8449,42 +8450,42 @@ FILE * LoadPrimBulls( FILE * fp )
 				PrimBulls[ i ].EnemyGun = nullptr;
 			}
 
-			fread( &PrimBulls[ i ].ID, sizeof( u_int16_t ), 1, fp );
-			fread( &PrimBulls[ i ].Weapon, sizeof( int8_t ), 1, fp );
-			fread( &PrimBulls[ i ].PowerLevel, sizeof( int16_t ), 1, fp );
-			fread( &PrimBulls[ i ].TrojPower, sizeof( float ), 1, fp );
-			fread( &PrimBulls[ i ].LifeCount, sizeof( float ), 1, fp );
-			fread( &PrimBulls[ i ].Speed, sizeof( float ), 1, fp );
-			fread( &PrimBulls[ i ].ColRadius, sizeof( float ), 1, fp );
-			fread( &PrimBulls[ i ].ColType, sizeof( u_int16_t ), 1, fp );
-			fread( &PrimBulls[ i ].Offset, sizeof( VECTOR ), 1, fp );
-			fread( &PrimBulls[ i ].Pos, sizeof( VECTOR ), 1, fp );
-			fread( &PrimBulls[ i ].Dir, sizeof( VECTOR ), 1, fp );
-			fread( &PrimBulls[ i ].LocalDir, sizeof( VECTOR ), 1, fp );
-			fread( &PrimBulls[ i ].UpVector, sizeof( VECTOR ), 1, fp );
-			fread( &PrimBulls[ i ].ColStart, sizeof( VECTOR ), 1, fp );
-			fread( &PrimBulls[ i ].ColDist, sizeof( float ), 1, fp );
-			fread( &PrimBulls[ i ].ColFlag, sizeof( u_int16_t ), 1, fp );
-			fread( &PrimBulls[ i ].ColPoint, sizeof( VERT ), 1, fp );
-			fread( &PrimBulls[ i ].ColPointNormal, sizeof( NORMAL ), 1, fp );
-			fread( &PrimBulls[ i ].ColGroup, sizeof( u_int16_t ), 1, fp );
-			fread( &PrimBulls[ i ].GroupImIn, sizeof( u_int16_t ), 1, fp );
-			fread( &PrimBulls[ i ].Mat, sizeof( MATRIX ), 1, fp );
-			fread( &PrimBulls[ i ].line, sizeof( u_int16_t ), 1, fp );
-			fread( &PrimBulls[ i ].fmpoly, sizeof( u_int16_t ), 1, fp );
-			fread( &PrimBulls[ i ].numfmpolys, sizeof( int16_t ), 1, fp );
-			fread( &PrimBulls[ i ].poly, sizeof( u_int16_t ), 1, fp );
-			fread( &PrimBulls[ i ].numpolys, sizeof( int16_t ), 1, fp );
-			fread( &PrimBulls[ i ].light, sizeof( u_int16_t ), 1, fp );
-			fread( &PrimBulls[ i ].lightsize, sizeof( float ), 1, fp );
-			fread( &PrimBulls[ i ].r, sizeof( float ), 1, fp );
-			fread( &PrimBulls[ i ].g, sizeof( float ), 1, fp );
-			fread( &PrimBulls[ i ].b, sizeof( float ), 1, fp );
-			fread( &PrimBulls[ i ].Bounces, sizeof( u_int16_t ), 1, fp );
-			fread( &PrimBulls[ i ].TimeInterval, sizeof( float ), 1, fp );
-			fread( &PrimBulls[ i ].TimeCount, sizeof( float ), 1, fp );
-			fread( &PrimBulls[ i ].FirePoint, sizeof( int16_t ), 1, fp );
-			fread( &PrimBulls[ i ].SpotFX, sizeof( int16_t ), 1, fp );
+			file_read( &PrimBulls[ i ].ID, sizeof( u_int16_t ), 1, fp );
+			file_read( &PrimBulls[ i ].Weapon, sizeof( int8_t ), 1, fp );
+			file_read( &PrimBulls[ i ].PowerLevel, sizeof( int16_t ), 1, fp );
+			file_read( &PrimBulls[ i ].TrojPower, sizeof( float ), 1, fp );
+			file_read( &PrimBulls[ i ].LifeCount, sizeof( float ), 1, fp );
+			file_read( &PrimBulls[ i ].Speed, sizeof( float ), 1, fp );
+			file_read( &PrimBulls[ i ].ColRadius, sizeof( float ), 1, fp );
+			file_read( &PrimBulls[ i ].ColType, sizeof( u_int16_t ), 1, fp );
+			file_read( &PrimBulls[ i ].Offset, sizeof( VECTOR ), 1, fp );
+			file_read( &PrimBulls[ i ].Pos, sizeof( VECTOR ), 1, fp );
+			file_read( &PrimBulls[ i ].Dir, sizeof( VECTOR ), 1, fp );
+			file_read( &PrimBulls[ i ].LocalDir, sizeof( VECTOR ), 1, fp );
+			file_read( &PrimBulls[ i ].UpVector, sizeof( VECTOR ), 1, fp );
+			file_read( &PrimBulls[ i ].ColStart, sizeof( VECTOR ), 1, fp );
+			file_read( &PrimBulls[ i ].ColDist, sizeof( float ), 1, fp );
+			file_read( &PrimBulls[ i ].ColFlag, sizeof( u_int16_t ), 1, fp );
+			file_read( &PrimBulls[ i ].ColPoint, sizeof( VERT ), 1, fp );
+			file_read( &PrimBulls[ i ].ColPointNormal, sizeof( NORMAL ), 1, fp );
+			file_read( &PrimBulls[ i ].ColGroup, sizeof( u_int16_t ), 1, fp );
+			file_read( &PrimBulls[ i ].GroupImIn, sizeof( u_int16_t ), 1, fp );
+			file_read( &PrimBulls[ i ].Mat, sizeof( MATRIX ), 1, fp );
+			file_read( &PrimBulls[ i ].line, sizeof( u_int16_t ), 1, fp );
+			file_read( &PrimBulls[ i ].fmpoly, sizeof( u_int16_t ), 1, fp );
+			file_read( &PrimBulls[ i ].numfmpolys, sizeof( int16_t ), 1, fp );
+			file_read( &PrimBulls[ i ].poly, sizeof( u_int16_t ), 1, fp );
+			file_read( &PrimBulls[ i ].numpolys, sizeof( int16_t ), 1, fp );
+			file_read( &PrimBulls[ i ].light, sizeof( u_int16_t ), 1, fp );
+			file_read( &PrimBulls[ i ].lightsize, sizeof( float ), 1, fp );
+			file_read( &PrimBulls[ i ].r, sizeof( float ), 1, fp );
+			file_read( &PrimBulls[ i ].g, sizeof( float ), 1, fp );
+			file_read( &PrimBulls[ i ].b, sizeof( float ), 1, fp );
+			file_read( &PrimBulls[ i ].Bounces, sizeof( u_int16_t ), 1, fp );
+			file_read( &PrimBulls[ i ].TimeInterval, sizeof( float ), 1, fp );
+			file_read( &PrimBulls[ i ].TimeCount, sizeof( float ), 1, fp );
+			file_read( &PrimBulls[ i ].FirePoint, sizeof( int16_t ), 1, fp );
+			file_read( &PrimBulls[ i ].SpotFX, sizeof( int16_t ), 1, fp );
 			i = PrimBulls[ i ].Prev;
 		}
 
@@ -8503,7 +8504,7 @@ FILE * LoadPrimBulls( FILE * fp )
 			PrimBulls[i].line = INDEX_NONE;
 			PrimBulls[i].TimeInterval = (float) 1;
 
-			fread( &PrimBulls[ i ].Next, sizeof( PrimBulls[ i ].Next ), 1, fp );
+			file_read( &PrimBulls[ i ].Next, sizeof( PrimBulls[ i ].Next ), 1, fp );
 			i = PrimBulls[ i ].Next;
 		}
 	}

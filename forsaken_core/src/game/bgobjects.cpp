@@ -1102,8 +1102,8 @@ bool PreLoadBGOFiles( void )
 
 	if( fp != nullptr )
 	{
-		fread( &MagicNumber, sizeof( u_int32_t ), 1, fp );
-		fread( &VersionNumber, sizeof( u_int32_t ), 1, fp );
+		file_read( &MagicNumber, sizeof( u_int32_t ), 1, fp );
+		file_read( &VersionNumber, sizeof( u_int32_t ), 1, fp );
 
 		if( ( MagicNumber != MAGIC_NUMBER ) || ( VersionNumber != BGO_VERSION_NUMBER  ) )
 		{
@@ -1112,7 +1112,7 @@ bool PreLoadBGOFiles( void )
 			return( false );
 		}
 
-		fread( &NumBGObjects, sizeof( int16_t ), 1, fp );
+		file_read( &NumBGObjects, sizeof( int16_t ), 1, fp );
 
 		if( NumBGObjects > MAXBGOBJECTS )
 		{
@@ -1133,21 +1133,21 @@ bool PreLoadBGOFiles( void )
 
 				snprintf( FilePtr->Filename, sizeof( FilePtr->Filename ), "data\\levels\\%s\\bgobjects\\%s", &ShortLevelNames[ LevelNum ][ 0 ], TempFilename );
 
-				fread( &FilePtr->Type, sizeof( int16_t ), 1, fp );
+				file_read( &FilePtr->Type, sizeof( int16_t ), 1, fp );
 
-				fread( &FilePtr->Group, sizeof( int16_t ), 1, fp );
+				file_read( &FilePtr->Group, sizeof( int16_t ), 1, fp );
 
-				fread( &FilePtr->Pos.x, sizeof( float ), 1, fp );
-				fread( &FilePtr->Pos.y, sizeof( float ), 1, fp );
-				fread( &FilePtr->Pos.z, sizeof( float ), 1, fp );
+				file_read( &FilePtr->Pos.x, sizeof( float ), 1, fp );
+				file_read( &FilePtr->Pos.y, sizeof( float ), 1, fp );
+				file_read( &FilePtr->Pos.z, sizeof( float ), 1, fp );
 
-				fread( &FilePtr->Dir.x, sizeof( float ), 1, fp );
-				fread( &FilePtr->Dir.y, sizeof( float ), 1, fp );
-				fread( &FilePtr->Dir.z, sizeof( float ), 1, fp );
+				file_read( &FilePtr->Dir.x, sizeof( float ), 1, fp );
+				file_read( &FilePtr->Dir.y, sizeof( float ), 1, fp );
+				file_read( &FilePtr->Dir.z, sizeof( float ), 1, fp );
 
-				fread( &FilePtr->Up.x, sizeof( float ), 1, fp );
-				fread( &FilePtr->Up.y, sizeof( float ), 1, fp );
-				fread( &FilePtr->Up.z, sizeof( float ), 1, fp );
+				file_read( &FilePtr->Up.x, sizeof( float ), 1, fp );
+				file_read( &FilePtr->Up.y, sizeof( float ), 1, fp );
+				file_read( &FilePtr->Up.z, sizeof( float ), 1, fp );
 
 				switch( FilePtr->Type )
 				{
@@ -1161,48 +1161,48 @@ bool PreLoadBGOFiles( void )
 					/*	DOOR */
 
 				case BGOTYPE_Door:
-					fread( &FilePtr->open_event, sizeof( int16_t ), 1, fp );
-					fread( &FilePtr->CloseEvent, sizeof( int16_t ), 1, fp );
-					fread( &FilePtr->ShotEvent, sizeof( int16_t ), 1, fp );
-					fread( &FilePtr->BumpEvent, sizeof( int16_t ), 1, fp );
-					fread( &FilePtr->PickupNeeded, sizeof( int32_t ), 1, fp );
-					fread( &FilePtr->OpenedBy, sizeof( int16_t ), 1, fp );
-					fread( &FilePtr->Locked, sizeof( int16_t ), 1, fp );
-					fread( &FilePtr->DoorSfxType, sizeof( int16_t ), 1, fp );
+					file_read( &FilePtr->open_event, sizeof( int16_t ), 1, fp );
+					file_read( &FilePtr->CloseEvent, sizeof( int16_t ), 1, fp );
+					file_read( &FilePtr->ShotEvent, sizeof( int16_t ), 1, fp );
+					file_read( &FilePtr->BumpEvent, sizeof( int16_t ), 1, fp );
+					file_read( &FilePtr->PickupNeeded, sizeof( int32_t ), 1, fp );
+					file_read( &FilePtr->OpenedBy, sizeof( int16_t ), 1, fp );
+					file_read( &FilePtr->Locked, sizeof( int16_t ), 1, fp );
+					file_read( &FilePtr->DoorSfxType, sizeof( int16_t ), 1, fp );
 					RequestDoorTypeSFX( FilePtr->DoorSfxType );
 					break;
 
 					/*	LOOPING ANIM */
 
 				case BGOTYPE_Looping_Anim:
-					fread( &FilePtr->ShotEvent, sizeof( int16_t ), 1, fp );
-					fread( &FilePtr->BumpEvent, sizeof( int16_t ), 1, fp );
-					fread( &FilePtr->EndEvent, sizeof( int16_t ), 1, fp );
-					fread( &FilePtr->GenType, sizeof( int16_t ), 1, fp );
-					fread( &FilePtr->Delay, sizeof( float ), 1, fp );
+					file_read( &FilePtr->ShotEvent, sizeof( int16_t ), 1, fp );
+					file_read( &FilePtr->BumpEvent, sizeof( int16_t ), 1, fp );
+					file_read( &FilePtr->EndEvent, sizeof( int16_t ), 1, fp );
+					file_read( &FilePtr->GenType, sizeof( int16_t ), 1, fp );
+					file_read( &FilePtr->Delay, sizeof( float ), 1, fp );
 					break;
 
 					/*	ONEOFF ANIM */
 
 				case BGOTYPE_OneOff_Anim:
-					fread( &FilePtr->ShotEvent, sizeof( int16_t ), 1, fp );
-					fread( &FilePtr->BumpEvent, sizeof( int16_t ), 1, fp );
-					fread( &FilePtr->EndEvent, sizeof( int16_t ), 1, fp );
-					fread( &FilePtr->GenType, sizeof( int16_t ), 1, fp );
-					fread( &FilePtr->Delay, sizeof( float ), 1, fp );
-					fread( &FilePtr->DestroyAtEnd, sizeof( int16_t ), 1, fp );
+					file_read( &FilePtr->ShotEvent, sizeof( int16_t ), 1, fp );
+					file_read( &FilePtr->BumpEvent, sizeof( int16_t ), 1, fp );
+					file_read( &FilePtr->EndEvent, sizeof( int16_t ), 1, fp );
+					file_read( &FilePtr->GenType, sizeof( int16_t ), 1, fp );
+					file_read( &FilePtr->Delay, sizeof( float ), 1, fp );
+					file_read( &FilePtr->DestroyAtEnd, sizeof( int16_t ), 1, fp );
 					break;
 
 					/*	MULTISTEP ANIM */
 
 				case BGOTYPE_MultipleStep_Anim:
-					fread( &FilePtr->ShotEvent, sizeof( int16_t ), 1, fp );
-					fread( &FilePtr->BumpEvent, sizeof( int16_t ), 1, fp );
-					fread( &FilePtr->EndEvent, sizeof( int16_t ), 1, fp );
-					fread( &FilePtr->DestroyAtEnd, sizeof( int16_t ), 1, fp );
-					fread( &FilePtr->OpenedBy, sizeof( int16_t ), 1, fp );
-					fread( &FilePtr->NumIntervals, sizeof( u_int16_t ), 1, fp );
-					fread( &FilePtr->DamagePerInterval, sizeof( float ), 1, fp );
+					file_read( &FilePtr->ShotEvent, sizeof( int16_t ), 1, fp );
+					file_read( &FilePtr->BumpEvent, sizeof( int16_t ), 1, fp );
+					file_read( &FilePtr->EndEvent, sizeof( int16_t ), 1, fp );
+					file_read( &FilePtr->DestroyAtEnd, sizeof( int16_t ), 1, fp );
+					file_read( &FilePtr->OpenedBy, sizeof( int16_t ), 1, fp );
+					file_read( &FilePtr->NumIntervals, sizeof( u_int16_t ), 1, fp );
+					file_read( &FilePtr->DamagePerInterval, sizeof( float ), 1, fp );
 					break;
 
 					/*	SEQUENCES ANIM */
@@ -2504,41 +2504,41 @@ FILE * LoadBGObjects( FILE * fp )
 
 	if( fp )
 	{
-		fread( &TempIndex, sizeof( u_int16_t ), 1, fp );
+		file_read( &TempIndex, sizeof( u_int16_t ), 1, fp );
 		if( TempIndex != INDEX_NONE ) FirstBGObjectUsed = &BGObjects[ TempIndex ];
 		else FirstBGObjectUsed = nullptr;
-		fread( &TempIndex, sizeof( u_int16_t ), 1, fp );
+		file_read( &TempIndex, sizeof( u_int16_t ), 1, fp );
 		if( TempIndex != INDEX_NONE ) FirstBGObjectFree = &BGObjects[ TempIndex ];
 		else FirstBGObjectFree = nullptr;
 
 		for( i = 0; i < MAXBGOBJECTS; i++ )
 		{
-			fread( &BGObjects[ i ].State, sizeof( int16_t ), 1, fp );
-			fread( &BGObjects[ i ].Type, sizeof( u_int16_t ), 1, fp );
-			fread( &BGObjects[ i ].Group, sizeof( u_int16_t ), 1, fp );
-			fread( &BGObjects[ i ].ModelIndex, sizeof( u_int16_t ), 1, fp );
-			fread( &BGObjects[ i ].StartPos, sizeof( VECTOR ), 1, fp );
-			fread( &BGObjects[ i ].Pos, sizeof( VECTOR ), 1, fp );
-			fread( &BGObjects[ i ].DirVector, sizeof( VECTOR ), 1, fp );
-			fread( &BGObjects[ i ].UpVector, sizeof( VECTOR ), 1, fp );
-			fread( &BGObjects[ i ].RightVector, sizeof( VECTOR ), 1, fp );
-			fread( &BGObjects[ i ].MoveOff, sizeof( VECTOR ), 1, fp );
-			fread( &BGObjects[ i ].CrushCount, sizeof( u_int16_t ), 1, fp );
-			fread( &BGObjects[ i ].Frame, sizeof( float ), 1, fp );
-			fread( &BGObjects[ i ].Matrix, sizeof( MATRIX ), 1, fp );
-			fread( &BGObjects[ i ].InvMatrix, sizeof( MATRIX ), 1, fp );
-			fread( &BGObjects[ i ].ColMatrix, sizeof( MATRIX ), 1, fp );
-			fread( &BGObjects[ i ].InvColMatrix, sizeof( MATRIX ), 1, fp );
-			fread( &BGObjects[ i ].ScaleMatrix, sizeof( MATRIX ), 1, fp );
-			fread( &BGObjects[ i ].InvScaleMatrix, sizeof( MATRIX ), 1, fp );
-			fread( &BGObjects[ i ].Offset, sizeof( float ), 1, fp );
-			fread( &BGObjects[ i ].OffsetInc, sizeof( float ), 1, fp );
-			fread( &BGObjects[ i ].MaxOffset, sizeof( float ), 1, fp );
-			fread( &BGObjects[ i ].Timer, sizeof( float ), 1, fp );
-			fread( &BGObjects[ i ].Width, sizeof( float ), 1, fp );
-			fread( &BGObjects[ i ].Height, sizeof( float ), 1, fp );
-			fread( &BGObjects[ i ].Shield, sizeof( float ), 1, fp );
-			fread( &NumChildren, sizeof( int16_t ), 1, fp );
+			file_read( &BGObjects[ i ].State, sizeof( int16_t ), 1, fp );
+			file_read( &BGObjects[ i ].Type, sizeof( u_int16_t ), 1, fp );
+			file_read( &BGObjects[ i ].Group, sizeof( u_int16_t ), 1, fp );
+			file_read( &BGObjects[ i ].ModelIndex, sizeof( u_int16_t ), 1, fp );
+			file_read( &BGObjects[ i ].StartPos, sizeof( VECTOR ), 1, fp );
+			file_read( &BGObjects[ i ].Pos, sizeof( VECTOR ), 1, fp );
+			file_read( &BGObjects[ i ].DirVector, sizeof( VECTOR ), 1, fp );
+			file_read( &BGObjects[ i ].UpVector, sizeof( VECTOR ), 1, fp );
+			file_read( &BGObjects[ i ].RightVector, sizeof( VECTOR ), 1, fp );
+			file_read( &BGObjects[ i ].MoveOff, sizeof( VECTOR ), 1, fp );
+			file_read( &BGObjects[ i ].CrushCount, sizeof( u_int16_t ), 1, fp );
+			file_read( &BGObjects[ i ].Frame, sizeof( float ), 1, fp );
+			file_read( &BGObjects[ i ].Matrix, sizeof( MATRIX ), 1, fp );
+			file_read( &BGObjects[ i ].InvMatrix, sizeof( MATRIX ), 1, fp );
+			file_read( &BGObjects[ i ].ColMatrix, sizeof( MATRIX ), 1, fp );
+			file_read( &BGObjects[ i ].InvColMatrix, sizeof( MATRIX ), 1, fp );
+			file_read( &BGObjects[ i ].ScaleMatrix, sizeof( MATRIX ), 1, fp );
+			file_read( &BGObjects[ i ].InvScaleMatrix, sizeof( MATRIX ), 1, fp );
+			file_read( &BGObjects[ i ].Offset, sizeof( float ), 1, fp );
+			file_read( &BGObjects[ i ].OffsetInc, sizeof( float ), 1, fp );
+			file_read( &BGObjects[ i ].MaxOffset, sizeof( float ), 1, fp );
+			file_read( &BGObjects[ i ].Timer, sizeof( float ), 1, fp );
+			file_read( &BGObjects[ i ].Width, sizeof( float ), 1, fp );
+			file_read( &BGObjects[ i ].Height, sizeof( float ), 1, fp );
+			file_read( &BGObjects[ i ].Shield, sizeof( float ), 1, fp );
+			file_read( &NumChildren, sizeof( int16_t ), 1, fp );
 
 			if( NumChildren )
 			{
@@ -2555,18 +2555,18 @@ FILE * LoadBGObjects( FILE * fp )
 				}
 			}
 
-			fread( &BGObjects[ i ].OldOldTime, sizeof( float ), 1, fp );
-			fread( &BGObjects[ i ].OldTime, sizeof( float ), 1, fp );
-			fread( &BGObjects[ i ].Time, sizeof( float ), 1, fp );
-			fread( &BGObjects[ i ].OverallTime, sizeof( float ), 1, fp );
-			fread( &BGObjects[ i ].MidTime, sizeof( float ), 1, fp );
-			fread( &BGObjects[ i ].AnimSpeed, sizeof( float ), 1, fp );
-			fread( &BGObjects[ i ].StateChangeDelay, sizeof( float ), 1, fp );
-			fread( &BGObjects[ i ].OpenTrigMod, sizeof( int16_t ), 1, fp );
-			fread( &BGObjects[ i ].CloseTrigMod, sizeof( int16_t ), 1, fp );
-			fread( &BGObjects[ i ].ShotTrigMod, sizeof( int16_t ), 1, fp );
-			fread( &BGObjects[ i ].BumpTrigMod, sizeof( int16_t ), 1, fp );
-			fread( &BGObjects[ i ].EndTrigMod, sizeof( int16_t ), 1, fp );
+			file_read( &BGObjects[ i ].OldOldTime, sizeof( float ), 1, fp );
+			file_read( &BGObjects[ i ].OldTime, sizeof( float ), 1, fp );
+			file_read( &BGObjects[ i ].Time, sizeof( float ), 1, fp );
+			file_read( &BGObjects[ i ].OverallTime, sizeof( float ), 1, fp );
+			file_read( &BGObjects[ i ].MidTime, sizeof( float ), 1, fp );
+			file_read( &BGObjects[ i ].AnimSpeed, sizeof( float ), 1, fp );
+			file_read( &BGObjects[ i ].StateChangeDelay, sizeof( float ), 1, fp );
+			file_read( &BGObjects[ i ].OpenTrigMod, sizeof( int16_t ), 1, fp );
+			file_read( &BGObjects[ i ].CloseTrigMod, sizeof( int16_t ), 1, fp );
+			file_read( &BGObjects[ i ].ShotTrigMod, sizeof( int16_t ), 1, fp );
+			file_read( &BGObjects[ i ].BumpTrigMod, sizeof( int16_t ), 1, fp );
+			file_read( &BGObjects[ i ].EndTrigMod, sizeof( int16_t ), 1, fp );
 			if( BGObjects[ i ].OpenTrigMod == -1 ) BGObjects[ i ].OpenTrigModPtr = nullptr;
 			else BGObjects[ i ].OpenTrigModPtr = &TrigMods[ BGObjects[ i ].OpenTrigMod ];
 			if( BGObjects[ i ].CloseTrigMod == -1 ) BGObjects[ i ].CloseTrigModPtr = nullptr;
@@ -2577,40 +2577,40 @@ FILE * LoadBGObjects( FILE * fp )
 			else BGObjects[ i ].BumpTrigModPtr = &TrigMods[ BGObjects[ i ].BumpTrigMod ];
 			if( BGObjects[ i ].EndTrigMod == -1 ) BGObjects[ i ].EndTrigModPtr = nullptr;
 			else BGObjects[ i ].EndTrigModPtr = &TrigMods[ BGObjects[ i ].EndTrigMod ];
-			fread( &BGObjects[ i ].Locked, sizeof( int16_t ), 1, fp );
-			fread( &BGObjects[ i ].OpenedBy, sizeof( int16_t ), 1, fp );
-			fread( &BGObjects[ i ].DestroyAtEnd, sizeof( int16_t ), 1, fp );
-			fread( &BGObjects[ i ].PickupNeeded, sizeof( int32_t ), 1, fp );
-			fread( &BGObjects[ i ].GenType, sizeof( int16_t ), 1, fp );
-			fread( &BGObjects[ i ].Delay, sizeof( float ), 1, fp );
-			fread( &BGObjects[ i ].WantedTime, sizeof( float ), 1, fp );
-			fread( &BGObjects[ i ].DamageTime, sizeof( float ), 1, fp );
-			fread( &BGObjects[ i ].StepInterval, sizeof( float ), 1, fp );
-			fread( &BGObjects[ i ].TimePerDamageUnit, sizeof( float ), 1, fp );
-			fread( &BGObjects[ i ].DamagePerInterval, sizeof( float ), 1, fp );
-			fread( &BGObjects[ i ].Center, sizeof( VECTOR ), 1, fp );
-			fread( &BGObjects[ i ].TopLeft, sizeof( VECTOR ), 1, fp );
-			fread( &BGObjects[ i ].BottomRight, sizeof( VECTOR ), 1, fp );
-			fread( &BGObjects[ i ].Radius, sizeof( float ), 1, fp );
-			fread( &BGObjects[ i ].ColCenter, sizeof( VECTOR ), 1, fp );
-			fread( &BGObjects[ i ].ColTopLeft, sizeof( VECTOR ), 1, fp );
-			fread( &BGObjects[ i ].ColBottomRight, sizeof( VECTOR ), 1, fp );
-			fread( &BGObjects[ i ].ColRadius, sizeof( float ), 1, fp );
-			fread( &BGObjects[ i ].Index, sizeof( u_int16_t ), 1, fp );
-			fread( &BGObjects[ i ].UpdateCount, sizeof( int16_t ), 1, fp );
-			fread( &BGObjects[ i ].DoorSfxType, sizeof( int16_t ), 1, fp );
-			fread( &BGObjects[ i ].SoundFX_ID, sizeof( u_int32_t ), 1, fp );
+			file_read( &BGObjects[ i ].Locked, sizeof( int16_t ), 1, fp );
+			file_read( &BGObjects[ i ].OpenedBy, sizeof( int16_t ), 1, fp );
+			file_read( &BGObjects[ i ].DestroyAtEnd, sizeof( int16_t ), 1, fp );
+			file_read( &BGObjects[ i ].PickupNeeded, sizeof( int32_t ), 1, fp );
+			file_read( &BGObjects[ i ].GenType, sizeof( int16_t ), 1, fp );
+			file_read( &BGObjects[ i ].Delay, sizeof( float ), 1, fp );
+			file_read( &BGObjects[ i ].WantedTime, sizeof( float ), 1, fp );
+			file_read( &BGObjects[ i ].DamageTime, sizeof( float ), 1, fp );
+			file_read( &BGObjects[ i ].StepInterval, sizeof( float ), 1, fp );
+			file_read( &BGObjects[ i ].TimePerDamageUnit, sizeof( float ), 1, fp );
+			file_read( &BGObjects[ i ].DamagePerInterval, sizeof( float ), 1, fp );
+			file_read( &BGObjects[ i ].Center, sizeof( VECTOR ), 1, fp );
+			file_read( &BGObjects[ i ].TopLeft, sizeof( VECTOR ), 1, fp );
+			file_read( &BGObjects[ i ].BottomRight, sizeof( VECTOR ), 1, fp );
+			file_read( &BGObjects[ i ].Radius, sizeof( float ), 1, fp );
+			file_read( &BGObjects[ i ].ColCenter, sizeof( VECTOR ), 1, fp );
+			file_read( &BGObjects[ i ].ColTopLeft, sizeof( VECTOR ), 1, fp );
+			file_read( &BGObjects[ i ].ColBottomRight, sizeof( VECTOR ), 1, fp );
+			file_read( &BGObjects[ i ].ColRadius, sizeof( float ), 1, fp );
+			file_read( &BGObjects[ i ].Index, sizeof( u_int16_t ), 1, fp );
+			file_read( &BGObjects[ i ].UpdateCount, sizeof( int16_t ), 1, fp );
+			file_read( &BGObjects[ i ].DoorSfxType, sizeof( int16_t ), 1, fp );
+			file_read( &BGObjects[ i ].SoundFX_ID, sizeof( u_int32_t ), 1, fp );
 
-			fread( &TempIndex, sizeof( u_int16_t ), 1, fp );
+			file_read( &TempIndex, sizeof( u_int16_t ), 1, fp );
 			if( TempIndex != INDEX_NONE ) BGObjects[ i ].PrevUsed = &BGObjects[ TempIndex ];
 			else  BGObjects[ i ].PrevUsed = nullptr;
-			fread( &TempIndex, sizeof( u_int16_t ), 1, fp );
+			file_read( &TempIndex, sizeof( u_int16_t ), 1, fp );
 			if( TempIndex != INDEX_NONE ) BGObjects[ i ].NextUsed = &BGObjects[ TempIndex ];
 			else  BGObjects[ i ].NextUsed = nullptr;
-			fread( &TempIndex, sizeof( u_int16_t ), 1, fp );
+			file_read( &TempIndex, sizeof( u_int16_t ), 1, fp );
 			if( TempIndex != INDEX_NONE ) BGObjects[ i ].PrevFree = &BGObjects[ TempIndex ];
 			else  BGObjects[ i ].PrevFree = nullptr;
-			fread( &TempIndex, sizeof( u_int16_t ), 1, fp );
+			file_read( &TempIndex, sizeof( u_int16_t ), 1, fp );
 			if( TempIndex != INDEX_NONE ) BGObjects[ i ].NextFree = &BGObjects[ TempIndex ];
 			else  BGObjects[ i ].NextFree = nullptr;
 		}

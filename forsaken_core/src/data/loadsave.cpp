@@ -148,8 +148,8 @@ bool PreInGameLoad( MENUITEM * /*MenuItem*/ )
 
 	if( fp != nullptr )
 	{
-		fread( &MagicNumber, sizeof( u_int32_t ), 1, fp );
-		fread( &VersionNumber, sizeof( u_int32_t ), 1, fp );
+		file_read( &MagicNumber, sizeof( u_int32_t ), 1, fp );
+		file_read( &VersionNumber, sizeof( u_int32_t ), 1, fp );
 
 		if( ( MagicNumber != MAGIC_NUMBER ) || ( VersionNumber != LOADSAVE_VERSION_NUMBER  ) )
 			Msg("Save file is in an old format.\nYou will most likely crash...\n");
@@ -200,8 +200,8 @@ bool InGameLoad( MENUITEM * /*MenuItem*/ )
 
 	if( fp != nullptr )
 	{
-		fread( &MagicNumber, sizeof( u_int32_t ), 1, fp );
-		fread( &VersionNumber, sizeof( u_int32_t ), 1, fp );
+		file_read( &MagicNumber, sizeof( u_int32_t ), 1, fp );
+		file_read( &VersionNumber, sizeof( u_int32_t ), 1, fp );
 
 		if( ( MagicNumber != MAGIC_NUMBER ) || ( VersionNumber != LOADSAVE_VERSION_NUMBER  ) )
 			Msg("Save file is in an old format.\nYou will most likely crash...\n");
@@ -212,12 +212,12 @@ bool InGameLoad( MENUITEM * /*MenuItem*/ )
 			return false;
 		}
 
-		fread( &Hours, sizeof( Hours ), 1, fp );
-		fread( &Minutes, sizeof( Minutes ), 1, fp );
-		fread( &Seconds, sizeof( Seconds ), 1, fp );
-		fread( &InitEnemiesNum, sizeof( NumInitEnemies ), 1, fp );
-		fread( &KilledEnemiesNum, sizeof( NumKilledEnemies ), 1, fp );
-		fread( &Lives, sizeof( Lives ), 1, fp );
+		file_read( &Hours, sizeof( Hours ), 1, fp );
+		file_read( &Minutes, sizeof( Minutes ), 1, fp );
+		file_read( &Seconds, sizeof( Seconds ), 1, fp );
+		file_read( &InitEnemiesNum, sizeof( NumInitEnemies ), 1, fp );
+		file_read( &KilledEnemiesNum, sizeof( NumKilledEnemies ), 1, fp );
+		file_read( &Lives, sizeof( Lives ), 1, fp );
 
 		DebugPrintf( "Loading Ships\n" );
 
@@ -331,7 +331,7 @@ bool InGameLoad( MENUITEM * /*MenuItem*/ )
 		fp = LoadAllText( fp );
 		if( !load_ok( fp ) ) return false;
 
-		fread( &Cheated, sizeof( bool ), 1, fp );
+		file_read( &Cheated, sizeof( bool ), 1, fp );
 		if( !load_ok( fp ) ) return false;
 
 		DebugPrintf( "Loaded OK\n" );
@@ -566,8 +566,8 @@ char *SavedGameInfo( int slot )
 
 	if( fp != nullptr )
 	{
-		fread( &MagicNumber, sizeof( u_int32_t ), 1, fp );
-		fread( &VersionNumber, sizeof( u_int32_t ), 1, fp );
+		file_read( &MagicNumber, sizeof( u_int32_t ), 1, fp );
+		file_read( &VersionNumber, sizeof( u_int32_t ), 1, fp );
 
 		if( ( MagicNumber != MAGIC_NUMBER ) || ( VersionNumber != LOADSAVE_VERSION_NUMBER  ) )
 			Msg("Save file is in an old format.\nYou will most likely crash...\n");
@@ -581,12 +581,12 @@ char *SavedGameInfo( int slot )
 
 		LevelName = GetMissionName( (char*)buf );
 
-		fread( &Hours, sizeof( Hours ), 1, fp );
-		fread( &Minutes, sizeof( Minutes ), 1, fp );
-		fread( &Seconds, sizeof( Seconds ), 1, fp );
-		fread( &InitEnemiesNum, sizeof( NumInitEnemies ), 1, fp );
-		fread( &KilledEnemiesNum, sizeof( NumKilledEnemies ), 1, fp );
-		fread( &Lives, sizeof( Lives ), 1, fp );
+		file_read( &Hours, sizeof( Hours ), 1, fp );
+		file_read( &Minutes, sizeof( Minutes ), 1, fp );
+		file_read( &Seconds, sizeof( Seconds ), 1, fp );
+		file_read( &InitEnemiesNum, sizeof( NumInitEnemies ), 1, fp );
+		file_read( &KilledEnemiesNum, sizeof( NumKilledEnemies ), 1, fp );
+		file_read( &Lives, sizeof( Lives ), 1, fp );
 		if ( strcasecmp( (char*)biker, DEFAULT_PLAYER_NAME ) )
 			snprintf( info, sizeof( info ), "%s in %s %hd'%02hd %hd/%hd",
 				biker,
@@ -618,8 +618,8 @@ bool SaveGameSlotUsed( int slot )
 	fp = file_open( SaveGameFileName( slot ), "rb" );
 	if ( fp )
 	{
-		fread( &MagicNumber, sizeof( u_int32_t ), 1, fp );
-		fread( &VersionNumber, sizeof( u_int32_t ), 1, fp );
+		file_read( &MagicNumber, sizeof( u_int32_t ), 1, fp );
+		file_read( &VersionNumber, sizeof( u_int32_t ), 1, fp );
 
 		if( ( MagicNumber != MAGIC_NUMBER ) || ( VersionNumber != LOADSAVE_VERSION_NUMBER  ) )
 			Msg("Save file is in an old format.\nYou will most likely crash...\n");

@@ -907,7 +907,7 @@ FILE * LoadTriggerAreas( FILE * fp )
 
 	if( fp )
 	{
-		fread( &NumTrigAreas, sizeof( u_int16_t ), 1, fp );
+		file_read( &NumTrigAreas, sizeof( u_int16_t ), 1, fp );
 
 		if( NumTrigAreas != NumZones )
 		{
@@ -919,7 +919,7 @@ FILE * LoadTriggerAreas( FILE * fp )
 
 		for( i = 0; i < NumZones; i++ )
 		{
-			fread( &TrigAreaPtr->state, sizeof( u_int16_t ), 1, fp );
+			file_read( &TrigAreaPtr->state, sizeof( u_int16_t ), 1, fp );
 			TrigAreaPtr++;
 		}
 	}

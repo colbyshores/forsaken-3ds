@@ -28,6 +28,7 @@
 #include "game/spotfx.h"
 #include "game/water.h"
 #include "game/main.h"
+#include "data/file.h"
 #include "input/controls.h"
 #include "ui/local.h"
 #include "util/util.h"
@@ -5269,58 +5270,58 @@ FILE * LoadModels( FILE * fp )
 
 	if( fp )
 	{
-		fread( &FirstModelUsed, sizeof( FirstModelUsed ), 1, fp );
-		fread( &FirstModelFree, sizeof( FirstModelFree ), 1, fp );
+		file_read( &FirstModelUsed, sizeof( FirstModelUsed ), 1, fp );
+		file_read( &FirstModelFree, sizeof( FirstModelFree ), 1, fp );
 
 		i = FirstModelUsed;
 
 		while( i != INDEX_NONE )
 		{
-			fread( &Models[ i ].Next, sizeof( u_int16_t ), 1, fp );
-			fread( &Models[ i ].Prev, sizeof( u_int16_t ), 1, fp );
-			fread( &Models[ i ].Type, sizeof( int16_t ), 1, fp );
-			fread( &Models[ i ].Flags, sizeof( u_int16_t ), 1, fp );
-			fread( &Models[ i ].SecWeapon, sizeof( BYTE ), 1, fp );
-			fread( &Models[ i ].Visible, sizeof( bool ), 1, fp );
-			fread( &Models[ i ].ModelNum, sizeof( u_int16_t ), 1, fp );
-			fread( &Models[ i ].Group, sizeof( u_int16_t ), 1, fp );
-			fread( &Models[ i ].OwnerType, sizeof( u_int16_t ), 1, fp );
-			fread( &Models[ i ].Owner, sizeof( u_int16_t ), 1, fp );
-			fread( &Models[ i ].Func, sizeof( int16_t ), 1, fp );
-			fread( &Models[ i ].Scale, sizeof( float ), 1, fp );
-			fread( &Models[ i ].Xscale, sizeof( float ), 1, fp );
-			fread( &Models[ i ].Yscale, sizeof( float ), 1, fp );
-			fread( &Models[ i ].Zscale, sizeof( float ), 1, fp );
-			fread( &Models[ i ].MaxScale, sizeof( float ), 1, fp );
-			fread( &Models[ i ].LifeCount, sizeof( float ), 1, fp );
-			fread( &Models[ i ].AxisRot, sizeof( float ), 1, fp );
-			fread( &Models[ i ].Speed, sizeof( float ), 1, fp );
-			fread( &Models[ i ].TimeInterval, sizeof( float ), 1, fp );
-			fread( &Models[ i ].TimeCount, sizeof( float ), 1, fp );
-			fread( &Models[ i ].Frame, sizeof( int16_t ), 1, fp );
-			fread( &Models[ i ].InterpFrame, sizeof( int16_t ), 1, fp );
-			fread( &Models[ i ].InterpTime, sizeof( float ), 1, fp );
-			fread( &Models[ i ].Qlerp, sizeof( QUATLERP ), 1, fp );
+			file_read( &Models[ i ].Next, sizeof( u_int16_t ), 1, fp );
+			file_read( &Models[ i ].Prev, sizeof( u_int16_t ), 1, fp );
+			file_read( &Models[ i ].Type, sizeof( int16_t ), 1, fp );
+			file_read( &Models[ i ].Flags, sizeof( u_int16_t ), 1, fp );
+			file_read( &Models[ i ].SecWeapon, sizeof( BYTE ), 1, fp );
+			file_read( &Models[ i ].Visible, sizeof( bool ), 1, fp );
+			file_read( &Models[ i ].ModelNum, sizeof( u_int16_t ), 1, fp );
+			file_read( &Models[ i ].Group, sizeof( u_int16_t ), 1, fp );
+			file_read( &Models[ i ].OwnerType, sizeof( u_int16_t ), 1, fp );
+			file_read( &Models[ i ].Owner, sizeof( u_int16_t ), 1, fp );
+			file_read( &Models[ i ].Func, sizeof( int16_t ), 1, fp );
+			file_read( &Models[ i ].Scale, sizeof( float ), 1, fp );
+			file_read( &Models[ i ].Xscale, sizeof( float ), 1, fp );
+			file_read( &Models[ i ].Yscale, sizeof( float ), 1, fp );
+			file_read( &Models[ i ].Zscale, sizeof( float ), 1, fp );
+			file_read( &Models[ i ].MaxScale, sizeof( float ), 1, fp );
+			file_read( &Models[ i ].LifeCount, sizeof( float ), 1, fp );
+			file_read( &Models[ i ].AxisRot, sizeof( float ), 1, fp );
+			file_read( &Models[ i ].Speed, sizeof( float ), 1, fp );
+			file_read( &Models[ i ].TimeInterval, sizeof( float ), 1, fp );
+			file_read( &Models[ i ].TimeCount, sizeof( float ), 1, fp );
+			file_read( &Models[ i ].Frame, sizeof( int16_t ), 1, fp );
+			file_read( &Models[ i ].InterpFrame, sizeof( int16_t ), 1, fp );
+			file_read( &Models[ i ].InterpTime, sizeof( float ), 1, fp );
+			file_read( &Models[ i ].Qlerp, sizeof( QUATLERP ), 1, fp );
 			Models[ i ].Qlerp.crnt = &Models[ i ].Quat;
-			fread( &Models[ i ].Quat, sizeof( QUAT ), 1, fp );
-			fread( &Models[ i ].Ship, sizeof( u_int16_t ), 1, fp );
-			fread( &Models[ i ].Pos, sizeof( VECTOR ), 1, fp );
-			fread( &Models[ i ].OldPos, sizeof( VECTOR ), 1, fp );
-			fread( &Models[ i ].Dir, sizeof( VECTOR ), 1, fp );
-			fread( &Models[ i ].Rot, sizeof( VECTOR ), 1, fp );
-			fread( &Models[ i ].Mat, sizeof( MATRIX ), 1, fp );
+			file_read( &Models[ i ].Quat, sizeof( QUAT ), 1, fp );
+			file_read( &Models[ i ].Ship, sizeof( u_int16_t ), 1, fp );
+			file_read( &Models[ i ].Pos, sizeof( VECTOR ), 1, fp );
+			file_read( &Models[ i ].OldPos, sizeof( VECTOR ), 1, fp );
+			file_read( &Models[ i ].Dir, sizeof( VECTOR ), 1, fp );
+			file_read( &Models[ i ].Rot, sizeof( VECTOR ), 1, fp );
+			file_read( &Models[ i ].Mat, sizeof( MATRIX ), 1, fp );
 			MatrixTranspose( &Models[ i ].Mat, &Models[ i ].InvMat );
-			fread( &Models[ i ].Radius, sizeof( float ), 1, fp );
-			fread( &Models[ i ].Red, sizeof( int ), 1, fp );
-			fread( &Models[ i ].Green, sizeof( int ), 1, fp );
-			fread( &Models[ i ].Blue, sizeof( int ), 1, fp );
-			fread( &Models[ i ].SpotFXFlags[ 0 ], sizeof( Models[i].SpotFXFlags ), 1, fp );
-			fread( &Models[ i ].SpotFXState[ 0 ], sizeof( Models[i].SpotFXState ), 1, fp );
-			fread( &Models[ i ].SpotFXDelay[ 0 ], sizeof( Models[i].SpotFXDelay ), 1, fp );
-			fread( &Models[ i ].SpotFXTimeInterval[ 0 ], sizeof( Models[i].SpotFXTimeInterval ), 1, fp );
-			fread( &Models[ i ].SpotFXTimeCount[ 0 ], sizeof( Models[i].SpotFXTimeCount ), 1, fp );
-			fread( &Models[ i ].SpotFXSFX_ID[ 0 ], sizeof( Models[i].SpotFXSFX_ID ), 1, fp );
-			fread( &Models[ i ].ClipGroup, sizeof( u_int16_t ), 1, fp );
+			file_read( &Models[ i ].Radius, sizeof( float ), 1, fp );
+			file_read( &Models[ i ].Red, sizeof( int ), 1, fp );
+			file_read( &Models[ i ].Green, sizeof( int ), 1, fp );
+			file_read( &Models[ i ].Blue, sizeof( int ), 1, fp );
+			file_read( &Models[ i ].SpotFXFlags[ 0 ], sizeof( Models[i].SpotFXFlags ), 1, fp );
+			file_read( &Models[ i ].SpotFXState[ 0 ], sizeof( Models[i].SpotFXState ), 1, fp );
+			file_read( &Models[ i ].SpotFXDelay[ 0 ], sizeof( Models[i].SpotFXDelay ), 1, fp );
+			file_read( &Models[ i ].SpotFXTimeInterval[ 0 ], sizeof( Models[i].SpotFXTimeInterval ), 1, fp );
+			file_read( &Models[ i ].SpotFXTimeCount[ 0 ], sizeof( Models[i].SpotFXTimeCount ), 1, fp );
+			file_read( &Models[ i ].SpotFXSFX_ID[ 0 ], sizeof( Models[i].SpotFXSFX_ID ), 1, fp );
+			file_read( &Models[ i ].ClipGroup, sizeof( u_int16_t ), 1, fp );
 
 			ReinitSpotFXSFX( i );
 
@@ -5340,7 +5341,7 @@ FILE * LoadModels( FILE * fp )
 			for( Count = 0; Count < 12; Count++ ) Models[i].TempLines[ Count ] = INDEX_NONE;
 			Models[i].Prev = INDEX_NONE;
 
-			fread( &Models[ i ].Next, sizeof( u_int16_t ), 1, fp );
+			file_read( &Models[ i ].Next, sizeof( u_int16_t ), 1, fp );
 			i = Models[ i ].Next;
 		}
 	}

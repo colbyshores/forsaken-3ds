@@ -14,6 +14,9 @@
  * an open file the way the level loaders store names: up to and including
  * the NUL, keeping at most size-1 characters (always terminated) and
  * stopping at end of file, so a bad file cannot overrun the buffer.
+ * file_read is fread for the loaders that read a block of fields and then
+ * test the stream once (feof/ferror stay set after any short read): the
+ * per-call count is deliberately not returned.
  */
 
 #include "game/main.h"
@@ -49,3 +52,9 @@ void find_close( void );
 
 FILE * file_open(const char * filename, const char * mode);
 void file_read_cstring( FILE * fp, char * dst, size_t size );
+
+[[gnu::always_inline]] inline void file_read( void * dst, size_t size, size_t count, FILE * fp )
+{
+	size_t got = fread( dst, size, count, fp );	/* a short read is reported */
+	(void) got;									/* by the stream's flags     */
+}

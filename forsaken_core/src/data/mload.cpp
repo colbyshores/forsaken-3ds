@@ -68,6 +68,7 @@
 ===================================================================*/
 
 #include "game/main.h"
+#include "data/file.h"
 #include <stdio.h>
 
 #include "math/new3d.h"
@@ -1415,12 +1416,12 @@ FILE *LoadTextureAnimations( FILE *f )
 
 			for( i = 0 ; i < Mloadheader.Group[group].num_animating_polys[mesh] ; i++ )
 			{
-				fread( &PolyAnim->State, sizeof( PolyAnim->State ), 1, f );
-				fread( &PolyAnim->MasterTime, sizeof( PolyAnim->MasterTime ), 1, f );
-				fread( &PolyAnim->CurrentTime, sizeof( PolyAnim->CurrentTime ), 1, f );
-				fread( &PolyAnim->CurrentOffset, sizeof( PolyAnim->CurrentOffset ), 1, f );
-				fread( &PolyAnim->newframe, sizeof( PolyAnim->newframe ), 1, f );
-				fread( PolyAnim->loopstack, sizeof( PolyAnim->loopstack ), 1, f );
+				file_read( &PolyAnim->State, sizeof( PolyAnim->State ), 1, f );
+				file_read( &PolyAnim->MasterTime, sizeof( PolyAnim->MasterTime ), 1, f );
+				file_read( &PolyAnim->CurrentTime, sizeof( PolyAnim->CurrentTime ), 1, f );
+				file_read( &PolyAnim->CurrentOffset, sizeof( PolyAnim->CurrentOffset ), 1, f );
+				file_read( &PolyAnim->newframe, sizeof( PolyAnim->newframe ), 1, f );
+				file_read( PolyAnim->loopstack, sizeof( PolyAnim->loopstack ), 1, f );
 				PolyAnim++;
 			}
 		}

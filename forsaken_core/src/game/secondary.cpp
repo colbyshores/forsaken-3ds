@@ -1,6 +1,7 @@
 /* secondary.cpp -- secondary weapons: missiles, mines, targeting; see secondary.h. */
 #include <stdio.h>
 #include "game/main.h"
+#include "data/file.h"
 #include "math/new3d.h"
 #include "math/quat.h"
 #include "game/compobjects.h"
@@ -7882,110 +7883,110 @@ FILE * LoadSecBulls( FILE * fp )
 	{
 		for( i = 0; i < MAXSECONDARYWEAPONS; i++ )
 		{
-			fread( &SecondaryWeaponsGot[ i ], sizeof( int16_t ), 1, fp );
-			fread( &SecAmmoUsed[ i ], sizeof( int16_t ), 1, fp );
-			fread( &SecondaryAmmo[ i ], sizeof( int16_t ), 1, fp );
+			file_read( &SecondaryWeaponsGot[ i ], sizeof( int16_t ), 1, fp );
+			file_read( &SecAmmoUsed[ i ], sizeof( int16_t ), 1, fp );
+			file_read( &SecondaryAmmo[ i ], sizeof( int16_t ), 1, fp );
 		}
 
 		for( i = 0; i < MAXPICKUPS; i++ )
 		{
-			fread( &SecWeaponsGot[ i ], sizeof( int8_t ), 1, fp );
+			file_read( &SecWeaponsGot[ i ], sizeof( int8_t ), 1, fp );
 		}
 
 		for( i = 0; i < MAXGROUPS; i++ )
 		{
-			fread( &NumSecBullsPerGroup[ i ], sizeof( int16_t ), 1, fp );
-			fread( &TempIndex, sizeof( u_int16_t ), 1, fp );
+			file_read( &NumSecBullsPerGroup[ i ], sizeof( int16_t ), 1, fp );
+			file_read( &TempIndex, sizeof( u_int16_t ), 1, fp );
 			if( TempIndex != INDEX_NONE ) SecBullGroups[ i ] = &SecBulls[ TempIndex ];
 			else SecBullGroups[ i ] = nullptr;
 		}
 
 
-		fread( &FirstSecBullUsed, sizeof( FirstSecBullUsed ), 1, fp );
-		fread( &FirstSecBullFree, sizeof( FirstSecBullFree ), 1, fp );
-		fread( &SecondaryFireDelay, sizeof( SecondaryFireDelay ), 1, fp );
-		fread( &TargetComputerOn, sizeof( TargetComputerOn ), 1, fp );
-		fread( &ImTargeted, sizeof( ImTargeted ), 1, fp );
-		fread( &TargetedDelay, sizeof( TargetedDelay ), 1, fp );
-		fread( &GlobalSecBullsID, sizeof( GlobalSecBullsID ), 1, fp );
+		file_read( &FirstSecBullUsed, sizeof( FirstSecBullUsed ), 1, fp );
+		file_read( &FirstSecBullFree, sizeof( FirstSecBullFree ), 1, fp );
+		file_read( &SecondaryFireDelay, sizeof( SecondaryFireDelay ), 1, fp );
+		file_read( &TargetComputerOn, sizeof( TargetComputerOn ), 1, fp );
+		file_read( &ImTargeted, sizeof( ImTargeted ), 1, fp );
+		file_read( &TargetedDelay, sizeof( TargetedDelay ), 1, fp );
+		file_read( &GlobalSecBullsID, sizeof( GlobalSecBullsID ), 1, fp );
 
 		i = FirstSecBullUsed;
 
 		while( i != INDEX_NONE )
 		{
-			fread( &SecBulls[ i ].Used, sizeof( bool ), 1, fp );
-			fread( &SecBulls[ i ].Next, sizeof( u_int16_t ), 1, fp );
-			fread( &SecBulls[ i ].Prev, sizeof( u_int16_t ), 1, fp );
+			file_read( &SecBulls[ i ].Used, sizeof( bool ), 1, fp );
+			file_read( &SecBulls[ i ].Next, sizeof( u_int16_t ), 1, fp );
+			file_read( &SecBulls[ i ].Prev, sizeof( u_int16_t ), 1, fp );
 
-			fread( &TempIndex, sizeof( u_int16_t ), 1, fp );
+			file_read( &TempIndex, sizeof( u_int16_t ), 1, fp );
 			if( TempIndex != INDEX_NONE ) SecBulls[ i ].NextInGroup = &SecBulls[ TempIndex ];
 			else SecBulls[ i ].NextInGroup = nullptr;
-			fread( &TempIndex, sizeof( u_int16_t ), 1, fp );
+			file_read( &TempIndex, sizeof( u_int16_t ), 1, fp );
 			if( TempIndex != INDEX_NONE ) SecBulls[ i ].PrevInGroup = &SecBulls[ TempIndex ];
 			else SecBulls[ i ].PrevInGroup = nullptr;
 
-			fread( &SecBulls[ i ].Flags, sizeof( u_int16_t ), 1, fp );
-			fread( &SecBulls[ i ].Index, sizeof( u_int16_t ), 1, fp );
-			fread( &SecBulls[ i ].SecType, sizeof( u_int16_t ), 1, fp );
-			fread( &SecBulls[ i ].Type, sizeof( u_int16_t ), 1, fp );
-			fread( &SecBulls[ i ].MoveType, sizeof( u_int16_t ), 1, fp );
-			fread( &SecBulls[ i ].State, sizeof( u_int16_t ), 1, fp );
-			fread( &SecBulls[ i ].OwnerType, sizeof( u_int16_t ), 1, fp );
-			fread( &SecBulls[ i ].Owner, sizeof( u_int16_t ), 1, fp );
-			fread( &SecBulls[ i ].ID, sizeof( u_int16_t ), 1, fp );
-			fread( &SecBulls[ i ].Weapon, sizeof( int8_t ), 1, fp );
-			fread( &SecBulls[ i ].Lensflare, sizeof( bool ), 1, fp );
-			fread( &SecBulls[ i ].LifeCount, sizeof( float ), 1, fp );
-			fread( &SecBulls[ i ].LifeSpan, sizeof( float ), 1, fp );
-			fread( &SecBulls[ i ].SpeedInc, sizeof( float ), 1, fp );
-			fread( &SecBulls[ i ].SpeedWanted, sizeof( float ), 1, fp );
-			fread( &SecBulls[ i ].Speed, sizeof( float ), 1, fp );
-			fread( &SecBulls[ i ].DropCount, sizeof( float ), 1, fp );
-			fread( &SecBulls[ i ].DropVector, sizeof( VECTOR ), 1, fp );
-			fread( &SecBulls[ i ].Size, sizeof( float ), 1, fp );
-			fread( &SecBulls[ i ].Pos, sizeof( VECTOR ), 1, fp );
-			fread( &SecBulls[ i ].Offset, sizeof( VECTOR ), 1, fp );
-			fread( &SecBulls[ i ].StartPos, sizeof( VECTOR ), 1, fp );
-			fread( &SecBulls[ i ].StartDir, sizeof( VECTOR ), 1, fp );
-			fread( &SecBulls[ i ].StartMat, sizeof( MATRIX ), 1, fp );
-			fread( &SecBulls[ i ].ColStart, sizeof( VECTOR ), 1, fp );
-			fread( &SecBulls[ i ].ColDist, sizeof( float ), 1, fp );
-			fread( &SecBulls[ i ].ColFlag, sizeof( u_int16_t ), 1, fp );
-			fread( &SecBulls[ i ].ColGroup, sizeof( u_int16_t ), 1, fp );
-			fread( &SecBulls[ i ].ColPoint, sizeof( VECTOR ), 1, fp );
-			fread( &SecBulls[ i ].ColPointNormal, sizeof( NORMAL ), 1, fp );
-			fread( &SecBulls[ i ].GroupImIn, sizeof( u_int16_t ), 1, fp );
-			fread( &SecBulls[ i ].ModelNum, sizeof( u_int16_t ), 1, fp );
-			fread( &SecBulls[ i ].ModelIndex, sizeof( u_int16_t ), 1, fp );
-			fread( &SecBulls[ i ].Mat, sizeof( MATRIX ), 1, fp );
-			fread( &SecBulls[ i ].fmpoly, sizeof( u_int16_t ), 1, fp );
-			fread( &SecBulls[ i ].numfmpolys, sizeof( int16_t ), 1, fp );
-			fread( &SecBulls[ i ].poly, sizeof( u_int16_t ), 1, fp );
-			fread( &SecBulls[ i ].numpolys, sizeof( int16_t ), 1, fp );
-			fread( &SecBulls[ i ].xsize, sizeof( float ), 1, fp );
-			fread( &SecBulls[ i ].ysize, sizeof( float ), 1, fp );
-			fread( &SecBulls[ i ].light, sizeof( u_int16_t ), 1, fp );
-			fread( &SecBulls[ i ].lightsize, sizeof( float ), 1, fp );
-			fread( &SecBulls[ i ].r, sizeof( float ), 1, fp );
-			fread( &SecBulls[ i ].g, sizeof( float ), 1, fp );
-			fread( &SecBulls[ i ].b, sizeof( float ), 1, fp );
-			fread( &SecBulls[ i ].TurnSpeed, sizeof( float ), 1, fp );
-			fread( &SecBulls[ i ].ViewCone, sizeof( float ), 1, fp );
-			fread( &SecBulls[ i ].TargetType, sizeof( u_int16_t ), 1, fp );
-			fread( &SecBulls[ i ].Target, sizeof( u_int16_t ), 1, fp );
-			fread( &SecBulls[ i ].DirQuat, sizeof( QUAT ), 1, fp );
-			fread( &SecBulls[ i ].DirVector, sizeof( VECTOR ), 1, fp );
-			fread( &SecBulls[ i ].UpVector, sizeof( VECTOR ), 1, fp );
-			fread( &SecBulls[ i ].Shield, sizeof( float ), 1, fp );
-			fread( &SecBulls[ i ].Damage, sizeof( float ), 1, fp );
-			fread( &SecBulls[ i ].Ammo, sizeof( u_int16_t ), 1, fp );
-			fread( &SecBulls[ i ].NumBounces, sizeof( int16_t ), 1, fp );
-			fread( &SecBulls[ i ].NumOldPos, sizeof( int16_t ), 1, fp );
-			fread( &SecBulls[ i ].RetractPos, sizeof( float ), 1, fp );
-			fread( &SecBulls[ i ].ColRadius, sizeof( float ), 1, fp );
-			fread( &SecBulls[ i ].Interval, sizeof( float ), 1, fp );
-			fread( &SecBulls[ i ].Time, sizeof( float ), 1, fp );
-			fread( &SecBulls[ i ].OldPos[ 0 ], sizeof( SecBulls[ i ].OldPos ), 1, fp );
+			file_read( &SecBulls[ i ].Flags, sizeof( u_int16_t ), 1, fp );
+			file_read( &SecBulls[ i ].Index, sizeof( u_int16_t ), 1, fp );
+			file_read( &SecBulls[ i ].SecType, sizeof( u_int16_t ), 1, fp );
+			file_read( &SecBulls[ i ].Type, sizeof( u_int16_t ), 1, fp );
+			file_read( &SecBulls[ i ].MoveType, sizeof( u_int16_t ), 1, fp );
+			file_read( &SecBulls[ i ].State, sizeof( u_int16_t ), 1, fp );
+			file_read( &SecBulls[ i ].OwnerType, sizeof( u_int16_t ), 1, fp );
+			file_read( &SecBulls[ i ].Owner, sizeof( u_int16_t ), 1, fp );
+			file_read( &SecBulls[ i ].ID, sizeof( u_int16_t ), 1, fp );
+			file_read( &SecBulls[ i ].Weapon, sizeof( int8_t ), 1, fp );
+			file_read( &SecBulls[ i ].Lensflare, sizeof( bool ), 1, fp );
+			file_read( &SecBulls[ i ].LifeCount, sizeof( float ), 1, fp );
+			file_read( &SecBulls[ i ].LifeSpan, sizeof( float ), 1, fp );
+			file_read( &SecBulls[ i ].SpeedInc, sizeof( float ), 1, fp );
+			file_read( &SecBulls[ i ].SpeedWanted, sizeof( float ), 1, fp );
+			file_read( &SecBulls[ i ].Speed, sizeof( float ), 1, fp );
+			file_read( &SecBulls[ i ].DropCount, sizeof( float ), 1, fp );
+			file_read( &SecBulls[ i ].DropVector, sizeof( VECTOR ), 1, fp );
+			file_read( &SecBulls[ i ].Size, sizeof( float ), 1, fp );
+			file_read( &SecBulls[ i ].Pos, sizeof( VECTOR ), 1, fp );
+			file_read( &SecBulls[ i ].Offset, sizeof( VECTOR ), 1, fp );
+			file_read( &SecBulls[ i ].StartPos, sizeof( VECTOR ), 1, fp );
+			file_read( &SecBulls[ i ].StartDir, sizeof( VECTOR ), 1, fp );
+			file_read( &SecBulls[ i ].StartMat, sizeof( MATRIX ), 1, fp );
+			file_read( &SecBulls[ i ].ColStart, sizeof( VECTOR ), 1, fp );
+			file_read( &SecBulls[ i ].ColDist, sizeof( float ), 1, fp );
+			file_read( &SecBulls[ i ].ColFlag, sizeof( u_int16_t ), 1, fp );
+			file_read( &SecBulls[ i ].ColGroup, sizeof( u_int16_t ), 1, fp );
+			file_read( &SecBulls[ i ].ColPoint, sizeof( VECTOR ), 1, fp );
+			file_read( &SecBulls[ i ].ColPointNormal, sizeof( NORMAL ), 1, fp );
+			file_read( &SecBulls[ i ].GroupImIn, sizeof( u_int16_t ), 1, fp );
+			file_read( &SecBulls[ i ].ModelNum, sizeof( u_int16_t ), 1, fp );
+			file_read( &SecBulls[ i ].ModelIndex, sizeof( u_int16_t ), 1, fp );
+			file_read( &SecBulls[ i ].Mat, sizeof( MATRIX ), 1, fp );
+			file_read( &SecBulls[ i ].fmpoly, sizeof( u_int16_t ), 1, fp );
+			file_read( &SecBulls[ i ].numfmpolys, sizeof( int16_t ), 1, fp );
+			file_read( &SecBulls[ i ].poly, sizeof( u_int16_t ), 1, fp );
+			file_read( &SecBulls[ i ].numpolys, sizeof( int16_t ), 1, fp );
+			file_read( &SecBulls[ i ].xsize, sizeof( float ), 1, fp );
+			file_read( &SecBulls[ i ].ysize, sizeof( float ), 1, fp );
+			file_read( &SecBulls[ i ].light, sizeof( u_int16_t ), 1, fp );
+			file_read( &SecBulls[ i ].lightsize, sizeof( float ), 1, fp );
+			file_read( &SecBulls[ i ].r, sizeof( float ), 1, fp );
+			file_read( &SecBulls[ i ].g, sizeof( float ), 1, fp );
+			file_read( &SecBulls[ i ].b, sizeof( float ), 1, fp );
+			file_read( &SecBulls[ i ].TurnSpeed, sizeof( float ), 1, fp );
+			file_read( &SecBulls[ i ].ViewCone, sizeof( float ), 1, fp );
+			file_read( &SecBulls[ i ].TargetType, sizeof( u_int16_t ), 1, fp );
+			file_read( &SecBulls[ i ].Target, sizeof( u_int16_t ), 1, fp );
+			file_read( &SecBulls[ i ].DirQuat, sizeof( QUAT ), 1, fp );
+			file_read( &SecBulls[ i ].DirVector, sizeof( VECTOR ), 1, fp );
+			file_read( &SecBulls[ i ].UpVector, sizeof( VECTOR ), 1, fp );
+			file_read( &SecBulls[ i ].Shield, sizeof( float ), 1, fp );
+			file_read( &SecBulls[ i ].Damage, sizeof( float ), 1, fp );
+			file_read( &SecBulls[ i ].Ammo, sizeof( u_int16_t ), 1, fp );
+			file_read( &SecBulls[ i ].NumBounces, sizeof( int16_t ), 1, fp );
+			file_read( &SecBulls[ i ].NumOldPos, sizeof( int16_t ), 1, fp );
+			file_read( &SecBulls[ i ].RetractPos, sizeof( float ), 1, fp );
+			file_read( &SecBulls[ i ].ColRadius, sizeof( float ), 1, fp );
+			file_read( &SecBulls[ i ].Interval, sizeof( float ), 1, fp );
+			file_read( &SecBulls[ i ].Time, sizeof( float ), 1, fp );
+			file_read( &SecBulls[ i ].OldPos[ 0 ], sizeof( SecBulls[ i ].OldPos ), 1, fp );
 			i = SecBulls[ i ].Prev;
 		}
 
@@ -8029,7 +8030,7 @@ FILE * LoadSecBulls( FILE * fp )
 			SecBulls[ i ].DirQuat.From2Vectors(&Forward, &SecBulls[ i ].DirVector);
 			SecBulls[ i ].DirQuat.ToMatrix(&SecBulls[ i ].Mat);
 
-			fread( &SecBulls[ i ].Next, sizeof( SecBulls[ i ].Next ), 1, fp );
+			file_read( &SecBulls[ i ].Next, sizeof( SecBulls[ i ].Next ), 1, fp );
 			i = SecBulls[ i ].Next;
 		}
 	}

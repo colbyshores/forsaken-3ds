@@ -1,4 +1,5 @@
 #include "game/main.h"
+#include "data/file.h"
 #include "rendering/render.h"
 #include "audio/sound.h"
 #include "audio/sfx.h"
@@ -2508,7 +2509,7 @@ FILE *LoadAllSfx( FILE *fp )
 	if( fp )
 	{
 		// work out number of sfx to load...
-		fread( &num_active_sfx, sizeof( u_int16_t ), 1, fp );
+		file_read( &num_active_sfx, sizeof( u_int16_t ), 1, fp );
 
 		// invalidate existing sfx data, stopping any current sfx...
 		for ( i = 0; i < MAX_LOOPING_SFX; i++ )
@@ -2520,9 +2521,9 @@ FILE *LoadAllSfx( FILE *fp )
 
 		// read in sfx data...
 		for ( i = 0; i < num_active_sfx; i++ )
-			fread( &SpotSfxList[ i ], sizeof( SPOT_SFX_LIST ), 1, fp );
+			file_read( &SpotSfxList[ i ], sizeof( SPOT_SFX_LIST ), 1, fp );
 
-		fread( &SfxUniqueID, sizeof( u_int32_t ), 1, fp );
+		file_read( &SfxUniqueID, sizeof( u_int32_t ), 1, fp );
 
 		ReTriggerSfx();
 	}

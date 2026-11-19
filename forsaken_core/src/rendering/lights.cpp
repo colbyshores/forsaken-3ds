@@ -13,6 +13,7 @@
 #include "world/visi.h"
 #include "rendering/text.h"
 #include "game/main.h"
+#include "data/file.h"
 #include "util/util.h"
 #include "data/mload.h"
 #include "game/camera.h"
@@ -1371,28 +1372,28 @@ FILE * LoadXLights( FILE * fp )
 
 	if( fp )
 	{
-		fread( &FirstXLightUsed, sizeof( u_int16_t ), 1, fp );
-		fread( &FirstXLightFree, sizeof( u_int16_t ), 1, fp );
-		fread( &TempIndex, sizeof( u_int16_t ), 1, fp );
+		file_read( &FirstXLightUsed, sizeof( u_int16_t ), 1, fp );
+		file_read( &FirstXLightFree, sizeof( u_int16_t ), 1, fp );
+		file_read( &TempIndex, sizeof( u_int16_t ), 1, fp );
 		if( TempIndex != INDEX_NONE ) FirstLightVisible = &XLights[ TempIndex ];
 		else FirstLightVisible = nullptr;
 
 		for( i = 0; i < MAXXLIGHTS; i++ )
 		{
-			fread( &XLights[ i ].Type, sizeof( int ), 1, fp );
-			fread( &XLights[ i ].Visible, sizeof( bool ), 1, fp );
-			fread( &XLights[ i ].r, sizeof( float ), 1, fp );
-			fread( &XLights[ i ].g, sizeof( float ), 1, fp );
-			fread( &XLights[ i ].b, sizeof( float ), 1, fp );
-			fread( &XLights[ i ].Size, sizeof( float ), 1, fp );
-			fread( &XLights[ i ].SizeCount, sizeof( float ), 1, fp );
-			fread( &XLights[ i ].CosArc, sizeof( float ), 1, fp );
-			fread( &XLights[ i ].Next, sizeof( u_int16_t ), 1, fp );
-			fread( &XLights[ i ].Prev, sizeof( u_int16_t ), 1, fp );
-			fread( &XLights[ i ].Pos, sizeof( VECTOR ), 1, fp );
-			fread( &XLights[ i ].Dir, sizeof( VECTOR ), 1, fp );
-			fread( &XLights[ i ].Group, sizeof( u_int16_t ), 1, fp );
-			fread( &TempIndex, sizeof( u_int16_t ), 1, fp );
+			file_read( &XLights[ i ].Type, sizeof( int ), 1, fp );
+			file_read( &XLights[ i ].Visible, sizeof( bool ), 1, fp );
+			file_read( &XLights[ i ].r, sizeof( float ), 1, fp );
+			file_read( &XLights[ i ].g, sizeof( float ), 1, fp );
+			file_read( &XLights[ i ].b, sizeof( float ), 1, fp );
+			file_read( &XLights[ i ].Size, sizeof( float ), 1, fp );
+			file_read( &XLights[ i ].SizeCount, sizeof( float ), 1, fp );
+			file_read( &XLights[ i ].CosArc, sizeof( float ), 1, fp );
+			file_read( &XLights[ i ].Next, sizeof( u_int16_t ), 1, fp );
+			file_read( &XLights[ i ].Prev, sizeof( u_int16_t ), 1, fp );
+			file_read( &XLights[ i ].Pos, sizeof( VECTOR ), 1, fp );
+			file_read( &XLights[ i ].Dir, sizeof( VECTOR ), 1, fp );
+			file_read( &XLights[ i ].Group, sizeof( u_int16_t ), 1, fp );
+			file_read( &TempIndex, sizeof( u_int16_t ), 1, fp );
 			if( TempIndex != INDEX_NONE ) XLights[ i ].NextVisible = &XLights[ TempIndex ];
 			else XLights[ i ].NextVisible = nullptr;
 		}

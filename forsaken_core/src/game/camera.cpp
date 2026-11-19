@@ -4,6 +4,7 @@
 		Include File...
 ===================================================================*/
 #include "game/main.h"
+#include "data/file.h"
 #include <stdio.h>
 #include "math/new3d.h"
 #include "math/quat.h"
@@ -208,7 +209,7 @@ FILE * LoadRemoteCameras( FILE * fp )
 
 	if( fp )
 	{
-		fread( &TempIndex, sizeof( u_int16_t ), 1, fp );
+		file_read( &TempIndex, sizeof( u_int16_t ), 1, fp );
 		if( TempIndex != INDEX_NONE )
 		{
 			ActiveRemoteCamera = ( RemoteCameras + TempIndex );

@@ -2,6 +2,7 @@
 #include <math.h>
 
 #include "game/main.h"
+#include "data/file.h"
 #include "math/new3d.h"
 #include "math/quat.h"
 #include "data/mload.h"
@@ -727,7 +728,7 @@ FILE * LoadRealTimeLights( FILE * fp )
 
 	if( fp )
 	{
-		fread( &NumLights, sizeof( u_int16_t ), 1, fp );
+		file_read( &NumLights, sizeof( u_int16_t ), 1, fp );
 
 		if( NumLights != rt_lights )
 		{
@@ -739,12 +740,12 @@ FILE * LoadRealTimeLights( FILE * fp )
 
 		for( i = 0; i < rt_lights; i++ )
 		{
-			fread( &RTLPtr->xlight, sizeof( u_int16_t ), 1, fp );
-			fread( &RTLPtr->enabled, sizeof( bool ), 1, fp );
-			fread( &RTLPtr->state, sizeof( LIGHTSTATE ), 1, fp );
-			fread( &RTLPtr->now_time, sizeof( float ), 1, fp );
-			fread( &RTLPtr->delay, sizeof( float ), 1, fp );
-			fread( &RTLPtr->intensity, sizeof( float ), 1, fp );
+			file_read( &RTLPtr->xlight, sizeof( u_int16_t ), 1, fp );
+			file_read( &RTLPtr->enabled, sizeof( bool ), 1, fp );
+			file_read( &RTLPtr->state, sizeof( LIGHTSTATE ), 1, fp );
+			file_read( &RTLPtr->now_time, sizeof( float ), 1, fp );
+			file_read( &RTLPtr->delay, sizeof( float ), 1, fp );
+			file_read( &RTLPtr->intensity, sizeof( float ), 1, fp );
 			RTLPtr++;
 		}
 	}

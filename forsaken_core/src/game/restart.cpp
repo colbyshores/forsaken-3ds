@@ -2,6 +2,7 @@
 	Includes
 ===================================================================*/
 #include "game/main.h"
+#include "data/file.h"
 #include <stdio.h>
 
 #include "math/new3d.h"
@@ -54,8 +55,8 @@ bool LoadStartPoints( void )
 
 	if( fp != nullptr )
 	{
-		fread( &MagicNumber, sizeof( u_int32_t ), 1, fp );
-		fread( &VersionNumber, sizeof( u_int32_t ), 1, fp );
+		file_read( &MagicNumber, sizeof( u_int32_t ), 1, fp );
+		file_read( &VersionNumber, sizeof( u_int32_t ), 1, fp );
 
 		if( ( MagicNumber != MAGIC_NUMBER ) || ( VersionNumber != RESTART_VERSION_NUMBER  ) )
 		{
@@ -70,21 +71,21 @@ bool LoadStartPoints( void )
 		}
 
 
-		fread( &num_start_positions, sizeof( int16_t ), 1, fp );
+		file_read( &num_start_positions, sizeof( int16_t ), 1, fp );
 
 		for( Count = 0; Count < num_start_positions; Count++ )
 		{
-			fread( &StartPositions[ Count ].Pos.x, sizeof( float ), 1, fp );
-			fread( &StartPositions[ Count ].Pos.y, sizeof( float ), 1, fp );
-			fread( &StartPositions[ Count ].Pos.z, sizeof( float ), 1, fp );
-			fread( &StartPositions[ Count ].Dir.x, sizeof( float ), 1, fp );
-			fread( &StartPositions[ Count ].Dir.y, sizeof( float ), 1, fp );
-			fread( &StartPositions[ Count ].Dir.z, sizeof( float ), 1, fp );
-			fread( &StartPositions[ Count ].Up.x, sizeof( float ), 1, fp );
-			fread( &StartPositions[ Count ].Up.y, sizeof( float ), 1, fp );
-			fread( &StartPositions[ Count ].Up.z, sizeof( float ), 1, fp );
-			fread( &StartPositions[ Count ].Group, sizeof( u_int16_t ), 1, fp );
-			fread( &OllyPad, sizeof( int16_t ), 1, fp );
+			file_read( &StartPositions[ Count ].Pos.x, sizeof( float ), 1, fp );
+			file_read( &StartPositions[ Count ].Pos.y, sizeof( float ), 1, fp );
+			file_read( &StartPositions[ Count ].Pos.z, sizeof( float ), 1, fp );
+			file_read( &StartPositions[ Count ].Dir.x, sizeof( float ), 1, fp );
+			file_read( &StartPositions[ Count ].Dir.y, sizeof( float ), 1, fp );
+			file_read( &StartPositions[ Count ].Dir.z, sizeof( float ), 1, fp );
+			file_read( &StartPositions[ Count ].Up.x, sizeof( float ), 1, fp );
+			file_read( &StartPositions[ Count ].Up.y, sizeof( float ), 1, fp );
+			file_read( &StartPositions[ Count ].Up.z, sizeof( float ), 1, fp );
+			file_read( &StartPositions[ Count ].Group, sizeof( u_int16_t ), 1, fp );
+			file_read( &OllyPad, sizeof( int16_t ), 1, fp );
 			Mloadheader.Group[ StartPositions[ Count ].Group ].StartPosInThisGroup = Count;
 
 			if( FirstStartPositionInGroup[StartPositions[Count].Group] == INDEX_NONE )
@@ -128,7 +129,7 @@ FILE * LoadStartRestartPoints( FILE * fp )
 {
 	if( fp )
 	{
-		fread( &last_start_position, sizeof( u_int16_t ), 1, fp );
+		file_read( &last_start_position, sizeof( u_int16_t ), 1, fp );
 	}
 
 	return( fp );

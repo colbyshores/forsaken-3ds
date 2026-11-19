@@ -15,6 +15,7 @@
 #include "game/camera.h"
 #include "ui/title.h"
 #include "game/main.h"
+#include "data/file.h"
 #include "rendering/text.h"
 #include "game/triggers.h"
 #include "ui/local.h"
@@ -3207,11 +3208,11 @@ FILE * LoadScreenPolys( FILE * fp )
 
 	if( fp )
 	{
-		fread( &CountDownOn, sizeof( CountDownOn ), 1, fp );
-		fread( &Countdown_Float, sizeof( Countdown_Float ), 1, fp );
-		fread( &ThermalTemp, sizeof( ThermalTemp ), 1, fp );
-		fread( &WantedThermalTemp, sizeof( WantedThermalTemp ), 1, fp );
-		fread( &ThermalMinimum, sizeof( ThermalMinimum ), 1, fp );
+		file_read( &CountDownOn, sizeof( CountDownOn ), 1, fp );
+		file_read( &Countdown_Float, sizeof( Countdown_Float ), 1, fp );
+		file_read( &ThermalTemp, sizeof( ThermalTemp ), 1, fp );
+		file_read( &WantedThermalTemp, sizeof( WantedThermalTemp ), 1, fp );
+		file_read( &ThermalMinimum, sizeof( ThermalMinimum ), 1, fp );
 
 		if( CountDownOn )
 		{
