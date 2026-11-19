@@ -3157,10 +3157,27 @@ void CheckLevelEnd ( void )
  * every stereo mode; the toggle UI is citro3d-only. */
 bool g_stereo_invert = false;
 
+/* The group an eye is in: walk its offset from the camera through the
+   portals. Each eye sits half the eye separation to the camera's side; near
+   a doorway that can be past the portal plane while the camera (the ship)
+   is not. FindVisible starts from the camera's group and rejects a portal
+   whose plane the viewpoint is behind, so an eye left in the ship's group
+   would not see the room it is already in, and that eye showed black for
+   a frame or two when flying through doorways at an angle. */
+static int16_t EyeGroup( VECTOR *eye_offset )
+{
+	if ( CurrentCamera.GroupImIn < 0 || CurrentCamera.GroupImIn >= Mloadheader.num_groups )
+		return CurrentCamera.GroupImIn;
+	return (int16_t) MoveGroup( &Mloadheader, &CurrentCamera.Pos, (u_int16_t) CurrentCamera.GroupImIn, eye_offset );
+}
+
 bool RenderCurrentCameraInStereo( RenderCurrentCameraPt render_camera )
 {
 	VECTOR cam_offset;
+	VECTOR left_offset;
 	render_viewport_t old_viewport = viewport;
+	int16_t centre_group = CurrentCamera.GroupImIn;
+	int16_t left_group, right_group;
 
 		/* Compute the camera-right offset in world space.
 		 * In D3D row-vector convention (FinalMat), the camera local X axis in
@@ -3173,6 +3190,11 @@ bool RenderCurrentCameraInStereo( RenderCurrentCameraPt render_camera )
 				cam_offset.y = CurrentCamera.Mat._12 * half_sep;
 				cam_offset.z = CurrentCamera.Mat._13 * half_sep;
 		}
+	left_offset.x = -cam_offset.x;
+	left_offset.y = -cam_offset.y;
+	left_offset.z = -cam_offset.z;
+	left_group = EyeGroup( &left_offset );
+	right_group = EyeGroup( &cam_offset );
 
 	if(render_info.stereo_mode == STEREO_MODE_HALF_HEIGHT)
 	{
@@ -3195,10 +3217,14 @@ bool RenderCurrentCameraInStereo( RenderCurrentCameraPt render_camera )
 		CurrentCamera.Pos.x -= cam_offset.x;
 		CurrentCamera.Pos.y -= cam_offset.y;
 		CurrentCamera.Pos.z -= cam_offset.z;
+		CurrentCamera.GroupImIn = left_group;
 	if(render_info.stereo_mode == STEREO_MODE_COLOR)
 			render_set_filter( 1, 0, 0 );
 		if( !render_camera() )
+		{
+		  CurrentCamera.GroupImIn = centre_group;
 		  return false;
+		}
 #ifdef __3DS__
 	/* Hardware stereo: the second pass draws to the right-eye target. */
 	if(render_info.stereo_mode == STEREO_MODE_3DS)
@@ -3214,6 +3240,7 @@ bool RenderCurrentCameraInStereo( RenderCurrentCameraPt render_camera )
 		CurrentCamera.Pos.x += 2.0f * cam_offset.x;
 		CurrentCamera.Pos.y += 2.0f * cam_offset.y;
 		CurrentCamera.Pos.z += 2.0f * cam_offset.z;
+		CurrentCamera.GroupImIn = right_group;
 	if(render_info.stereo_mode == STEREO_MODE_COLOR)
 	{
 			switch( render_info.stereo_right_color )
@@ -3240,7 +3267,10 @@ bool RenderCurrentCameraInStereo( RenderCurrentCameraPt render_camera )
 			CurrentCamera.Viewport.X = viewport.X;
 	}
 		if( !render_camera() )
+		{
+		  CurrentCamera.GroupImIn = centre_group;
 		  return false;
+		}
 #ifdef __3DS__
 	if(render_info.stereo_mode == STEREO_MODE_3DS)
 	{
@@ -3256,6 +3286,7 @@ bool RenderCurrentCameraInStereo( RenderCurrentCameraPt render_camera )
 		CurrentCamera.Pos.x -= cam_offset.x;
 		CurrentCamera.Pos.y -= cam_offset.y;
 		CurrentCamera.Pos.z -= cam_offset.z;
+		CurrentCamera.GroupImIn = centre_group;
 	CurrentCamera.Viewport.Height = viewport.Height;
 	CurrentCamera.Viewport.ScaleY = CurrentCamera.Viewport.Height / 2.0f;
 	CurrentCamera.Viewport.Width = viewport.Width;
