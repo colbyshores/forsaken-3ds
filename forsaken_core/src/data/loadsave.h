@@ -20,7 +20,8 @@ constexpr int LOADSAVE_VERSION_NUMBER = 5;
 /*
  * fn prototypes
  */
-void InGameLoad( MENUITEM * MenuItem );
+bool InGameLoad( MENUITEM * MenuItem );
+extern bool SavedGameDamaged;
 bool InGameSave( MENUITEM * MenuItem );
 bool PreInGameLoad( MENUITEM * MenuItem );
 char *SaveGameFileName( int slot );

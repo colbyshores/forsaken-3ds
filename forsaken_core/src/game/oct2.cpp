@@ -2873,6 +2873,12 @@ bool RenderScene( void )
 
 		input_grab( true );
 
+		if( SavedGameDamaged )
+		{
+			AddColourMessageToQue( SystemMessageColour, SAVED_GAME_DAMAGED );
+			SavedGameDamaged = false;
+		}
+
 		break;
 
 
@@ -2987,7 +2993,15 @@ bool RenderScene( void )
 		DebugState("STATUS_TitleLoadGamePostStartingSinglePlayer\n");
 
 		smallinitShip( WhoIAm );
-		InGameLoad( NULL );
+		if( !InGameLoad( NULL ) )
+		{
+			/* The save is truncated or damaged, and part of it may already
+			   be applied over the level. Start its level again from the
+			   beginning instead; STATUS_PostStartingSinglePlayer says why. */
+			SavedGameDamaged = true;
+			StartASinglePlayerGame( NULL );
+			break;
+		}
 
 
 		MyGameStatus = STATUS_SinglePlayer;

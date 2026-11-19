@@ -23,6 +23,10 @@
  * (checked 2026-11-18 on four levels: each routine's output scanned for
  * address-like values across two runs, and every field type checked).
  * A file with the wrong magic or version is still loaded after a warning.
+ * InGameLoad returns false when a read runs past the end of the file (it
+ * checks between modules) or a module's loader fails; the level has then
+ * been partly restored, and oct2.cpp starts it again from the beginning.
+ * InGameSave writes saveNN.TMP and renames it over saveNN.SAV when complete.
  */
 
 /*===================================================================
@@ -98,6 +102,40 @@ char *SaveGamePicFileName( int slot )
 }
 
 
+/* Read a NUL-terminated string of at most size bytes, the NUL included,
+   into dst. False at the end of the file or when it does not fit. */
+static bool read_string( FILE * fp, int8_t * dst, size_t size )
+{
+	for( size_t i = 0; i < size; i++ )
+	{
+		if( fread( &dst[ i ], 1, 1, fp ) != 1 )
+			return false;
+		if( dst[ i ] == 0 )
+			return true;
+	}
+	return false;
+}
+
+/* After one module's Load*: false if the module failed (it returns NULL,
+   having closed fp) or any read so far ran past the end of the file or
+   failed (fp's end-of-file and error flags stay set once a read does), in
+   which case fp is closed here. */
+static bool load_ok( FILE * fp )
+{
+	if( !fp )
+		return false;
+	if( feof( fp ) || ferror( fp ) )
+	{
+		fclose( fp );
+		return false;
+	}
+	return true;
+}
+
+/* Set when InGameLoad refused a save and the level was restarted, so the
+   restarted level can say so (oct2.cpp STATUS_PostStartingSinglePlayer). */
+bool SavedGameDamaged = false;
+
 bool PreInGameLoad( MENUITEM * /*MenuItem*/ )
 {
 	FILE	*	fp;
@@ -116,12 +154,11 @@ bool PreInGameLoad( MENUITEM * /*MenuItem*/ )
 		if( ( MagicNumber != MAGIC_NUMBER ) || ( VersionNumber != LOADSAVE_VERSION_NUMBER  ) )
 			Msg("Save file is in an old format.\nYou will most likely crash...\n");
 
-		i = 0;
-		do
+		if( !read_string( fp, buf, sizeof( buf ) ) )
 		{
-			fread( &buf[i], sizeof(char), 1, fp );
+			fclose( fp );
+			return false;
 		}
-		while( buf[ i++ ] != 0 );
 
 		for (i = 0; i < NumLevels; i++)
 		{
@@ -149,12 +186,11 @@ bool PreInGameLoad( MENUITEM * /*MenuItem*/ )
 	Input		:	MENUITEM * MenuItem
 	Output		:	nothing
 ===================================================================*/
-void InGameLoad( MENUITEM * /*MenuItem*/ )
+bool InGameLoad( MENUITEM * /*MenuItem*/ )
 {
 	FILE	*	fp;
 	int8_t		buf[ 256 ];
 	int8_t		biker[ 256 ];
-	int16_t		i;
 	int16_t		Hours, Minutes, Seconds;
 	int16_t		KilledEnemiesNum, InitEnemiesNum;
 	u_int32_t		MagicNumber;
@@ -170,18 +206,11 @@ void InGameLoad( MENUITEM * /*MenuItem*/ )
 		if( ( MagicNumber != MAGIC_NUMBER ) || ( VersionNumber != LOADSAVE_VERSION_NUMBER  ) )
 			Msg("Save file is in an old format.\nYou will most likely crash...\n");
 
-		i = 0;
-		do
+		if( !read_string( fp, buf, sizeof( buf ) ) || !read_string( fp, biker, sizeof( biker ) ) )
 		{
-			fread( &buf[i], sizeof(char), 1, fp );
+			fclose( fp );
+			return false;
 		}
-		while( buf[ i++ ] != 0 );
-		i = 0;
-		do
-		{
-			fread( &biker[i], sizeof(char), 1, fp );
-		}
-		while( biker[ i++ ] != 0 );
 
 		fread( &Hours, sizeof( Hours ), 1, fp );
 		fread( &Minutes, sizeof( Minutes ), 1, fp );
@@ -192,121 +221,126 @@ void InGameLoad( MENUITEM * /*MenuItem*/ )
 
 		DebugPrintf( "Loading Ships\n" );
 
+		if( !load_ok( fp ) ) return false;	// the header
 		fp = LoadShips( fp );
-		if( !fp ) return;
+		if( !load_ok( fp ) ) return false;
 
 		DebugPrintf( "Loading Enemies\n" );
 
 		if( !Enemy_Load( fp ) )
-			return;
+			return false;	// Enemy_Load closed fp
+		if( !load_ok( fp ) ) return false;
 
 		DebugPrintf( "Loading LoadSFX\n" );
 
 		fp = LoadAllSfx( fp );
-		if( !fp ) return;
+		if( !load_ok( fp ) ) return false;
 
 		DebugPrintf( "Loading Texture Animations\n" );
 
 		fp = LoadTextureAnimations( fp );
-		if( !fp ) return;
+		if( !load_ok( fp ) ) return false;
 
 		DebugPrintf( "Loading RestartPoints\n" );
 
 		fp = LoadStartRestartPoints( fp );
-		if( !fp ) return;
+		if( !load_ok( fp ) ) return false;
 
 		DebugPrintf( "Loading RemoteCameras\n" );
 
 		fp = LoadRemoteCameras( fp );
-		if( !fp ) return;
+		if( !load_ok( fp ) ) return false;
 
 		DebugPrintf( "Loading ScreePolys\n" );
 
 		fp = LoadScreenPolys( fp );
-		if( !fp ) return;
+		if( !load_ok( fp ) ) return false;
 
 		DebugPrintf( "Loading TriggerAreas\n" );
 
 		fp = LoadTriggerAreas( fp );
-		if( !fp ) return;
+		if( !load_ok( fp ) ) return false;
 
 		DebugPrintf( "Loading ExternalForces\n" );
 
 		fp = LoadExternalForces( fp );
-		if( !fp ) return;
+		if( !load_ok( fp ) ) return false;
 
 		DebugPrintf( "Loading Teleports\n" );
 
 		fp = LoadTeleports( fp );
-		if( !fp ) return;
+		if( !load_ok( fp ) ) return false;
 
 		DebugPrintf( "Loading Realtime Lights\n" );
 
 		fp = LoadRealTimeLights( fp );
-		if( !fp ) return;
+		if( !load_ok( fp ) ) return false;
 
 		DebugPrintf( "Loading XLights\n" );
 
 		fp = LoadXLights( fp );
-		if( !fp ) return;
+		if( !load_ok( fp ) ) return false;
 
 		DebugPrintf( "Loading Triggers\n" );
 
 		fp = LoadAllTriggers( fp );
-		if( !fp ) return;
+		if( !load_ok( fp ) ) return false;
 
 		DebugPrintf( "Loading BGObjects\n" );
 
 		fp = LoadBGObjects( fp );
-		if( !fp ) return;
+		if( !load_ok( fp ) ) return false;
 
 		DebugPrintf( "Loading Pickups\n" );
 
 		fp = LoadAllPickups( fp );
-		if( !fp ) return;
+		if( !load_ok( fp ) ) return false;
 
 		DebugPrintf( "Loading PrimBulls\n" );
 
 		fp = LoadPrimBulls( fp );
-		if( !fp ) return;
+		if( !load_ok( fp ) ) return false;
 
 		DebugPrintf( "Loading SecBulls\n" );
 
 		fp = LoadSecBulls( fp );
-		if( !fp ) return;
+		if( !load_ok( fp ) ) return false;
 
 		DebugPrintf( "Loading Models\n" );
 
 		fp = LoadModels( fp );
-		if( !fp ) return;
+		if( !load_ok( fp ) ) return false;
 
 		DebugPrintf( "Loading Polys\n" );
 
 		fp = LoadPolys( fp );
-		if( !fp ) return;
+		if( !load_ok( fp ) ) return false;
 
 		DebugPrintf( "Loading FmPolys\n" );
 
 		fp = LoadFmPolys( fp );
-		if( !fp ) return;
+		if( !load_ok( fp ) ) return false;
 
 		DebugPrintf( "Loading SpotFX\n" );
 
 		fp = LoadAllSpotFX( fp );
-		if( !fp ) return;
+		if( !load_ok( fp ) ) return false;
 
 		DebugPrintf( "Loading Text\n" );
 
 		fp = LoadAllText( fp );
-		if( !fp ) return;
+		if( !load_ok( fp ) ) return false;
 
 		fread( &Cheated, sizeof( bool ), 1, fp );
+		if( !load_ok( fp ) ) return false;
 
 		DebugPrintf( "Loaded OK\n" );
 		fclose( fp );
 
 		timer_clear( &countdown_timer );
+		return true;
 	}
+	return false;
 }
 
 
@@ -521,7 +555,6 @@ char *SavedGameInfo( int slot )
 	FILE	*	fp;
 	int8_t		buf[ 256 ];
 	int8_t		biker[ 256 ];
-	int16_t		i;
 	int16_t		Hours, Minutes, Seconds;
 	int16_t		KilledEnemiesNum, InitEnemiesNum;
 	int16_t		Lives;
@@ -539,18 +572,12 @@ char *SavedGameInfo( int slot )
 		if( ( MagicNumber != MAGIC_NUMBER ) || ( VersionNumber != LOADSAVE_VERSION_NUMBER  ) )
 			Msg("Save file is in an old format.\nYou will most likely crash...\n");
 
-		i = 0;
-		do
+		if( !read_string( fp, buf, sizeof( buf ) ) || !read_string( fp, biker, sizeof( biker ) ) )
 		{
-			fread( &buf[i], sizeof(char), 1, fp );
+			fclose( fp );
+			snprintf( info, sizeof( info ), "damaged slot %d", slot + 1 );
+			return info;
 		}
-		while( buf[ i++ ] != 0 );
-		i = 0;
-		do
-		{
-			fread( &biker[i], sizeof(char), 1, fp );
-		}
-		while( biker[ i++ ] != 0 );
 
 		LevelName = GetMissionName( (char*)buf );
 

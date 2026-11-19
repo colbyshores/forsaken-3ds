@@ -164,6 +164,7 @@
 #define YOU_NEED_FLAG					"you need the %s flag to score" // %s=<team name>
 #define YOU_KILLED_YOURSELF				"you killed yourself"
 #define NO_LIVES_LEFT					"No Lives Left"
+#define SAVED_GAME_DAMAGED				"Saved game damaged: level restarted"
 #define LAST_LIFE						"Last Life"
 #define ONE_LIFE_LEFT					"%d Life Left" // %d=1
 #define LIVES_LEFT						"%d Lives Left" // %d=2, 3, 4...
