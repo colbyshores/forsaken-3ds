@@ -62,24 +62,43 @@ struct sound_source_t {
 	char path[MAX_PATH_LEN];
 };
 
-/* SFX channel pool. The DSP firmware mixes channels in software and starts
- * skipping audio when too many channels are active simultaneously (which
- * killed both SFX and music under heavy combat). Capping total concurrent
- * SFX voices keeps the DSP under its mixing budget. Music owns channel 23
- * directly via music_3ds.cpp; SFX stay in 0-(MAX_SFX_VOICES-1).
- *
- * When all SFX slots are full, alloc evicts the OLDEST-allocated channel
- * (round-robin replacement) so a new gunshot doesn't get silently dropped. */
-constexpr int MAX_SFX_VOICES = 8;
-static bool       channel_used[MAX_CHANNELS];
-static u_int64_t  channel_alloc_time[MAX_CHANNELS];
-static u_int64_t  s_alloc_seq = 0;
-/* The source holding each SFX channel, so an evicted source can be told it
-   no longer has one (otherwise its volume/pan/release calls would act on
-   the sound that took the channel over). */
-static sound_source_t *channel_owner[MAX_SFX_VOICES];
+namespace {
 
-static int alloc_channel(void)
+/* The ndsp service and the SFX channel pool (one instance, g_sound).
+ *
+ * The DSP firmware mixes channels in software and starts skipping audio
+ * when too many channels are active simultaneously (which killed both SFX
+ * and music under heavy combat). Capping total concurrent SFX voices keeps
+ * the DSP under its mixing budget. Music owns channel 23 directly via
+ * music_3ds.cpp; SFX stay in 0-(MAX_SFX_VOICES-1).
+ *
+ * When all SFX slots are full, alloc_channel evicts the OLDEST-allocated
+ * channel (round-robin replacement) so a new gunshot doesn't get silently
+ * dropped. */
+constexpr int MAX_SFX_VOICES = 8;
+
+class SoundSystem {
+	public:
+	bool init();
+	void destroy();
+
+	int  alloc_channel();
+	void free_channel(int ch);
+	/* Record the source holding a channel alloc_channel returned. */
+	void set_owner(int ch, sound_source_t *src) { channel_owner[ch] = src; }
+
+	private:
+	bool       ndsp_initialized = false;
+	bool       channel_used[MAX_CHANNELS] = {};
+	u_int64_t  channel_alloc_time[MAX_CHANNELS] = {};
+	u_int64_t  alloc_seq = 0;
+	/* The source holding each SFX channel, so an evicted source can be told
+	   it no longer has one (otherwise its volume/pan/release calls would act
+	   on the sound that took the channel over). */
+	sound_source_t *channel_owner[MAX_SFX_VOICES] = {};
+};
+
+int SoundSystem::alloc_channel()
 {
 	int i, oldest_idx = 0;
 	u_int64_t oldest = (u_int64_t)-1;
@@ -89,7 +108,7 @@ static int alloc_channel(void)
 		if (!channel_used[i])
 		{
 			channel_used[i] = true;
-			channel_alloc_time[i] = ++s_alloc_seq;
+			channel_alloc_time[i] = ++alloc_seq;
 			return i;
 		}
 		if (channel_alloc_time[i] < oldest)
@@ -104,11 +123,11 @@ static int alloc_channel(void)
 	if (channel_owner[oldest_idx])
 		channel_owner[oldest_idx]->channel = -1;
 	channel_owner[oldest_idx] = nullptr;
-	channel_alloc_time[oldest_idx] = ++s_alloc_seq;
+	channel_alloc_time[oldest_idx] = ++alloc_seq;
 	return oldest_idx;
 }
 
-static void free_channel(int ch)
+void SoundSystem::free_channel(int ch)
 {
 	if (ch >= 0 && ch < MAX_SFX_VOICES)
 	{
@@ -119,13 +138,11 @@ static void free_channel(int ch)
 
 /* ---- init / destroy ---- */
 
-static bool ndsp_initialized = false;
-
 /* ndspInit requires the DSP firmware blob at sdmc:/3ds/dspfirm.cdc.
  * Development .3dsx builds bundle a copy in romfs (the CIA and the release
  * .3dsx do not); copy it to the SD if the SD copy is missing or
  * zero-length, so emulator and dev runs need no separate dump step. */
-static void ensure_dspfirm_on_sd(void)
+void ensure_dspfirm_on_sd(void)
 {
 	const char *sd_path  = "sdmc:/3ds/dspfirm.cdc";
 	const char *src_path = "romfs:/dspfirm.cdc";
@@ -151,6 +168,42 @@ static void ensure_dspfirm_on_sd(void)
 	fclose(src);
 	DebugPrintf("sound_init: extracted dspfirm.cdc to %s\n", sd_path);
 }
+
+bool SoundSystem::init()
+{
+	if (ndsp_initialized)
+		return true;
+
+	ensure_dspfirm_on_sd();
+
+	Result rc = ndspInit();
+	if (R_FAILED(rc))
+	{
+		DebugPrintf("sound_init: ndspInit failed (0x%08lx)\n", rc);
+		return false;
+	}
+
+	ndspSetOutputMode(NDSP_OUTPUT_STEREO);
+	memset(channel_used, 0, sizeof(channel_used));
+
+	ndsp_initialized = true;
+	DebugPrintf("sound_init: ndsp initialized\n");
+	return true;
+}
+
+void SoundSystem::destroy()
+{
+	if (!ndsp_initialized)
+		return;
+
+	ndspExit();
+	ndsp_initialized = false;
+	DebugPrintf("sound_destroy: ndsp shut down\n");
+}
+
+SoundSystem g_sound;
+
+} // namespace
 
 /* Returns true if we expect ndspInit() to succeed later — either the
  * firmware blob is on the virtual SD already, or we have a copy in romfs
@@ -233,37 +286,8 @@ void sound_show_missing_firmware_warning(void)
 	gspWaitForVBlank();
 }
 
-bool sound_init(void)
-{
-	if (ndsp_initialized)
-		return true;
-
-	ensure_dspfirm_on_sd();
-
-	Result rc = ndspInit();
-	if (R_FAILED(rc))
-	{
-		DebugPrintf("sound_init: ndspInit failed (0x%08lx)\n", rc);
-		return false;
-	}
-
-	ndspSetOutputMode(NDSP_OUTPUT_STEREO);
-	memset(channel_used, 0, sizeof(channel_used));
-
-	ndsp_initialized = true;
-	DebugPrintf("sound_init: ndsp initialized\n");
-	return true;
-}
-
-void sound_destroy(void)
-{
-	if (!ndsp_initialized)
-		return;
-
-	ndspExit();
-	ndsp_initialized = false;
-	DebugPrintf("sound_destroy: ndsp shut down\n");
-}
+bool sound_init(void) { return g_sound.init(); }
+void sound_destroy(void) { g_sound.destroy(); }
 
 /* ---- 3D listener (no-ops: ndsp has no 3D positioning) ---- */
 
@@ -442,7 +466,7 @@ sound_source_t *sound_source(sound_buffer_t *buffer)
 		return nullptr;
 	}
 
-	ch = alloc_channel();
+	ch = g_sound.alloc_channel();
 	if (ch < 0)
 	{
 		DebugPrintf("sound_source: no free channels\n");
@@ -450,11 +474,11 @@ sound_source_t *sound_source(sound_buffer_t *buffer)
 	}
 
 	src = (sound_source_t *)malloc(sizeof(sound_source_t));
-	if (!src) { free_channel(ch); return nullptr; }
+	if (!src) { g_sound.free_channel(ch); return nullptr; }
 	memset(src, 0, sizeof(sound_source_t));
 
 	src->channel = ch;
-	channel_owner[ch] = src;
+	g_sound.set_owner(ch, src);
 	src->buffer  = buffer;
 	src->playing = false;
 	src->looping = false;
@@ -578,7 +602,7 @@ void sound_release_source(sound_source_t *src)
 	if (src->channel >= 0)
 	{
 		ndspChnWaveBufClear(src->channel);
-		free_channel(src->channel);
+		g_sound.free_channel(src->channel);
 	}
 	free(src);
 }
