@@ -6665,6 +6665,179 @@ void AutoMovement( OBJECT * Object , ENEMY * Enemy , bool AngleDecellBefore )
 	Output		:	OBJECt * Object
 	Output		:	Nothing
 ===================================================================*/
+/* near the current node: set up the transition toward the next one (slope aim point, turn) or ask for a new node; between nodes: pitch toward the node path */
+[[gnu::always_inline]] static inline void CrawlNodeTransition( OBJECT *& Object, ENEMY *& Enemy, VECTOR & Move_Off, MATRIX & StepMat, NODE *& TNode, NODE *& NextTNode, NODE *& LastTNode, float & length, VECTOR & AimPos, VECTOR & TempPos, VECTOR & AnglePos, float & Distance, VECTOR & Up, float & XRot )
+{
+	if( DistanceVector2Vector( &Object->Pos , &TNode->SolidPos ) < length )
+	{
+
+		// We are in transition...
+		if( NextTNode && ( NextTNode != Enemy->TNode ) )
+		{
+			if( NextTNode->SolidPos.y > TNode->SolidPos.y && ( (NextTNode->SolidPos.y - TNode->SolidPos.y) > 32.0F ) )
+			{
+				// we will be going up a slope....
+				Move_Off.x = NextTNode->SolidPos.x - TNode->SolidPos.x;
+				Move_Off.y = NextTNode->SolidPos.y - TNode->SolidPos.y;
+				Move_Off.z = NextTNode->SolidPos.z - TNode->SolidPos.z;
+				NormaliseVector( &Move_Off );
+
+				AimPos.x = TNode->SolidPos.x + ( Move_Off.x * length );
+				AimPos.y = TNode->SolidPos.y + ( Move_Off.y * length );
+				AimPos.z = TNode->SolidPos.z + ( Move_Off.z * length );
+
+				Distance = DistanceVector2Vector( &Object->Pos , &AimPos );
+
+
+				if(	!Enemy->ImInNodeTransition )
+				{
+					Enemy->DistanceToPointOnSlope = Distance;
+				}
+
+				Distance = 1.0F - (Distance / Enemy->DistanceToPointOnSlope);
+
+				if( Distance > 0.0F && Distance < 1.0F )
+				{
+					AnglePos.x = TNode->SolidPos.x + ( ( (length*16.0F) * Distance) * Move_Off.x );
+					AnglePos.y = TNode->SolidPos.y + ( ( (length*16.0F) * Distance) * Move_Off.y );
+					AnglePos.z = TNode->SolidPos.z + ( ( (length*16.0F) * Distance) * Move_Off.z );
+					ApplyMatrix( &Enemy->Object.Mat, &SlideUp, &Up );
+					MakeViewMatrix(&Enemy->Object.Pos, &AnglePos, &Up, &Enemy->Object.Mat);
+				}
+
+				Move_Off.x = AimPos.x - Object->Pos.x;
+				Move_Off.y = AimPos.y - Object->Pos.y;
+				Move_Off.z = AimPos.z - Object->Pos.z;
+				NormaliseVector( &Move_Off );
+
+				AimPos.x = ( TNode->SolidPos.x - Object->Pos.x );
+				AimPos.y = ( TNode->SolidPos.y - Object->Pos.y );
+				AimPos.z = ( TNode->SolidPos.z - Object->Pos.z );
+
+			}else if( LastTNode &&  (LastTNode->SolidPos.y > TNode->SolidPos.y && ( (LastTNode->SolidPos.y - TNode->SolidPos.y) > 32.0F ) ))
+			{
+				// we will be down a slope....
+				Move_Off.x = NextTNode->SolidPos.x - TNode->SolidPos.x;
+				Move_Off.y = NextTNode->SolidPos.y - TNode->SolidPos.y;
+				Move_Off.z = NextTNode->SolidPos.z - TNode->SolidPos.z;
+				NormaliseVector( &Move_Off );
+
+				AimPos.x = TNode->SolidPos.x + ( Move_Off.x * length );
+				AimPos.y = TNode->SolidPos.y + ( Move_Off.y * length );
+				AimPos.z = TNode->SolidPos.z + ( Move_Off.z * length );
+
+				Distance = DistanceVector2Vector( &Object->Pos , &AimPos );
+
+				if(	!Enemy->ImInNodeTransition )
+				{
+					Enemy->DistanceToPointOnSlope = Distance;
+				}
+
+				Distance = 1.0F - (Distance / Enemy->DistanceToPointOnSlope);
+
+				if( Distance > 0.0F && Distance < 1.0F )
+				{
+					AnglePos.x = TNode->SolidPos.x + ( ( (length*16.0F) * Distance) * Move_Off.x );
+					AnglePos.y = TNode->SolidPos.y + ( ( (length*16.0F) * Distance) * Move_Off.y );
+					AnglePos.z = TNode->SolidPos.z + ( ( (length*16.0F) * Distance) * Move_Off.z );
+					ApplyMatrix( &Enemy->Object.Mat, &SlideUp, &Up );
+					MakeViewMatrix(&Enemy->Object.Pos, &AnglePos, &Up, &Enemy->Object.Mat);
+				}
+
+				Move_Off.x = AimPos.x - Object->Pos.x;
+				Move_Off.y = AimPos.y - Object->Pos.y;
+				Move_Off.z = AimPos.z - Object->Pos.z;
+				NormaliseVector( &Move_Off );
+
+				AimPos.x = ( TNode->SolidPos.x - Object->Pos.x );
+				AimPos.y = ( TNode->SolidPos.y - Object->Pos.y );
+				AimPos.z = ( TNode->SolidPos.z - Object->Pos.z );
+
+
+			}else{
+				// its Level...
+				AimPos.x = ( TNode->SolidPos.x - Object->Pos.x );
+				AimPos.y = ( TNode->SolidPos.y - Object->Pos.y );
+				AimPos.z = ( TNode->SolidPos.z - Object->Pos.z );
+
+				ApplyMatrix( &Object->InvMat, &AimPos, &TempPos );
+				if( TempPos.z >= 0.0F )
+				{
+					if( TNode && LastTNode )
+					{
+						AI_AimAtTarget( &Enemy->Object.InvMat , &LastTNode->SolidPos, &TNode->SolidPos);
+						if( AimData.Angle.y > -3.0F && AimData.Angle.y < 3.0F )
+						{
+							XRot = (AimData.Angle.x * (0.1F * framelag));
+						}
+					}
+				}
+				Object->Angle.z = 0.0F;
+				Object->Autolevel = ObjectAutoLevelRot( Object , 0.05F * framelag );
+
+				BuildRotMatrix( 0.0F, 0.0F, Object->Autolevel, &StepMat );
+				MatrixMultiply( &Object->Mat , &StepMat , &Object->Mat );
+			}
+			Enemy->ImInNodeTransition = true;
+		}else{
+			Enemy->PickNewNodeNow = true;
+		}
+
+
+	}else{
+		if( TNode && LastTNode )
+		{
+			AI_AimAtTarget( &Enemy->Object.InvMat , &LastTNode->SolidPos, &TNode->SolidPos);
+#ifdef EDITION_REMASTER
+			/* CargoDrone is a fixed-orientation craft — its body
+			 * should never pitch.  Without this skip, the slope
+			 * between LastTNode and TNode adds XRot every frame:
+			 *
+			 *   - Defend2 lift 8 approach: #137 (y=1556) -> wait
+			 *     #138 (y=1411).  145u Y drop over 1272u horizontal
+			 *     -> drone visibly tilts forward through the whole
+			 *     1.3k-unit approach until the wait suppressor
+			 *     fires at XZ-close range.
+			 *
+			 *   - Post-lift walk to next-next on any lift whose
+			 *     wait -> upper has a Y delta the suppressor doesn't
+			 *     fully recover from before the drone is moving
+			 *     again.
+			 *
+			 * Yaw (Angle.y) is left alone so the drone still turns
+			 * through corners — only pitch is locked. */
+			if( Enemy->Type != ENEMY_CargoDrone )
+#endif
+				if( AimData.Angle.y > -3.0F && AimData.Angle.y < 3.0F )
+				{
+					XRot = (AimData.Angle.x * (0.1F * framelag));
+			}
+		}
+		Enemy->ImInNodeTransition = false;
+	}
+}
+
+#ifdef EDITION_REMASTER
+/* remaster: re-raycast to the floor every frame so ground bots stay on the mesh where load-time node snapping missed (not the CargoDrone) */
+[[gnu::always_inline]] static inline void CrawlGroundSnap( OBJECT *& Object, ENEMY *& Enemy )
+{
+	if( Enemy->Type != ENEMY_CargoDrone )
+	{
+		VECTOR	GroundOff = { 0.0F, -MaxColDistance, 0.0F };
+		VECTOR	GroundPos, GroundNewTgt;
+		u_int16_t	GroundGroup;
+		NORMAL	GroundNormal;
+		if ( BackgroundCollide( &MCloadheadert0, &Mloadheader,
+								&Object->Pos, Object->Group, &GroundOff,
+								&GroundPos, &GroundGroup, &GroundNormal,
+								&GroundNewTgt, false, nullptr ) )
+		{
+			Object->Pos.y = GroundPos.y + 75.0F;
+		}
+	}
+}
+#endif /* EDITION_REMASTER */
+
 void AutoMovementCrawl( OBJECT * Object , ENEMY * Enemy )
 {
 	VECTOR	Move_Off = { 0.0F , 0.0F , 0.0F };
@@ -6701,153 +6874,7 @@ void AutoMovementCrawl( OBJECT * Object , ENEMY * Enemy )
 		NormaliseVector( &Move_Off );
 
 
-		if( DistanceVector2Vector( &Object->Pos , &TNode->SolidPos ) < length )
-		{
-
-			// We are in transition...
-			if( NextTNode && ( NextTNode != Enemy->TNode ) )
-			{
-				if( NextTNode->SolidPos.y > TNode->SolidPos.y && ( (NextTNode->SolidPos.y - TNode->SolidPos.y) > 32.0F ) )
-				{
-					// we will be going up a slope....
-					Move_Off.x = NextTNode->SolidPos.x - TNode->SolidPos.x;
-					Move_Off.y = NextTNode->SolidPos.y - TNode->SolidPos.y;
-					Move_Off.z = NextTNode->SolidPos.z - TNode->SolidPos.z;
-					NormaliseVector( &Move_Off );
-
-					AimPos.x = TNode->SolidPos.x + ( Move_Off.x * length );
-					AimPos.y = TNode->SolidPos.y + ( Move_Off.y * length );
-					AimPos.z = TNode->SolidPos.z + ( Move_Off.z * length );
-
-					Distance = DistanceVector2Vector( &Object->Pos , &AimPos );
-
-
-					if(	!Enemy->ImInNodeTransition )
-					{
-						Enemy->DistanceToPointOnSlope = Distance;
-					}
-
-					Distance = 1.0F - (Distance / Enemy->DistanceToPointOnSlope);
-
-					if( Distance > 0.0F && Distance < 1.0F )
-					{
-						AnglePos.x = TNode->SolidPos.x + ( ( (length*16.0F) * Distance) * Move_Off.x );
-						AnglePos.y = TNode->SolidPos.y + ( ( (length*16.0F) * Distance) * Move_Off.y );
-						AnglePos.z = TNode->SolidPos.z + ( ( (length*16.0F) * Distance) * Move_Off.z );
-						ApplyMatrix( &Enemy->Object.Mat, &SlideUp, &Up );
-						MakeViewMatrix(&Enemy->Object.Pos, &AnglePos, &Up, &Enemy->Object.Mat);
-					}
-
-					Move_Off.x = AimPos.x - Object->Pos.x;
-					Move_Off.y = AimPos.y - Object->Pos.y;
-					Move_Off.z = AimPos.z - Object->Pos.z;
-					NormaliseVector( &Move_Off );
-
-					AimPos.x = ( TNode->SolidPos.x - Object->Pos.x );
-					AimPos.y = ( TNode->SolidPos.y - Object->Pos.y );
-					AimPos.z = ( TNode->SolidPos.z - Object->Pos.z );
-
-				}else if( LastTNode &&  (LastTNode->SolidPos.y > TNode->SolidPos.y && ( (LastTNode->SolidPos.y - TNode->SolidPos.y) > 32.0F ) ))
-				{
-					// we will be down a slope....
-					Move_Off.x = NextTNode->SolidPos.x - TNode->SolidPos.x;
-					Move_Off.y = NextTNode->SolidPos.y - TNode->SolidPos.y;
-					Move_Off.z = NextTNode->SolidPos.z - TNode->SolidPos.z;
-					NormaliseVector( &Move_Off );
-
-					AimPos.x = TNode->SolidPos.x + ( Move_Off.x * length );
-					AimPos.y = TNode->SolidPos.y + ( Move_Off.y * length );
-					AimPos.z = TNode->SolidPos.z + ( Move_Off.z * length );
-
-					Distance = DistanceVector2Vector( &Object->Pos , &AimPos );
-
-					if(	!Enemy->ImInNodeTransition )
-					{
-						Enemy->DistanceToPointOnSlope = Distance;
-					}
-
-					Distance = 1.0F - (Distance / Enemy->DistanceToPointOnSlope);
-
-					if( Distance > 0.0F && Distance < 1.0F )
-					{
-						AnglePos.x = TNode->SolidPos.x + ( ( (length*16.0F) * Distance) * Move_Off.x );
-						AnglePos.y = TNode->SolidPos.y + ( ( (length*16.0F) * Distance) * Move_Off.y );
-						AnglePos.z = TNode->SolidPos.z + ( ( (length*16.0F) * Distance) * Move_Off.z );
-						ApplyMatrix( &Enemy->Object.Mat, &SlideUp, &Up );
-						MakeViewMatrix(&Enemy->Object.Pos, &AnglePos, &Up, &Enemy->Object.Mat);
-					}
-
-					Move_Off.x = AimPos.x - Object->Pos.x;
-					Move_Off.y = AimPos.y - Object->Pos.y;
-					Move_Off.z = AimPos.z - Object->Pos.z;
-					NormaliseVector( &Move_Off );
-
-					AimPos.x = ( TNode->SolidPos.x - Object->Pos.x );
-					AimPos.y = ( TNode->SolidPos.y - Object->Pos.y );
-					AimPos.z = ( TNode->SolidPos.z - Object->Pos.z );
-
-
-				}else{
-					// its Level...
-					AimPos.x = ( TNode->SolidPos.x - Object->Pos.x );
-					AimPos.y = ( TNode->SolidPos.y - Object->Pos.y );
-					AimPos.z = ( TNode->SolidPos.z - Object->Pos.z );
-
-					ApplyMatrix( &Object->InvMat, &AimPos, &TempPos );
-					if( TempPos.z >= 0.0F )
-					{
-						if( TNode && LastTNode )
-						{
-							AI_AimAtTarget( &Enemy->Object.InvMat , &LastTNode->SolidPos, &TNode->SolidPos);
-							if( AimData.Angle.y > -3.0F && AimData.Angle.y < 3.0F )
-							{
-								XRot = (AimData.Angle.x * (0.1F * framelag));
-							}
-						}
-					}
-					Object->Angle.z = 0.0F;
-					Object->Autolevel = ObjectAutoLevelRot( Object , 0.05F * framelag );
-
-					BuildRotMatrix( 0.0F, 0.0F, Object->Autolevel, &StepMat );
-					MatrixMultiply( &Object->Mat , &StepMat , &Object->Mat );
-				}
-				Enemy->ImInNodeTransition = true;
-			}else{
-				Enemy->PickNewNodeNow = true;
-			}
-
-
-		}else{
-			if( TNode && LastTNode )
-			{
-				AI_AimAtTarget( &Enemy->Object.InvMat , &LastTNode->SolidPos, &TNode->SolidPos);
-#ifdef EDITION_REMASTER
-				/* CargoDrone is a fixed-orientation craft — its body
-				 * should never pitch.  Without this skip, the slope
-				 * between LastTNode and TNode adds XRot every frame:
-				 *
-				 *   - Defend2 lift 8 approach: #137 (y=1556) -> wait
-				 *     #138 (y=1411).  145u Y drop over 1272u horizontal
-				 *     -> drone visibly tilts forward through the whole
-				 *     1.3k-unit approach until the wait suppressor
-				 *     fires at XZ-close range.
-				 *
-				 *   - Post-lift walk to next-next on any lift whose
-				 *     wait -> upper has a Y delta the suppressor doesn't
-				 *     fully recover from before the drone is moving
-				 *     again.
-				 *
-				 * Yaw (Angle.y) is left alone so the drone still turns
-				 * through corners — only pitch is locked. */
-				if( Enemy->Type != ENEMY_CargoDrone )
-#endif
-					if( AimData.Angle.y > -3.0F && AimData.Angle.y < 3.0F )
-					{
-						XRot = (AimData.Angle.x * (0.1F * framelag));
-				}
-			}
-			Enemy->ImInNodeTransition = false;
-		}
+		CrawlNodeTransition( Object, Enemy, Move_Off, StepMat, TNode, NextTNode, LastTNode, length, AimPos, TempPos, AnglePos, Distance, Up, XRot );
 
 #ifdef EDITION_REMASTER
 		/* Lift-wait: CargoDrone parks at a node with flag 0x40 (KEX lift-base marker).
@@ -7049,20 +7076,7 @@ void AutoMovementCrawl( OBJECT * Object , ENEMY * Enemy )
 	 * structural bottom of the shaft (far below the node Y), not the lift
 	 * platform (a BGO). Snapping there pulls the drone into the floor and
 	 * takes it below Zone[39]'s Y range, preventing Drone1Wait from firing. */
-	if( Enemy->Type != ENEMY_CargoDrone )
-	{
-		VECTOR	GroundOff = { 0.0F, -MaxColDistance, 0.0F };
-		VECTOR	GroundPos, GroundNewTgt;
-		u_int16_t	GroundGroup;
-		NORMAL	GroundNormal;
-		if ( BackgroundCollide( &MCloadheadert0, &Mloadheader,
-								&Object->Pos, Object->Group, &GroundOff,
-								&GroundPos, &GroundGroup, &GroundNormal,
-								&GroundNewTgt, false, nullptr ) )
-		{
-			Object->Pos.y = GroundPos.y + 75.0F;
-		}
-	}
+	CrawlGroundSnap( Object, Enemy );
 #endif
 }
 
