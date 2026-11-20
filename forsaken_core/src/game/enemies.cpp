@@ -5170,14 +5170,280 @@ bool PreLoadEnemies( void )
 	}
 }
 
+/* set up the enemy type's model (MXA or MX, or a component object) the first time this level uses it. True: LoadEnemies fails */
+[[gnu::always_inline]] static inline bool LoadEnemyInitModel( int16_t & Count, char (&NewFilename)[ 128 ], u_int16_t & Group, u_int16_t & ModelNum, VECTOR & Pos, VECTOR & DirVector, COMP_OBJ *& Comp, float & OverallTime, float & MidTime )
+{
+	char		TempFilename[ 256 ];
+	int16_t		TempNum;
+	char		Ext[ 16 ];
+
+	if( EnemyTypes[ ModelNum ].ModelFilename[ 0 ] )
+	{
+		Get_Ext( (u_int8_t*)EnemyTypes[ ModelNum ].ModelFilename, (u_int8_t*)&Ext[ 0 ] );
+
+		if( !strcasecmp( &Ext[ 0 ], "MXA" ) )
+		{
+			if( EnemyTypes[ ModelNum ].ModelNumber != -1 )
+			{
+				ModelNum = EnemyTypes[ ModelNum ].ModelNumber;
+				Comp = nullptr;
+			}
+			else
+			{
+				Msg( "Error loading enemy %s\n", &NewFilename[ 0 ] );
+				return true;
+			}
+		}
+		else
+		{
+			if( !strcasecmp( &Ext[ 0 ], "MX" ) )
+			{
+				if( EnemyTypes[ ModelNum ].ModelNumber != -1 )
+				{
+					ModelNum = EnemyTypes[ ModelNum ].ModelNumber;
+					Comp = nullptr;
+				}
+				else
+				{
+					Msg( "Error loading enemy %s\n", &NewFilename[ 0 ] );
+					return true;
+				}
+			}
+			else
+			{
+				if( !strcasecmp( &Ext[ 0 ], "COB" ) )
+				{
+					if( EnemyTypes[ ModelNum ].ModelNumber != -1 )
+					{
+						TempNum = EnemyTypes[ ModelNum ].ModelNumber;
+
+						if( EnemyTypes[ ModelNum ].LevelSpecific )
+						{
+							snprintf( &TempFilename[ 0 ], sizeof( TempFilename ), "data\\levels\\%s\\bgobjects\\%s", &ShortLevelNames[ LevelNum ][ 0 ], EnemyTypes[ ModelNum ].ModelFilename );
+						}
+						else
+						{
+							snprintf( &TempFilename[ 0 ], sizeof( TempFilename ), "data\\bgobjects\\%s", EnemyTypes[ ModelNum ].ModelFilename );
+						}
+
+						Comp = LoadCompObj( (int8_t*)&TempFilename[ 0 ], &Pos, &DirVector, Group,
+											&OverallTime, &MidTime, (u_int16_t*)&TempNum, OWNER_ENEMY, Count );
+						if( Comp )
+						{
+							ModelNum = INDEX_NONE;
+						}
+						else
+						{
+							Msg( "Error loading enemy %s\n", &NewFilename[ 0 ] );
+							return true;
+						}
+					}
+				}
+				else
+				{
+					Msg( "Error loading enemy %s\n", &NewFilename[ 0 ] );
+					return true;
+				}
+			}
+		}
+	}
+	else
+	{
+		DebugPrintf( "Enemy %d has no model\n", ModelNum );
+	}
+	return false;
+}
+
+/* per-type setup of a freshly initialised enemy (turret guns, boss parts, component objects) */
+[[gnu::always_inline]] static inline void LoadEnemyTypeSetup( ENEMY *& Enemy, COMP_OBJ *& Comp, COMP_OBJ *& TempComp, u_int16_t & EnemyType )
+{
+	int16_t		CompCount;
+
+	switch( EnemyType )
+	{
+	case ENEMY_SnubTurret:
+		LoadEnemySnubTurret( Enemy, Comp, TempComp );
+		break;
+
+	case ENEMY_BeamTurret:
+		LoadEnemyBeamTurret( Enemy, Comp, TempComp );
+		break;
+
+	case ENEMY_DuelTurret:
+		LoadEnemyDuelTurret( Enemy, Comp, TempComp );
+		break;
+
+	case ENEMY_PulseTurret:
+		LoadEnemyPulseTurret( Enemy, Comp, TempComp );
+		break;
+
+	case ENEMY_MissileTurret:
+		LoadEnemyMissileTurret( Enemy, Comp, TempComp );
+		break;
+
+	case ENEMY_LEADER_SnubBot:
+	case ENEMY_SnubBot:
+		Enemy->Object.UserContComps[ TURRETCOMP_Base ] = GetCompObjAddress( 1, 1, Comp );
+		Enemy->Object.UserContComps[ TURRETCOMP_Gun ] = GetCompObjAddress( 2, 1, Comp );
+		if( Enemy->Object.UserContComps[ TURRETCOMP_Base ] )
+		{
+			TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Base ];
+			TempComp->UserControl = true;
+			if( !GetCompObjAxis( TempComp ) )
+			{
+				TempComp->UserAxis.x = 0.0F;
+				TempComp->UserAxis.y = 1.0F;
+				TempComp->UserAxis.z = 0.0F;
+				TempComp->UserAxisPoint.x = 0.0F;
+				TempComp->UserAxisPoint.y = 0.0F;
+				TempComp->UserAxisPoint.z = 0.0F;
+			}
+		}
+		if( Enemy->Object.UserContComps[ TURRETCOMP_Gun ] )
+		{
+			TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Gun ];
+			TempComp->UserControl = true;
+			if( !GetCompObjAxis( TempComp ) )
+			{
+				TempComp->UserAxis.x = 1.0F;
+				TempComp->UserAxis.y = 0.0F;
+				TempComp->UserAxis.z = 0.0F;
+				TempComp->UserAxisPoint.x = 0.0F;
+				TempComp->UserAxisPoint.y = 0.0F;
+				TempComp->UserAxisPoint.z = 0.0F;
+			}
+
+			if( TempComp->UserAxis.x > 0.0F )			// Temp Fix;
+			{
+				TempComp->UserAxis.x = -TempComp->UserAxis.x;
+				TempComp->UserAxis.y = -TempComp->UserAxis.y;
+				TempComp->UserAxis.z = -TempComp->UserAxis.z;
+			}
+		}
+		break;
+
+#ifdef EDITION_REMASTER
+	case ENEMY_ShieldTurret:
+		LoadEnemyShieldTurret( Enemy, Comp, TempComp );
+		break;
+
+	case ENEMY_Boss_Ramqan:
+		/* KEX defs/n64Enemies.txt for Boss_Ramqan:
+		 *   turretBaseComponent_1   10  (body yaw)
+		 *   turretGunComponent_1    11  (body pitch — Pulsar)
+		 *   turretGunComponent_2    14  (L cannon — Solaris)
+		 *   turretGunComponent_3    13  (R cannon — Suss-bullet cluster)
+		 * The .cob doesn't carry PROPSTATE_UserControl markers
+		 * for these comps, so the loader leaves
+		 * UserContComps[] empty and every gun falls back to the
+		 * body matrix (firing straight forward).  Wire the
+		 * pairs (base/yaw + gun/pitch) here; SetTurretVector
+		 * + UpdateCompObjChildren + GetLastCompDispMatrix then
+		 * give each gun a real aim matrix.  GunNum=i*2 (see
+		 * InitGuns) so:
+		 *   gun 0 (body)    : UserContComps[0]/[1] = comp 10/11
+		 *   gun 1 (L cannon): UserContComps[2]/[3] = comp 10/14
+		 *   gun 2 (R cannon): UserContComps[4]/[5] = comp 10/13
+		 * The body yaw comp is shared across all three since
+		 * KEX only authors one turret base for this rig. */
+		/* Force axes unconditionally — ramqan.cob may carry
+		 * authored RotateAxis properties for these comps
+		 * that GetCompObjAxis would honour and skip our
+		 * fallback, leaving the comp rotating around a
+		 * non-yaw axis that doesn't track. KEX's
+		 * AimAtTarget feeds the turret yaw + pitch directly
+		 * regardless of authored axis, so we mirror that. */
+		{
+			static const int8_t comp_base[3] = { 10, 10, 10 };
+			static const int8_t comp_gun[3]  = { 11, 14, 13 };
+			int g;
+			for( g = 0; g < 3; g++ )
+			{
+				int slot_base = g * 2;
+				int slot_gun  = g * 2 + 1;
+				Enemy->Object.UserContComps[ slot_base ] = GetCompObjAddress( comp_base[g], 1, Comp );
+				Enemy->Object.UserContComps[ slot_gun  ] = GetCompObjAddress( comp_gun[g],  1, Comp );
+				if( Enemy->Object.UserContComps[ slot_base ] )
+				{
+					TempComp = Enemy->Object.UserContComps[ slot_base ];
+					TempComp->UserControl = true;
+					TempComp->UserAxis.x = 0.0F;
+					TempComp->UserAxis.y = 1.0F;
+					TempComp->UserAxis.z = 0.0F;
+					TempComp->UserAxisPoint.x = 0.0F;
+					TempComp->UserAxisPoint.y = 0.0F;
+					TempComp->UserAxisPoint.z = 0.0F;
+				}
+				if( Enemy->Object.UserContComps[ slot_gun ] )
+				{
+					TempComp = Enemy->Object.UserContComps[ slot_gun ];
+					TempComp->UserControl = true;
+					TempComp->UserAxis.x = -1.0F;
+					TempComp->UserAxis.y = 0.0F;
+					TempComp->UserAxis.z = 0.0F;
+					TempComp->UserAxisPoint.x = 0.0F;
+					TempComp->UserAxisPoint.y = 0.0F;
+					TempComp->UserAxisPoint.z = 0.0F;
+				}
+			}
+		}
+		break;
+#endif
+
+	case ENEMY_AirMoble:
+	case ENEMY_AmmoDump:
+	case ENEMY_Max:
+		break;
+
+	case ENEMY_LEADER_LeviTank:
+	case ENEMY_LeviTank:
+		LoadEnemyLeviTank( Enemy, Comp, TempComp );
+		break;
+
+	case ENEMY_LEADER_Mekton:
+	case ENEMY_Mekton:
+		LoadEnemyMekton( Enemy, Comp, TempComp );
+		break;
+
+	case ENEMY_GuardBot:
+		LoadEnemyGuardBot( Enemy, Comp, TempComp );
+		break;
+
+	case ENEMY_LEADER_Legz:
+	case ENEMY_Legz:
+		LoadEnemyLegz( Enemy, Comp, TempComp );
+		break;
+
+	case ENEMY_LazerBot:
+	case ENEMY_LEADER_LazerBot:
+		LoadEnemyLazerBot( Enemy, Comp, TempComp );
+		break;
+
+	case ENEMY_Boss_Metatank:
+		LoadEnemyBossMetatank( CompCount, Enemy, Comp, TempComp );
+		break;
+
+	case ENEMY_Boss_Avatar:
+		LoadEnemyBossAvatar( CompCount, Enemy, Comp, TempComp );
+		break;
+
+	case ENEMY_Boss_Nukecrane:
+	case ENEMY_Supressor:
+	case ENEMY_MineSweeper:
+	case ENEMY_Swarm:
+	case ENEMY_Shade:
+	case ENEMY_MineLayer:
+	case ENEMY_Hunter:
+		break;
+	}
+}
+
 bool LoadEnemies( void )
 {
 	FILE	*	fp;
 	int16_t		Count;
-	int16_t		CompCount;
 	const char	*	NewExt = ".NME";
 	char		NewFilename[ 128 ];
-	char		TempFilename[ 256 ];
 	u_int16_t		Group;
 	u_int16_t		ModelNum;
 	u_int16_t		TriggerMod;
@@ -5187,8 +5453,6 @@ bool LoadEnemies( void )
 	VECTOR		DirVector;
 	VECTOR		UpVector;
 	ENEMY	*	Enemy;
-	int16_t		TempNum;
-	char		Ext[ 16 ];
 	COMP_OBJ *	Comp = nullptr;
 	COMP_OBJ *	TempComp = nullptr;
 	float		OverallTime, MidTime;
@@ -5268,80 +5532,8 @@ bool LoadEnemies( void )
 
 			if( (EnemyType != ENEMY_Boss_Exogenon) || (Exogenon_Num_StartPos == 0) )
 			{
-				if( EnemyTypes[ ModelNum ].ModelFilename[ 0 ] )
-				{
-					Get_Ext( (u_int8_t*)EnemyTypes[ ModelNum ].ModelFilename, (u_int8_t*)&Ext[ 0 ] );
-
-					if( !strcasecmp( &Ext[ 0 ], "MXA" ) )
-					{
-						if( EnemyTypes[ ModelNum ].ModelNumber != -1 )
-						{
-							ModelNum = EnemyTypes[ ModelNum ].ModelNumber;
-							Comp = nullptr;
-						}
-						else
-						{
-							Msg( "Error loading enemy %s\n", &NewFilename[ 0 ] );
-							return( false );
-						}
-					}
-					else
-					{
-						if( !strcasecmp( &Ext[ 0 ], "MX" ) )
-						{
-							if( EnemyTypes[ ModelNum ].ModelNumber != -1 )
-							{
-								ModelNum = EnemyTypes[ ModelNum ].ModelNumber;
-								Comp = nullptr;
-							}
-							else
-							{
-								Msg( "Error loading enemy %s\n", &NewFilename[ 0 ] );
-								return( false );
-							}
-						}
-						else
-						{
-							if( !strcasecmp( &Ext[ 0 ], "COB" ) )
-							{
-								if( EnemyTypes[ ModelNum ].ModelNumber != -1 )
-								{
-									TempNum = EnemyTypes[ ModelNum ].ModelNumber;
-
-									if( EnemyTypes[ ModelNum ].LevelSpecific )
-									{
-										snprintf( &TempFilename[ 0 ], sizeof( TempFilename ), "data\\levels\\%s\\bgobjects\\%s", &ShortLevelNames[ LevelNum ][ 0 ], EnemyTypes[ ModelNum ].ModelFilename );
-									}
-									else
-									{
-										snprintf( &TempFilename[ 0 ], sizeof( TempFilename ), "data\\bgobjects\\%s", EnemyTypes[ ModelNum ].ModelFilename );
-									}
-
-									Comp = LoadCompObj( (int8_t*)&TempFilename[ 0 ], &Pos, &DirVector, Group,
-														&OverallTime, &MidTime, (u_int16_t*)&TempNum, OWNER_ENEMY, Count );
-									if( Comp )
-									{
-										ModelNum = INDEX_NONE;
-									}
-									else
-									{
-										Msg( "Error loading enemy %s\n", &NewFilename[ 0 ] );
-										return( false );
-									}
-								}
-							}
-							else
-							{
-								Msg( "Error loading enemy %s\n", &NewFilename[ 0 ] );
-								return( false );
-							}
-						}
-					}
-				}
-				else
-				{
-					DebugPrintf( "Enemy %d has no model\n", ModelNum );
-				}
+				if( LoadEnemyInitModel( Count, NewFilename, Group, ModelNum, Pos, DirVector, Comp, OverallTime, MidTime ) )
+					return( false );
 
 				Enemy = InitOneEnemy( GenType, &Pos, &DirVector, &UpVector, Group, ModelNum, TriggerMod ,EnemyType , Network , Pickup , (u_int16_t) Formationlink , GenerationDelay ); //-1);
 
@@ -5384,183 +5576,7 @@ bool LoadEnemies( void )
 					Enemy->Object.Time = 0.0F;
 					Enemy->Object.OverallTime = OverallTime;
 
-					switch( EnemyType )
-					{
-					case ENEMY_SnubTurret:
-						LoadEnemySnubTurret( Enemy, Comp, TempComp );
-						break;
-
-					case ENEMY_BeamTurret:
-						LoadEnemyBeamTurret( Enemy, Comp, TempComp );
-						break;
-
-					case ENEMY_DuelTurret:
-						LoadEnemyDuelTurret( Enemy, Comp, TempComp );
-						break;
-
-					case ENEMY_PulseTurret:
-						LoadEnemyPulseTurret( Enemy, Comp, TempComp );
-						break;
-
-					case ENEMY_MissileTurret:
-						LoadEnemyMissileTurret( Enemy, Comp, TempComp );
-						break;
-
-					case ENEMY_LEADER_SnubBot:
-					case ENEMY_SnubBot:
-						Enemy->Object.UserContComps[ TURRETCOMP_Base ] = GetCompObjAddress( 1, 1, Comp );
-						Enemy->Object.UserContComps[ TURRETCOMP_Gun ] = GetCompObjAddress( 2, 1, Comp );
-						if( Enemy->Object.UserContComps[ TURRETCOMP_Base ] )
-						{
-							TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Base ];
-							TempComp->UserControl = true;
-							if( !GetCompObjAxis( TempComp ) )
-							{
-								TempComp->UserAxis.x = 0.0F;
-								TempComp->UserAxis.y = 1.0F;
-								TempComp->UserAxis.z = 0.0F;
-								TempComp->UserAxisPoint.x = 0.0F;
-								TempComp->UserAxisPoint.y = 0.0F;
-								TempComp->UserAxisPoint.z = 0.0F;
-							}
-						}
-						if( Enemy->Object.UserContComps[ TURRETCOMP_Gun ] )
-						{
-							TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Gun ];
-							TempComp->UserControl = true;
-							if( !GetCompObjAxis( TempComp ) )
-							{
-								TempComp->UserAxis.x = 1.0F;
-								TempComp->UserAxis.y = 0.0F;
-								TempComp->UserAxis.z = 0.0F;
-								TempComp->UserAxisPoint.x = 0.0F;
-								TempComp->UserAxisPoint.y = 0.0F;
-								TempComp->UserAxisPoint.z = 0.0F;
-							}
-
-							if( TempComp->UserAxis.x > 0.0F )			// Temp Fix;
-							{
-								TempComp->UserAxis.x = -TempComp->UserAxis.x;
-								TempComp->UserAxis.y = -TempComp->UserAxis.y;
-								TempComp->UserAxis.z = -TempComp->UserAxis.z;
-							}
-						}
-						break;
-
-#ifdef EDITION_REMASTER
-					case ENEMY_ShieldTurret:
-						LoadEnemyShieldTurret( Enemy, Comp, TempComp );
-						break;
-
-					case ENEMY_Boss_Ramqan:
-						/* KEX defs/n64Enemies.txt for Boss_Ramqan:
-						 *   turretBaseComponent_1   10  (body yaw)
-						 *   turretGunComponent_1    11  (body pitch — Pulsar)
-						 *   turretGunComponent_2    14  (L cannon — Solaris)
-						 *   turretGunComponent_3    13  (R cannon — Suss-bullet cluster)
-						 * The .cob doesn't carry PROPSTATE_UserControl markers
-						 * for these comps, so the loader leaves
-						 * UserContComps[] empty and every gun falls back to the
-						 * body matrix (firing straight forward).  Wire the
-						 * pairs (base/yaw + gun/pitch) here; SetTurretVector
-						 * + UpdateCompObjChildren + GetLastCompDispMatrix then
-						 * give each gun a real aim matrix.  GunNum=i*2 (see
-						 * InitGuns) so:
-						 *   gun 0 (body)    : UserContComps[0]/[1] = comp 10/11
-						 *   gun 1 (L cannon): UserContComps[2]/[3] = comp 10/14
-						 *   gun 2 (R cannon): UserContComps[4]/[5] = comp 10/13
-						 * The body yaw comp is shared across all three since
-						 * KEX only authors one turret base for this rig. */
-						/* Force axes unconditionally — ramqan.cob may carry
-						 * authored RotateAxis properties for these comps
-						 * that GetCompObjAxis would honour and skip our
-						 * fallback, leaving the comp rotating around a
-						 * non-yaw axis that doesn't track. KEX's
-						 * AimAtTarget feeds the turret yaw + pitch directly
-						 * regardless of authored axis, so we mirror that. */
-						{
-							static const int8_t comp_base[3] = { 10, 10, 10 };
-							static const int8_t comp_gun[3]  = { 11, 14, 13 };
-							int g;
-							for( g = 0; g < 3; g++ )
-							{
-								int slot_base = g * 2;
-								int slot_gun  = g * 2 + 1;
-								Enemy->Object.UserContComps[ slot_base ] = GetCompObjAddress( comp_base[g], 1, Comp );
-								Enemy->Object.UserContComps[ slot_gun  ] = GetCompObjAddress( comp_gun[g],  1, Comp );
-								if( Enemy->Object.UserContComps[ slot_base ] )
-								{
-									TempComp = Enemy->Object.UserContComps[ slot_base ];
-									TempComp->UserControl = true;
-									TempComp->UserAxis.x = 0.0F;
-									TempComp->UserAxis.y = 1.0F;
-									TempComp->UserAxis.z = 0.0F;
-									TempComp->UserAxisPoint.x = 0.0F;
-									TempComp->UserAxisPoint.y = 0.0F;
-									TempComp->UserAxisPoint.z = 0.0F;
-								}
-								if( Enemy->Object.UserContComps[ slot_gun ] )
-								{
-									TempComp = Enemy->Object.UserContComps[ slot_gun ];
-									TempComp->UserControl = true;
-									TempComp->UserAxis.x = -1.0F;
-									TempComp->UserAxis.y = 0.0F;
-									TempComp->UserAxis.z = 0.0F;
-									TempComp->UserAxisPoint.x = 0.0F;
-									TempComp->UserAxisPoint.y = 0.0F;
-									TempComp->UserAxisPoint.z = 0.0F;
-								}
-							}
-						}
-						break;
-#endif
-
-					case ENEMY_AirMoble:
-					case ENEMY_AmmoDump:
-					case ENEMY_Max:
-						break;
-
-					case ENEMY_LEADER_LeviTank:
-					case ENEMY_LeviTank:
-						LoadEnemyLeviTank( Enemy, Comp, TempComp );
-						break;
-
-					case ENEMY_LEADER_Mekton:
-					case ENEMY_Mekton:
-						LoadEnemyMekton( Enemy, Comp, TempComp );
-						break;
-
-					case ENEMY_GuardBot:
-						LoadEnemyGuardBot( Enemy, Comp, TempComp );
-						break;
-
-					case ENEMY_LEADER_Legz:
-					case ENEMY_Legz:
-						LoadEnemyLegz( Enemy, Comp, TempComp );
-						break;
-
-					case ENEMY_LazerBot:
-					case ENEMY_LEADER_LazerBot:
-						LoadEnemyLazerBot( Enemy, Comp, TempComp );
-						break;
-
-					case ENEMY_Boss_Metatank:
-						LoadEnemyBossMetatank( CompCount, Enemy, Comp, TempComp );
-						break;
-
-					case ENEMY_Boss_Avatar:
-						LoadEnemyBossAvatar( CompCount, Enemy, Comp, TempComp );
-						break;
-
-					case ENEMY_Boss_Nukecrane:
-					case ENEMY_Supressor:
-					case ENEMY_MineSweeper:
-					case ENEMY_Swarm:
-					case ENEMY_Shade:
-					case ENEMY_MineLayer:
-					case ENEMY_Hunter:
-						break;
-					}
+					LoadEnemyTypeSetup( Enemy, Comp, TempComp, EnemyType );
 				}
 				else
 				{
