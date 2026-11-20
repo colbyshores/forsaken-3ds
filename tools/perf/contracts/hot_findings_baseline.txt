@@ -281,7 +281,7 @@ R7|screenpolys.cpp|update|float division inner_loop=false
 R7|screenpolys.cpp|update|float division inner_loop=false
 R7|screenpolys.cpp|UpdateDigit|float division inner_loop=false
 R7|screenpolys.cpp|UpdateDigit|float division inner_loop=false
-R7|secondary.cpp|ProcessSecondaryBullets|float division inner_loop=false
+R7|secondary.cpp|process|float division inner_loop=false
 R7|ships.cpp|ProcessShips|float division in hot loop
 R7|ships.cpp|ProcessShips|float division in hot loop
 R7|ships.cpp|ProcessShips|float division in hot loop

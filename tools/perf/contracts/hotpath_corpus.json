@@ -121,9 +121,10 @@
     {
       "file": "secondary.cpp",
       "symbols": [
-        "ProcessSecondaryBullets"
+        "ProcessSecondaryBullets",
+        "process"
       ],
-      "why": "per projectile per frame"
+      "why": "per projectile per frame; process is ProcessSecondaryBullets' body (SecondaryWeapons::process)"
     },
     {
       "file": "lights.cpp",
