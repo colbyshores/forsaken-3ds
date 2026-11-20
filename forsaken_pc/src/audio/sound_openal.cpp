@@ -48,8 +48,22 @@ struct sound_source_t {
 // sound system load / unload
 //
 
-static ALCdevice* Device = nullptr;
-static ALCcontext* Context = nullptr;
+namespace {
+
+/* The OpenAL device and context (one instance, g_audio). init opens them
+ * once; a failed open is retried by the next call. */
+class AudioDevice {
+	public:
+	bool init();
+	void destroy();
+
+	private:
+	ALCdevice  *Device = nullptr;
+	ALCcontext *Context = nullptr;
+	int         initialized = 0;
+};
+
+} // namespace
 
 static void print_info ( void )
 {
@@ -118,12 +132,11 @@ static void print_info ( void )
 	DebugPrintf("openal: info end\n");
 }
 
-bool sound_init( void )
+bool AudioDevice::init()
 {
 	// TODO - disabling the ability to re-init sound system
 	// on ubuntu using "drivers = pulse" will handle in alcOpenDevice
 	// is there really even a reason we need to re-init sound?
-	static int initialized = 0;
 	if(initialized)
 		return true;
 
@@ -165,7 +178,7 @@ bool sound_init( void )
 	return true;
 }
 
-void sound_destroy( void )
+void AudioDevice::destroy()
 {
 	ALCcontext * Context = alcGetCurrentContext();
 	ALCdevice * Device = alcGetContextsDevice(Context);
@@ -173,6 +186,11 @@ void sound_destroy( void )
 	alcDestroyContext(Context);
 	alcCloseDevice(Device);
 }
+
+namespace { AudioDevice g_audio; }
+
+bool sound_init( void ) { return g_audio.init(); }
+void sound_destroy( void ) { g_audio.destroy(); }
 
 //
 // 3d routines
