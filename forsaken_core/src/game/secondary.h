@@ -53,9 +53,6 @@ constexpr int SEC_XMISSILE = 2;
 
 constexpr int MAXSECONDARYWEAPONBULLETS = 256;
 
-constexpr int MAXENEMYSECONDARYWEAPONS = 6;
-constexpr auto TOTALSECONDARYWEAPONS = ( MAXSECONDARYWEAPONS + 2 + MAXENEMYSECONDARYWEAPONS );
-
 constexpr int MAXSCATTERED = 9;
 
 constexpr int MUGMISSILE = 0; // Straight

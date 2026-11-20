@@ -1749,12 +1749,10 @@ void ReceiveGameMessages( void )
 	memmove( GameStatus,		InitMsg->GameStatus,		sizeof(GameStatus));//memcpy
 	memmove( TeamNumber,		InitMsg->TeamNumber,		sizeof(TeamNumber));//memcpy
 	/* FIXME(multiplayer): the packet carries BYTE[16][16] / BYTE[16]
-	 * but the stats are int[17][17] / int[17] (stats.cpp), so these
+	 * but the stats are int[17][17] / int[17] (GameStats, stats.h), so these
 	 * raw copies do not round-trip. Sizes are the packet's, exactly as
 	 * the old private u_int8_t declarations made them. Owner decision. */
-	memmove( KillStats,		InitMsg->KillStats,		sizeof(InitMsg->KillStats));
-	memmove( KillCounter,	InitMsg->KillCounter,	sizeof(InitMsg->KillCounter));
-	memmove( BonusStats,		InitMsg->BonusStats,		sizeof(InitMsg->BonusStats));
+	Stats.unpack_from_host( InitMsg->KillStats, InitMsg->KillCounter, InitMsg->BonusStats );
 
 	memset( PickupValid, 0, sizeof(PickupValid) );  // turn off all weapons
 	UnpackPickupInfo( InitMsg->PickupFlags );	// which weapons are enabled
@@ -3392,9 +3390,7 @@ enum channel_t {
 
 	PackPickupInfo( InitMsg->PickupFlags );												// currently enabled pickups
 
-	memmove( InitMsg->KillStats,		KillStats,		sizeof(InitMsg->KillStats));			// other players stats stats//memcpy
-	memmove( InitMsg->KillCounter,	KillCounter,	sizeof(InitMsg->KillCounter));		// other players kills counts//memcpy
-	memmove( InitMsg->BonusStats,		BonusStats,		sizeof(InitMsg->KillCounter));		// other players bonus stats//memcpy
+	Stats.pack_for_joiner( InitMsg->KillStats, InitMsg->KillCounter, InitMsg->BonusStats );		// other players kill stats, kill counts and bonus stats
 	memmove( InitMsg->PlayerReady,	PlayerReady,	sizeof(InitMsg->PlayerReady));		// other players ready status//memcpy
 	memmove( InitMsg->GameStatus,		GameStatus,		sizeof(InitMsg->GameStatus));		// other players game status//memcpy
 	memmove( InitMsg->TeamNumber,		TeamNumber,		sizeof(InitMsg->TeamNumber));		// what team everyone is on//memcpy

@@ -24,6 +24,8 @@ constexpr int MAXBIKETYPES = 17; /* selectable bikes (ship models) */
 /* Weapons. */
 constexpr int MAXPRIMARYWEAPONS = 6;
 constexpr int MAXSECONDARYWEAPONS = 11;
+constexpr int MAXENEMYSECONDARYWEAPONS = 6;
+constexpr auto TOTALSECONDARYWEAPONS = ( MAXSECONDARYWEAPONS + 2 + MAXENEMYSECONDARYWEAPONS ); /* player, pine missile + titan shrapnel, enemy */
 
 /* Network resync queues: pickups / mines a client missed. */
 constexpr int MAXMISSEDPICKUPS = 256;

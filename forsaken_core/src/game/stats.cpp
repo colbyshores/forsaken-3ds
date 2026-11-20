@@ -48,38 +48,12 @@
 #include "game/oct2.h"
 #include "util/util.h"
 
-/* internal variables */
-int	KillStats[MAX_PLAYERS+1][MAX_PLAYERS+1];								// each player's KillStats[Killer][Victim];
-int BonusStats[MAX_PLAYERS+1];													// each player's ctf/bounty points
-int KillCounter[MAX_PLAYERS+1];													// number of kills made during this life
 const char *PrimaryWeaponName[MAXPRIMARYWEAPONS+1]			= { "PULSAR", "TROJAX", "PYROLITE", "TRANSPULSE", "SUSS-GUN", "LASER", "ORBITAL" };
 const char *SecondaryWeaponName[TOTALSECONDARYWEAPONS]	= { "MUG", "SOLARIS", "THIEF", "SCATTER", "GRAVGON", "MFRL", "TITAN", "PURGE MINE", "PINE MINE", "QUANTUM MINE", "SPIDER MINE", "PINE MISSILE", "TITAN SHRAPNEL", "ENEMY SPIRAL MISSILE", "ENEMY HOMING MISSILE", "ENEMY BLUE HOMING MISSILE", "ENEMY FIREBALL", "ENEMY TENTACLE", "ENEMY DEPTH CHARGE" };
 
-namespace {
-
-/* Per-game statistics this file keeps to itself (one instance, g_stats):
- * kills by weapon, the score ranking, and the one-off first-blood and
- * first-to-fifty announcements. KillStats / BonusStats / KillCounter stay
- * global: networking.cpp reads and writes them directly. */
-class GameStats {
-	public:
-	int  weapon_kills( int PlayerID, int WeaponType, int Weapon );
-	void reset_all();
-	void reset_player( int Player );
-	void update_kills( int Killer, int Victim, int WeaponType, int Weapon );
-	void sort_scores();
-	int  player_by_rank( int rank );
-	void init_sort_tab( int Player );
-
-	private:
-	int	PrimaryStats[MAX_PLAYERS+1][MAXPRIMARYWEAPONS+1] = {};				// PrimaryStats[Killer][PrimaryWeaponType];
-	int	SecondaryStats[MAX_PLAYERS+1][TOTALSECONDARYWEAPONS] = {};		// SecondaryStats[Killer][SecondaryWeaponType];
-	int	ScoreSortTab[MAX_PLAYERS + 1] = {};								// player numbers in order of highest score to lowest
-	bool FirstBlood = false;
-	bool FirstToFifty = false;
-};
-
-} // namespace
+int GameStats::KillCounter[MAX_PLAYERS+1] = {};
+int GameStats::BonusStats[MAX_PLAYERS+1] = {};
+GameStats Stats;
 
 /*===================================================================
   Procedure :   Get Weapon Name...
@@ -300,7 +274,7 @@ void GameStats::update_kills(int Killer, int Victim, int WeaponType, int Weapon)
   Output    :   nothing
 ===================================================================*/
 /* Update number of kills made during this life */
-void UpdateKillCount(int Killer)
+void GameStats::count_kill(int Killer)
 {
 	char	prefix[256];
 	bool PlaySound = false;
@@ -344,21 +318,14 @@ void UpdateKillCount(int Killer)
   Output    :   nothing
 ===================================================================*/
 /* Update Individual bonus statistics */
-void UpdateBonusStats(int Player, int Points)
-{
-	BonusStats[Player] += Points;
-}
+void UpdateBonusStats(int Player, int Points) { Stats.add_bonus( Player, Points ); }
 /*===================================================================
   Procedure :   Get Individual Kill Statistics...
   Input   :   killer id, victim id
   Output    :   amount of kills
 ===================================================================*/
 /* Get An Individual Kill Statistic */
-int GetKillStats(int Killer, int Victim)
-{
-	// return the amount of kills on victim
-	return KillStats[Killer][Victim];
-}
+int GetKillStats(int Killer, int Victim) { return Stats.kills( Killer, Victim ); }
 
 /*===================================================================
   Procedure :   Get a player's score...
@@ -383,11 +350,7 @@ int GetScoreStats(int Player)
   Output    :   bonus points
 ===================================================================*/
 /* Get an individual's bonus statistics */
-int GetBonusStats(int Player)
-{
-	// return an individual player's bonus points
-	return BonusStats[Player];
-}
+int GetBonusStats(int Player) { return Stats.bonus( Player ); }
 
 /*===================================================================
   Procedure :   Get Team Kills...
@@ -460,7 +423,7 @@ int GetTotalDeaths(int Victim)
 	Input		:		nothing
 	Output		:		nothing
 ===================================================================*/
-void GameStats::sort_scores()
+inline void GameStats::sort_scores()
 {
 	int i;
 	int temp;
@@ -598,12 +561,11 @@ int scoreable_status( int player )
 	return ( GameStatus[player] == STATUS_Normal || GameStatus[player] == STATUS_ViewingScore || player_left(player) );
 }
 
-namespace { GameStats g_stats; }
-
-int GetWeaponKillStats(int PlayerID, int WeaponType, int Weapon) { return g_stats.weapon_kills( PlayerID, WeaponType, Weapon ); }
-void ResetAllStats() { g_stats.reset_all(); }
-void ResetIndividualStats(int Player) { g_stats.reset_player( Player ); }
-void UpdateKillStats(int Killer, int Victim, int WeaponType, int Weapon) { g_stats.update_kills( Killer, Victim, WeaponType, Weapon ); }
-void ScoreSort() { g_stats.sort_scores(); }
-int GetPlayerByRank( int rank ) { return g_stats.player_by_rank( rank ); }
-void InitScoreSortTab(int Player) { g_stats.init_sort_tab( Player ); }
+int GetWeaponKillStats(int PlayerID, int WeaponType, int Weapon) { return Stats.weapon_kills( PlayerID, WeaponType, Weapon ); }
+void ResetAllStats() { Stats.reset_all(); }
+void ResetIndividualStats(int Player) { Stats.reset_player( Player ); }
+void UpdateKillStats(int Killer, int Victim, int WeaponType, int Weapon) { Stats.update_kills( Killer, Victim, WeaponType, Weapon ); }
+void UpdateKillCount(int Killer) { Stats.count_kill( Killer ); }
+void ScoreSort() { Stats.sort_scores(); }
+int GetPlayerByRank( int rank ) { return Stats.player_by_rank( rank ); }
+void InitScoreSortTab(int Player) { Stats.init_sort_tab( Player ); }
