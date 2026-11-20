@@ -1299,6 +1299,276 @@ static	u_int8_t	SmokeRingShadeTable[ 5 ] = { 255, 200, 150, 100, 50 };
 	}
 }
 
+/* FM_ANIMSPEED */
+[[gnu::always_inline]] static inline void FmPolyAnimSpeed( u_int16_t & i )
+{
+	FmPolys[i].Frame += ( framelag / FmPolys[i].AnimSpeed );
+	if( FmPolys[i].Frame >= (*FmPolys[i].Frm_Info)->Num_Frames )
+	{
+		KillUsedFmPoly( i );
+
+	}
+}
+
+/* FM_ANIM */
+[[gnu::always_inline]] static inline void FmPolyAnim( u_int16_t & i )
+{
+	FmPolys[i].Trans = ( 248 - ( (int16_t) ( FmPolys[i].Frame * 8.0F ) ) );
+	FmPolys[i].Frame += ( framelag / 3.0F );
+
+	if( FmPolys[i].Frame >= (*FmPolys[i].Frm_Info)->Num_Frames )
+	{
+		KillUsedFmPoly( i );
+	}
+}
+
+/* FM_ANIM2 */
+[[gnu::always_inline]] static inline void FmPolyAnim2( u_int16_t & i )
+{
+	FmPolys[i].Trans = ( 248 - ( (int16_t) ( FmPolys[i].Frame * 8.0F ) ) );
+	FmPolys[i].Frame += ( framelag / 4.0F );
+	if( FmPolys[i].Frame >= (*FmPolys[i].Frm_Info)->Num_Frames )
+	{
+		KillUsedFmPoly( i );
+	}
+}
+
+/* FM_TROJAX */
+[[gnu::always_inline]] static inline void FmPolyTrojax( u_int16_t & i, VECTOR & Rotation )
+{
+	FmPolys[ i ].Rot += ( FmPolys[i].RotSpeed * framelag );
+	/* @vfp-exempt R3 — sprite rotation wraps at 360 degrees in float; integerizing changes the drawn angle. measured n/a. Verified 2026-11-19. */
+	if( FmPolys[ i ].Rot > 360.0F ) FmPolys[ i ].Rot -= 360.0F;
+	else if( FmPolys[ i ].Rot < 0.0F ) FmPolys[ i ].Rot += 360.0F;
+	fast_sincosf( D2R( FmPolys[ i ].Rot ), &Rotation.x, &Rotation.y );
+	Rotation.z = 0.0F;
+	ApplyMatrix( &FmPolys[ i ].Mat, &Rotation, &FmPolys[ i ].UpVector );
+}
+
+/* FM_PULSAR_EXP */
+[[gnu::always_inline]] static inline void FmPolyPulsarExplosion( u_int16_t & i )
+{
+	FmPolys[i].Frame += ( framelag / 4.0F );
+	if( FmPolys[i].Frame >= (*FmPolys[i].Frm_Info)->Num_Frames )
+	{
+		KillUsedFmPoly( i );
+	}
+}
+
+/* FM_NMEBULLET1 */
+[[gnu::always_inline]] static inline void FmPolyNmeBullet1( u_int16_t & i )
+{
+	FmPolys[i].Frame += ( framelag / 3.0F );
+	if( FmPolys[i].Frame >= (*FmPolys[i].Frm_Info)->Num_Frames )
+	{
+		FmPolys[i].Frame -= ( ( FmPolys[i].Frame / (*FmPolys[i].Frm_Info)->Num_Frames )
+								* (*FmPolys[i].Frm_Info)->Num_Frames );
+	}
+}
+
+/* FM_FLAME */
+[[gnu::always_inline]] static inline void FmPolyFlame( u_int16_t & i )
+{
+	FmPolys[ i ].Rot += ( FmPolys[i].RotSpeed * framelag );
+	/* @vfp-exempt R3 — flame sprite rotation wrap on a float angle; integerizing changes the drawn rotation. measured n/a. Verified 2026-11-19. */
+	if( FmPolys[ i ].Rot > 360.0F ) FmPolys[ i ].Rot -= 360.0F;
+	else if( FmPolys[ i ].Rot < 0.0F ) FmPolys[ i ].Rot += 360.0F;
+
+	FmPolys[i].Frame += framelag;
+	/* @vfp-exempt R3 — animation frame clamp on a float frame counter; integerizing changes which frame is drawn. measured n/a. Verified 2026-11-19. */
+	if( FmPolys[i].Frame > 12.0F ) FmPolys[i].Frame = 12.0F;
+}
+
+/* FM_PICKUP_REGEN */
+[[gnu::always_inline]] static inline void FmPolyPickupRegen( u_int16_t & i )
+{
+	FmPolys[i].Frame += ( framelag / 6.0F );
+
+	if( FmPolys[i].Frame >= (*FmPolys[i].Frm_Info)->Num_Frames )
+	{
+		KillUsedFmPoly( i );
+	}
+}
+
+/* FM_BLOODSPLAT */
+[[gnu::always_inline]] static inline void FmPolyBloodSplat( u_int16_t & i, float & R, float & G, float & B, float & T, float & FadeDec )
+{
+	FmPolys[i].Frame += ( framelag / 8.0F ); //6.0F;
+	/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
+	if( FmPolys[i].Frame >= (*FmPolys[i].Frm_Info)->Num_Frames )
+	{
+		/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
+		KillUsedFmPoly( i );
+	}
+	/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
+	else
+	{
+		FadeDec = ( 255.0F / ( (*FmPolys[i].Frm_Info)->Num_Frames * 8.0F ) ) * framelag;
+		R = ( ( (float) FmPolys[i].R ) - FadeDec );
+		G = ( ( (float) FmPolys[i].G ) - FadeDec );
+		B = ( ( (float) FmPolys[i].B ) - FadeDec );
+		T = ( ( (float) FmPolys[i].Trans ) - FadeDec );
+		if( R < 0.0F ) R = 0.0F;
+		if( G < 0.0F ) G = 0.0F;
+		if( B < 0.0F ) B = 0.0F;
+		if( T < 0.0F ) T = 0.0F;
+		FmPolys[i].R = (u_int8_t) R;
+		/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
+		FmPolys[i].G = (u_int8_t) G;
+		FmPolys[i].B = (u_int8_t) B;
+		FmPolys[i].Trans = (u_int8_t) T;
+	}
+}
+
+/* FM_BLOODDRIBBLE */
+[[gnu::always_inline]] static inline void FmPolyBloodDribble( u_int16_t & i )
+{
+	FmPolys[i].Frame += ( framelag / 8.0F ); //6.0F;
+	/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
+	if( FmPolys[i].Frame >= (*FmPolys[i].Frm_Info)->Num_Frames )
+	{
+		KillUsedFmPoly( i );
+	}
+}
+
+/* FM_MUSHROOM */
+[[gnu::always_inline]] static inline void FmPolyMushroom( u_int16_t & i )
+{
+	FmPolys[i].Frame += ( framelag / 6.0F );
+
+	if( FmPolys[i].Frame >= (*FmPolys[i].Frm_Info)->Num_Frames )
+	{
+		KillUsedFmPoly( i );
+	}
+}
+
+/* FM_SPOTFX_SPARKSFACEME */
+[[gnu::always_inline]] static inline void FmPolySpotFXSparksFaceMe( u_int16_t & i )
+{
+	/* @vfp-exempt R3 — lifetime test on the sprite's float countdown; integerizing changes when it dies. measured n/a. Verified 2026-11-19. */
+	if( FmPolys[i].LifeCount == 0.0F )
+	{
+		KillUsedFmPoly( i );
+	}
+}
+
+/* FM_SPOTFX_GLOW */
+[[gnu::always_inline]] static inline void FmPolySpotFXGlow( u_int16_t & i )
+{
+	if( FmPolys[i].OnceOnly )
+	{
+		FmPolys[i].OnceOnly--;
+	}
+	else
+	{
+		KillUsedFmPoly( i );
+	}
+}
+
+/* FM_RESTART_INACTIVE */
+[[gnu::always_inline]] static inline void FmPolyRestartInactive( u_int16_t & i )
+{
+	FadeColour( &FmPolys[i].R, FmPolys[i].Start_R, 5.0F );
+	FadeColour( &FmPolys[i].G, FmPolys[i].Start_G, 5.0F );
+	FadeColour( &FmPolys[i].B, FmPolys[i].Start_B, 5.0F );
+
+	FmPolys[ i ].Rot += ( FmPolys[ i ].RotSpeed * framelag );
+	FmPolys[ i ].Rot = FMOD( FmPolys[ i ].Rot, 360.0F );
+}
+
+/* FM_RESTART_ACTIVE */
+[[gnu::always_inline]] static inline void FmPolyRestartActive( u_int16_t & i )
+{
+	FadeColour( &FmPolys[i].R, FmPolys[i].Start_R, 5.0F );
+	FadeColour( &FmPolys[i].G, FmPolys[i].Start_G, 5.0F );
+	FadeColour( &FmPolys[i].B, FmPolys[i].Start_B, 5.0F );
+
+	FmPolys[ i ].Rot += ( FmPolys[ i ].RotSpeed * framelag );
+	FmPolys[ i ].Rot = FMOD( FmPolys[ i ].Rot, 360.0F );
+}
+
+/* FM_FIREBALL */
+[[gnu::always_inline]] static inline void FmPolyFireball( u_int16_t & i, float & Speed, float & OldSize )
+{
+	FmPolys[i].Trans = ( 248 - ( (int16_t) ( FmPolys[i].Frame * 8.0F ) ) );
+
+	Speed = ( FmPolys[i].UpSpeed * framelag );
+	FmPolys[i].Pos.x += ( FmPolys[i].UpVector.x * Speed );
+	FmPolys[i].Pos.y += ( FmPolys[i].UpVector.y * Speed );
+	/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
+	FmPolys[i].Pos.z += ( FmPolys[i].UpVector.z * Speed );
+
+	Speed = ( FmPolys[i].Speed * framelag );
+	/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
+	FmPolys[i].Pos.x += ( FmPolys[i].Dir.x * Speed );
+	FmPolys[i].Pos.y += ( FmPolys[i].Dir.y * Speed );
+	/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
+	FmPolys[i].Pos.z += ( FmPolys[i].Dir.z * Speed );
+
+	OldSize = FmPolys[i].xsize;
+	/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
+
+	FmPolys[i].xsize -= ( ( 0.15F * GLOBAL_SCALE ) * framelag );
+	/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
+	FmPolys[i].ysize -= ( ( 0.15F * GLOBAL_SCALE ) * framelag );
+
+	if( ( FmPolys[i].xsize > 0.0F ) && ( FmPolys[i].ysize > 0.0F ) )
+	{
+		if( FmPolys[i].Speed > 0.0F )
+		{
+			FmPolys[i].Speed -= ( 0.15F * framelag );
+			if( FmPolys[i].Speed < 0.0F ) FmPolys[i].Speed = 0.0F;
+		}
+
+		if( FmPolys[i].UpSpeed < 10.0F )
+		{
+			/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
+			FmPolys[i].UpSpeed += ( 0.15F * framelag );
+			if( FmPolys[i].UpSpeed > 10.0F ) FmPolys[i].UpSpeed = 10.0F;
+		}
+
+		FmPolys[i].Frame += ( framelag / FmPolys[i].AnimSpeed );
+		if( FmPolys[i].Frame >= (*FmPolys[i].Frm_Info)->Num_Frames )
+		{
+			KillUsedFmPoly( i );
+
+		}
+	}
+	else
+	{
+		KillUsedFmPoly( i );
+	}
+}
+
+/* FM_SPARKLE */
+[[gnu::always_inline]] static inline void FmPolySparkle( u_int16_t & i, float & Speed )
+{
+	if( FmPolys[i].LifeCount == 0.0F )
+	{
+		KillUsedFmPoly( i );
+	}
+	else
+	{
+		Speed = ( FmPolys[i].Speed * framelag );
+		FmPolys[i].Pos.x += ( FmPolys[i].Dir.x * Speed );
+		/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
+		FmPolys[i].Pos.y += ( FmPolys[i].Dir.y * Speed );
+		FmPolys[i].Pos.z += ( FmPolys[i].Dir.z * Speed );
+
+		Speed = FMOD( FmPolys[i].LifeCount, 20.0F );
+
+		if( Speed > 10.0F )
+		{
+			FmPolys[i].xsize = ( ( 20.0F - Speed ) * 0.05F );
+		}
+		else
+		{
+			FmPolys[i].xsize = ( Speed * 0.05F );
+		}
+		FmPolys[i].ysize = FmPolys[i].xsize;
+	}
+}
+
 void FmPolyProcess( void )
 {
 	u_int16_t	i;
@@ -1329,31 +1599,15 @@ void FmPolyProcess( void )
 		switch( FmPolys[i].SeqNum )
 		{
 		case FM_ANIMSPEED:							// Anim using animspeed
-			FmPolys[i].Frame += ( framelag / FmPolys[i].AnimSpeed );
-			if( FmPolys[i].Frame >= (*FmPolys[i].Frm_Info)->Num_Frames )
-			{
-				KillUsedFmPoly( i );
-
-			}
+			FmPolyAnimSpeed( i );
 			break;
 
 		case FM_ANIM:								// Explosion?
-			FmPolys[i].Trans = ( 248 - ( (int16_t) ( FmPolys[i].Frame * 8.0F ) ) );
-			FmPolys[i].Frame += ( framelag / 3.0F );
-
-			if( FmPolys[i].Frame >= (*FmPolys[i].Frm_Info)->Num_Frames )
-			{
-				KillUsedFmPoly( i );
-			}
+			FmPolyAnim( i );
 			break;
 
 		case FM_ANIM2:								// Ship Explosion?
-			FmPolys[i].Trans = ( 248 - ( (int16_t) ( FmPolys[i].Frame * 8.0F ) ) );
-			FmPolys[i].Frame += ( framelag / 4.0F );
-			if( FmPolys[i].Frame >= (*FmPolys[i].Frm_Info)->Num_Frames )
-			{
-				KillUsedFmPoly( i );
-			}
+			FmPolyAnim2( i );
 			break;
 
 		case FM_SMOKE_TRAIL:						// Smoke Trail?
@@ -1365,21 +1619,11 @@ void FmPolyProcess( void )
 			break;
 
 		case FM_TROJAX:								// Trojax bullet
-			FmPolys[ i ].Rot += ( FmPolys[i].RotSpeed * framelag );
-			/* @vfp-exempt R3 — sprite rotation wraps at 360 degrees in float; integerizing changes the drawn angle. measured n/a. Verified 2026-11-19. */
-			if( FmPolys[ i ].Rot > 360.0F ) FmPolys[ i ].Rot -= 360.0F;
-			else if( FmPolys[ i ].Rot < 0.0F ) FmPolys[ i ].Rot += 360.0F;
-			fast_sincosf( D2R( FmPolys[ i ].Rot ), &Rotation.x, &Rotation.y );
-			Rotation.z = 0.0F;
-			ApplyMatrix( &FmPolys[ i ].Mat, &Rotation, &FmPolys[ i ].UpVector );
+			FmPolyTrojax( i, Rotation );
 			break;
 
 		case FM_PULSAR_EXP:							// Pulsar Explosion?
-			FmPolys[i].Frame += ( framelag / 4.0F );
-			if( FmPolys[i].Frame >= (*FmPolys[i].Frm_Info)->Num_Frames )
-			{
-				KillUsedFmPoly( i );
-			}
+			FmPolyPulsarExplosion( i );
 			break;
 
 			/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
@@ -1387,12 +1631,7 @@ void FmPolyProcess( void )
 			break;
 
 		case FM_NMEBULLET1:
-			FmPolys[i].Frame += ( framelag / 3.0F );
-			if( FmPolys[i].Frame >= (*FmPolys[i].Frm_Info)->Num_Frames )
-			{
-				FmPolys[i].Frame -= ( ( FmPolys[i].Frame / (*FmPolys[i].Frm_Info)->Num_Frames )
-										* (*FmPolys[i].Frm_Info)->Num_Frames );
-			}
+			FmPolyNmeBullet1( i );
 			break;
 
 		case FM_SHRAPNEL_EXP:						// Shrapnel Explosion?
@@ -1400,13 +1639,7 @@ void FmPolyProcess( void )
 			break;
 
 		case FM_FLAME:								// Flame Thrower?
-			FmPolys[ i ].Rot += ( FmPolys[i].RotSpeed * framelag );
-			if( FmPolys[ i ].Rot > 360.0F ) FmPolys[ i ].Rot -= 360.0F;
-			else if( FmPolys[ i ].Rot < 0.0F ) FmPolys[ i ].Rot += 360.0F;
-
-			FmPolys[i].Frame += framelag;
-			/* @vfp-exempt R3 — animation frame clamp on a float frame counter; integerizing changes which frame is drawn. measured n/a. Verified 2026-11-19. */
-			if( FmPolys[i].Frame > 12.0F ) FmPolys[i].Frame = 12.0F;
+			FmPolyFlame( i );
 			break;
 
 			/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
@@ -1452,12 +1685,7 @@ void FmPolyProcess( void )
 			break;
 
 		case FM_PICKUP_REGEN:							// Regenerating Pickup?
-			FmPolys[i].Frame += ( framelag / 6.0F );
-
-			if( FmPolys[i].Frame >= (*FmPolys[i].Frm_Info)->Num_Frames )
-			{
-				KillUsedFmPoly( i );
-			}
+			FmPolyPickupRegen( i );
 			break;
 
 		case FM_BLOOD:									// Blood?
@@ -1465,41 +1693,12 @@ void FmPolyProcess( void )
 			break;
 
 		case FM_BLOODSPLAT:								// Blood Splat?
-			FmPolys[i].Frame += ( framelag / 8.0F ); //6.0F;
-			/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
-			if( FmPolys[i].Frame >= (*FmPolys[i].Frm_Info)->Num_Frames )
-			{
-				/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
-				KillUsedFmPoly( i );
-			}
-			/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
-			else
-			{
-				FadeDec = ( 255.0F / ( (*FmPolys[i].Frm_Info)->Num_Frames * 8.0F ) ) * framelag;
-				R = ( ( (float) FmPolys[i].R ) - FadeDec );
-				G = ( ( (float) FmPolys[i].G ) - FadeDec );
-				B = ( ( (float) FmPolys[i].B ) - FadeDec );
-				T = ( ( (float) FmPolys[i].Trans ) - FadeDec );
-				if( R < 0.0F ) R = 0.0F;
-				if( G < 0.0F ) G = 0.0F;
-				if( B < 0.0F ) B = 0.0F;
-				if( T < 0.0F ) T = 0.0F;
-				FmPolys[i].R = (u_int8_t) R;
-				/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
-				FmPolys[i].G = (u_int8_t) G;
-				FmPolys[i].B = (u_int8_t) B;
-				FmPolys[i].Trans = (u_int8_t) T;
-			}
+			FmPolyBloodSplat( i, R, G, B, T, FadeDec );
 			break;
 
 			/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 		case FM_BLOODDRIBBLE:							// Blood Dribble?
-			FmPolys[i].Frame += ( framelag / 8.0F ); //6.0F;
-			/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
-			if( FmPolys[i].Frame >= (*FmPolys[i].Frm_Info)->Num_Frames )
-			{
-				KillUsedFmPoly( i );
-			}
+			FmPolyBloodDribble( i );
 			break;
 
 			/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
@@ -1520,12 +1719,7 @@ void FmPolyProcess( void )
 			break;
 
 		case FM_MUSHROOM:								// Mushroom Explosion?
-			FmPolys[i].Frame += ( framelag / 6.0F );
-
-			if( FmPolys[i].Frame >= (*FmPolys[i].Frm_Info)->Num_Frames )
-			{
-				KillUsedFmPoly( i );
-			}
+			FmPolyMushroom( i );
 			break;
 
 		case FM_SMOKE_RING:								// Smoke Ring?
@@ -1549,11 +1743,7 @@ void FmPolyProcess( void )
 			break;
 
 		case FM_SPOTFX_SPARKSFACEME:
-			/* @vfp-exempt R3 — lifetime test on the sprite's float countdown; integerizing changes when it dies. measured n/a. Verified 2026-11-19. */
-			if( FmPolys[i].LifeCount == 0.0F )
-			{
-				KillUsedFmPoly( i );
-			}
+			FmPolySpotFXSparksFaceMe( i );
 			break;
 
 		case FM_SPOTFX_GRAVGON_TRAIL:						// Gravgon Smoke Trail?
@@ -1561,14 +1751,7 @@ void FmPolyProcess( void )
 			break;
 
 		case FM_SPOTFX_GLOW:							// SpotFX Glow?
-			if( FmPolys[i].OnceOnly )
-			{
-				FmPolys[i].OnceOnly--;
-			}
-			else
-			{
-				KillUsedFmPoly( i );
-			}
+			FmPolySpotFXGlow( i );
 			break;
 
 		case FM_NME_TRAIL:								// Nme Trail?
@@ -1627,21 +1810,11 @@ void FmPolyProcess( void )
 			break;
 
 		case FM_RESTART_INACTIVE:							// Restart Point Inactive
-			FadeColour( &FmPolys[i].R, FmPolys[i].Start_R, 5.0F );
-			FadeColour( &FmPolys[i].G, FmPolys[i].Start_G, 5.0F );
-			FadeColour( &FmPolys[i].B, FmPolys[i].Start_B, 5.0F );
-
-			FmPolys[ i ].Rot += ( FmPolys[ i ].RotSpeed * framelag );
-			FmPolys[ i ].Rot = FMOD( FmPolys[ i ].Rot, 360.0F );
+			FmPolyRestartInactive( i );
 			break;
 
 		case FM_RESTART_ACTIVE:								// Restart Point Active
-			FadeColour( &FmPolys[i].R, FmPolys[i].Start_R, 5.0F );
-			FadeColour( &FmPolys[i].G, FmPolys[i].Start_G, 5.0F );
-			FadeColour( &FmPolys[i].B, FmPolys[i].Start_B, 5.0F );
-
-			FmPolys[ i ].Rot += ( FmPolys[ i ].RotSpeed * framelag );
-			FmPolys[ i ].Rot = FMOD( FmPolys[ i ].Rot, 360.0F );
+			FmPolyRestartActive( i );
 			break;
 
 		case FM_SPOTFX_WATERSPLASH:							// Water Splash?
@@ -1653,82 +1826,12 @@ void FmPolyProcess( void )
 			break;
 
 		case FM_FIREBALL:
-			FmPolys[i].Trans = ( 248 - ( (int16_t) ( FmPolys[i].Frame * 8.0F ) ) );
-
-			Speed = ( FmPolys[i].UpSpeed * framelag );
-			FmPolys[i].Pos.x += ( FmPolys[i].UpVector.x * Speed );
-			FmPolys[i].Pos.y += ( FmPolys[i].UpVector.y * Speed );
-			/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
-			FmPolys[i].Pos.z += ( FmPolys[i].UpVector.z * Speed );
-
-			Speed = ( FmPolys[i].Speed * framelag );
-			/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
-			FmPolys[i].Pos.x += ( FmPolys[i].Dir.x * Speed );
-			FmPolys[i].Pos.y += ( FmPolys[i].Dir.y * Speed );
-			/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
-			FmPolys[i].Pos.z += ( FmPolys[i].Dir.z * Speed );
-
-			OldSize = FmPolys[i].xsize;
-			/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
-
-			FmPolys[i].xsize -= ( ( 0.15F * GLOBAL_SCALE ) * framelag );
-			/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
-			FmPolys[i].ysize -= ( ( 0.15F * GLOBAL_SCALE ) * framelag );
-
-			if( ( FmPolys[i].xsize > 0.0F ) && ( FmPolys[i].ysize > 0.0F ) )
-			{
-				if( FmPolys[i].Speed > 0.0F )
-				{
-					FmPolys[i].Speed -= ( 0.15F * framelag );
-					if( FmPolys[i].Speed < 0.0F ) FmPolys[i].Speed = 0.0F;
-				}
-
-				if( FmPolys[i].UpSpeed < 10.0F )
-				{
-					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
-					FmPolys[i].UpSpeed += ( 0.15F * framelag );
-					if( FmPolys[i].UpSpeed > 10.0F ) FmPolys[i].UpSpeed = 10.0F;
-				}
-
-				FmPolys[i].Frame += ( framelag / FmPolys[i].AnimSpeed );
-				if( FmPolys[i].Frame >= (*FmPolys[i].Frm_Info)->Num_Frames )
-				{
-					KillUsedFmPoly( i );
-
-				}
-			}
-			else
-			{
-				KillUsedFmPoly( i );
-			}
+			FmPolyFireball( i, Speed, OldSize );
 			break;
 
 			/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 		case FM_SPARKLE:						// Sparkle?
-			if( FmPolys[i].LifeCount == 0.0F )
-			{
-				KillUsedFmPoly( i );
-			}
-			else
-			{
-				Speed = ( FmPolys[i].Speed * framelag );
-				FmPolys[i].Pos.x += ( FmPolys[i].Dir.x * Speed );
-				/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
-				FmPolys[i].Pos.y += ( FmPolys[i].Dir.y * Speed );
-				FmPolys[i].Pos.z += ( FmPolys[i].Dir.z * Speed );
-
-				Speed = FMOD( FmPolys[i].LifeCount, 20.0F );
-
-				if( Speed > 10.0F )
-				{
-					FmPolys[i].xsize = ( ( 20.0F - Speed ) * 0.05F );
-				}
-				else
-				{
-					FmPolys[i].xsize = ( Speed * 0.05F );
-				}
-				FmPolys[i].ysize = FmPolys[i].xsize;
-			}
+			FmPolySparkle( i, Speed );
 			break;
 
 			/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
