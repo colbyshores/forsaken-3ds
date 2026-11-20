@@ -61,8 +61,14 @@
  * texgroup range in the batch, in walk order, with the same per-batch state.
  * Splitting only the submit (never state, order or uniforms) keeps pixels
  * identical while tolerating per-eye culling differences: a texgroup the
- * left eye never converted is simply converted live instead. */
-[[gnu::always_inline]] static inline void draw_flush_batch( int & batch_vertCount, int batch_tg0, int group, bool orthographic,
+ * left eye never converted is simply converted live instead.
+ *
+ * Kept out of line on purpose: inlined at its three sites (as the old
+ * FLUSH_BATCH macro or always_inline) it reshapes draw_render_object's
+ * per-texgroup path. On the Old 3DS, the always_inline form measured
+ * +0.09 ms/frame CPU in stereo. Out of line, it ran 0.01 ms faster than the
+ * macro. One call per batch is cheaper than the bloat. */
+[[gnu::noinline]] static void draw_flush_batch( int & batch_vertCount, int batch_tg0, int group, bool orthographic,
 	int batch_startOffset, bool batch_colourkey, bool batch_hasTexture,
 	const int (&tg_memo_off)[MAX_TEXTURE_GROUPS], const int (&tg_memo_cnt)[MAX_TEXTURE_GROUPS],
 	gpu_vertex_t * const (&tg_persist_buf)[MAX_TEXTURE_GROUPS], const int (&tg_persist_cnt)[MAX_TEXTURE_GROUPS] )
