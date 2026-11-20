@@ -49,6 +49,5 @@ int DisplayGoal( u_int16_t group );
 
 
 /* Defined in goal.cpp; shared with the modules that use it. */
-extern int GoalTeamMembers[ MAX_TEAMS ];
 void SetTeamGoals( u_int16_t *TeamGoals );
 extern int TeamFlag[ MAX_TEAMS ];
