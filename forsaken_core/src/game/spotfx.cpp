@@ -47,10 +47,31 @@ constexpr int FX_VERSION_NUMBER = 4;
 ===================================================================*/
 int32_t		NumSpotFX;
 SPOTFX		SpotFX[ MAXSPOTFX ];
-SPOTFX	*	SpotFXGroups[ MAXGROUPS ];
-u_int16_t		NumSpotFXPerGroup[ MAXGROUPS ];
-SPOTFX	*	FirstSpotFXUsed = nullptr;
-SPOTFX	*	FirstSpotFXFree = nullptr;
+
+namespace {
+
+/* The SpotFX pool's bookkeeping (one instance, g_spotfx): the used and free
+ * lists through SpotFX[], and the per-group lists the save code writes.
+ * Emptied with the scene, walked each frame, and saved with the game.
+ * SpotFX[] itself stays global (models, triggers and the loader use it). */
+class SpotFXPool {
+	public:
+	void    process();
+	void    setup();
+	SPOTFX *find_free();
+	void    setup_groups();
+	void    add_to_group( SPOTFX * SpotFX, u_int16_t Group );
+	FILE   *save( FILE * fp );
+	FILE   *restore( FILE * fp );
+
+	private:
+	SPOTFX *  FirstSpotFXUsed = nullptr;
+	SPOTFX *  FirstSpotFXFree = nullptr;
+	SPOTFX *  SpotFXGroups[ MAXGROUPS ] = {};
+	u_int16_t NumSpotFXPerGroup[ MAXGROUPS ] = {};
+};
+
+} // namespace
 
 /*===================================================================
 	Procedure	:	Load all SpotFX from the level's .FX file
@@ -453,7 +474,7 @@ bool LoadSpotFX( void )
 	Input		:	nothing
 	Output		:	nothing
 ===================================================================*/
-void ProcessSpotFX( void )
+void SpotFXPool::process()
 {
 	SPOTFX	*	SpotFX;
 
@@ -575,7 +596,7 @@ void ProcessSpotFX( void )
 	Input		:	nothing
 	Output		:	nothing
 ===================================================================*/
-void SetupSpotFX( void )
+void SpotFXPool::setup()
 {
 	u_int16_t	i;
 
@@ -749,7 +770,7 @@ void DisableSpotFX( u_int16_t SpotFXIndex )
 	Input		:	Nothing
 	Output		:	SPOTFX	*	SpotFX ( NULL if not available )
 ===================================================================*/
-SPOTFX * FindFreeSpotFX( void )
+SPOTFX * SpotFXPool::find_free()
 {
 	SPOTFX * Object;
 
@@ -2219,7 +2240,7 @@ void CreateSpotFXFireWall( VECTOR * Pos, VECTOR * Dir, VECTOR * Up, u_int16_t Gr
 	Input		:	Nothing
 	Output		:	Nothing
 ===================================================================*/
-void SetupSpotFXGroups( void )
+void SpotFXPool::setup_groups()
 {
 	int16_t	Count;
 
@@ -2236,7 +2257,7 @@ void SetupSpotFXGroups( void )
 				:	u_int16_t		Group
 	Output		:	Nothing
 ===================================================================*/
-void AddSpotFXToGroup( SPOTFX * SpotFX, u_int16_t Group )
+void SpotFXPool::add_to_group( SPOTFX * SpotFX, u_int16_t Group )
 {
 	SpotFX->PrevInGroup = nullptr;
 	SpotFX->NextInGroup = SpotFXGroups[ Group ];
@@ -2251,7 +2272,7 @@ void AddSpotFXToGroup( SPOTFX * SpotFX, u_int16_t Group )
 	Input		:	FILE	*	File Pointer
 	Output		:	FILE	*	Updated File Pointer
 ===================================================================*/
-FILE * SaveAllSpotFX( FILE * fp )
+FILE * SpotFXPool::save( FILE * fp )
 {
 	int		i;
 	u_int16_t	TempIndex = INDEX_NONE;
@@ -2324,7 +2345,7 @@ FILE * SaveAllSpotFX( FILE * fp )
 	Output		:	FILE	*	Updated File Pointer ( closed and NULL
 					if the count does not match the level )
 ===================================================================*/
-FILE * LoadAllSpotFX( FILE * fp )
+FILE * SpotFXPool::restore( FILE * fp )
 {
 	int		i;
 	u_int16_t	TempIndex;
@@ -2406,3 +2427,13 @@ FILE * LoadAllSpotFX( FILE * fp )
 
 	return( fp );
 }
+
+namespace { SpotFXPool g_spotfx; }
+
+void ProcessSpotFX( void ) { g_spotfx.process(); }
+void SetupSpotFX( void ) { g_spotfx.setup(); }
+SPOTFX * FindFreeSpotFX( void ) { return g_spotfx.find_free(); }
+void SetupSpotFXGroups( void ) { g_spotfx.setup_groups(); }
+void AddSpotFXToGroup( SPOTFX * SpotFX, u_int16_t Group ) { g_spotfx.add_to_group( SpotFX, Group ); }
+FILE * SaveAllSpotFX( FILE * fp ) { return g_spotfx.save( fp ); }
+FILE * LoadAllSpotFX( FILE * fp ) { return g_spotfx.restore( fp ); }

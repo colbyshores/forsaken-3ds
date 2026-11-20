@@ -158,7 +158,10 @@
       "symbols": [
         "*"
       ],
-      "why": "impact/spot effects per frame"
+      "cold_symbols": [
+        "restore"
+      ],
+      "why": "impact/spot effects per frame; restore is the saved-game load (LoadAllSpotFX)"
     },
     {
       "file": "water.cpp",

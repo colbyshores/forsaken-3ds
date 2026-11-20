@@ -94,8 +94,8 @@ R2|screenpolys.cpp|ScrPolyDispNonSolid|float-to-int cast in loop body
 R2|screenpolys.cpp|ScrPolyDispNonSolid|float-to-int cast in loop body
 R2|ships.cpp|ProcessShips|untyped-heuristic: float-to-int cast in loop body
 R2|ships.cpp|ProcessShips|untyped-heuristic: float-to-int cast in loop body
-R2|spotfx.cpp|SaveAllSpotFX|float-to-int cast in loop body
-R2|spotfx.cpp|SaveAllSpotFX|float-to-int cast in loop body
+R2|spotfx.cpp|save|float-to-int cast in loop body
+R2|spotfx.cpp|save|float-to-int cast in loop body
 R2|visi.cpp|FindVisible|float-to-int cast in loop body
 R2|visi.cpp|FindVisible|float-to-int cast in loop body
 R2|visi.cpp|FindVisible|float-to-int cast in loop body
