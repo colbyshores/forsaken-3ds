@@ -33,9 +33,34 @@
 void ExogenonAim( ENEMY * Enemy );
 
 
-VECTOR	ExogenonSweepAngle;
-u_int32_t	ExogenonSweepDir;
 void	ExogenonFireLeftRight( ENEMY * Enemy );
+
+namespace {
+
+/* The Exogenon's sweep aim (one instance, g_exogenon_sweep): the fire state
+ * remembers the move flags and angle it aimed with, and each sweep tick
+ * replays them before re-aiming. */
+class ExogenonSweep {
+	public:
+	void remember( const ENEMY * Enemy )
+	{
+		ExogenonSweepDir = Enemy->AIMoveFlags;
+		ExogenonSweepAngle = Enemy->AI_Angle;
+	}
+	void replay( ENEMY * Enemy ) const
+	{
+		Enemy->AIMoveFlags = ExogenonSweepDir;
+		Enemy->AI_Angle = ExogenonSweepAngle;
+	}
+
+	private:
+	VECTOR    ExogenonSweepAngle = {};
+	u_int32_t ExogenonSweepDir = 0;
+};
+
+ExogenonSweep g_exogenon_sweep;
+
+} // namespace
 
 /*===================================================================
 	Procedure	:	Exogenon Idle
@@ -200,8 +225,7 @@ void AI_EXOGENON_FIRE( ENEMY * Enemy )
 
 			Enemy->Object.AI_Mode = AIMODE_EXOGENON_SWEEP;
 			ExogenonAim( Enemy );
-			ExogenonSweepDir = Enemy->AIMoveFlags;
-			ExogenonSweepAngle = Enemy->AI_Angle;
+			g_exogenon_sweep.remember( Enemy );
 			Enemy->Timer = 60.0F * 1.0F;
 		}
 	}
@@ -251,8 +275,7 @@ void AI_EXOGENON_SWEEP( ENEMY * Enemy )
 		{
 			Enemy->Timer = 0.0F;
 		}
-		Enemy->AIMoveFlags = ExogenonSweepDir;
-		Enemy->AI_Angle = ExogenonSweepAngle;
+		g_exogenon_sweep.replay( Enemy );
 		ExogenonAim( Enemy );
 
 	}
