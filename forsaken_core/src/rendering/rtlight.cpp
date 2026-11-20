@@ -41,13 +41,32 @@ constexpr auto TWO_PI = (2.0F * PI);
 /******************************************************************************************
 	Globals
 *******************************************************************************************/
-u_int16_t rt_lights = 0;
-RT_LIGHT *rt_light = nullptr;
+namespace {
+
+/* The level's real-time lights (one instance, g_rtlights): loaded from the
+ * level's .RTL file, animated each frame, switched by triggers, and saved
+ * with the game. */
+class RealTimeLights {
+	public:
+	bool  load();
+	bool  release();
+	void  process();
+	void  enable( u_int16_t *data );
+	void  disable( u_int16_t *data );
+	FILE *save( FILE *fp );
+	FILE *restore( FILE *fp );
+
+	private:
+	u_int16_t rt_lights = 0;
+	RT_LIGHT *rt_light = nullptr;
+};
+
+} // namespace
 
 /******************************************************************************************
 	Load real-time game lights for level
 *******************************************************************************************/
-bool LoadRTLights( void )
+bool RealTimeLights::load()
 {
 	FILE	*	fp;
 	int8_t		Filename[ 256 ];
@@ -222,7 +241,7 @@ bool LoadRTLights( void )
 /******************************************************************************************
 	Release real-time game lights for level
 *******************************************************************************************/
-bool ReleaseRTLights( void )
+bool RealTimeLights::release()
 {
 	int j;
 	RT_LIGHT *light;
@@ -357,7 +376,7 @@ static float TurnOffPoint( RT_LIGHT *light, PULSETYPE type )
 /******************************************************************************************
 	Process real-time game lights
 *******************************************************************************************/
-void ProcessRTLights( void )
+void RealTimeLights::process()
 {
 	int j;
 	RT_LIGHT *light;
@@ -599,7 +618,7 @@ void ProcessRTLights( void )
 /******************************************************************************************
 	Enable real-time game light
 *******************************************************************************************/
-void EnableRTLight( u_int16_t *data )
+void RealTimeLights::enable( u_int16_t *data )
 {
 	int id;
 	RT_LIGHT *light;
@@ -646,7 +665,7 @@ void EnableRTLight( u_int16_t *data )
 /******************************************************************************************
 	Disable real-time game light
 *******************************************************************************************/
-void DisableRTLight( u_int16_t *data )
+void RealTimeLights::disable( u_int16_t *data )
 {
 	int id;
 	RT_LIGHT *light;
@@ -689,7 +708,7 @@ void DisableRTLight( u_int16_t *data )
 	Input		:	FILE	*	File Pointer
 	Output		:	FILE	*	Updated File Pointer
 ===================================================================*/
-FILE * SaveRealTimeLights( FILE * fp )
+FILE * RealTimeLights::save( FILE * fp )
 {
 	int			i;
 	RT_LIGHT *	RTLPtr;
@@ -720,7 +739,7 @@ FILE * SaveRealTimeLights( FILE * fp )
 	Input		:	FILE	*	File Pointer
 	Output		:	FILE	*	Updated File Pointer
 ===================================================================*/
-FILE * LoadRealTimeLights( FILE * fp )
+FILE * RealTimeLights::restore( FILE * fp )
 {
 	int			i;
 	RT_LIGHT *	RTLPtr;
@@ -752,3 +771,13 @@ FILE * LoadRealTimeLights( FILE * fp )
 
 	return( fp );
 }
+
+namespace { RealTimeLights g_rtlights; }
+
+bool LoadRTLights( void ) { return g_rtlights.load(); }
+bool ReleaseRTLights( void ) { return g_rtlights.release(); }
+void ProcessRTLights( void ) { g_rtlights.process(); }
+void EnableRTLight( u_int16_t *data ) { g_rtlights.enable( data ); }
+void DisableRTLight( u_int16_t *data ) { g_rtlights.disable( data ); }
+FILE * SaveRealTimeLights( FILE * fp ) { return g_rtlights.save( fp ); }
+FILE * LoadRealTimeLights( FILE * fp ) { return g_rtlights.restore( fp ); }
