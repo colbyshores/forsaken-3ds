@@ -3104,7 +3104,6 @@ bool PreLoadPickups( void )
 {
 	int16_t   Count;
 	VECTOR  Dir = { 0.0F, 0.0F, 0.0F };
-	u_int16_t  i = 0;
 
 	for( Count = 0; Count < NumRegenPoints; Count++ )
 	{
@@ -3141,7 +3140,7 @@ bool PreLoadPickups( void )
 			MaxPickupType[ RegenPoints[ Count ].Type ]++;
 
 			/* try to create the pickup */
-			i = InitOnePickup(
+			InitOnePickup(
 				  &RegenPoints[ Count ].Pos,
 				  RegenPoints[ Count ].Group,
 				  &Dir,
