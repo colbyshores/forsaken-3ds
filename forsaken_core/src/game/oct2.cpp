@@ -930,6 +930,118 @@ int GetCurPrimAmmo( void )
 	else                                          return GeneralAmmo;
 }
 
+/* HUD shown only in normal (not watch) mode: the weapons-possessed bar and the other normal-mode panel items */
+[[gnu::always_inline]] static inline void DrawPanelNormalModeHud( int & current, int & left, int & right, int & top, int & energy, u_int8_t & Count, u_int8_t & r, u_int8_t & g, u_int8_t & b, char (&MessageBuff)[150] )
+{
+	if(ShowWeaponsPossessedOnHUD)
+	{
+		// primaries using general ammo
+		for( Count = 0; Count < MAXPRIMARYWEAPONS; Count++ )
+		{
+			if(Count == PYROLITE_RIFLE || Count == SUSS_GUN)
+				continue;
+			current = (Count == Ships[WhoIAm].Primary);
+			if( current || PrimaryWeaponsGot[ Count ] > 0 )
+			{
+				Print4x5Text( PrimaryNames[ Count ], left, top, HUDColour );
+				if( Count == PULSAR )
+					Printu_int16_t( GeneralAmmo, right, top, HUDColour );
+			}
+			top += FontHeight;
+		}
+
+		// primaries using pyro ammo
+		current = (PYROLITE_RIFLE == Ships[WhoIAm].Primary);
+		if( current || PrimaryWeaponsGot[ PYROLITE_RIFLE ] > 0 )
+		{
+			Print4x5Text( PrimaryNames[ PYROLITE_RIFLE ], left, top, HUDColour );
+			Printu_int16_t( PyroliteAmmo, right, top, HUDColour );
+		}
+		top += FontHeight;
+
+		// primaries using suss ammo
+		current = (SUSS_GUN == Ships[WhoIAm].Primary);
+		if( current || PrimaryWeaponsGot[ SUSS_GUN ] > 0 )
+		{
+			Print4x5Text( PrimaryNames[ SUSS_GUN ], left, top, HUDColour );
+			Printu_int16_t( SussGunAmmo, right, top, HUDColour );
+		}
+		top += FontHeight*2;
+
+		// Secondaries
+		for( Count = 0; Count < MAXSECONDARYWEAPONS; Count++ )
+		{
+			current = ( Count == Ships[WhoIAm].Secondary || GetBestMine() == Count );
+			if(Count == 7) top += FontHeight; // add space for mines
+			if( current || (u_int16_t) SecondaryAmmo[ Count ] > 0 )
+			{
+				Print4x5Text( SecondaryNames[Count], left, top, HUDColour );
+				Printu_int16_t( (u_int16_t) SecondaryAmmo[ Count ] , right, top, HUDColour );
+			}
+			top += FontHeight;
+		}
+	} // end of show full inventory
+
+	// top right
+	top = FontHeight;
+
+	// mine
+	int mine = (int) GetBestMine();
+	if( mine != 65535 )
+	{
+		int left = render_info.window_size.cx;
+		Print4x5Text( SecondaryNames[mine], left-FontWidth*10, top, HUDColour );
+		Printu_int16_t( (u_int16_t) SecondaryAmmo[mine], left-FontWidth*2, top, HUDColour );
+	}
+
+	// bottom right
+	top = render_info.window_size.cy - FontHeight*5;
+
+	// trojax level
+	energy = (int) ( ( PowerLevel * 0.01F ) * 9.0F );
+
+	// or lazer temperature
+	if( !energy )
+		energy = (int) ( ( LaserTemperature *0.01F ) * 9.0F );
+
+	// render trojax/lazer bar
+	if( energy )
+	{
+		// 72   (first frame) is power bar charging
+		// 72-8 (last frame)  is power bar at full charge
+		if( energy > 8 ) energy = 8;
+		AddScreenPolyText(
+			(72-energy),
+			(float) (viewport.X + (viewport.Width>>1))-16 ,
+			(float) (viewport.Y + (viewport.Height>>1))+4 ,
+			r, g, b, 255 );
+	}
+
+	// nitro bar
+	if ( ( control.turbo || Ships[WhoIAm].Object.CruiseControl == CRUISE_NITRO ) && NitroFuel )
+	{
+		float bar = ( Ships[WhoIAm].Object.Flags & SHIP_SuperNashram ) ?
+			(float) Ships[WhoIAm].SuperNashramTimer*0.008f :
+			(float) NitroFuel*0.04f;
+		AddScreenPolyTextScale(
+			72,
+			(float) ( (render_info.window_size.cx>>1) - (NitroFuel - 8) ),
+			(float) (viewport.Y + (viewport.Height>>1)-7 ) ,
+			bar,
+			1.0F,
+			r, g, b, 255 );
+	}
+
+	// Average Kills Per Minute
+	if(ShowKPMOnHUD)
+	{
+		snprintf( MessageBuff, sizeof( MessageBuff ), "KPM: %.2f", (float)
+				(GetTotalKills(WhoIAm) - GetFriendlyKills(WhoIAm))
+				/ (LevelTimeTaken / 60.0F) );
+		Print4x5Text( &MessageBuff[0], FontWidth, render_info.window_size.cy - FontWidth*6, RED);
+	}
+}
+
 void DrawSimplePanel()
 {
 	int current = 0;
@@ -950,113 +1062,7 @@ void DrawSimplePanel()
 			// HUD settings only shown in normal mode
 			if(!SwitchedToWatchMode)
 			{
-				if(ShowWeaponsPossessedOnHUD)
-				{
-					// primaries using general ammo
-					for( Count = 0; Count < MAXPRIMARYWEAPONS; Count++ )
-					{
-						if(Count == PYROLITE_RIFLE || Count == SUSS_GUN)
-							continue;
-						current = (Count == Ships[WhoIAm].Primary);
-						if( current || PrimaryWeaponsGot[ Count ] > 0 )
-						{
-							Print4x5Text( PrimaryNames[ Count ], left, top, HUDColour );
-							if( Count == PULSAR )
-								Printu_int16_t( GeneralAmmo, right, top, HUDColour );
-						}
-						top += FontHeight;
-					}
-
-					// primaries using pyro ammo
-					current = (PYROLITE_RIFLE == Ships[WhoIAm].Primary);
-					if( current || PrimaryWeaponsGot[ PYROLITE_RIFLE ] > 0 )
-					{
-						Print4x5Text( PrimaryNames[ PYROLITE_RIFLE ], left, top, HUDColour );
-						Printu_int16_t( PyroliteAmmo, right, top, HUDColour );
-					}
-					top += FontHeight;
-
-					// primaries using suss ammo
-					current = (SUSS_GUN == Ships[WhoIAm].Primary);
-					if( current || PrimaryWeaponsGot[ SUSS_GUN ] > 0 )
-					{
-						Print4x5Text( PrimaryNames[ SUSS_GUN ], left, top, HUDColour );
-						Printu_int16_t( SussGunAmmo, right, top, HUDColour );
-					}
-					top += FontHeight*2;
-
-					// Secondaries
-					for( Count = 0; Count < MAXSECONDARYWEAPONS; Count++ )
-					{
-						current = ( Count == Ships[WhoIAm].Secondary || GetBestMine() == Count );
-						if(Count == 7) top += FontHeight; // add space for mines
-						if( current || (u_int16_t) SecondaryAmmo[ Count ] > 0 )
-						{
-							Print4x5Text( SecondaryNames[Count], left, top, HUDColour );
-							Printu_int16_t( (u_int16_t) SecondaryAmmo[ Count ] , right, top, HUDColour );
-						}
-						top += FontHeight;
-					}
-				} // end of show full inventory
-
-				// top right
-				top = FontHeight;
-
-				// mine
-				int mine = (int) GetBestMine();
-				if( mine != 65535 )
-				{
-					int left = render_info.window_size.cx;
-					Print4x5Text( SecondaryNames[mine], left-FontWidth*10, top, HUDColour );
-					Printu_int16_t( (u_int16_t) SecondaryAmmo[mine], left-FontWidth*2, top, HUDColour );
-				}
-
-				// bottom right
-				top = render_info.window_size.cy - FontHeight*5;
-
-				// trojax level
-				energy = (int) ( ( PowerLevel * 0.01F ) * 9.0F );
-
-				// or lazer temperature
-				if( !energy )
-					energy = (int) ( ( LaserTemperature *0.01F ) * 9.0F );
-
-				// render trojax/lazer bar
-				if( energy )
-				{
-					// 72   (first frame) is power bar charging
-					// 72-8 (last frame)  is power bar at full charge
-					if( energy > 8 ) energy = 8;
-					AddScreenPolyText(
-						(72-energy),
-						(float) (viewport.X + (viewport.Width>>1))-16 ,
-						(float) (viewport.Y + (viewport.Height>>1))+4 ,
-						r, g, b, 255 );
-				}
-
-				// nitro bar
-				if ( ( control.turbo || Ships[WhoIAm].Object.CruiseControl == CRUISE_NITRO ) && NitroFuel )
-				{
-					float bar = ( Ships[WhoIAm].Object.Flags & SHIP_SuperNashram ) ?
-						(float) Ships[WhoIAm].SuperNashramTimer*0.008f :
-						(float) NitroFuel*0.04f;
-					AddScreenPolyTextScale(
-						72,
-						(float) ( (render_info.window_size.cx>>1) - (NitroFuel - 8) ),
-						(float) (viewport.Y + (viewport.Height>>1)-7 ) ,
-						bar,
-						1.0F,
-						r, g, b, 255 );
-				}
-
-				// Average Kills Per Minute
-				if(ShowKPMOnHUD)
-				{
-					snprintf( MessageBuff, sizeof( MessageBuff ), "KPM: %.2f", (float)
-							(GetTotalKills(WhoIAm) - GetFriendlyKills(WhoIAm))
-							/ (LevelTimeTaken / 60.0F) );
-					Print4x5Text( &MessageBuff[0], FontWidth, render_info.window_size.cy - FontWidth*6, RED);
-				}
+				DrawPanelNormalModeHud( current, left, right, top, energy, Count, r, g, b, MessageBuff );
 			}
 			// HUD settings only shown in watch mode
 			else
