@@ -15,15 +15,33 @@
 	Globals
 ===================================================================*/
 LINE	Lines[ MAXLINES ];
-u_int16_t	FirstLineUsed;
-u_int16_t	FirstLineFree;
+
+namespace {
+
+/* The Lines[] pool's list heads (one instance, g_lines): the newest used
+ * line and the first free one. Reset with the scene, changed as owners
+ * take and release lines, and walked by each group's line draw. Lines[]
+ * itself stays global (its owners keep indices into it). */
+class LinePool {
+	public:
+	void      init();
+	u_int16_t find_free();
+	void      kill_used( u_int16_t i );
+	bool      execute( u_int16_t group, RENDEROBJECT *renderObject );
+
+	private:
+	u_int16_t FirstLineUsed = 0;
+	u_int16_t FirstLineFree = 0;
+};
+
+} // namespace
 
 /*===================================================================
 	Procedure	:	Init Line Structures (empty used list, all free)
 	Input		:	Nothing
 	Output		:	Nothing
 ===================================================================*/
-void InitLines( void )
+void LinePool::init()
 {
 	int i;
 
@@ -56,7 +74,7 @@ void InitLines( void )
 	Input		:	Nothing
 	Output		:	u_int16_t	Number of the free Line
 ===================================================================*/
-u_int16_t FindFreeLine( void )
+u_int16_t LinePool::find_free()
 {
 	u_int16_t i;
 
@@ -82,7 +100,7 @@ u_int16_t FindFreeLine( void )
 	Input		:	u_int16_t		Number of Line to free....
 	Output		:	Nothing
 ===================================================================*/
-void KillUsedLine( u_int16_t i )
+void LinePool::kill_used( u_int16_t i )
 {
 	u_int16_t	its_prev;
 	u_int16_t	its_next;
@@ -206,7 +224,7 @@ bool LinesDispGroup( u_int16_t Group, RENDEROBJECT *renderObject, u_int16_t * St
 				:	RENDEROBJECT *		renderObject (scratch batch)
 	Output		:	false if a draw fails
 ===================================================================*/
-bool ExecuteLines( u_int16_t group, RENDEROBJECT *renderObject )
+bool LinePool::execute( u_int16_t group, RENDEROBJECT *renderObject )
 {
 	u_int16_t  i = 0;
 
@@ -223,3 +241,9 @@ bool ExecuteLines( u_int16_t group, RENDEROBJECT *renderObject )
 	return true;
 }
 
+namespace { LinePool g_lines; }
+
+void InitLines( void ) { g_lines.init(); }
+u_int16_t FindFreeLine( void ) { return g_lines.find_free(); }
+void KillUsedLine( u_int16_t i ) { g_lines.kill_used( i ); }
+bool ExecuteLines( u_int16_t group, RENDEROBJECT *renderObject ) { return g_lines.execute( group, renderObject ); }

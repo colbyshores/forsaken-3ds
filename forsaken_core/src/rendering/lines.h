@@ -72,4 +72,3 @@ u_int16_t FindFreeLine( void );
 
 /* Defined in lines.cpp; shared with the modules that use it. */
 extern LINE Lines[ MAXLINES ];
-extern u_int16_t FirstLineUsed;
