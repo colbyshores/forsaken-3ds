@@ -50,18 +50,43 @@ constexpr int NOD_VERSION_NUMBER = 1;
 ===================================================================*/
 
 NODENETWORKHEADER	NodeNetworkHeader;
-void SetNetworkDistance( void );
 
-float	* NodeArray = nullptr;
+namespace {
 
-NODE *	NodeInGroup[MAXGROUPS];
+/* The level's node routing tables (one instance, g_nodes): each group's
+ * chain of nodes, the N x N shortest-path distance table, and the source
+ * node and table cursor of the load-time distance recursion. Built by
+ * Nodeload (the chains while reading nodes, the table by
+ * set_network_distance) and freed by NodeRelease; read by the AI as it
+ * routes (WhichNode, WhichRetreatNode) and as objects move between groups
+ * (UpdateNearestNodeSpecial). NodeNetworkHeader stays global (the AI,
+ * triggers and enemies use it). */
+class NodeRoutes {
+	public:
+	bool load( char * Filename );
+	void release();
+	NODE * which_node( u_int32_t Network , NODE * NodeFrom , NODE * NodeTo );
+	NODE * which_retreat_node( u_int32_t Network , NODE * NodeFrom , NODE * NodeTo );
+	void update_nearest_special( OBJECT * Object );
+
+	private:
+	void recurse( NODE * NodeFrom , NODE * NodeTo , float Distance );
+	void set_network_distance();
+
+	NODE *	NodeInGroup[MAXGROUPS] = {};
+	float	* NodeArray = nullptr;
+	NODE * Source = nullptr;
+	float * NA = nullptr;
+};
+
+} // namespace
 
 /*===================================================================
 	Procedure	:		Load .Nod File
 	Input		:		char	*	Filename
 	Output		:		Nothing
 ===================================================================*/
-bool Nodeload( char * Filename )
+bool NodeRoutes::load( char * Filename )
 {
 	char		*	Buffer;
 	char		*	OrgBuffer;
@@ -264,7 +289,7 @@ bool Nodeload( char * Filename )
 
 	NodeNetworkHeader.State = true;
 
-	SetNetworkDistance();
+	set_network_distance();
 
 	return true;
 }
@@ -274,7 +299,7 @@ bool Nodeload( char * Filename )
 	Input		:		NOTHING
 	Output		:		Nothing
 ===================================================================*/
-void NodeRelease( void)
+void NodeRoutes::release()
 {
 	if( NodeNetworkHeader.State )
 	{
@@ -380,10 +405,7 @@ void ShowNodeNetwork( u_int32_t NetMask )
 				:		int32_t	Network
 	Output		:		Nothing
 ===================================================================*/
-NODE * Source;
-float * NA;
-
-void NodeRecurse( NODE * NodeFrom , NODE * NodeTo , float Distance )
+void NodeRoutes::recurse( NODE * NodeFrom , NODE * NodeTo , float Distance )
 {
 	int i;
 
@@ -404,7 +426,7 @@ void NodeRecurse( NODE * NodeFrom , NODE * NodeTo , float Distance )
 	}
 	for( i = 0 ; i < NodeTo->NumOfLinks ; i++ )
 	{
-		NodeRecurse( NodeTo , NodeTo->NodeLink[i] ,  Distance );
+		recurse( NodeTo , NodeTo->NodeLink[i] ,  Distance );
 	}
 }
 /*===================================================================
@@ -413,7 +435,7 @@ void NodeRecurse( NODE * NodeFrom , NODE * NodeTo , float Distance )
 				:		int32_t	Network
 	Output		:		Nothing
 ===================================================================*/
-void SetNetworkDistance( void )
+void NodeRoutes::set_network_distance()
 {
 	int e,o,v;
 	NODE * NodeFrom;
@@ -445,7 +467,7 @@ void SetNetworkDistance( void )
 		Source =  NodeFrom;
 		for( v = 0 ; v < NodeFrom->NumOfLinks ; v++ )
 		{
-			NodeRecurse( NodeFrom, NodeFrom->NodeLink[v], 0.0F );
+			recurse( NodeFrom, NodeFrom->NodeLink[v], 0.0F );
 		}
 		NodeFrom++;
 	}
@@ -541,7 +563,7 @@ void UpdateNearestNode( OBJECT * Object )
 				:		NODE * NodeTo...Which node im trying to get to...
 	Output		:		NODE * Which node to go to get to my destination quickly..
 ===================================================================*/
-NODE * WhichNode( u_int32_t Network , NODE * NodeFrom , NODE * NodeTo )
+NODE * NodeRoutes::which_node( u_int32_t Network , NODE * NodeFrom , NODE * NodeTo )
 {
 	float Distance,Temp;
 	int i;
@@ -584,7 +606,7 @@ NODE * WhichNode( u_int32_t Network , NODE * NodeFrom , NODE * NodeTo )
 				:		NODE * NodeTo...Which node im trying to get to...
 	Output		:		NODE * Which node to go to get to my destination quickly..
 ===================================================================*/
-NODE * WhichRetreatNode( u_int32_t Network , NODE * NodeFrom , NODE * NodeTo )
+NODE * NodeRoutes::which_retreat_node( u_int32_t Network , NODE * NodeFrom , NODE * NodeTo )
 {
 	float Distance,Temp;
 	int i;
@@ -753,7 +775,7 @@ NODE * FindSuitableSplineNodeRandom( u_int32_t Network, NODE * NodeFrom , NODE *
 
 #define NODE_DIST(a,b)  DistanceVector2Vector( (VECTOR*)(a), (VECTOR*)(b) )
 
-void UpdateNearestNodeSpecial( OBJECT * Object )
+void NodeRoutes::update_nearest_special( OBJECT * Object )
 {
 	float Distance;
 	int i;
@@ -872,3 +894,11 @@ float ReturnClosestNode( VECTOR * Pos, VECTOR * NearestNodePos, u_int16_t * Grou
 	}
 	return( Distance );
 }
+
+namespace { NodeRoutes g_nodes; }
+
+bool Nodeload( char * Filename ) { return g_nodes.load( Filename ); }
+void NodeRelease( void ) { g_nodes.release(); }
+NODE * WhichNode( u_int32_t Network , NODE * NodeFrom , NODE * NodeTo ) { return g_nodes.which_node( Network, NodeFrom, NodeTo ); }
+NODE * WhichRetreatNode( u_int32_t Network , NODE * NodeFrom , NODE * NodeTo ) { return g_nodes.which_retreat_node( Network, NodeFrom, NodeTo ); }
+void UpdateNearestNodeSpecial( OBJECT * Object ) { g_nodes.update_nearest_special( Object ); }
