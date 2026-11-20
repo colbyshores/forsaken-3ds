@@ -202,10 +202,22 @@ bool replace_file( const char * from, const char * to )
 #define GLOB_ABORTED GLOB_ABEND
 #endif
 
-static glob_t glob_handle;
-static int glob_pos = -1;
+namespace {
 
-static char *find_strip_path( char *path )
+/* The one active file search (one instance, g_search): the glob results
+ * and the next name to hand out. pos is -1 when no search is open. */
+class FileSearch {
+	public:
+	char *first( const char * str );
+	char *next();
+	void  close();
+
+	private:
+	glob_t handle = {};
+	int    pos = -1;
+};
+
+char *find_strip_path( char *path )
 {
 	char *c = strrchr(path, '/');
 	if( c )
@@ -214,25 +226,25 @@ static char *find_strip_path( char *path )
 		return path;
 }
 
-static int find_globerr( const char *epath, int eerrno )
+int find_globerr( const char *epath, int eerrno )
 {
 	DebugPrintf("file: glob error while searching for \"%s\": %s\n", epath, strerror(eerrno));
 	DebugPrintf("Trying to continue anyway...\n");
 	return 0;
 }
 
-char* find_file( const char * str )
+char *FileSearch::first( const char * str )
 {
 	char * path = convert_path(str);
 	DebugPrintf("file: find_file called with %s\n",path);
-	if (glob_pos >= 0)
-		globfree(&glob_handle);
-	switch( glob(path, 0, find_globerr, &glob_handle) )
+	if (pos >= 0)
+		globfree(&handle);
+	switch( glob(path, 0, find_globerr, &handle) )
 	{
 	case 0:
-		glob_pos = 0;
-		DebugPrintf("file: found file \"%s\" (1 of %d)\n", glob_handle.gl_pathv[0], glob_handle.gl_pathc);
-		return find_strip_path(glob_handle.gl_pathv[glob_pos++]);
+		pos = 0;
+		DebugPrintf("file: found file \"%s\" (1 of %d)\n", handle.gl_pathv[0], handle.gl_pathc);
+		return find_strip_path(handle.gl_pathv[pos++]);
 		break;
 	case GLOB_NOSPACE:
 		DebugPrintf("file: find_file: ran out of memory!\n");
@@ -250,19 +262,27 @@ char* find_file( const char * str )
 	return nullptr;
 }
 
-char* find_next_file( void )
+char *FileSearch::next()
 {
-	if (glob_pos < 0 || glob_pos >= (int)glob_handle.gl_pathc)
+	if (pos < 0 || pos >= (int)handle.gl_pathc)
 		return nullptr;
-	DebugPrintf("file: found file \"%s\" (%d of %d)\n", glob_handle.gl_pathv[glob_pos], glob_pos+1, glob_handle.gl_pathc);
-	return find_strip_path(glob_handle.gl_pathv[glob_pos++]);
+	DebugPrintf("file: found file \"%s\" (%d of %d)\n", handle.gl_pathv[pos], pos+1, handle.gl_pathc);
+	return find_strip_path(handle.gl_pathv[pos++]);
 }
 
-void find_close( void )
+void FileSearch::close()
 {
-	globfree(&glob_handle);
-	glob_pos = -1;
+	globfree(&handle);
+	pos = -1;
 }
+
+FileSearch g_search;
+
+} // namespace
+
+char* find_file( const char * str ) { return g_search.first( str ); }
+char* find_next_file( void ) { return g_search.next(); }
+void find_close( void ) { g_search.close(); }
 
 bool file_read_cstring( FILE * fp, char * dst, size_t size )
 {
