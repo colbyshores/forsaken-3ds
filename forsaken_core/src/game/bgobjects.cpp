@@ -39,13 +39,56 @@
 /*===================================================================
 	Global Variables
 ===================================================================*/
-BGO_FILE	*	BGOFilesPtr = nullptr;
 BGOBJECT	*	FirstBGObjectUsed = nullptr;
-BGOBJECT	*	FirstBGObjectFree = nullptr;
 BGOBJECT		BGObjects[ MAXBGOBJECTS ];
 bool			ShowColZones = false;
 
-DOORTYPESFX DoorTypeSFX[] = {
+namespace {
+
+/* The module's private state (one instance, g_bgobjects):
+ * - the free list through BGObjects[]: refilled by InitBGObjects with the
+ *   scene, changed as objects are made and die (ProcessBGObjects frees
+ *   those destroyed at the end of their animation), and saved with the
+ *   game;
+ * - the level's .BGO file entries, read by PreLoadBGOFiles and freed once
+ *   LoadBGOFiles has made the objects;
+ * - the title-screen FlyGirl: loaded with the title, animated each title
+ *   frame, released with it;
+ * - the door sound table: each door type's sound names, resolved to sound
+ *   indices as a level's doors are preloaded.
+ * BGObjects[] and its used list stay global (collision, enemies and the
+ * saved game use them). */
+class BGObjectState {
+	public:
+	void       init();
+	BGOBJECT * find_free();
+	void       kill_used( BGOBJECT * Object );
+	bool       preload_files();
+	bool       load_files();
+	FILE *     save( FILE * fp );
+	FILE *     restore( FILE * fp );
+	void       request_door_sfx( int16_t Type );
+	/* Out of line, as StartOrChangeDoorSoundFX was: the door state changes
+	 * in ProcessBGObjects, ChangeBGState and UpdateBGObject all call it. */
+	[[gnu::noinline]] void start_or_change_door_sfx( BGOBJECT * Object );
+	bool       preload_flygirl();
+	bool       allocate_flygirl();
+	void       release_flygirl();
+	void       update_flygirl( VECTOR * Pos, MATRIX * Matrix, bool Visible );
+
+	private:
+	BGOBJECT *  FirstBGObjectFree = nullptr;
+	BGO_FILE *  BGOFilesPtr = nullptr;
+	COMP_OBJ *  FlyGirlComps = nullptr;
+	float       FlyGirlAnim = 0.0F;
+	BIKEINFO    FlyGirlCompFile = { "FlyGirl.cob", 0, 0, 0.0F };
+	/* Static, so it keeps its constant initialiser in .data: the (int8_t*)
+	 * casts are not constant expressions, so as an instance member it would
+	 * need a static constructor. */
+	static DOORTYPESFX DoorTypeSFX[];
+};
+
+DOORTYPESFX BGObjectState::DoorTypeSFX[] = {
 
 { -1, (int8_t*)"gndoorop",	-1, nullptr,		-1, (int8_t*)"gndoorst",	-1, nullptr,	-1, (int8_t*)"gndoorop",	-1, nullptr,		-1, (int8_t*)"gndoorcl",	-1, nullptr },
 { -1, (int8_t*)"stndrstr",	-1, (int8_t*)"stndrmov",	-1, (int8_t*)"stndrstp", -1, nullptr,	-1, (int8_t*)"stndrstr",	-1, (int8_t*)"stndrmov",	-1, (int8_t*)"stndrstp", -1, nullptr },
@@ -59,6 +102,8 @@ DOORTYPESFX DoorTypeSFX[] = {
 
 };
 
+} // namespace
+
 /*===================================================================
 	Defines
 ===================================================================*/
@@ -69,7 +114,7 @@ constexpr int BGO_VERSION_NUMBER = 3;
 	Input		:	nothing
 	Output		:	nothing
 ===================================================================*/
-void InitBGObjects( void )
+void BGObjectState::init()
 {
 	u_int16_t	i;
 
@@ -98,7 +143,7 @@ void InitBGObjects( void )
 	Input		:	nothing
 	Output		:	BGObject	*	Object ( NULL if not available )
 ===================================================================*/
-BGOBJECT * FindFreeBGObject( void )
+BGOBJECT * BGObjectState::find_free()
 {
 	BGOBJECT * Object;
 
@@ -134,7 +179,7 @@ BGOBJECT * FindFreeBGObject( void )
 	Input		:	BGObject	*	Object
 	Output		:	nothing
 ===================================================================*/
-void KillUsedBGObject( BGOBJECT * Object )
+void BGObjectState::kill_used( BGOBJECT * Object )
 {
 	BGOBJECT	*	PrevObject;
 	BGOBJECT	*	NextObject;
@@ -1104,7 +1149,7 @@ void ChangeBGState( BGOBJECT * Object, u_int16_t OwnerType, u_int16_t Owner, int
 	Input		:	Nothing ( reads the current level's .BGO file )
 	Output		:	bool		true/false ( true if there is no file )
 ===================================================================*/
-bool PreLoadBGOFiles( void )
+bool BGObjectState::preload_files()
 {
 	BGO_FILE	*	FilePtr = nullptr;
 	char			TempFilename[ 256 ];
@@ -1201,7 +1246,7 @@ bool PreLoadBGOFiles( void )
 					file_read( &FilePtr->OpenedBy, sizeof( int16_t ), 1, fp );
 					file_read( &FilePtr->Locked, sizeof( int16_t ), 1, fp );
 					file_read( &FilePtr->DoorSfxType, sizeof( int16_t ), 1, fp );
-					RequestDoorTypeSFX( FilePtr->DoorSfxType );
+					request_door_sfx( FilePtr->DoorSfxType );
 					break;
 
 					/*	LOOPING ANIM */
@@ -1302,7 +1347,7 @@ bool PreLoadBGOFiles( void )
 		BGOFilesPtr = nullptr;
 	}
 
-	RequestDoorTypeSFX( 0 );
+	request_door_sfx( 0 );
 
 	return( true );
 }
@@ -1312,7 +1357,7 @@ bool PreLoadBGOFiles( void )
 	Input		:	Nothing
 	Output		:	bool		true/false
 ===================================================================*/
-bool LoadBGOFiles( void )
+bool BGObjectState::load_files()
 {
 	BGO_FILE	*	FilePtr;
 	BGOBJECT	*	Object;
@@ -2436,7 +2481,7 @@ void ExplodeChildren( COMP_OBJ * Children, int16_t NumChildren )
 	Input		:	FILE	*	File Pointer
 	Output		:	FILE	*	Updated File Pointer
 ===================================================================*/
-FILE * SaveBGObjects( FILE * fp )
+FILE * BGObjectState::save( FILE * fp )
 {
 	int		i;
 	u_int16_t	TempIndex = INDEX_NONE;
@@ -2537,7 +2582,7 @@ FILE * SaveBGObjects( FILE * fp )
 	Input		:	FILE	*	File Pointer
 	Output		:	FILE	*	Updated File Pointer
 ===================================================================*/
-FILE * LoadBGObjects( FILE * fp )
+FILE * BGObjectState::restore( FILE * fp )
 {
 	int		i;
 	u_int16_t	TempIndex;
@@ -2788,7 +2833,7 @@ bool AllocateCompShip( u_int16_t Ship )
 	Input		:	int16_t	Type
 	Output		:	Nothing
 ===================================================================*/
-void RequestDoorTypeSFX( int16_t Type )
+void BGObjectState::request_door_sfx( int16_t Type )
 {
 	DoorTypeSFX[ Type ].StartOpeningSoundFX	= ReturnSFXIndex( (char*)DoorTypeSFX[ Type ].StartOpeningName );	// Start Opening
 	DoorTypeSFX[ Type ].OpeningSoundFX		= ReturnSFXIndex( (char*)DoorTypeSFX[ Type ].OpeningName );		// Opening
@@ -2805,7 +2850,7 @@ void RequestDoorTypeSFX( int16_t Type )
 	Input		:	BGOBJECt	*	Door
 	Output		:	Nothing
 ===================================================================*/
-void StartOrChangeDoorSoundFX( BGOBJECT * Object )
+void BGObjectState::start_or_change_door_sfx( BGOBJECT * Object )
 {
 	int16_t	Sfx1, Sfx2;
 
@@ -2864,16 +2909,12 @@ void StartOrChangeDoorSoundFX( BGOBJECT * Object )
 	}
 }
 
-BIKEINFO FlyGirlCompFile = { "FlyGirl.cob", 0, 0, 0.0F };
-COMP_OBJ * FlyGirlComps = nullptr;
-float FlyGirlAnim;
-
 /*===================================================================
 	Procedure	:	PreLoad All Components for FlyGirl
 	Input		:	Nothing
 	Output		:	bool		true/false
 ===================================================================*/
-bool PreLoadFlyGirl( void )
+bool BGObjectState::preload_flygirl()
 {
 	u_int16_t	BaseModel;
 	char	TempFilename[ 256 ];
@@ -2903,7 +2944,7 @@ bool PreLoadFlyGirl( void )
 	Input		:	Nothing
 	Output		:	bool	true/false
 ===================================================================*/
-bool AllocateCompFlyGirl( void )
+bool BGObjectState::allocate_flygirl()
 {
 	u_int16_t			BaseModel;
 	char			TempFilename[ 256 ];
@@ -2948,7 +2989,7 @@ bool AllocateCompFlyGirl( void )
 	Input		:	Nothing
 	Output		:	Nothing
 ===================================================================*/
-void ReleaseFlyGirl( void )
+void BGObjectState::release_flygirl()
 {
 	if( FlyGirlComps )
 	{
@@ -2969,7 +3010,7 @@ void ReleaseFlyGirl( void )
 				:	bool		Visible
 	Output		:	Nothing
 ===================================================================*/
-void UpdateFlyGirl( VECTOR * Pos, MATRIX * Matrix, bool Visible )
+void BGObjectState::update_flygirl( VECTOR * Pos, MATRIX * Matrix, bool Visible )
 {
 	FlyGirlAnim += framelag;
 
@@ -2981,3 +3022,19 @@ void UpdateFlyGirl( VECTOR * Pos, MATRIX * Matrix, bool Visible )
 	SetCompObjModelsState( FlyGirlComps, 1, Visible );
 	UpdateCompObjChildren( FlyGirlComps, 1, Matrix, Pos, FlyGirlAnim, 0, Pos );
 }
+
+namespace { BGObjectState g_bgobjects; }
+
+void InitBGObjects( void ) { g_bgobjects.init(); }
+BGOBJECT * FindFreeBGObject( void ) { return g_bgobjects.find_free(); }
+void KillUsedBGObject( BGOBJECT * Object ) { g_bgobjects.kill_used( Object ); }
+bool PreLoadBGOFiles( void ) { return g_bgobjects.preload_files(); }
+bool LoadBGOFiles( void ) { return g_bgobjects.load_files(); }
+FILE * SaveBGObjects( FILE * fp ) { return g_bgobjects.save( fp ); }
+FILE * LoadBGObjects( FILE * fp ) { return g_bgobjects.restore( fp ); }
+void RequestDoorTypeSFX( int16_t Type ) { g_bgobjects.request_door_sfx( Type ); }
+void StartOrChangeDoorSoundFX( BGOBJECT * Object ) { g_bgobjects.start_or_change_door_sfx( Object ); }
+bool PreLoadFlyGirl( void ) { return g_bgobjects.preload_flygirl(); }
+bool AllocateCompFlyGirl( void ) { return g_bgobjects.allocate_flygirl(); }
+void ReleaseFlyGirl( void ) { g_bgobjects.release_flygirl(); }
+void UpdateFlyGirl( VECTOR * Pos, MATRIX * Matrix, bool Visible ) { g_bgobjects.update_flygirl( Pos, Matrix, Visible ); }
