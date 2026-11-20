@@ -4282,6 +4282,311 @@ void ReleaseAllEnemies( void )
 	}
 }
 
+#ifdef EDITION_REMASTER
+/* Populate Remaster N64 enemy slots (100-108) by template-copying
+ * from a similar 1998 enemy, then overriding the model filename.
+ *
+ * Re-applied on every level load, after PreLoadEnemies' ReadEnemyTxtFile()
+ * has rewritten the 1998 template entries from enemies.txt (which
+ * names none of the N64-only IDs), so each copy picks up the
+ * current template values. */
+[[gnu::always_inline]] static inline void PreLoadEnemiesN64Templates( void )
+{
+	/* Each N64-only enemy uses its real Remaster mesh. Asset
+	 * extraction (extract_remaster_levels.py from ForsakenEX.kpf)
+	 * is a hard prereq — if the n64/ files aren't there the
+	 * model loader fails visibly rather than silently falling
+	 * back to the wrong shape. The 1998 template provides AI
+	 * brain + behaviour; ModelFilename overrides the visual. */
+
+	/* Boss_Manmech (100): walking boss, 4-part .cob (body +
+	 * cannon + 2 arms). Mekton template = CRAWL_AI. */
+	EnemyTypes[ ENEMY_Boss_Manmech ] = EnemyTypes[ ENEMY_Mekton ];
+	EnemyTypes[ ENEMY_Boss_Manmech ].ModelFilename = "n64\\manmech.cob";
+	EnemyTypes[ ENEMY_Boss_Manmech ].Shield = 6500;
+
+	/* CargoDrone (101): non-combat floor-patrol drone.  KEX
+	 * defs/n64Enemies.txt:
+	 *   brainClass        kexForsakenAIBrainCrawl  (= CRAWL_AI ✓)
+	 *   primaryWeaponDef  (none)
+	 *   secondaryWeaponDef(none)
+	 *   shield            25000  (effectively invulnerable on touch)
+	 *   ai.bAttackOnSite  FALSE  (ignores player)
+	 *   ai.thinkRange     262144 (very far — patrols regardless)
+	 * Mekton template = CRAWL + 1 gun.  Suppress weapons
+	 * (NumOfGuns=0, PrimaryWeaponType=NO_PRIMARY) so the drone
+	 * patrols inertly as KEX intends. */
+	EnemyTypes[ ENEMY_CargoDrone ] = EnemyTypes[ ENEMY_Mekton ];
+	EnemyTypes[ ENEMY_CargoDrone ].ModelFilename = "n64\\cargodrone.mx";
+	EnemyTypes[ ENEMY_CargoDrone ].NumOfGuns = 0;
+	EnemyTypes[ ENEMY_CargoDrone ].PrimaryWeaponType = NO_PRIMARY;
+	EnemyTypes[ ENEMY_CargoDrone ].Shield = 25000;
+	EnemyTypes[ ENEMY_CargoDrone ].Behave.Flags &= ~AI_BEHAVIOUR_ATTACK_ONSITE;
+	EnemyTypes[ ENEMY_CargoDrone ].Behave.Flags &= ~AI_BEHAVIOUR_ATTACK_FIND;
+	EnemyTypes[ ENEMY_CargoDrone ].Behave.Flags &= ~AI_BEHAVIOUR_ATTACK_PROVOKE;
+
+	/* Boss_Ramqan (102): 19-part walking boss with parametric-
+	 * arc hop locomotion (kexForsakenAIBrainJump → JUMP_AI,
+	 * see aijump.cpp). */
+	EnemyTypes[ ENEMY_Boss_Ramqan ] = EnemyTypes[ ENEMY_Mekton ];
+	EnemyTypes[ ENEMY_Boss_Ramqan ].ModelFilename = "n64\\ramqan.cob";
+	EnemyTypes[ ENEMY_Boss_Ramqan ].Shield = 15000; /* KEX defs/n64Enemies.txt */
+	EnemyTypes[ ENEMY_Boss_Ramqan ].ControlType = ENEMY_CONTROLTYPE_JUMP_AI;
+	/* Three guns per KEX defs/n64Enemies.txt:
+	 *   gun 0: body-mounted Pulsar (Gun_RamqanBody, comp 11)
+	 *   gun 1: left  cannon Solaris rocket (comp 14)
+	 *   gun 2: right cannon Suss-bullet cluster ≈ KEX Scatter (comp 13)
+	 * Per-COMP_OBJ aim is wired in LoadEnemies's UserContComps
+	 * switch case, so each gun's matrix actually points at the
+	 * player and the per-gun BurstAngle gates work correctly. */
+	EnemyTypes[ ENEMY_Boss_Ramqan ].NumOfGuns = 3;
+	EnemyTypes[ ENEMY_Boss_Ramqan ].GunType[0] = GUN_RamqanBody;
+	EnemyTypes[ ENEMY_Boss_Ramqan ].GunType[1] = GUN_Ramqan;
+	EnemyTypes[ ENEMY_Boss_Ramqan ].GunType[2] = GUN_RamqanScatter;
+	EnemyTypes[ ENEMY_Boss_Ramqan ].GunFirePoints[0] = &RamqanBodyFirePos;
+	EnemyTypes[ ENEMY_Boss_Ramqan ].GunFirePoints[1] = &RamqanLCannonFirePos;
+	EnemyTypes[ ENEMY_Boss_Ramqan ].GunFirePoints[2] = &RamqanRCannonFirePos;
+	EnemyTypes[ ENEMY_Boss_Ramqan ].GunAimPos[0]     = &RamqanBodyAimPos;
+	EnemyTypes[ ENEMY_Boss_Ramqan ].GunAimPos[1]     = &RamqanLCannonAimPos;
+	EnemyTypes[ ENEMY_Boss_Ramqan ].GunAimPos[2]     = &RamqanRCannonAimPos;
+	/* Wire the KPF-sourced anim sequences so JumpBegin/JumpDoMovement
+	 * can drive the rig through the correct poses at each phase.
+	 * See RamqanSeqs[] above for the per-index time ranges. */
+	EnemyTypes[ ENEMY_Boss_Ramqan ].AnimSeqs = RamqanSeqs;
+
+	/* ShieldTurret (103): 3-part stationary turret per KEX defs/n64Enemies.txt:
+	 *   model bgobjects/n64/shieldturret.cob
+	 *   brainClass kexForsakenAIBrainTurret  (1998 TURRET_AI ✓ via BeamTurret template)
+	 *   gun_1 Gun_ShieldTurret → primaryWeaponDef Pulsar_Enemy_Blue
+	 *   turretBaseComponent_1 = 2 (flat-idx, .cob ID = 1, the pivot)
+	 *   turretGunComponent_1  = 3 (flat-idx, .cob ID = 2, the gun)
+	 *   shield = 256, viewCone 360°, maxRange 8192, reload 6.0, burst 3 @3°
+	 * .cob has 4 ANI_TRANS entries on the gun comp (recoil ROT) which we
+	 * sacrifice in exchange for runtime aim via UserContComps[]. */
+	EnemyTypes[ ENEMY_ShieldTurret ] = EnemyTypes[ ENEMY_BeamTurret ];
+	EnemyTypes[ ENEMY_ShieldTurret ].ModelFilename = "n64\\shieldTurret.cob";
+	EnemyTypes[ ENEMY_ShieldTurret ].Shield = 256;
+	EnemyTypes[ ENEMY_ShieldTurret ].NumOfGuns = 1;
+	EnemyTypes[ ENEMY_ShieldTurret ].GunType[0] = GUN_ShieldTurretGun;
+	EnemyTypes[ ENEMY_ShieldTurret ].GunFirePoints[0] = &ShieldTurretFirePos;
+	EnemyTypes[ ENEMY_ShieldTurret ].GunAimPos[0]     = &ShieldTurretAimPos;
+
+	/* Boss_Maldroid (104): 12-part walking boss. */
+	EnemyTypes[ ENEMY_Boss_Maldroid ] = EnemyTypes[ ENEMY_Mekton ];
+	EnemyTypes[ ENEMY_Boss_Maldroid ].ModelFilename = "n64\\maldroid.cob";
+	EnemyTypes[ ENEMY_Boss_Maldroid ].Shield = 5000;
+
+	/* Enforcer (105): flying combatant.  KEX
+	 * defs/n64Enemies.txt:
+	 *   brainClass         kexForsakenAIBrainFly  (= FLY_AI ✓)
+	 *   primaryWeaponDef   "Pulsar"      → NME_PULSAR (red)
+	 *   secondaryWeaponDef "Gravgon"     → no exact 1998
+	 *                                      match; leave Hunter
+	 *                                      template's secondary
+	 *                                      (MULTIPLEMISSILE)
+	 *   shield             320
+	 *   primaryFireRate    8.0
+	 *   maxRange           1024  (Hunter default ✓)
+	 *   ai.bAttackOnSite   TRUE
+	 * Hunter template = FLY_AI + MULTIPLEMISSILE secondary +
+	 * NME_SUSS_GUN primary (green snub bullets).  Override
+	 * primary to NME_PULSAR for KEX-faithful red Pulsar
+	 * shots; FLY_AI brain reads PrimaryWeaponType directly
+	 * (aidogfight.cpp).  Secondary stays Hunter default. */
+	EnemyTypes[ ENEMY_Enforcer ] = EnemyTypes[ ENEMY_Hunter ];
+	EnemyTypes[ ENEMY_Enforcer ].ModelFilename = "n64\\enforcer.mx";
+	EnemyTypes[ ENEMY_Enforcer ].PrimaryWeaponType = NME_PULSAR;
+	EnemyTypes[ ENEMY_Enforcer ].Shield = 320;
+
+	/* Boss_DreadNaught2 (106): 4-part heavy bomber. Unused by
+	 * current level set — populated for safety / future maps. */
+	EnemyTypes[ ENEMY_Boss_DreadNaught2 ] = EnemyTypes[ ENEMY_Boss_Avatar ];
+	EnemyTypes[ ENEMY_Boss_DreadNaught2 ].ModelFilename = "n64\\dreadnaught.cob";
+	EnemyTypes[ ENEMY_Boss_DreadNaught2 ].Shield = 7500;
+
+	/* Boss_DreadNaught (107): same 4-part heavy bomber, real
+	 * encounter. */
+	EnemyTypes[ ENEMY_Boss_DreadNaught ] = EnemyTypes[ ENEMY_Boss_Avatar ];
+	EnemyTypes[ ENEMY_Boss_DreadNaught ].ModelFilename = "n64\\dreadnaught.cob";
+	EnemyTypes[ ENEMY_Boss_DreadNaught ].Shield = 8000;
+
+	/* Ghost (108): flying enemy with blue plasma.  KEX
+	 * defs/n64Enemies.txt:
+	 *   brainClass         kexForsakenAIBrainFly  (= FLY_AI ✓)
+	 *   primaryWeaponDef   "Pulsar_Enemy_Blue"  → NME_PULSAR_BLUE
+	 *   (no secondary)
+	 *   shield             80
+	 *   primaryFireRate    24.0
+	 *   ai.bAttackOnSite   TRUE
+	 *   bStealth           (not set — KEX Ghost is NOT stealthed
+	 *                       despite the name)
+	 * Shade template = stealth FLY (CLOAK behaviour).  KEX
+	 * Ghost is just a regular flying enemy; clear the cloak
+	 * flag and override primary to the new blue plasma
+	 * weapon (matches KEX particle/pulsar_enemy_blue.particle:
+	 * light_color={0,0,1}, blackColor1={0.25,0.25,1.0}). */
+	EnemyTypes[ ENEMY_Ghost ] = EnemyTypes[ ENEMY_Shade ];
+	EnemyTypes[ ENEMY_Ghost ].ModelFilename = "n64\\ghost.mx";
+	EnemyTypes[ ENEMY_Ghost ].PrimaryWeaponType = NME_PULSAR_BLUE;
+	EnemyTypes[ ENEMY_Ghost ].Shield = 80;
+	EnemyTypes[ ENEMY_Ghost ].Behave.Flags &= ~AI_BEHAVIOUR_CLOAK;
+
+	/* Disable StealthMode on any N64 template-copy whose
+	 * ModelFilename has a path separator. The PreLoadEnemies
+	 * loader auto-creates a stealth variant by prepending 'S'
+	 * to the filename byte 0 — fine for "Shade.mx" => "SShade.mx"
+	 * (which exists in 1998's models directory), but for
+	 * "n64\\ghost.mx" it produces "Sn64\\ghost.mx" which doesn't
+	 * exist, and PreInitModel returns false on the missing file.
+	 * The Ghost brain handles invisibility separately from the
+	 * model swap, so disabling the second-mesh load only loses
+	 * the visual stealth effect, not the gameplay behaviour. */
+	{
+		int _n64_ids[] = {
+			ENEMY_Boss_Manmech, ENEMY_CargoDrone, ENEMY_Boss_Ramqan,
+			ENEMY_ShieldTurret, ENEMY_Boss_Maldroid, ENEMY_Enforcer,
+			ENEMY_Boss_DreadNaught2, ENEMY_Boss_DreadNaught, ENEMY_Ghost,
+		};
+		int _i;
+		for (_i = 0; _i < (int)(sizeof(_n64_ids)/sizeof(_n64_ids[0])); _i++) {
+			int _id = _n64_ids[_i];
+			if (EnemyTypes[_id].ModelFilename &&
+				strchr(EnemyTypes[_id].ModelFilename, '\\') != nullptr)
+			{
+				EnemyTypes[_id].StealthMode = false;
+			}
+		}
+	}
+}
+#endif /* EDITION_REMASTER */
+
+/* preload one enemy type's model (MXA, MX, or a .cob component object) the first time a level uses it. True: PreLoadEnemies fails */
+[[gnu::always_inline]] static inline bool PreLoadEnemyModel( char (&TempFilename)[ 256 ], u_int16_t & ModelNum, char (&Ext)[ 16 ], int16_t & NextEnemyModel, u_int16_t & DupModel )
+{
+	if( EnemyTypes[ ModelNum ].ModelFilename[ 0 ] )
+	{
+
+		Get_Ext( (u_int8_t*)&EnemyTypes[ ModelNum ].ModelFilename[ 0 ], (u_int8_t*)&Ext[ 0 ] );
+
+		if( !strcasecmp( &Ext[ 0 ], "MXA" ) )
+		{
+			if( EnemyTypes[ ModelNum ].ModelNumber == -1 )
+			{
+				DupModel = FindDuplicateModel( (int8_t*)&EnemyTypes[ ModelNum ].ModelFilename[ 0 ], NextEnemyModel );
+
+				if( DupModel != INDEX_NONE )
+				{
+					EnemyTypes[ ModelNum ].ModelNumber = DupModel;
+				}
+				else
+				{
+					copy_string( &ModelNames[ NextEnemyModel ].Name[ 0 ], sizeof( ModelNames[ NextEnemyModel ].Name ), EnemyTypes[ ModelNum ].ModelFilename );
+
+					ModelNames[ NextEnemyModel ].LOD = 0;
+					ModelNames[ NextEnemyModel ].Panel = false;
+					ModelNames[ NextEnemyModel ].DoIMorph = true;
+					ModelNames[ NextEnemyModel ].ModelIndex = NextEnemyModel;
+					ModelNames[ NextEnemyModel ].StoreTriangles = false;
+					ModelNames[ NextEnemyModel ].AllocateTpage = LOAD_TPAGES;
+					ModelNames[ NextEnemyModel ].LevelSpecific = EnemyTypes[ ModelNum ].LevelSpecific;
+					ModelNames[ NextEnemyModel ].LoadEnable = true;
+					EnemyTypes[ ModelNum ].ModelNumber = NextEnemyModel;
+					NextEnemyModel++;
+
+					if( EnemyTypes[ ModelNum ].StealthMode )
+					{
+						ModelNames[ NextEnemyModel ].Name[ 0 ] = 'S';
+						copy_string( &ModelNames[ NextEnemyModel ].Name[ 1 ], sizeof( ModelNames[ 0 ].Name ) - 1, EnemyTypes[ ModelNum ].ModelFilename );
+						ModelNames[ NextEnemyModel ].LOD = 0;
+						ModelNames[ NextEnemyModel ].Panel = false;
+						ModelNames[ NextEnemyModel ].DoIMorph = true;
+						ModelNames[ NextEnemyModel ].ModelIndex = NextEnemyModel;
+						ModelNames[ NextEnemyModel ].StoreTriangles = false;
+						ModelNames[ NextEnemyModel ].AllocateTpage = LOAD_TPAGES;
+						ModelNames[ NextEnemyModel ].LevelSpecific = EnemyTypes[ ModelNum ].LevelSpecific;
+						ModelNames[ NextEnemyModel ].LoadEnable = true;
+						NextEnemyModel++;
+					}
+				}
+			}
+		}
+		else
+		{
+			if( !strcasecmp( &Ext[ 0 ], "MX" ) )
+			{
+				if( EnemyTypes[ ModelNum ].ModelNumber == -1 )
+				{
+					DupModel = FindDuplicateModel( (int8_t*)&EnemyTypes[ ModelNum ].ModelFilename[ 0 ], NextEnemyModel );
+
+					if( DupModel != INDEX_NONE )
+					{
+						EnemyTypes[ ModelNum ].ModelNumber = DupModel;
+					}
+					else
+					{
+						copy_string( &ModelNames[ NextEnemyModel ].Name[ 0 ], sizeof( ModelNames[ NextEnemyModel ].Name ), EnemyTypes[ ModelNum ].ModelFilename );
+
+						ModelNames[ NextEnemyModel ].LOD = 0;
+						ModelNames[ NextEnemyModel ].Panel = false;
+						ModelNames[ NextEnemyModel ].DoIMorph = false;
+						ModelNames[ NextEnemyModel ].ModelIndex = NextEnemyModel;
+						ModelNames[ NextEnemyModel ].StoreTriangles = false;
+						ModelNames[ NextEnemyModel ].AllocateTpage = LOAD_TPAGES;
+						ModelNames[ NextEnemyModel ].LevelSpecific = EnemyTypes[ ModelNum ].LevelSpecific;
+						ModelNames[ NextEnemyModel ].LoadEnable = true;
+						EnemyTypes[ ModelNum ].ModelNumber = NextEnemyModel;
+						NextEnemyModel++;
+
+						if( EnemyTypes[ ModelNum ].StealthMode )
+						{
+							ModelNames[ NextEnemyModel ].Name[ 0 ] = 'S';
+							copy_string( &ModelNames[ NextEnemyModel ].Name[ 1 ], sizeof( ModelNames[ 0 ].Name ) - 1, EnemyTypes[ ModelNum ].ModelFilename );
+							ModelNames[ NextEnemyModel ].LOD = 0;
+							ModelNames[ NextEnemyModel ].Panel = false;
+							ModelNames[ NextEnemyModel ].DoIMorph = false;
+							ModelNames[ NextEnemyModel ].ModelIndex = NextEnemyModel;
+							ModelNames[ NextEnemyModel ].StoreTriangles = false;
+							ModelNames[ NextEnemyModel ].AllocateTpage = LOAD_TPAGES;
+							ModelNames[ NextEnemyModel ].LevelSpecific = EnemyTypes[ ModelNum ].LevelSpecific;
+							ModelNames[ NextEnemyModel ].LoadEnable = true;
+							NextEnemyModel++;
+						}
+					}
+				}
+			}
+			else
+			{
+				if( !strcasecmp( &Ext[ 0 ], "COB" ) )
+				{
+					if( EnemyTypes[ ModelNum ].ModelNumber == -1 )
+					{
+						EnemyTypes[ ModelNum ].ModelNumber = NextEnemyModel;
+
+						if( EnemyTypes[ ModelNum ].LevelSpecific )
+						{
+							snprintf( &TempFilename[ 0 ], sizeof( TempFilename ), "data\\levels\\%s\\bgobjects\\%s", &ShortLevelNames[ LevelNum ][ 0 ], EnemyTypes[ ModelNum ].ModelFilename );
+						}
+						else
+						{
+							snprintf( &TempFilename[ 0 ], sizeof( TempFilename ), "data\\bgobjects\\%s", EnemyTypes[ ModelNum ].ModelFilename );
+						}
+
+						if( !PreLoadCompObj( (int8_t*)&TempFilename[ 0 ], (u_int16_t*)&NextEnemyModel, EnemyTypes[ ModelNum ].LevelSpecific ) )
+						{
+							return true;
+						}
+					}
+				}
+			}
+		}
+	}
+	else
+	{
+		DebugPrintf( "Enemy %d has no model\n", ModelNum );
+	}
+	return false;
+}
+
 /*===================================================================
 	Procedure	:	PreLoad Enemies
 	Input		:	Nothing
@@ -4323,183 +4628,9 @@ bool PreLoadEnemies( void )
 
 	ReadEnemyTxtFile( "data\\txt\\Enemies.txt" );
 
-	/* Populate Remaster N64 enemy slots (100-108) by template-copying
-	 * from a similar 1998 enemy, then overriding the model filename.
-	 *
-	 * Re-applied on every level load, after ReadEnemyTxtFile() above
-	 * has rewritten the 1998 template entries from enemies.txt (which
-	 * names none of the N64-only IDs), so each copy picks up the
-	 * current template values. */
 #ifdef EDITION_REMASTER
-	{
-
-		/* Each N64-only enemy uses its real Remaster mesh. Asset
-		 * extraction (extract_remaster_levels.py from ForsakenEX.kpf)
-		 * is a hard prereq — if the n64/ files aren't there the
-		 * model loader fails visibly rather than silently falling
-		 * back to the wrong shape. The 1998 template provides AI
-		 * brain + behaviour; ModelFilename overrides the visual. */
-
-		/* Boss_Manmech (100): walking boss, 4-part .cob (body +
-		 * cannon + 2 arms). Mekton template = CRAWL_AI. */
-		EnemyTypes[ ENEMY_Boss_Manmech ] = EnemyTypes[ ENEMY_Mekton ];
-		EnemyTypes[ ENEMY_Boss_Manmech ].ModelFilename = "n64\\manmech.cob";
-		EnemyTypes[ ENEMY_Boss_Manmech ].Shield = 6500;
-
-		/* CargoDrone (101): non-combat floor-patrol drone.  KEX
-		 * defs/n64Enemies.txt:
-		 *   brainClass        kexForsakenAIBrainCrawl  (= CRAWL_AI ✓)
-		 *   primaryWeaponDef  (none)
-		 *   secondaryWeaponDef(none)
-		 *   shield            25000  (effectively invulnerable on touch)
-		 *   ai.bAttackOnSite  FALSE  (ignores player)
-		 *   ai.thinkRange     262144 (very far — patrols regardless)
-		 * Mekton template = CRAWL + 1 gun.  Suppress weapons
-		 * (NumOfGuns=0, PrimaryWeaponType=NO_PRIMARY) so the drone
-		 * patrols inertly as KEX intends. */
-		EnemyTypes[ ENEMY_CargoDrone ] = EnemyTypes[ ENEMY_Mekton ];
-		EnemyTypes[ ENEMY_CargoDrone ].ModelFilename = "n64\\cargodrone.mx";
-		EnemyTypes[ ENEMY_CargoDrone ].NumOfGuns = 0;
-		EnemyTypes[ ENEMY_CargoDrone ].PrimaryWeaponType = NO_PRIMARY;
-		EnemyTypes[ ENEMY_CargoDrone ].Shield = 25000;
-		EnemyTypes[ ENEMY_CargoDrone ].Behave.Flags &= ~AI_BEHAVIOUR_ATTACK_ONSITE;
-		EnemyTypes[ ENEMY_CargoDrone ].Behave.Flags &= ~AI_BEHAVIOUR_ATTACK_FIND;
-		EnemyTypes[ ENEMY_CargoDrone ].Behave.Flags &= ~AI_BEHAVIOUR_ATTACK_PROVOKE;
-
-		/* Boss_Ramqan (102): 19-part walking boss with parametric-
-		 * arc hop locomotion (kexForsakenAIBrainJump → JUMP_AI,
-		 * see aijump.cpp). */
-		EnemyTypes[ ENEMY_Boss_Ramqan ] = EnemyTypes[ ENEMY_Mekton ];
-		EnemyTypes[ ENEMY_Boss_Ramqan ].ModelFilename = "n64\\ramqan.cob";
-		EnemyTypes[ ENEMY_Boss_Ramqan ].Shield = 15000; /* KEX defs/n64Enemies.txt */
-		EnemyTypes[ ENEMY_Boss_Ramqan ].ControlType = ENEMY_CONTROLTYPE_JUMP_AI;
-		/* Three guns per KEX defs/n64Enemies.txt:
-		 *   gun 0: body-mounted Pulsar (Gun_RamqanBody, comp 11)
-		 *   gun 1: left  cannon Solaris rocket (comp 14)
-		 *   gun 2: right cannon Suss-bullet cluster ≈ KEX Scatter (comp 13)
-		 * Per-COMP_OBJ aim is wired in LoadEnemies's UserContComps
-		 * switch case, so each gun's matrix actually points at the
-		 * player and the per-gun BurstAngle gates work correctly. */
-		EnemyTypes[ ENEMY_Boss_Ramqan ].NumOfGuns = 3;
-		EnemyTypes[ ENEMY_Boss_Ramqan ].GunType[0] = GUN_RamqanBody;
-		EnemyTypes[ ENEMY_Boss_Ramqan ].GunType[1] = GUN_Ramqan;
-		EnemyTypes[ ENEMY_Boss_Ramqan ].GunType[2] = GUN_RamqanScatter;
-		EnemyTypes[ ENEMY_Boss_Ramqan ].GunFirePoints[0] = &RamqanBodyFirePos;
-		EnemyTypes[ ENEMY_Boss_Ramqan ].GunFirePoints[1] = &RamqanLCannonFirePos;
-		EnemyTypes[ ENEMY_Boss_Ramqan ].GunFirePoints[2] = &RamqanRCannonFirePos;
-		EnemyTypes[ ENEMY_Boss_Ramqan ].GunAimPos[0]     = &RamqanBodyAimPos;
-		EnemyTypes[ ENEMY_Boss_Ramqan ].GunAimPos[1]     = &RamqanLCannonAimPos;
-		EnemyTypes[ ENEMY_Boss_Ramqan ].GunAimPos[2]     = &RamqanRCannonAimPos;
-		/* Wire the KPF-sourced anim sequences so JumpBegin/JumpDoMovement
-		 * can drive the rig through the correct poses at each phase.
-		 * See RamqanSeqs[] above for the per-index time ranges. */
-		EnemyTypes[ ENEMY_Boss_Ramqan ].AnimSeqs = RamqanSeqs;
-
-		/* ShieldTurret (103): 3-part stationary turret per KEX defs/n64Enemies.txt:
-		 *   model bgobjects/n64/shieldturret.cob
-		 *   brainClass kexForsakenAIBrainTurret  (1998 TURRET_AI ✓ via BeamTurret template)
-		 *   gun_1 Gun_ShieldTurret → primaryWeaponDef Pulsar_Enemy_Blue
-		 *   turretBaseComponent_1 = 2 (flat-idx, .cob ID = 1, the pivot)
-		 *   turretGunComponent_1  = 3 (flat-idx, .cob ID = 2, the gun)
-		 *   shield = 256, viewCone 360°, maxRange 8192, reload 6.0, burst 3 @3°
-		 * .cob has 4 ANI_TRANS entries on the gun comp (recoil ROT) which we
-		 * sacrifice in exchange for runtime aim via UserContComps[]. */
-		EnemyTypes[ ENEMY_ShieldTurret ] = EnemyTypes[ ENEMY_BeamTurret ];
-		EnemyTypes[ ENEMY_ShieldTurret ].ModelFilename = "n64\\shieldTurret.cob";
-		EnemyTypes[ ENEMY_ShieldTurret ].Shield = 256;
-		EnemyTypes[ ENEMY_ShieldTurret ].NumOfGuns = 1;
-		EnemyTypes[ ENEMY_ShieldTurret ].GunType[0] = GUN_ShieldTurretGun;
-		EnemyTypes[ ENEMY_ShieldTurret ].GunFirePoints[0] = &ShieldTurretFirePos;
-		EnemyTypes[ ENEMY_ShieldTurret ].GunAimPos[0]     = &ShieldTurretAimPos;
-
-		/* Boss_Maldroid (104): 12-part walking boss. */
-		EnemyTypes[ ENEMY_Boss_Maldroid ] = EnemyTypes[ ENEMY_Mekton ];
-		EnemyTypes[ ENEMY_Boss_Maldroid ].ModelFilename = "n64\\maldroid.cob";
-		EnemyTypes[ ENEMY_Boss_Maldroid ].Shield = 5000;
-
-		/* Enforcer (105): flying combatant.  KEX
-		 * defs/n64Enemies.txt:
-		 *   brainClass         kexForsakenAIBrainFly  (= FLY_AI ✓)
-		 *   primaryWeaponDef   "Pulsar"      → NME_PULSAR (red)
-		 *   secondaryWeaponDef "Gravgon"     → no exact 1998
-		 *                                      match; leave Hunter
-		 *                                      template's secondary
-		 *                                      (MULTIPLEMISSILE)
-		 *   shield             320
-		 *   primaryFireRate    8.0
-		 *   maxRange           1024  (Hunter default ✓)
-		 *   ai.bAttackOnSite   TRUE
-		 * Hunter template = FLY_AI + MULTIPLEMISSILE secondary +
-		 * NME_SUSS_GUN primary (green snub bullets).  Override
-		 * primary to NME_PULSAR for KEX-faithful red Pulsar
-		 * shots; FLY_AI brain reads PrimaryWeaponType directly
-		 * (aidogfight.cpp).  Secondary stays Hunter default. */
-		EnemyTypes[ ENEMY_Enforcer ] = EnemyTypes[ ENEMY_Hunter ];
-		EnemyTypes[ ENEMY_Enforcer ].ModelFilename = "n64\\enforcer.mx";
-		EnemyTypes[ ENEMY_Enforcer ].PrimaryWeaponType = NME_PULSAR;
-		EnemyTypes[ ENEMY_Enforcer ].Shield = 320;
-
-		/* Boss_DreadNaught2 (106): 4-part heavy bomber. Unused by
-		 * current level set — populated for safety / future maps. */
-		EnemyTypes[ ENEMY_Boss_DreadNaught2 ] = EnemyTypes[ ENEMY_Boss_Avatar ];
-		EnemyTypes[ ENEMY_Boss_DreadNaught2 ].ModelFilename = "n64\\dreadnaught.cob";
-		EnemyTypes[ ENEMY_Boss_DreadNaught2 ].Shield = 7500;
-
-		/* Boss_DreadNaught (107): same 4-part heavy bomber, real
-		 * encounter. */
-		EnemyTypes[ ENEMY_Boss_DreadNaught ] = EnemyTypes[ ENEMY_Boss_Avatar ];
-		EnemyTypes[ ENEMY_Boss_DreadNaught ].ModelFilename = "n64\\dreadnaught.cob";
-		EnemyTypes[ ENEMY_Boss_DreadNaught ].Shield = 8000;
-
-		/* Ghost (108): flying enemy with blue plasma.  KEX
-		 * defs/n64Enemies.txt:
-		 *   brainClass         kexForsakenAIBrainFly  (= FLY_AI ✓)
-		 *   primaryWeaponDef   "Pulsar_Enemy_Blue"  → NME_PULSAR_BLUE
-		 *   (no secondary)
-		 *   shield             80
-		 *   primaryFireRate    24.0
-		 *   ai.bAttackOnSite   TRUE
-		 *   bStealth           (not set — KEX Ghost is NOT stealthed
-		 *                       despite the name)
-		 * Shade template = stealth FLY (CLOAK behaviour).  KEX
-		 * Ghost is just a regular flying enemy; clear the cloak
-		 * flag and override primary to the new blue plasma
-		 * weapon (matches KEX particle/pulsar_enemy_blue.particle:
-		 * light_color={0,0,1}, blackColor1={0.25,0.25,1.0}). */
-		EnemyTypes[ ENEMY_Ghost ] = EnemyTypes[ ENEMY_Shade ];
-		EnemyTypes[ ENEMY_Ghost ].ModelFilename = "n64\\ghost.mx";
-		EnemyTypes[ ENEMY_Ghost ].PrimaryWeaponType = NME_PULSAR_BLUE;
-		EnemyTypes[ ENEMY_Ghost ].Shield = 80;
-		EnemyTypes[ ENEMY_Ghost ].Behave.Flags &= ~AI_BEHAVIOUR_CLOAK;
-
-		/* Disable StealthMode on any N64 template-copy whose
-		 * ModelFilename has a path separator. The PreLoadEnemies
-		 * loader auto-creates a stealth variant by prepending 'S'
-		 * to the filename byte 0 — fine for "Shade.mx" => "SShade.mx"
-		 * (which exists in 1998's models directory), but for
-		 * "n64\\ghost.mx" it produces "Sn64\\ghost.mx" which doesn't
-		 * exist, and PreInitModel returns false on the missing file.
-		 * The Ghost brain handles invisibility separately from the
-		 * model swap, so disabling the second-mesh load only loses
-		 * the visual stealth effect, not the gameplay behaviour. */
-		{
-			int _n64_ids[] = {
-				ENEMY_Boss_Manmech, ENEMY_CargoDrone, ENEMY_Boss_Ramqan,
-				ENEMY_ShieldTurret, ENEMY_Boss_Maldroid, ENEMY_Enforcer,
-				ENEMY_Boss_DreadNaught2, ENEMY_Boss_DreadNaught, ENEMY_Ghost,
-			};
-			int _i;
-			for (_i = 0; _i < (int)(sizeof(_n64_ids)/sizeof(_n64_ids[0])); _i++) {
-				int _id = _n64_ids[_i];
-				if (EnemyTypes[_id].ModelFilename &&
-					strchr(EnemyTypes[_id].ModelFilename, '\\') != nullptr)
-				{
-					EnemyTypes[_id].StealthMode = false;
-				}
-			}
-		}
-	}
-#endif /* EDITION_REMASTER — N64 enemy template block */
+	PreLoadEnemiesN64Templates();
+#endif
 
 	NextEnemyModel = NextNewModel;
 
@@ -4569,127 +4700,8 @@ bool PreLoadEnemies( void )
 				ModelNum = fallback;
 			}
 
-			if( EnemyTypes[ ModelNum ].ModelFilename[ 0 ] )
-			{
-
-				Get_Ext( (u_int8_t*)&EnemyTypes[ ModelNum ].ModelFilename[ 0 ], (u_int8_t*)&Ext[ 0 ] );
-
-				if( !strcasecmp( &Ext[ 0 ], "MXA" ) )
-				{
-					if( EnemyTypes[ ModelNum ].ModelNumber == -1 )
-					{
-						DupModel = FindDuplicateModel( (int8_t*)&EnemyTypes[ ModelNum ].ModelFilename[ 0 ], NextEnemyModel );
-
-						if( DupModel != INDEX_NONE )
-						{
-							EnemyTypes[ ModelNum ].ModelNumber = DupModel;
-						}
-						else
-						{
-							copy_string( &ModelNames[ NextEnemyModel ].Name[ 0 ], sizeof( ModelNames[ NextEnemyModel ].Name ), EnemyTypes[ ModelNum ].ModelFilename );
-
-							ModelNames[ NextEnemyModel ].LOD = 0;
-							ModelNames[ NextEnemyModel ].Panel = false;
-							ModelNames[ NextEnemyModel ].DoIMorph = true;
-							ModelNames[ NextEnemyModel ].ModelIndex = NextEnemyModel;
-							ModelNames[ NextEnemyModel ].StoreTriangles = false;
-							ModelNames[ NextEnemyModel ].AllocateTpage = LOAD_TPAGES;
-							ModelNames[ NextEnemyModel ].LevelSpecific = EnemyTypes[ ModelNum ].LevelSpecific;
-							ModelNames[ NextEnemyModel ].LoadEnable = true;
-							EnemyTypes[ ModelNum ].ModelNumber = NextEnemyModel;
-							NextEnemyModel++;
-
-							if( EnemyTypes[ ModelNum ].StealthMode )
-							{
-								ModelNames[ NextEnemyModel ].Name[ 0 ] = 'S';
-								copy_string( &ModelNames[ NextEnemyModel ].Name[ 1 ], sizeof( ModelNames[ 0 ].Name ) - 1, EnemyTypes[ ModelNum ].ModelFilename );
-								ModelNames[ NextEnemyModel ].LOD = 0;
-								ModelNames[ NextEnemyModel ].Panel = false;
-								ModelNames[ NextEnemyModel ].DoIMorph = true;
-								ModelNames[ NextEnemyModel ].ModelIndex = NextEnemyModel;
-								ModelNames[ NextEnemyModel ].StoreTriangles = false;
-								ModelNames[ NextEnemyModel ].AllocateTpage = LOAD_TPAGES;
-								ModelNames[ NextEnemyModel ].LevelSpecific = EnemyTypes[ ModelNum ].LevelSpecific;
-								ModelNames[ NextEnemyModel ].LoadEnable = true;
-								NextEnemyModel++;
-							}
-						}
-					}
-				}
-				else
-				{
-					if( !strcasecmp( &Ext[ 0 ], "MX" ) )
-					{
-						if( EnemyTypes[ ModelNum ].ModelNumber == -1 )
-						{
-							DupModel = FindDuplicateModel( (int8_t*)&EnemyTypes[ ModelNum ].ModelFilename[ 0 ], NextEnemyModel );
-
-							if( DupModel != INDEX_NONE )
-							{
-								EnemyTypes[ ModelNum ].ModelNumber = DupModel;
-							}
-							else
-							{
-								copy_string( &ModelNames[ NextEnemyModel ].Name[ 0 ], sizeof( ModelNames[ NextEnemyModel ].Name ), EnemyTypes[ ModelNum ].ModelFilename );
-
-								ModelNames[ NextEnemyModel ].LOD = 0;
-								ModelNames[ NextEnemyModel ].Panel = false;
-								ModelNames[ NextEnemyModel ].DoIMorph = false;
-								ModelNames[ NextEnemyModel ].ModelIndex = NextEnemyModel;
-								ModelNames[ NextEnemyModel ].StoreTriangles = false;
-								ModelNames[ NextEnemyModel ].AllocateTpage = LOAD_TPAGES;
-								ModelNames[ NextEnemyModel ].LevelSpecific = EnemyTypes[ ModelNum ].LevelSpecific;
-								ModelNames[ NextEnemyModel ].LoadEnable = true;
-								EnemyTypes[ ModelNum ].ModelNumber = NextEnemyModel;
-								NextEnemyModel++;
-
-								if( EnemyTypes[ ModelNum ].StealthMode )
-								{
-									ModelNames[ NextEnemyModel ].Name[ 0 ] = 'S';
-									copy_string( &ModelNames[ NextEnemyModel ].Name[ 1 ], sizeof( ModelNames[ 0 ].Name ) - 1, EnemyTypes[ ModelNum ].ModelFilename );
-									ModelNames[ NextEnemyModel ].LOD = 0;
-									ModelNames[ NextEnemyModel ].Panel = false;
-									ModelNames[ NextEnemyModel ].DoIMorph = false;
-									ModelNames[ NextEnemyModel ].ModelIndex = NextEnemyModel;
-									ModelNames[ NextEnemyModel ].StoreTriangles = false;
-									ModelNames[ NextEnemyModel ].AllocateTpage = LOAD_TPAGES;
-									ModelNames[ NextEnemyModel ].LevelSpecific = EnemyTypes[ ModelNum ].LevelSpecific;
-									ModelNames[ NextEnemyModel ].LoadEnable = true;
-									NextEnemyModel++;
-								}
-							}
-						}
-					}
-					else
-					{
-						if( !strcasecmp( &Ext[ 0 ], "COB" ) )
-						{
-							if( EnemyTypes[ ModelNum ].ModelNumber == -1 )
-							{
-								EnemyTypes[ ModelNum ].ModelNumber = NextEnemyModel;
-
-								if( EnemyTypes[ ModelNum ].LevelSpecific )
-								{
-									snprintf( &TempFilename[ 0 ], sizeof( TempFilename ), "data\\levels\\%s\\bgobjects\\%s", &ShortLevelNames[ LevelNum ][ 0 ], EnemyTypes[ ModelNum ].ModelFilename );
-								}
-								else
-								{
-									snprintf( &TempFilename[ 0 ], sizeof( TempFilename ), "data\\bgobjects\\%s", EnemyTypes[ ModelNum ].ModelFilename );
-								}
-
-								if( !PreLoadCompObj( (int8_t*)&TempFilename[ 0 ], (u_int16_t*)&NextEnemyModel, EnemyTypes[ ModelNum ].LevelSpecific ) )
-								{
-									return( false );
-								}
-							}
-						}
-					}
-				}
-			}
-			else
-			{
-				DebugPrintf( "Enemy %d has no model\n", ModelNum );
-			}
+			if( PreLoadEnemyModel( TempFilename, ModelNum, Ext, NextEnemyModel, DupModel ) )
+				return( false );
 
 		}
 
