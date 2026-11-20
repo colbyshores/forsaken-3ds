@@ -2030,15 +2030,11 @@ bool DisplayGroupUnclippedFmPolys(RENDEROBJECT *renderObject )
 }
 
 /* Fill one batch of FmPolys: the clippable ones of one group (Clipped) or
- * every FM_FLAG_DONTCLIP one (unclipped). The two public wrappers pass a
- * constant Clipped, so each compiles to its own specialised copy. */
+ * every FM_FLAG_DONTCLIP one (unclipped). The two public wrappers stamp the
+ * memo epoch and pass a constant Clipped, so each compiles to its own
+ * specialised copy. */
 [[gnu::always_inline]] static inline bool FmPolyDispGroupFill( bool Clipped, u_int16_t Group, RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * NextFmPoly )
 {
-	/* opt5b memo epoch: stamp this fill's content identity (one group, or the
-	 * whole scene for the unclipped pass). */
-	renderObject->memoEpochPass = Clipped ? SMEMO_PASS_FM_CLIPPED : SMEMO_PASS_FM_UNCLIPPED;
-	renderObject->memoEpochGroup = Clipped ? Group : SMEMO_WHOLE_GROUP;
-	renderObject->memoEpochResume = smemo_resume(*TPage, *NextFmPoly);
 	u_int16_t			i;
 	int16_t			Count;
 	int16_t			BitCount;
@@ -2258,6 +2254,10 @@ bool DisplayGroupUnclippedFmPolys(RENDEROBJECT *renderObject )
 ===================================================================*/
 bool FmPolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * NextFmPoly )
 {
+	/* opt5b memo epoch: stamp this fill's content identity. */
+	renderObject->memoEpochPass = SMEMO_PASS_FM_CLIPPED;
+	renderObject->memoEpochGroup = Group;
+	renderObject->memoEpochResume = smemo_resume(*TPage, *NextFmPoly);
 	return FmPolyDispGroupFill( true, Group, renderObject, TPage, NextFmPoly );
 }
 
@@ -2270,6 +2270,10 @@ bool FmPolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int16_
 ===================================================================*/
 bool FmPolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * NextFmPoly )
 {
+	/* opt5b memo epoch: whole-scene fill (no single group). */
+	renderObject->memoEpochPass = SMEMO_PASS_FM_UNCLIPPED;
+	renderObject->memoEpochGroup = SMEMO_WHOLE_GROUP;
+	renderObject->memoEpochResume = smemo_resume(*TPage, *NextFmPoly);
 	return FmPolyDispGroupFill( false, 0, renderObject, TPage, NextFmPoly );
 }
 
