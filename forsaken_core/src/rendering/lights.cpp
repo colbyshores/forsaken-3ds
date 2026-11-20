@@ -175,6 +175,329 @@ void SetLightDie ( u_int16_t light )
 float	cral = 0.0F;
 
 
+#ifndef GPU_LIGHTING
+/* PC (no GPU_LIGHTING): add every visible XLight's contribution to this mesh's vertex colours on the CPU, cell by cell within the light's reach */
+[[gnu::always_inline]] static inline void XLightGroupMeshCPU( MLOADHEADER *& Mloadheader, u_int16_t & group, int & mesh, int & vert, LVERTEX *& VertBase, LVERTEX *& LVert, COLOR & col, float & x, float & y, float & z, float & Dirx, float & Diry, float & Dirz, float & CosArc )
+{
+	XLIGHT	* XLightPnt;
+	float	blf;
+	float	glf;
+	float	rlf;
+	VECTOR	Temp;
+	VECTOR	CellIndex;
+	float	distance;
+	VERTEXCELL	* VertexCellPnt;
+	u_int16_t	* VertexIndexPnt;
+	u_int16_t	* OrgVertexIndexPnt;
+	int	Cell;
+	int	CellIndex_x;
+	int	CellIndex_y;
+	int	CellIndex_z;
+	int	CellRange_x;
+	int	CellRange_y;
+	int	CellRange_z;
+	int	Cellx;
+	int	Celly;
+	int	Cellz;
+	int	NumOfxCells;
+	int	NumOfyCells;
+	int	NumOfzCells;
+	float	CellSize;
+	float	Size, OSize;
+	float	SizeX2;
+	float	Posx, Posy, Posz;
+	float	Cosa;
+	float	rlen;
+	float	intense;
+	u_int32_t	tempiR;
+	u_int32_t	tempiG;
+	u_int32_t	tempiB;
+	u_int32_t	tempiA;
+	float	centerx;
+	float	centery;
+	float	centerz;
+	float	half_sizex;
+	float	half_sizey;
+	float	half_sizez;
+	u_int32_t	inc;
+	u_int32_t	carry;
+	u_int32_t	clamp;
+
+	CellSize = Mloadheader->CellSize;
+	VertexCellPnt = Mloadheader->Group[group].vertex_cell_pnt[mesh];
+	OrgVertexIndexPnt = Mloadheader->Group[group].vertex_index_pnt[mesh];
+
+	NumOfxCells = Mloadheader->Group[group].xcells[mesh];
+	NumOfyCells = Mloadheader->Group[group].ycells[mesh];
+	NumOfzCells = Mloadheader->Group[group].zcells[mesh];
+
+	/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-11-19. */
+	if( WhiteOut == 0.0F )
+	{
+
+		centerx		=	Mloadheader->Group[group].center.x;
+		centery		=	Mloadheader->Group[group].center.y;
+		centerz		=	Mloadheader->Group[group].center.z;
+		half_sizex	=	Mloadheader->Group[group].half_size.x;
+		half_sizey	=	Mloadheader->Group[group].half_size.y;
+		half_sizez	=	Mloadheader->Group[group].half_size.z;
+
+		XLightPnt = FirstLightVisible;
+		while( XLightPnt )
+		{
+			if( GroupsAreVisible( group, XLightPnt->Group ) )
+			{
+				Posx = XLightPnt->Pos.x;
+				Posy = XLightPnt->Pos.y;
+				Posz = XLightPnt->Pos.z;
+				/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
+				OSize  = XLightPnt->Size;
+
+				Temp.x = Posx - centerx;
+				/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
+				if( Temp.x < 0.0F )	Temp.x *= -1.0F;
+				Temp.y = Posy - centery;
+				/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
+				if( Temp.y < 0.0F )	Temp.y *= -1.0F;
+				/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
+				Temp.z = Posz - centerz;
+				if( Temp.z < 0.0F )	Temp.z *= -1.0F;
+				if ( (Temp.x <= ( half_sizex + OSize ) ) &&
+					 (Temp.y <= ( half_sizey + OSize ) ) &&
+					 (Temp.z <= ( half_sizez + OSize ) ) )
+				{
+					SizeX2 = OSize * OSize;
+					Size = 1 / SizeX2;
+					rlf	= XLightPnt->r;
+					glf	= XLightPnt->g;
+					blf	= XLightPnt->b;
+
+					if( XLightPnt->Type == SPOT_LIGHT )
+					{
+						Dirx = XLightPnt->Dir.x;
+						Diry = XLightPnt->Dir.y;
+						Dirz = XLightPnt->Dir.z;
+						CosArc = XLightPnt->CosArc;
+					}
+
+
+					CellIndex.x = Posx - Mloadheader->Group[group].cell_origin[mesh].x;
+					CellIndex.y = Posy - Mloadheader->Group[group].cell_origin[mesh].y;
+					CellIndex.z = Posz - Mloadheader->Group[group].cell_origin[mesh].z;
+					CellIndex_x = (int) fast_floorf( (CellIndex.x - OSize) * CellSize );
+					CellIndex_y = (int) fast_floorf( (CellIndex.y - OSize) * CellSize );
+					CellIndex_z = (int) fast_floorf( (CellIndex.z - OSize) * CellSize );
+					CellRange_x = (int) fast_floorf( (CellIndex.x + OSize) * CellSize );
+					CellRange_y = (int) fast_floorf( (CellIndex.y + OSize) * CellSize );
+					CellRange_z = (int) fast_floorf( (CellIndex.z + OSize) * CellSize );
+
+
+					if( CellIndex_x < 0 )
+					{
+						CellIndex_x = 0;
+					}else{
+						if( CellIndex_x >= NumOfxCells )
+							CellIndex_x = NumOfxCells-1;
+					}
+					if( CellIndex_y < 0 )
+					{
+						CellIndex_y = 0;
+					}else{
+						if( CellIndex_y >= NumOfyCells )
+							CellIndex_y = NumOfyCells-1;
+					}
+					if( CellIndex_z < 0 )
+					{
+						CellIndex_z = 0;
+					}else{
+						if( CellIndex_z >= NumOfzCells )
+							CellIndex_z = NumOfzCells-1;
+					}
+
+					if( CellRange_x < 0 )
+					{
+						CellRange_x = 0;
+					}else{
+						if( CellRange_x >= NumOfxCells  )
+							CellRange_x = NumOfxCells-1;
+					}
+					if( CellRange_y < 0 )
+					{
+						CellRange_y = 0;
+					}else{
+						if( CellRange_y >=NumOfyCells  )
+							CellRange_y = NumOfyCells-1;
+					}
+					if( CellRange_z < 0 )
+					{
+						CellRange_z = 0;
+					}else{
+						if( CellRange_z >= NumOfzCells )
+							CellRange_z = NumOfzCells-1;
+					}
+
+					switch( XLightPnt->Type )
+					{
+					case POINT_LIGHT:
+						Cellz = CellIndex_z;
+
+						while( Cellz <= CellRange_z )
+						{
+							Celly = CellIndex_y;
+							while( Celly <= CellRange_y )
+							{
+								Cell = ( CellIndex_x + NumOfxCells *
+									   ( Celly + NumOfyCells *
+										 Cellz ) );
+								Cellx = CellRange_x - CellIndex_x + 1;
+
+								while( Cellx-- )
+								{
+									VertexIndexPnt = OrgVertexIndexPnt+VertexCellPnt[Cell].start_vert_in_cell;
+									vert = VertexCellPnt[Cell].num_verts_in_cell;
+
+									while( vert-- )
+									{
+										LVert = VertBase + *VertexIndexPnt++;
+										/* find the distance from vert to light */
+										x = LVert->x;
+										y = LVert->y;
+										z = LVert->z;
+										x -= Posx;
+										y -= Posy;
+										z -= Posz;
+
+										/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
+										distance = (x*x) + (y*y) + (z*z);
+										if ( distance <  SizeX2  )					// float
+										{
+											distance = 1.0F - ( distance * Size );	// float
+
+											col = LVert->color;
+											tempiA = col & 0xff000000;
+											tempiR = (int) ( rlf * distance );
+											tempiG = (int) ( glf * distance );
+											tempiB = (int) ( blf * distance );
+											inc = ( tempiR << 16 ) + ( tempiG << 8 ) + tempiB;
+											carry = ( ( col + inc ) ^ ( col ^ inc ) ) & 0x01010100;
+											clamp = carry - ( carry >> 8 );
+											col = ( ( col + inc - carry ) | clamp) & 0x00ffffff;
+											col |= tempiA;
+
+											LVert->color = col;
+										}
+									}
+
+									Cell++;
+								}
+								Celly++;
+							}
+							Cellz++;
+						}
+						break;
+					case SPOT_LIGHT:
+						Cellz = CellIndex_z;
+						while( Cellz <= CellRange_z )
+						{
+							Celly = CellIndex_y;
+							while( Celly <= CellRange_y )
+							{
+								Cell = (u_int16_t) ( CellIndex_x + NumOfxCells *
+												( Celly + NumOfyCells *
+												  Cellz ) );
+								Cellx = CellRange_x - CellIndex_x + 1;
+
+								while( Cellx-- )
+								{
+									VertexIndexPnt = OrgVertexIndexPnt+VertexCellPnt[Cell].start_vert_in_cell;
+									vert = VertexCellPnt[Cell].num_verts_in_cell;
+									while( vert-- )
+									{
+										LVert = VertBase + *VertexIndexPnt++;
+										/* find the distance from vert to light */
+										x = LVert->x - Posx;
+										y = LVert->y - Posy;
+										z = LVert->z - Posz;
+										/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
+										distance = (x*x) + (y*y) + (z*z);
+
+										if ( distance <  SizeX2  )
+											/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
+										{
+
+											if( distance > 0.0F )
+											{
+												distance = (float) sqrtf( distance );
+												rlen = 1.0F / distance;
+												x *= rlen;
+												y *= rlen;
+												z *= rlen;
+											}
+											/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
+											Cosa = ( ( x*Dirx ) + ( y*Diry ) + ( z*Dirz ) );
+
+											/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
+											if( distance > 0.5F * OSize )
+											{
+												if ( Cosa > CosArc )
+												{
+													// Lights Are Go....
+													intense = ( ( OSize - distance ) / ( 0.75F * OSize ) ) * ( ( Cosa - CosArc ) / ( 1.0F - CosArc ) );
+													/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
+												}else{
+													continue;
+												}
+											}else if ( distance > MIN_LIGHT_SIZE ) {
+												float cosarc2;
+
+												/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
+												cosarc2 = CosArc * ( 1.0F - ( ( OSize * 0.5F - distance ) / ( OSize * 0.5F - MIN_LIGHT_SIZE ) ) );
+												if ( Cosa > cosarc2 )
+												{
+													intense = ( ( OSize - distance ) / ( OSize - MIN_LIGHT_SIZE ) ) * ( ( Cosa - cosarc2 ) / ( 1.0F - cosarc2 ) );
+												}else{
+													/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
+													continue;
+												}
+											}else {
+												if ( Cosa > 0.0F )
+												{
+													intense = 1.0F;
+												}else{
+													intense = 1.0F + Cosa;
+												}
+											}
+
+											col =  LVert->color;				// int
+											tempiA = col & 0xff000000;
+											tempiR = (int) ( rlf * intense );
+											tempiG = (int) ( glf * intense );
+											tempiB = (int) ( blf * intense );
+											inc = ( tempiR << 16 ) + ( tempiG << 8 ) + tempiB;
+											carry = ( ( col + inc ) ^ ( col ^ inc ) ) & 0x01010100;
+											clamp = carry - ( carry >> 8 );
+											col = ( ( col + inc - carry ) | clamp) & 0x00ffffff;
+											col |= tempiA;
+											LVert->color = col;
+										}
+									}
+									Cell++;
+								}
+								Celly++;
+							}
+							Cellz++;
+						}
+						break;
+
+					}
+				}
+			}
+			XLightPnt = XLightPnt->NextVisible;
+		}
+	}
+}
+#endif /* GPU_LIGHTING */
+
 bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 {
 	int		mesh;
@@ -193,50 +516,8 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 	float	intensity;
 #ifndef GPU_LIGHTING
 	/* the CPU light loop's working variables */
-	XLIGHT * XLightPnt;
-	float	blf;
-	float	glf;
-	float	rlf;
-	VECTOR	Temp;
-	VECTOR	CellIndex;
-	float	distance;
-	VERTEXCELL * VertexCellPnt;
-	u_int16_t * VertexIndexPnt;
-	u_int16_t * OrgVertexIndexPnt;
-	int	Cell;
-	int	CellIndex_x;
-	int	CellIndex_y;
-	int	CellIndex_z;
-	int	CellRange_x;
-	int	CellRange_y;
-	int	CellRange_z;
-	int	Cellx;
-	int	Celly;
-	int	Cellz;
-	int		NumOfxCells;
-	int		NumOfyCells;
-	int		NumOfzCells;
-	float	CellSize;
-	float	Size,OSize;
-	float	SizeX2;
-	float	Posx,Posy,Posz;
 	float	Dirx = 0.0f, Diry = 0.0f, Dirz = 0.0f;
-	float	Cosa,CosArc = 0.0f;
-	float	rlen;
-	float	intense;
-	u_int32_t	tempiR;
-	u_int32_t	tempiG;
-	u_int32_t	tempiB;
-	u_int32_t	tempiA;
-	float	centerx;
-	float	centery;
-	float	centerz;
-	float	half_sizex;
-	float	half_sizey;
-	float	half_sizez;
-	u_int32_t inc;
-	u_int32_t carry;
-	u_int32_t clamp;
+	float	CosArc = 0.0f;
 #endif
 
 
@@ -246,9 +527,6 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 		intWhiteOut = (256 - (intWhiteOut-256) );
 	}
 
-#ifndef GPU_LIGHTING
-	CellSize = Mloadheader->CellSize;
-#endif
 	/* Snapshot and clear the group's clean flag on entry: only a plain
 	 * restore in this call may set it again, so a mesh is never skipped on
 	 * the strength of a flag set earlier in the same call. The skip is only
@@ -275,14 +553,6 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 			( ( GroupWaterInfo[group] == WATERSTATE_NOWATER || ShowPlaneRGB ) && WhiteOut == 0.0F ) ?
 				SMEMO_PASS_UNSET : SMEMO_PASS_PER_FRAME;
 
-#ifndef GPU_LIGHTING
-		VertexCellPnt = Mloadheader->Group[group].vertex_cell_pnt[mesh];
-		OrgVertexIndexPnt = Mloadheader->Group[group].vertex_index_pnt[mesh];
-
-		NumOfxCells = Mloadheader->Group[group].xcells[mesh];
-		NumOfyCells = Mloadheader->Group[group].ycells[mesh];
-		NumOfzCells = Mloadheader->Group[group].zcells[mesh];
-#endif
 
 		if( Mloadheader->Group[group].num_animating_polys[mesh] != 0 )
 		{
@@ -469,269 +739,7 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 		 * and shaders/render_c3d.v.pica. */
 		/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
 #else
-		if( WhiteOut == 0.0F )
-		{
-
-			centerx		=	Mloadheader->Group[group].center.x;
-			centery		=	Mloadheader->Group[group].center.y;
-			centerz		=	Mloadheader->Group[group].center.z;
-			half_sizex	=	Mloadheader->Group[group].half_size.x;
-			half_sizey	=	Mloadheader->Group[group].half_size.y;
-			half_sizez	=	Mloadheader->Group[group].half_size.z;
-
-			XLightPnt = FirstLightVisible;
-			while( XLightPnt )
-			{
-				if( GroupsAreVisible( group, XLightPnt->Group ) )
-				{
-					Posx = XLightPnt->Pos.x;
-					Posy = XLightPnt->Pos.y;
-					Posz = XLightPnt->Pos.z;
-					/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
-					OSize  = XLightPnt->Size;
-
-					Temp.x = Posx - centerx;
-					/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
-					if( Temp.x < 0.0F )	Temp.x *= -1.0F;
-					Temp.y = Posy - centery;
-					/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
-					if( Temp.y < 0.0F )	Temp.y *= -1.0F;
-					/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
-					Temp.z = Posz - centerz;
-					if( Temp.z < 0.0F )	Temp.z *= -1.0F;
-					if ( (Temp.x <= ( half_sizex + OSize ) ) &&
-						 (Temp.y <= ( half_sizey + OSize ) ) &&
-						 (Temp.z <= ( half_sizez + OSize ) ) )
-					{
-						SizeX2 = OSize * OSize;
-						Size = 1 / SizeX2;
-						rlf	= XLightPnt->r;
-						glf	= XLightPnt->g;
-						blf	= XLightPnt->b;
-
-						if( XLightPnt->Type == SPOT_LIGHT )
-						{
-							Dirx = XLightPnt->Dir.x;
-							Diry = XLightPnt->Dir.y;
-							Dirz = XLightPnt->Dir.z;
-							CosArc = XLightPnt->CosArc;
-						}
-
-
-						CellIndex.x = Posx - Mloadheader->Group[group].cell_origin[mesh].x;
-						CellIndex.y = Posy - Mloadheader->Group[group].cell_origin[mesh].y;
-						CellIndex.z = Posz - Mloadheader->Group[group].cell_origin[mesh].z;
-						CellIndex_x = (int) fast_floorf( (CellIndex.x - OSize) * CellSize );
-						CellIndex_y = (int) fast_floorf( (CellIndex.y - OSize) * CellSize );
-						CellIndex_z = (int) fast_floorf( (CellIndex.z - OSize) * CellSize );
-						CellRange_x = (int) fast_floorf( (CellIndex.x + OSize) * CellSize );
-						CellRange_y = (int) fast_floorf( (CellIndex.y + OSize) * CellSize );
-						CellRange_z = (int) fast_floorf( (CellIndex.z + OSize) * CellSize );
-
-
-						if( CellIndex_x < 0 )
-						{
-							CellIndex_x = 0;
-						}else{
-							if( CellIndex_x >= NumOfxCells )
-								CellIndex_x = NumOfxCells-1;
-						}
-						if( CellIndex_y < 0 )
-						{
-							CellIndex_y = 0;
-						}else{
-							if( CellIndex_y >= NumOfyCells )
-								CellIndex_y = NumOfyCells-1;
-						}
-						if( CellIndex_z < 0 )
-						{
-							CellIndex_z = 0;
-						}else{
-							if( CellIndex_z >= NumOfzCells )
-								CellIndex_z = NumOfzCells-1;
-						}
-
-						if( CellRange_x < 0 )
-						{
-							CellRange_x = 0;
-						}else{
-							if( CellRange_x >= NumOfxCells  )
-								CellRange_x = NumOfxCells-1;
-						}
-						if( CellRange_y < 0 )
-						{
-							CellRange_y = 0;
-						}else{
-							if( CellRange_y >=NumOfyCells  )
-								CellRange_y = NumOfyCells-1;
-						}
-						if( CellRange_z < 0 )
-						{
-							CellRange_z = 0;
-						}else{
-							if( CellRange_z >= NumOfzCells )
-								CellRange_z = NumOfzCells-1;
-						}
-
-						switch( XLightPnt->Type )
-						{
-						case POINT_LIGHT:
-							Cellz = CellIndex_z;
-
-							while( Cellz <= CellRange_z )
-							{
-								Celly = CellIndex_y;
-								while( Celly <= CellRange_y )
-								{
-									Cell = ( CellIndex_x + NumOfxCells *
-										   ( Celly + NumOfyCells *
-											 Cellz ) );
-									Cellx = CellRange_x - CellIndex_x + 1;
-
-									while( Cellx-- )
-									{
-										VertexIndexPnt = OrgVertexIndexPnt+VertexCellPnt[Cell].start_vert_in_cell;
-										vert = VertexCellPnt[Cell].num_verts_in_cell;
-
-										while( vert-- )
-										{
-											LVert = VertBase + *VertexIndexPnt++;
-											/* find the distance from vert to light */
-											x = LVert->x;
-											y = LVert->y;
-											z = LVert->z;
-											x -= Posx;
-											y -= Posy;
-											z -= Posz;
-
-											/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
-											distance = (x*x) + (y*y) + (z*z);
-											if ( distance <  SizeX2  )					// float
-											{
-												distance = 1.0F - ( distance * Size );	// float
-
-												col = LVert->color;
-												tempiA = col & 0xff000000;
-												tempiR = (int) ( rlf * distance );
-												tempiG = (int) ( glf * distance );
-												tempiB = (int) ( blf * distance );
-												inc = ( tempiR << 16 ) + ( tempiG << 8 ) + tempiB;
-												carry = ( ( col + inc ) ^ ( col ^ inc ) ) & 0x01010100;
-												clamp = carry - ( carry >> 8 );
-												col = ( ( col + inc - carry ) | clamp) & 0x00ffffff;
-												col |= tempiA;
-
-												LVert->color = col;
-											}
-										}
-
-										Cell++;
-									}
-									Celly++;
-								}
-								Cellz++;
-							}
-							break;
-						case SPOT_LIGHT:
-							Cellz = CellIndex_z;
-							while( Cellz <= CellRange_z )
-							{
-								Celly = CellIndex_y;
-								while( Celly <= CellRange_y )
-								{
-									Cell = (u_int16_t) ( CellIndex_x + NumOfxCells *
-													( Celly + NumOfyCells *
-													  Cellz ) );
-									Cellx = CellRange_x - CellIndex_x + 1;
-
-									while( Cellx-- )
-									{
-										VertexIndexPnt = OrgVertexIndexPnt+VertexCellPnt[Cell].start_vert_in_cell;
-										vert = VertexCellPnt[Cell].num_verts_in_cell;
-										while( vert-- )
-										{
-											LVert = VertBase + *VertexIndexPnt++;
-											/* find the distance from vert to light */
-											x = LVert->x - Posx;
-											y = LVert->y - Posy;
-											z = LVert->z - Posz;
-											/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
-											distance = (x*x) + (y*y) + (z*z);
-
-											if ( distance <  SizeX2  )
-												/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
-											{
-
-												if( distance > 0.0F )
-												{
-													distance = (float) sqrtf( distance );
-													rlen = 1.0F / distance;
-													x *= rlen;
-													y *= rlen;
-													z *= rlen;
-												}
-												/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
-												Cosa = ( ( x*Dirx ) + ( y*Diry ) + ( z*Dirz ) );
-
-												/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
-												if( distance > 0.5F * OSize )
-												{
-													if ( Cosa > CosArc )
-													{
-														// Lights Are Go....
-														intense = ( ( OSize - distance ) / ( 0.75F * OSize ) ) * ( ( Cosa - CosArc ) / ( 1.0F - CosArc ) );
-														/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
-													}else{
-														continue;
-													}
-												}else if ( distance > MIN_LIGHT_SIZE ) {
-													float cosarc2;
-
-													/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
-													cosarc2 = CosArc * ( 1.0F - ( ( OSize * 0.5F - distance ) / ( OSize * 0.5F - MIN_LIGHT_SIZE ) ) );
-													if ( Cosa > cosarc2 )
-													{
-														intense = ( ( OSize - distance ) / ( OSize - MIN_LIGHT_SIZE ) ) * ( ( Cosa - cosarc2 ) / ( 1.0F - cosarc2 ) );
-													}else{
-														/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
-														continue;
-													}
-												}else {
-													if ( Cosa > 0.0F )
-													{
-														intense = 1.0F;
-													}else{
-														intense = 1.0F + Cosa;
-													}
-												}
-
-												col =  LVert->color;				// int
-												tempiA = col & 0xff000000;
-												tempiR = (int) ( rlf * intense );
-												tempiG = (int) ( glf * intense );
-												tempiB = (int) ( blf * intense );
-												inc = ( tempiR << 16 ) + ( tempiG << 8 ) + tempiB;
-												carry = ( ( col + inc ) ^ ( col ^ inc ) ) & 0x01010100;
-												clamp = carry - ( carry >> 8 );
-												col = ( ( col + inc - carry ) | clamp) & 0x00ffffff;
-												col |= tempiA;
-												LVert->color = col;
-											}
-										}
-										Cell++;
-									}
-									Celly++;
-								}
-								Cellz++;
-							}
-							break;
-
-						}
-					}
-				}
-				XLightPnt = XLightPnt->NextVisible;
-			}
-		}
+		XLightGroupMeshCPU( Mloadheader, group, mesh, vert, VertBase, LVert, col, x, y, z, Dirx, Diry, Dirz, CosArc );
 #endif /* GPU_LIGHTING */
 		/*	unlock the vertex buffer	*/
 		if(!FSUnlockVertexBuffer((RENDEROBJECT*)&Mloadheader->Group[group].renderObject[mesh]))
