@@ -40,8 +40,6 @@
 ===================================================================*/
 
 
-static int GTabRowSize;
-
 #define GROUP2GROUP_OFFSET( G1, G2 )	( ( (G2) >> 5 ) + ( (G1) * GTabRowSize ) )
 #define GROUP2GROUP_MASK( G1, G2 )		( 1 << ( (G2) & 31 ) )
 
@@ -54,17 +52,14 @@ struct GROUPRELATION
 };
 
 
-static GROUPRELATION ConnectedGroup;
-static GROUPRELATION VisibleGroup;
-static GROUPRELATION IndirectVisibleGroup;
+struct VISISTAT
+{
+	u_int32_t tsum;
+	u_int32_t tmax;
+	u_int32_t tmin;
+	u_int32_t visits;
+};
 
-static bool InitConnections = false;
-
-
-u_int16_t Num_IndirectVisible = 0;
-u_int16_t IndirectVisible[ MAXGROUPS ];
-
-static VECTOR clip_top, clip_bottom, clip_left, clip_right; // clipping planes
 
 int		NumOfVertsTouched= 0;
 
@@ -73,13 +68,56 @@ u_int16_t	NumGroupsVisible;
 u_int16_t	GroupsVisible[MAXGROUPS];
 u_int16_t	IsGroupVisible[MAXGROUPS];
 
-struct
-{
-	u_int32_t tsum;
-	u_int32_t tmax;
-	u_int32_t tmin;
-	u_int32_t visits;
-} VisiStats[ MAXGROUPS ];
+namespace {
+
+/* The portal-visibility state (one instance, g_visi):
+ * - the level's Connected / Visible / IndirectVisible group relations
+ *   (bitmap table plus sorted per-group lists) and their row size, read by
+ *   ReadGroupConnections at level load and freed by FreeGroupConnections;
+ * - the camera's four clip planes, rebuilt by FindVisible each camera pass
+ *   and read while its portal walk projects portal vertices;
+ * - the indirectly visible groups of the active cameras, rebuilt each frame
+ *   by Init/AddIndirectVisible (nothing reads them back at present);
+ * - the per-group triangle stats, reset at level load, added to by
+ *   DisplayBackground each frame and written by OutputVisiStats.
+ * The per-frame results other files read (GroupsVisible, IsGroupVisible,
+ * NumGroupsVisible, GroupImIn, NumOfVertsTouched) stay global.
+ * Layout: IndirectVisible sits at offset 0 so AddIndirectVisible's merge
+ * loop indexes it with no added offset; the rest are reached through their
+ * own literal (object + offset) and cost nothing extra where they are. */
+class Visibility {
+	public:
+	void       init_stats( MLOADHEADER *m );
+	bool       output_stats( MLOADHEADER *m, char *lname );
+	bool       groups_are_connected( u_int16_t g1, u_int16_t g2 );
+	bool       groups_are_visible( u_int16_t g1, u_int16_t g2 );
+	bool       read_connections( MLOADHEADER *m, FileReader & in );
+	void       free_connections();
+	GROUPLIST *visible_groups( u_int16_t g );
+	int        visible_overlap( u_int16_t g1, u_int16_t g2, u_int16_t *overlapping_group );
+	void       init_indirect_visible( u_int16_t g );
+	void       add_indirect_visible( u_int16_t g );
+	void       find_visible( CAMERA *cam, MLOADHEADER *Mloadheader );
+	bool       display_background( MLOADHEADER	* Mloadheader, CAMERA *cam );
+
+	private:
+	bool are_groups_related( GROUPRELATION *rel, u_int16_t g1, u_int16_t g2 );
+	int  transform_to_viewport( CAMERA *cam, VISLIST *v, VERT *wpos, VECTOR *vpos );
+	int  visible_portal_extent( CAMERA *cam, VISLIST *v, PORTAL *p, EXTENT *e );
+	void process_visible_portal( CAMERA *cam, VISLIST *v, VISTREE *t, EXTENT *e );
+
+	u_int16_t     IndirectVisible[ MAXGROUPS ] = {};
+	GROUPRELATION IndirectVisibleGroup = {};
+	u_int16_t     Num_IndirectVisible = 0;
+	GROUPRELATION VisibleGroup = {};
+	int           GTabRowSize = 0;
+	VECTOR        clip_top = {}, clip_bottom = {}, clip_left = {}, clip_right = {}; // clipping planes
+	GROUPRELATION ConnectedGroup = {};
+	VISISTAT      VisiStats[ MAXGROUPS ] = {};
+	bool          InitConnections = false;
+};
+
+} // namespace
 
 
 struct DebugRay {
@@ -131,7 +169,7 @@ static void InitDebugRays( void )
 }
 
 
-void InitVisiStats( MLOADHEADER *m )
+void Visibility::init_stats( MLOADHEADER *m )
 {
 	int j;
 
@@ -146,7 +184,7 @@ void InitVisiStats( MLOADHEADER *m )
 }
 
 
-bool OutputVisiStats( MLOADHEADER *m, char *lname )
+bool Visibility::output_stats( MLOADHEADER *m, char *lname )
 {
 	FILE *f;
 	char fname[ 256 ];
@@ -206,7 +244,7 @@ bool OutputVisiStats( MLOADHEADER *m, char *lname )
 }
 
 
-static bool AreGroupsRelated( GROUPRELATION *rel, u_int16_t g1, u_int16_t g2 )
+bool Visibility::are_groups_related( GROUPRELATION *rel, u_int16_t g1, u_int16_t g2 )
 {
 	u_int32_t *t, mask;
 
@@ -219,18 +257,18 @@ static bool AreGroupsRelated( GROUPRELATION *rel, u_int16_t g1, u_int16_t g2 )
 }
 
 
-bool GroupsAreConnected( u_int16_t g1, u_int16_t g2 )
+bool Visibility::groups_are_connected( u_int16_t g1, u_int16_t g2 )
 {
-	return AreGroupsRelated( &ConnectedGroup, g1, g2 );
+	return are_groups_related( &ConnectedGroup, g1, g2 );
 }
 
 
-bool GroupsAreVisible( u_int16_t g1, u_int16_t g2 )
+bool Visibility::groups_are_visible( u_int16_t g1, u_int16_t g2 )
 {
-	return AreGroupsRelated( &VisibleGroup, g1, g2 );
+	return are_groups_related( &VisibleGroup, g1, g2 );
 }
 
-bool ReadGroupConnections( MLOADHEADER *m, FileReader & in )
+bool Visibility::read_connections( MLOADHEADER *m, FileReader & in )
 {
 	u_int32_t tabsize;
 	u_int16_t g;
@@ -341,7 +379,7 @@ bool ReadGroupConnections( MLOADHEADER *m, FileReader & in )
 }
 
 
-void FreeGroupConnections( void )
+void Visibility::free_connections()
 {
 	int g;
 
@@ -385,7 +423,7 @@ void FreeGroupConnections( void )
 	}
 }
 
-GROUPLIST *VisibleGroups( u_int16_t g )
+GROUPLIST *Visibility::visible_groups( u_int16_t g )
 {
 	if( g >= Mloadheader.num_groups )
 		Msg( "VisibleGroups() Group %d out of range", g );
@@ -399,7 +437,7 @@ GROUPLIST *VisibleGroups( u_int16_t g )
 	return &VisibleGroup.list[ g ];
 }
 
-int VisibleOverlap( u_int16_t g1, u_int16_t g2, u_int16_t *overlapping_group )
+int Visibility::visible_overlap( u_int16_t g1, u_int16_t g2, u_int16_t *overlapping_group )
 {
 	u_int32_t *t1, *t2, overlap;
 	int j;
@@ -445,7 +483,7 @@ int VisibleOverlap( u_int16_t g1, u_int16_t g2, u_int16_t *overlapping_group )
 	return gnum;
 }
 
-void InitIndirectVisible( u_int16_t g )
+void Visibility::init_indirect_visible( u_int16_t g )
 {
 	GROUPLIST *list;
 	int j;
@@ -458,7 +496,7 @@ void InitIndirectVisible( u_int16_t g )
 	Num_IndirectVisible = list->groups;
 }
 
-void AddIndirectVisible( u_int16_t g )
+void Visibility::add_indirect_visible( u_int16_t g )
 {
 	static u_int16_t AddedVisible[ MAXGROUPS ];
 	int current, next;
@@ -532,8 +570,8 @@ MaximiseExtent( EXTENT *e1, EXTENT *e2, EXTENT *e )
 	e->max.z = MAX( e1->max.z, e2->max.z );
 }
 
-static int
-Transform2Viewport( CAMERA *cam, VISLIST *v, VERT *wpos, VECTOR *vpos )
+int
+Visibility::transform_to_viewport( CAMERA *cam, VISLIST *v, VERT *wpos, VECTOR *vpos )
 {
 	int clip;
 
@@ -632,8 +670,8 @@ NearClipPortalExtent( VISLIST *v, PORTAL *p, EXTENT *e )
 	return 1;
 }
 
-static int
-VisiblePortalExtent( CAMERA *cam, VISLIST *v, PORTAL *p, EXTENT *e )
+int
+Visibility::visible_portal_extent( CAMERA *cam, VISLIST *v, PORTAL *p, EXTENT *e )
 {
 	VECTOR pos;
 	int vnum;
@@ -653,7 +691,7 @@ VisiblePortalExtent( CAMERA *cam, VISLIST *v, PORTAL *p, EXTENT *e )
 	clip_all = CLIP_LEFT | CLIP_RIGHT | CLIP_TOP | CLIP_BOTTOM | CLIP_FRONT;
 	for ( vnum = 0; vnum < p->num_vertices_in_portal; vnum++ )
 	{
-		clip = Transform2Viewport( cam, v, &p->Verts[ vnum ], &pos );
+		clip = transform_to_viewport( cam, v, &p->Verts[ vnum ], &pos );
 		clip_any |= clip;
 		clip_all &= clip;
 		if ( !( clip & CLIP_FRONT ) )
@@ -695,8 +733,8 @@ VisiblePortalExtent( CAMERA *cam, VISLIST *v, PORTAL *p, EXTENT *e )
 	return 1;
 }
 
-static void
-ProcessVisiblePortal( CAMERA *cam, VISLIST *v, VISTREE *t, EXTENT *e )
+void
+Visibility::process_visible_portal( CAMERA *cam, VISLIST *v, VISTREE *t, EXTENT *e )
 {
 	VISGROUP *adj_group;
 	PORTAL *p;
@@ -707,7 +745,7 @@ ProcessVisiblePortal( CAMERA *cam, VISLIST *v, VISTREE *t, EXTENT *e )
 	if ( !t )
 		return;
 	p = t->portal;
-	if ( !VisiblePortalExtent( cam, v, p, &extent ) )
+	if ( !visible_portal_extent( cam, v, p, &extent ) )
 	{
 		return; // portal entirely clipped by main viewport
 	}
@@ -729,12 +767,12 @@ ProcessVisiblePortal( CAMERA *cam, VISLIST *v, VISTREE *t, EXTENT *e )
 		adj_group->visible++;
 		for ( vnum = t->num_visible, tvis = t->visible; vnum--; tvis++)
 		{
-			ProcessVisiblePortal( cam, v, tvis, &extent );
+			process_visible_portal( cam, v, tvis, &extent );
 		}
 	}
 }
 
-void FindVisible( CAMERA *cam, MLOADHEADER *Mloadheader )
+void Visibility::find_visible( CAMERA *cam, MLOADHEADER *Mloadheader )
 {
 	VISLIST *v;
 	VISGROUP *g;
@@ -826,7 +864,7 @@ void FindVisible( CAMERA *cam, MLOADHEADER *Mloadheader )
 	{
 		for ( j = 0; j < Mloadheader->Group[ cam->GroupImIn].num_portals; j++ )
 		{
-			ProcessVisiblePortal( cam, v, &Mloadheader->Group[ cam->GroupImIn ].Portal [ j ].visible, &g->extent );
+			process_visible_portal( cam, v, &Mloadheader->Group[ cam->GroupImIn ].Portal [ j ].visible, &g->extent );
 		}
 	}
 
@@ -1063,7 +1101,7 @@ int ClipGroup( CAMERA *cam, u_int16_t group )
 		Disp Visipoly Model
 ===================================================================*/
 bool
-DisplayBackground( MLOADHEADER	* Mloadheader, CAMERA *cam )
+Visibility::display_background( MLOADHEADER	* Mloadheader, CAMERA *cam )
 {
 	RENDERMATRIX	Tempproj;
 	RENDERMATRIX	Tempview;
@@ -1233,3 +1271,18 @@ bool PointInGroupBoundingBox( MLOADHEADER * Mloadheader, VECTOR * Pos, u_int16_t
 	}
 	return false;
 }
+
+namespace { Visibility g_visi; }
+
+void InitVisiStats( MLOADHEADER *m ) { g_visi.init_stats( m ); }
+bool OutputVisiStats( MLOADHEADER *m, char *lname ) { return g_visi.output_stats( m, lname ); }
+bool GroupsAreConnected( u_int16_t g1, u_int16_t g2 ) { return g_visi.groups_are_connected( g1, g2 ); }
+bool GroupsAreVisible( u_int16_t g1, u_int16_t g2 ) { return g_visi.groups_are_visible( g1, g2 ); }
+bool ReadGroupConnections( MLOADHEADER *m, FileReader & in ) { return g_visi.read_connections( m, in ); }
+void FreeGroupConnections( void ) { g_visi.free_connections(); }
+GROUPLIST *VisibleGroups( u_int16_t g ) { return g_visi.visible_groups( g ); }
+int VisibleOverlap( u_int16_t g1, u_int16_t g2, u_int16_t *overlapping_group ) { return g_visi.visible_overlap( g1, g2, overlapping_group ); }
+void InitIndirectVisible( u_int16_t g ) { g_visi.init_indirect_visible( g ); }
+void AddIndirectVisible( u_int16_t g ) { g_visi.add_indirect_visible( g ); }
+void FindVisible( CAMERA *cam, MLOADHEADER *Mloadheader ) { g_visi.find_visible( cam, Mloadheader ); }
+bool DisplayBackground( MLOADHEADER	* Mloadheader, CAMERA *cam ) { return g_visi.display_background( Mloadheader, cam ); }

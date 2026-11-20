@@ -29,10 +29,6 @@ struct GROUPLIST
 	u_int16_t *group;
 };
 
-// indirectly visible groups seen by any active camera
-extern u_int16_t Num_IndirectVisible;
-extern u_int16_t IndirectVisible[ MAXGROUPS ];
-
 /*
  * fn prototypes
  */

@@ -40,9 +40,10 @@
       "file": "visi.cpp",
       "symbols": [
         "FindVisible",
-        "ProcessVisiblePortal"
+        "find_visible",
+        "process_visible_portal"
       ],
-      "why": "portal PVS traversal per camera pass, per visible group"
+      "why": "portal PVS traversal per camera pass, per visible group; find_visible and process_visible_portal are FindVisible's and ProcessVisiblePortal's bodies (Visibility members)"
     },
     {
       "file": "polys.cpp",
