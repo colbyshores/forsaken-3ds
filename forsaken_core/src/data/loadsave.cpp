@@ -119,9 +119,10 @@ static bool load_ok( FILE * fp )
 	return true;
 }
 
-/* Set when InGameLoad refused a save and the level was restarted, so the
-   restarted level can say so (oct2.cpp STATUS_PostStartingSinglePlayer). */
-bool SavedGameDamaged = false;
+/* See SavedGames in loadsave.h: set when InGameLoad refused a save and the
+   level was restarted, so the restarted level can say so (oct2.cpp
+   STATUS_PostStartingSinglePlayer). */
+SavedGames SaveGames;
 
 bool PreInGameLoad( MENUITEM * /*MenuItem*/ )
 {

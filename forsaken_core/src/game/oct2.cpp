@@ -2632,10 +2632,10 @@ char NodeName[256];
 
 	input_grab( true );
 
-	if( SavedGameDamaged )
+	if( SaveGames.damaged_save_pending() )
 	{
 		AddColourMessageToQue( SystemMessageColour, SAVED_GAME_DAMAGED );
-		SavedGameDamaged = false;
+		SaveGames.damaged_save_reported();
 	}
 
 }
@@ -2765,7 +2765,7 @@ char NodeName[256];
 		/* The save is truncated or damaged, and part of it may already
 		   be applied over the level. Start its level again from the
 		   beginning instead; STATUS_PostStartingSinglePlayer says why. */
-		SavedGameDamaged = true;
+		SaveGames.note_damaged_save();
 		StartASinglePlayerGame( nullptr );
 		return;
 	}
