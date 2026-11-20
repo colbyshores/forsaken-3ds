@@ -100,8 +100,6 @@ extern u_int8_t Colourtrans[ MAXFONTCOLOURS ][ 3 ];
 extern int TeamCol[ MAX_TEAMS ];
 extern char * StatusTab[ 256 ];
 void MessageQuePrintAll( void );
-extern float MessageTime[ MAX_MESSAGES ];
-extern char MessageBank[ MAX_MESSAGES ][ MAXPERLINE ];
 extern int FontWidth;
 extern int FontHeight;
 extern float MaxMessageTime;

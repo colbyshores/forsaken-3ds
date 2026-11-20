@@ -55,8 +55,6 @@ u_int8_t Colourtrans[MAXFONTCOLOURS][3] = {
 
 float MaxMessageTime = 5.0f;
 
-int16_t	TextActivatedOrder = 0;
-int16_t	CurrentTextActivated = 0;
 int	TeamCol[MAX_TEAMS] = { 1, 2, 3, 4 };
 const char *TeamName[ MAX_TEAMS ] = // team colour names should match TeamCol[] colours (given in Colourtrans[][] below)
 {
@@ -70,28 +68,73 @@ int FontWidth = 8;
 int FontHeight = 8;
 
 
-int	PermX;
-u_int16_t big[4] = { 10000 , 1000 , 100 , 10 };
-u_int16_t little[4] = { 1000 , 100 , 10 , 1 };
+namespace {
 
-// player text messages
-float PlayerMessageTime[MAX_MESSAGES] = { 0.0F , 0.0F , 0.0F , 0.0F };
-char PlayerMessageBank[MAX_MESSAGES][MAXPERLINE];
-int PlayerMessageColours[MAX_MESSAGES];
-// normal text messages short que
-float MessageTime[MAX_MESSAGES] = { 0.0F , 0.0F , 0.0F , 0.0F };
-int MessageColour[MAX_MESSAGES];
-char MessageBank[MAX_MESSAGES][MAXPERLINE];
-// all messages long que
-char MessageBankLong[MAX_MESSAGES_LONG][MAXPERLINE];
-int MessageColourLong[MAX_MESSAGES_LONG];
+/* The HUD text state (one instance, g_hud_text): the font's character map
+ * and the pen x Print4x5Text continues from, the short and player message
+ * queues and the long message history, the level's trigger text and which
+ * messages have fired, and the score display's flash timer. The font map is
+ * built once by InitFont; the queues change as messages arrive and age each
+ * frame; the trigger text is loaded and freed with the level and saved with
+ * the game. MaxMessageTime, the font size and the team colour/name tables
+ * stay global (title, networking and the HUD use them). */
+class HudText {
+	public:
+	int   print( const char * Text , int x , int y , int color );
+	void  print_u16( u_int16_t tempnum , int x , int y , int col );
+	void  player_queue_print();
+	void  queue_print();
+	void  queue_print_all();
+	void  add_player_message( int Colour, const char * Text, va_list args );
+	void  add_colour_message( int Colour, const char * Text, va_list args );
+	void  print_score_sort();
+	bool  read_txt( char *Filename );
+	void  free_txt();
+	void  trigger( u_int16_t * Data );
+	void  init_messages();
+	bool  read_msg( char *Filename );
+	void  free_msg();
+	void  next_message();
+	void  last_message();
+	FILE *save( FILE * fp );
+	FILE *restore( FILE * fp );
+	void  init_font();
 
-u_int8_t	CharTrans[256];
+	private:
+	void  add_player_short( char ** Text, int Colour );
+	void  add_colour_short( char ** Text, int Colour );
+	void  display_old();
 
-u_int16_t NumOfTextMessages = 0;
-const char * TextMessagesPnt[MAXTEXTMESSAGES];
-char * TextMessages = nullptr;
-TEXTMSGINFO * TextMsgInfo = nullptr;
+	static constexpr u_int16_t big[4] = { 10000 , 1000 , 100 , 10 };
+	static constexpr u_int16_t little[4] = { 1000 , 100 , 10 , 1 };
+
+	u_int8_t	CharTrans[256] = {};
+	int	PermX = 0;
+	float	FlashSpeed = 0.0F;
+	bool	FlashToggle = false;
+	// normal text messages short que
+	float MessageTime[MAX_MESSAGES] = {};
+	int MessageColour[MAX_MESSAGES] = {};
+	// player text messages
+	float PlayerMessageTime[MAX_MESSAGES] = {};
+	int PlayerMessageColours[MAX_MESSAGES] = {};
+	float MessageSize = 0.0F;
+	float ThisMessageTime = 0.0F;
+	int16_t	TextActivatedOrder = 0;
+	int16_t	CurrentTextActivated = 0;
+	u_int16_t NumOfTextMessages = 0;
+	char * TextMessages = nullptr;
+	TEXTMSGINFO * TextMsgInfo = nullptr;
+	char MessageBank[MAX_MESSAGES][MAXPERLINE] = {};
+	char PlayerMessageBank[MAX_MESSAGES][MAXPERLINE] = {};
+	const char * TextMessagesPnt[MAXTEXTMESSAGES] = {};
+	char TempMessage[512] = {};
+	// all messages long que
+	int MessageColourLong[MAX_MESSAGES_LONG] = {};
+	char MessageBankLong[MAX_MESSAGES_LONG][MAXPERLINE] = {};
+};
+
+} // namespace
 
 
 /*===================================================================
@@ -121,7 +164,7 @@ int Printint16_t( int16_t num , int x , int y , int color )
 	Output		:		nothing
 ===================================================================*/
 
-void Printu_int16_t( u_int16_t tempnum , int x , int y , int col )
+void HudText::print_u16( u_int16_t tempnum , int x , int y , int col )
 {
 	int i;
 	int num;
@@ -210,7 +253,7 @@ void Print4x5TextSmall( char * Text , int x , int y , int color )
 	Input		:		char * Text, u_int16_t x , u_int16_t y
 	Output		:		last x position
 ===================================================================*/
-int Print4x5Text( const char * Text , int x , int y , int color )
+int HudText::print( const char * Text , int x , int y , int color )
 {
 	u_int8_t num;
 	u_int8_t r , g , b;
@@ -243,7 +286,7 @@ int Print4x5Text( const char * Text , int x , int y , int color )
 	Input		:		nothing
 	Output		:		nothing
 ===================================================================*/
-void	PlayerMessageQuePrint( void )
+void	HudText::player_queue_print()
 {
 	int i,y,z,MAX, ypos;
 	char MessageBuff[150];
@@ -300,7 +343,7 @@ void	PlayerMessageQuePrint( void )
 	Input		:		nothing
 	Output		:		nothing
 ===================================================================*/
-void	MessageQuePrint( void )
+void	HudText::queue_print()
 {
 	int i,y,z,MAX;
 	char MessageBuff[150];
@@ -340,7 +383,7 @@ void	MessageQuePrint( void )
 	Input		:		nothing
 	Output		:		nothing
 ===================================================================*/
-void	MessageQuePrintAll( void )
+void	HudText::queue_print_all()
 {
 	int i,y,z,MAX;
 	char MessageBuff[150];
@@ -366,17 +409,13 @@ void	MessageQuePrintAll( void )
 	}
 }
 
-char TempMessage[512];
-float MessageSize;
-float ThisMessageTime;
-
 /*===================================================================
 	Procedure	:		Add Colour Player Message to the Que (text messages)...
 	Input		:		char * Text
 	Output		:		nothing
 ===================================================================*/
 
-void AddPlayerMessageToQueShort( char ** Text, int Colour )
+void HudText::add_player_short( char ** Text, int Colour )
 {
 	char * Pnt;
 	int i,x,j;
@@ -417,7 +456,7 @@ void AddPlayerMessageToQueShort( char ** Text, int Colour )
 	Input		:		char * Text
 	Output		:		nothing
 ===================================================================*/
-void AddColourMessageToQueShort( char ** Text, int Colour )
+void HudText::add_colour_short( char ** Text, int Colour )
 {
 	char * Pnt;
 	int i,x,j;
@@ -453,7 +492,7 @@ void AddColourMessageToQueShort( char ** Text, int Colour )
 }
 
 
-void AddPlayerMessageToQue( int Colour, const char * Text, ... )
+void HudText::add_player_message( int Colour, const char * Text, va_list args )
 {
 	int x, j;
 
@@ -461,7 +500,6 @@ void AddPlayerMessageToQue( int Colour, const char * Text, ... )
 	if(Colour > -1)
 	{
 		char * Pnt;
-		va_list args;
 
 		for(x = MAX_MESSAGES_LONG-1; x > 0; x--)
 		{
@@ -475,9 +513,7 @@ void AddPlayerMessageToQue( int Colour, const char * Text, ... )
 		for(j = 0; j < MAXPERLINE; j++)
 			MessageBankLong[0][j] = 0;
 
-		va_start( args, Text );
 		vsnprintf( &TempMessage[0], sizeof(TempMessage)-1, Text, args);
-		va_end( args );
 
 		TempMessage[sizeof(TempMessage)-1] = 0;
 
@@ -489,11 +525,11 @@ void AddPlayerMessageToQue( int Colour, const char * Text, ... )
 			ThisMessageTime = MaxMessageTime;
 
 		while( Pnt )
-			AddPlayerMessageToQueShort( &Pnt, Colour );
+			add_player_short( &Pnt, Colour );
 	}
 }
 
-void AddColourMessageToQue( int Colour, const char * Text, ... )
+void HudText::add_colour_message( int Colour, const char * Text, va_list args )
 {
 	int x, j;
 
@@ -501,7 +537,6 @@ void AddColourMessageToQue( int Colour, const char * Text, ... )
 	if(Colour > -1)
 	{
 		char * Pnt;
-		va_list args;
 
 		for(x = MAX_MESSAGES_LONG-1; x > 0; x--)
 		{
@@ -515,9 +550,7 @@ void AddColourMessageToQue( int Colour, const char * Text, ... )
 		for(j = 0; j < MAXPERLINE; j++)
 			MessageBankLong[0][j] = 0;
 
-		va_start( args, Text );
 		vsnprintf( &TempMessage[0], sizeof(TempMessage)-1, Text, args);
-		va_end( args );
 
 		TempMessage[sizeof(TempMessage)-1] = 0;
 
@@ -529,7 +562,7 @@ void AddColourMessageToQue( int Colour, const char * Text, ... )
 			ThisMessageTime = MaxMessageTime;
 
 		while( Pnt )
-			AddColourMessageToQueShort( &Pnt, Colour );
+			add_colour_short( &Pnt, Colour );
 	}
 }
 
@@ -539,10 +572,8 @@ void AddColourMessageToQue( int Colour, const char * Text, ... )
 	Output		:		nothing
 ===================================================================*/
 constexpr float FLASH_RATE = ( 15.0F );
-float	FlashSpeed = 0.0F;
-bool	FlashToggle = false;
 
-void PrintScoreSort( void )
+void HudText::print_score_sort()
 {
 	bool teamOK[MAX_TEAMS];
 	bool teamleft[MAX_TEAMS];
@@ -747,7 +778,7 @@ void PrintScoreSort( void )
 	Input		:		char *Filename
 	Output		:		bool true/false
 ===================================================================*/
-bool ReadTxtFile( char *Filename )
+bool HudText::read_txt( char *Filename )
 {
 	long			File_Size;
 	long			Read_Size;
@@ -799,7 +830,7 @@ bool ReadTxtFile( char *Filename )
 	Input		:		void
 	Output		:		void
 ===================================================================*/
-void FreeTxtFile( void )
+void HudText::free_txt()
 {
 	if( TextMessages )
 	{
@@ -813,7 +844,7 @@ void FreeTxtFile( void )
 	Input		:		u_int16_t * Data
 	Output		:		void
 ===================================================================*/
-void TriggerTextMessage( u_int16_t * Data )
+void HudText::trigger( u_int16_t * Data )
 {
 	TEXTMSGINFO * Tmi;
 	bool	DoneBefore = false;
@@ -846,7 +877,7 @@ void TriggerTextMessage( u_int16_t * Data )
 	Input		:		void
 	Output		:		void
 ===================================================================*/
-void InitTextMessages( void )
+void HudText::init_messages()
 {
 	int i;
 	for( i = 0 ; i < MAX_MESSAGES ; i++ )
@@ -865,7 +896,7 @@ void InitTextMessages( void )
 	Input		:		char *Filename
 	Output		:		bool true/false
 ===================================================================*/
-bool ReadMsgFile( char *Filename )
+bool HudText::read_msg( char *Filename )
 {
 	long			File_Size;
 	long			Read_Size;
@@ -941,7 +972,7 @@ bool ReadMsgFile( char *Filename )
 	Input		:		void
 	Output		:		void
 ===================================================================*/
-void FreeMsgFile( void )
+void HudText::free_msg()
 {
 	if( TextMsgInfo )
 	{
@@ -956,7 +987,7 @@ void FreeMsgFile( void )
 	Input		:		u_int16_t * Data
 	Output		:		void
 ===================================================================*/
-void DisplayOldTextMessage( void )
+void HudText::display_old()
 {
 	TEXTMSGINFO * Tmi;
 	int16_t	i;
@@ -982,7 +1013,7 @@ void DisplayOldTextMessage( void )
 	Input		:		void
 	Output		:		void
 ===================================================================*/
-void NextTextMessage( void )
+void HudText::next_message()
 {
 	CurrentTextActivated++;
 	if( CurrentTextActivated >= TextActivatedOrder )
@@ -991,7 +1022,7 @@ void NextTextMessage( void )
 	}
 	if( TextActivatedOrder )
 	{
-		DisplayOldTextMessage();
+		display_old();
 	}
 }
 /*===================================================================
@@ -999,7 +1030,7 @@ void NextTextMessage( void )
 	Input		:		void
 	Output		:		void
 ===================================================================*/
-void LastTextMessage( void )
+void HudText::last_message()
 {
 	CurrentTextActivated--;
 	if( CurrentTextActivated < 0 )
@@ -1010,7 +1041,7 @@ void LastTextMessage( void )
 	}
 	if( TextActivatedOrder )
 	{
-		DisplayOldTextMessage();
+		display_old();
 	}
 }
 
@@ -1019,7 +1050,7 @@ void LastTextMessage( void )
 	Input		:		FILE * fp
 	Output		:		bool
 ===================================================================*/
-FILE * SaveAllText( FILE * fp )
+FILE * HudText::save( FILE * fp )
 {
 	TEXTMSGINFO * Tmi;
 	int i;
@@ -1046,7 +1077,7 @@ FILE * SaveAllText( FILE * fp )
 	Input		:		FILE * fp
 	Output		:		bool
 ===================================================================*/
-FILE *	LoadAllText( FILE * fp )
+FILE *	HudText::restore( FILE * fp )
 {
 	TEXTMSGINFO * Tmi;
 	int i;
@@ -1107,7 +1138,7 @@ void DisplayConnectionStatus( int num , int x , int y)
 
 
 // maps ascii character codes to location on texture
-void InitFont( void )
+void HudText::init_font()
 {
 	u_int16_t i;
 	u_int8_t e;
@@ -1152,3 +1183,37 @@ void InitFont( void )
 	CharTrans[(u_int8_t)'`'] = e++;
 	CharTrans[(u_int8_t)'~'] = e++;
 }
+
+namespace { HudText g_hud_text; }
+
+int Print4x5Text( const char * Text , int x , int y , int color ) { return g_hud_text.print( Text, x, y, color ); }
+void Printu_int16_t( u_int16_t tempnum , int x , int y , int col ) { g_hud_text.print_u16( tempnum, x, y, col ); }
+void PlayerMessageQuePrint( void ) { g_hud_text.player_queue_print(); }
+void MessageQuePrint( void ) { g_hud_text.queue_print(); }
+void MessageQuePrintAll( void ) { g_hud_text.queue_print_all(); }
+void AddPlayerMessageToQue( int Colour, const char * Text, ... )
+{
+	va_list args;
+	va_start( args, Text );
+	g_hud_text.add_player_message( Colour, Text, args );
+	va_end( args );
+}
+void AddColourMessageToQue( int Colour, const char * Text, ... )
+{
+	va_list args;
+	va_start( args, Text );
+	g_hud_text.add_colour_message( Colour, Text, args );
+	va_end( args );
+}
+void PrintScoreSort( void ) { g_hud_text.print_score_sort(); }
+bool ReadTxtFile( char *Filename ) { return g_hud_text.read_txt( Filename ); }
+void FreeTxtFile( void ) { g_hud_text.free_txt(); }
+void TriggerTextMessage( u_int16_t * Data ) { g_hud_text.trigger( Data ); }
+void InitTextMessages( void ) { g_hud_text.init_messages(); }
+bool ReadMsgFile( char *Filename ) { return g_hud_text.read_msg( Filename ); }
+void FreeMsgFile( void ) { g_hud_text.free_msg(); }
+void NextTextMessage( void ) { g_hud_text.next_message(); }
+void LastTextMessage( void ) { g_hud_text.last_message(); }
+FILE * SaveAllText( FILE * fp ) { return g_hud_text.save( fp ); }
+FILE * LoadAllText( FILE * fp ) { return g_hud_text.restore( fp ); }
+void InitFont( void ) { g_hud_text.init_font(); }
