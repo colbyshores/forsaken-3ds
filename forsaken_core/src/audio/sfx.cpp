@@ -108,19 +108,133 @@ struct SNDLOOKUP {
 	bool Requested;
 };
 
-SNDLOOKUP SndLookup[ MAX_SFX ];
+constexpr int MAX_SFX_VARIANTS = 16;
+
+#define SFX_BIKER_START ( SFX_BIKER_GP )
+#define SFX_BIKECOMP_START ( SFX_BIKECOMP_AM )
+#define SFX_NUM_BIKE_PHRASES ( SFX_BIKER_EX - SFX_BIKER_GP + 1 )
+#define SFX_NUM_BIKECOMP_PHRASES ( SFX_Select_Trojax - SFX_BIKECOMP_AM + 1 )
+
+constexpr float TAUNT_PAUSE = 5.0F;
+
+namespace {
+
+/* The sound catalogue (one instance, g_sfx_catalog): for each SFX_* slot,
+ * whether it is wanted, how many variants were found on disk, each
+ * variant's full path and the loaded buffer; and the variant counts of
+ * every biker's and bike computer's speech. Built when sound starts
+ * (PreInitSfx, PreProcessSfx), re-pointed when the player picks another
+ * biker or bike computer, and read by every play. Sfx_Filenames, the name
+ * table the SFX_* enum indexes, is a static member: its level-specific
+ * tail is filled as a level names its sounds and cleared with the sound. */
+class SfxCatalog {
+	public:
+	sound_buffer_t *buffer_create( char *file, int sfxnum );
+	void    buffer_delete( int sfx );
+	void    sfx_path( int sfxnum, char *path, size_t size );
+	void    name_prefix( int sfxnum, char *file, size_t size );
+	void    clear_level_spec();
+	int16_t index_of( char *file );
+	void    full_bike_path( char *fullpath, size_t size, int sfxnum, int variant, int total_variants, int bike );
+	void    full_bike_comp_path( char *fullpath, size_t size, int sfxnum, int variant, int total_variants, int bikecomp );
+	void    pre_init();
+	void    request( int16_t sfxnum );
+	void    update_for_biker( u_int16_t biker );
+	void    update_for_bike_computer( u_int16_t bikecomp );
+	void    find_bike_variants();
+	void    find_bike_comp_variants();
+	void    pre_process();
+	void    request_main();
+	void    request_title();
+	void    forget_buffers();
+	void    free_paths();
+	void    release_buffers();
+
+	/* Read by StartPannedSfx, the looping list and the taunt. */
+	int       flags( int sfx ) const { return Sfx_Filenames[ sfx ].Flags; }
+	int       lookup( int sfx ) const { return Sfx_Filenames[ sfx ].SfxLookup; }
+	u_int16_t variants( int sfx ) const { return SndLookup[ sfx ].Num_Variants; }
+	char     *full_path( int sfx, int variant ) const { return SfxFullPath[ sfx ][ variant ]; }
+	u_int16_t bike_variants( int phrase, int biker ) const { return BikeSpeechVariants[ phrase ][ biker ]; }
+
+	private:
+	char *    SfxFullPath[ MAX_SFX ][ MAX_SFX_VARIANTS ] = {};
+	u_int16_t BikeSpeechVariants[ SFX_NUM_BIKE_PHRASES ][ MAXBIKETYPES ] = {};
+	u_int16_t BikeCompVariants[ SFX_NUM_BIKECOMP_PHRASES ][ MAXBIKECOMPTYPES ] = {};
+
+	/* Static members, each its own symbol as the globals were. Every play
+	 * indexes SndLookup and SfxFullPath, and every new source indexes
+	 * sound_buffers. As instance members only one of them can sit at offset
+	 * 0; the others cost instructions (StartPannedSfx +3 with sound_buffers
+	 * first, sound_source_create +2 with it after SfxFullPath). */
+	static SFXNAME         Sfx_Filenames[ MAX_SFX ];
+	static SNDLOOKUP       SndLookup[ MAX_SFX ];
+	static sound_buffer_t *sound_buffers[ MAX_SFX ];
+};
+
+SNDLOOKUP SfxCatalog::SndLookup[ MAX_SFX ] = {};
+sound_buffer_t *SfxCatalog::sound_buffers[ MAX_SFX ] = {};
+
+SfxCatalog g_sfx_catalog;
+
+/* The biker-speech taunt playing now (one instance, g_taunts): its sfx uid,
+ * whether it follows a moving enemy (and which one), the pause between
+ * position updates, and the .wav path StartPannedSfx plays it from. Set
+ * when a taunt starts, cleared when its sfx holder is freed or sound
+ * restarts, and updated each frame while an enemy's taunt plays. */
+class Taunts {
+	public:
+	void  play_biker_speech( int16_t sfx, u_int16_t Group, VECTOR *SfxPos, float Freq, int biker, char variant, bool update );
+	void  process_enemy();
+	void  play_updatable( VECTOR *pos, u_int16_t Group, u_int16_t bike, char variant );
+	void  stop();
+	void  stop_enemy( ENEMY *Enemy );
+	void  play_enemy( ENEMY *Enemy );
+	void  reset() { TauntID = 0; Taunter = 0xFF; TauntUpdatable = false; EnemyTaunter = nullptr; }
+	char *path() { return TauntPath; }
+
+	private:
+	u_int32_t TauntID = 0;
+	bool      TauntUpdatable = false;
+	BYTE      Taunter = 0xFF;
+	float     ProcessTauntPause = TAUNT_PAUSE;
+	ENEMY *   EnemyTaunter = nullptr;
+	char      TauntPath[ 128 ] = {};
+};
+
+Taunts g_taunts;
+
+} // namespace
+
+/****************************************
+Fn Prototypes
+*****************************************/
+sound_buffer_t * sound_buffer_create( char *file, int sfxnum );
+void sound_buffer_delete( int sfx );
+void GetSfxPath( int sfxnum, char *path, size_t size );
+void CheckSpeech( int index );
+void FreeSfxHolder( int index );
+void GetSfxFileNamePrefix( int sfxnum, char *file, size_t size );
+void ClearLevelSpecSfx( void );
+void GetFullBikeSfxPath( char *fullpath, size_t size, int sfxnum, int variant, int total_variants, int bike );
+void GetFullBikeCompSfxPath( char *fullpath, size_t size, int sfxnum, int variant, int total_variants, int bikecomp );
+void GetBikeVariants( void );
+void GetBikeCompVariants( void );
+void PreProcessSfx( void );
+bool StartPannedSfx(int16_t Sfx, u_int16_t *Group , VECTOR * SfxPos, float Freq, int type, int HolderIndex, float VolModify, u_int16_t Effects, bool OverideDistanceCheck );
+void InitSfxHolders( void );
+int FindFreeSfxHolder( void );
+u_int32_t PlayGeneralPannedSfx(int16_t Sfx, u_int16_t Group , VECTOR * SfxPos, float Freq, bool OverideDistanceCheck, u_int16_t Effects, float VolModify );
+int GetSfxHolderIndex( u_int32_t uid );
+void PlayUpdatableBikerTaunt( VECTOR *pos, u_int16_t Group, u_int16_t bike, char variant );
 
 /****************************************
 globals
 *****************************************/
-ENEMY *EnemyTaunter;
-BYTE Taunter = 0xFF;
-u_int32_t TauntID = 0;
-bool TauntUpdatable = false;
 char CurrentTauntVariant;
 constexpr int MAX_ANY_SFX = 256; // openal soft max is 256 so this feels good
 
-SFXNAME	Sfx_Filenames[MAX_SFX] =
+SFXNAME	SfxCatalog::Sfx_Filenames[MAX_SFX] =
 {
 	/************************************************
 	Generic
@@ -361,13 +475,9 @@ struct SFX_HOLDER {
 	sound_source_t * source;
 };
 
-SFX_HOLDER	SfxHolder[ MAX_ANY_SFX ];
 bool		NoSFX = false;
-float		GlobalSoundAttenuation = 0.8F;
 
 bool bSoundEnabled = false;
-u_int32_t CurrentBikerSpeech = 0;
-u_int32_t CurrentBikeCompSpeech = 0;
 
 float	LastDistance[MAX_SFX];
 
@@ -376,9 +486,7 @@ float	LastDistance[MAX_SFX];
 // reusable buffers for sources
 /////
 
-sound_buffer_t * sound_buffers[MAX_SFX];
-
-sound_buffer_t * sound_buffer_create( char *file, int sfxnum )
+sound_buffer_t * SfxCatalog::buffer_create( char *file, int sfxnum )
 {
 	sound_buffer_t * buffer;
 
@@ -405,7 +513,7 @@ sound_buffer_t * sound_buffer_create( char *file, int sfxnum )
 //   that way we can simply iterate one list...
 
 // use this if you want sound to reinit
-void sound_buffer_delete( int sfx )
+void SfxCatalog::buffer_delete( int sfx )
 {
 	sound_release_buffer(sound_buffers[sfx]);
 	sound_buffers[sfx] = nullptr;
@@ -450,20 +558,68 @@ struct SPOT_SFX_LIST
 };
 
 constexpr int MAX_LOOPING_SFX = 64;
-SPOT_SFX_LIST SpotSfxList[ MAX_LOOPING_SFX ];
 
-char TauntPath[ 128 ];
+namespace {
 
+/* The sounds playing now (one instance, g_sfx_player): the sfx holders
+ * every play takes one of, the looping / spot sfx list (each entry is owned
+ * by a holder through its SfxBufferIndex and uid), the next uid, the
+ * holders carrying biker and bike-computer speech, and the sfx volume.
+ * Holders are taken per play and freed when their sound ends (checked each
+ * frame); the looping list is walked each frame, paused and re-triggered
+ * around sound restarts, and saved with the game. */
+class SfxPlayer {
+	public:
+	void      check_speech( int index );
+	void      free_holder( int index );
+	void      pause_all();
+	bool      restore_data( u_int32_t id, VECTOR *pos, u_int16_t *group );
+	void      retrigger();
+	bool      initialize( int flags );
+	void      destroy();
+	bool      start_panned( int16_t Sfx, u_int16_t *Group, VECTOR * SfxPos, float Freq, int type, int HolderIndex, float VolModify, u_int16_t Effects, bool OverideDistanceCheck );
+	void      init_holders();
+	int       find_free();
+	u_int32_t play_with_trigger( int16_t Sfx, int16_t TriggeredSfx );
+	u_int32_t play( int16_t Sfx, float Vol );
+	u_int32_t play_general_panned( int16_t Sfx, u_int16_t Group, VECTOR * SfxPos, float Freq, bool OverideDistanceCheck, u_int16_t Effects, float VolModify );
+	u_int32_t play_spot( int16_t Sfx, u_int16_t *Group, VECTOR * SfxPos, float Freq, float Vol, u_int16_t Effects );
+	u_int32_t play_fixed_spot( int16_t Sfx, u_int16_t Group, VECTOR * SfxPos, float Freq, float Vol, u_int16_t Effects );
+	int       holder_index( u_int32_t uid );
+	bool      stop( u_int32_t uid );
+	void      set_levels();
+	void      check_buffer_list();
+	int       init_looping( int16_t Sfx, int variant, u_int16_t *Group, VECTOR *SfxPos, float Freq, float Volume, int type, u_int16_t Effects, u_int32_t uid );
+	void      stop_looping( int index );
+	void      modify_looping( u_int32_t uid, float Freq, float Volume );
+	void      process_looping();
+	FILE     *save( FILE *fp );
+	FILE     *restore( FILE *fp );
+	float     distance_volume( VECTOR *sfxpos, u_int16_t sfxgroup, VECTOR *listenerpos, u_int16_t listenergroup, long *vol, VECTOR *sfxvector );
+	bool      update_taunt( u_int32_t uid, u_int16_t Group, VECTOR *SfxPos );
 
-u_int32_t SfxUniqueID = 1;
+	private:
+	SFX_HOLDER SfxHolder[ MAX_ANY_SFX ] = {};
+	u_int32_t  CurrentBikerSpeech = 0;
+	u_int32_t  CurrentBikeCompSpeech = 0;
 
-constexpr int MAX_SFX_VARIANTS = 16;
-char *SfxFullPath[ MAX_SFX ][ MAX_SFX_VARIANTS ];
+	/* Static members, each its own symbol as the globals were.
+	 * - SpotSfxList: after the 8 KB SfxHolder[] it costs an add per access
+	 *   (ModifyLoopingSfx, run per ship engine per frame, +1).
+	 * - SfxUniqueID and GlobalSoundAttenuation: their non-zero starting
+	 *   values would move the whole instance from .bss to .data. */
+	static SPOT_SFX_LIST SpotSfxList[ MAX_LOOPING_SFX ];
+	static u_int32_t     SfxUniqueID;
+	static float         GlobalSoundAttenuation;
+};
 
-/****************************************
-Fn Prototypes
-*****************************************/
-void InitSfxHolders( void );
+SPOT_SFX_LIST SfxPlayer::SpotSfxList[ MAX_LOOPING_SFX ] = {};
+u_int32_t SfxPlayer::SfxUniqueID = 1;
+float SfxPlayer::GlobalSoundAttenuation = 0.8F;
+
+SfxPlayer g_sfx_player;
+
+} // namespace
 
 struct LEVELSPEC_SFX_FILES {
 	char file[128];
@@ -743,7 +899,7 @@ const char *LevelSpecSfxPath = {
 	"data\\sound\\Mapped\\",
 };
 
-void GetSfxPath( int sfxnum, char *path, size_t size )
+void SfxCatalog::sfx_path( int sfxnum, char *path, size_t size )
 {
 
 	if ( sfxnum > SFX_LEVELSPEC_Start )
@@ -803,7 +959,7 @@ bool SetPosVelDir_Listner( VECTOR * Pos , VECTOR * Velocity , MATRIX * Mat )
 	return true;
 }
 
-void CheckSpeech( int index )
+void SfxPlayer::check_speech( int index )
 {
 	if ( CurrentBikerSpeech )
 	{
@@ -829,16 +985,13 @@ constexpr int SFX_HOLDERTYPE_Taunt = 4;
 	description	:		Marks an SfxHolder as unused
 						If Sfx being played was biker speech, reset CurrentBikerSpeech
 *****************************************/
-void FreeSfxHolder( int index )
+void SfxPlayer::free_holder( int index )
 {
 	CheckSpeech( index );
 
 	if( SfxHolder[ index ].SfxFlags == SFX_HOLDERTYPE_Taunt )
 	{
-		TauntID = 0;
-		Taunter = 0xFF;
-		TauntUpdatable = false;
-		EnemyTaunter = nullptr;
+		g_taunts.reset();
 	}
 
 	if(SfxHolder[index].source)
@@ -858,7 +1011,7 @@ void FreeSfxHolder( int index )
 	notes		:		BikeCompSpeechSlider can be zero ( volume ) to indicate no bike computer
 
 *****************************************/
-void GetSfxFileNamePrefix( int sfxnum, char *file, size_t size )
+void SfxCatalog::name_prefix( int sfxnum, char *file, size_t size )
 {
 	if ( Sfx_Filenames[ sfxnum ].Flags & SFX_BikeComp )
 	{
@@ -885,7 +1038,7 @@ void GetSfxFileNamePrefix( int sfxnum, char *file, size_t size )
 	Input		: none
 	Output		: none
 *****************************************/
-void ClearLevelSpecSfx( void )
+void SfxCatalog::clear_level_spec()
 {
 	int i;
 
@@ -976,7 +1129,7 @@ bool IsDigit( char check )
 	Output		: int16_t: index no.
 *****************************************/
 
-int16_t ReturnSFXIndex( char *file )
+int16_t SfxCatalog::index_of( char *file )
 {
 	int16_t i, level_spec_flags, filelen;
 	char *suffix;
@@ -1093,7 +1246,7 @@ int16_t ReturnSFXIndex( char *file )
 }
 
 
-void PauseAllSfx( void )
+void SfxPlayer::pause_all()
 {
 	u_int16_t i;
 	SPOT_SFX_LIST temp;
@@ -1125,7 +1278,7 @@ constexpr float LOOPING_SFX_SCALE = 0.75F; // used for max distance of looping s
 constexpr int LOOPING_SFX_FixedGroup = 0;
 constexpr int LOOPING_SFX_VariableGroup = 1;
 
-bool RestoreSfxData( u_int32_t id, VECTOR *pos, u_int16_t *group )
+bool SfxPlayer::restore_data( u_int32_t id, VECTOR *pos, u_int16_t *group )
 {
 	int i;
 
@@ -1150,7 +1303,7 @@ bool RestoreSfxData( u_int32_t id, VECTOR *pos, u_int16_t *group )
 	return false;
 }
 
-void ReTriggerSfx( void )
+void SfxPlayer::retrigger()
 {
 	SPOT_SFX_LIST temp;
 	u_int32_t tempuid;
@@ -1197,7 +1350,7 @@ void ReTriggerSfx( void )
 	}
 }
 
-void GetFullBikeSfxPath( char *fullpath, size_t size, int sfxnum, int variant, int total_variants, int bike )
+void SfxCatalog::full_bike_path( char *fullpath, size_t size, int sfxnum, int variant, int total_variants, int bike )
 {
 	char filename[256];
 	char numstr[12];
@@ -1238,7 +1391,7 @@ void GetFullBikeSfxPath( char *fullpath, size_t size, int sfxnum, int variant, i
 
 }
 
-void GetFullBikeCompSfxPath( char *fullpath, size_t size, int sfxnum, int variant, int total_variants, int bikecomp )
+void SfxCatalog::full_bike_comp_path( char *fullpath, size_t size, int sfxnum, int variant, int total_variants, int bikecomp )
 {
 	char filename[256];
 	char numstr[12];
@@ -1307,7 +1460,7 @@ void GetFullSfxPath( char *fullpath, size_t size, int sfxnum, int variant, int t
 
 }
 
-void PreInitSfx( void )
+void SfxCatalog::pre_init()
 {
 	int i;
 
@@ -1329,19 +1482,12 @@ void PreInitSfx( void )
 	}
 }
 
-void RequestSfx( int16_t sfxnum )
+void SfxCatalog::request( int16_t sfxnum )
 {
 	SndLookup[ sfxnum ].Requested = true;
 }
 
-#define SFX_BIKER_START ( SFX_BIKER_GP )
-#define SFX_BIKECOMP_START ( SFX_BIKECOMP_AM )
-#define SFX_NUM_BIKE_PHRASES ( SFX_BIKER_EX - SFX_BIKER_GP + 1 )
-#define SFX_NUM_BIKECOMP_PHRASES ( SFX_Select_Trojax - SFX_BIKECOMP_AM + 1 )
-u_int16_t BikeSpeechVariants[ SFX_NUM_BIKE_PHRASES ][ MAXBIKETYPES ];
-u_int16_t BikeCompVariants[ SFX_NUM_BIKECOMP_PHRASES ][ MAXBIKECOMPTYPES ];
-
-void UpdateSfxForBiker( u_int16_t biker )
+void SfxCatalog::update_for_biker( u_int16_t biker )
 {
 	int i, j;
 	char file[ 128 ];
@@ -1370,7 +1516,7 @@ void UpdateSfxForBiker( u_int16_t biker )
 	}
 }
 
-void UpdateSfxForBikeComputer( u_int16_t bikecomp )
+void SfxCatalog::update_for_bike_computer( u_int16_t bikecomp )
 {
 	int i, j;
 	char file[ 128 ];
@@ -1400,7 +1546,7 @@ void UpdateSfxForBikeComputer( u_int16_t bikecomp )
 }
 
 
-void GetBikeVariants( void )
+void SfxCatalog::find_bike_variants()
 {
 	int bike, i, j;
 	char filename[256];
@@ -1448,7 +1594,7 @@ void GetBikeVariants( void )
 	}
 }
 
-void GetBikeCompVariants( void )
+void SfxCatalog::find_bike_comp_variants()
 {
 	int bikecomp, i, j;
 	char filename[256];
@@ -1496,7 +1642,7 @@ void GetBikeCompVariants( void )
 	}
 }
 
-void PreProcessSfx( void )
+void SfxCatalog::pre_process()
 {
 	int i, j;
 	char filename[256];
@@ -1558,7 +1704,7 @@ void PreProcessSfx( void )
 	GetBikeCompVariants();
 }
 
-void RequestMainSfx( void )
+void SfxCatalog::request_main()
 {
 	u_int16_t i;
 	for ( i = 0; i < MAX_SFX; i++ )
@@ -1574,7 +1720,7 @@ void RequestMainSfx( void )
 	// if not team game, un-request flag & scoring sfx
 }
 
-void RequestTitleSfx( void )
+void SfxCatalog::request_title()
 {
 	u_int16_t i;
 	for ( i = 0; i < MAX_SFX; i++ )
@@ -1589,7 +1735,7 @@ void RequestTitleSfx( void )
 	Output		: none
 *****************************************/
 constexpr int DESTROYSOUND_KeepLevelSpecTable = 1;
-bool InitializeSound( int flags )
+bool SfxPlayer::initialize( int flags )
 {
 	int i;
 
@@ -1619,18 +1765,14 @@ bool InitializeSound( int flags )
 	PreProcessSfx();
 
 	// null globals which could have dirty memory
-	for( i = 0; i < MAX_SFX; i++ )
-		sound_buffers[i] = nullptr;
+	g_sfx_catalog.forget_buffers();
 	for( i = 0; i < MAX_ANY_SFX; i++ )
 		SfxHolder[i].source = nullptr;
 	for( i = 0; i < MAX_LOOPING_SFX; i++ )
 		SpotSfxList[i].source = nullptr;
 
 	// initialise taunt stuff
-	Taunter = 0xFF;
-	TauntID = 0;
-	TauntUpdatable = false;
-	EnemyTaunter = nullptr;
+	g_taunts.reset();
 
 	InitSfxHolders();
 
@@ -1653,9 +1795,9 @@ bool InitializeSound( int flags )
 	Input		:	Nothing
 	Output		:	Nothing
 ===================================================================*/
-void DestroySound( int /*flags*/ )
+void SfxPlayer::destroy()
 {
-	int i, j;
+	int i;
 
 	DebugPrintf("DestroySound\n");
 
@@ -1664,14 +1806,7 @@ void DestroySound( int /*flags*/ )
 	if ( !bSoundEnabled )
 		return;
 
-	for ( i = 0; i < MAX_SFX; i++ )
-	{
-		for( j = 0; j < MAX_SFX_VARIANTS; j++ )
-		{
-			if( SfxFullPath[ i ][ j ] )
-				free( SfxFullPath[ i ][ j ] );
-		}
-	}
+	g_sfx_catalog.free_paths();
 
 	for ( i=0; i < MAX_LOOPING_SFX; i++ )
 	{
@@ -1689,6 +1824,38 @@ void DestroySound( int /*flags*/ )
 		FreeSfxHolder( i );
 	}
 
+	g_sfx_catalog.release_buffers();
+
+	bSoundEnabled = false;
+}
+
+/* InitializeSound's and DestroySound's passes over the catalogue. */
+void SfxCatalog::forget_buffers()
+{
+	int i;
+
+	for( i = 0; i < MAX_SFX; i++ )
+		sound_buffers[i] = nullptr;
+}
+
+void SfxCatalog::free_paths()
+{
+	int i, j;
+
+	for ( i = 0; i < MAX_SFX; i++ )
+	{
+		for( j = 0; j < MAX_SFX_VARIANTS; j++ )
+		{
+			if( SfxFullPath[ i ][ j ] )
+				free( SfxFullPath[ i ][ j ] );
+		}
+	}
+}
+
+void SfxCatalog::release_buffers()
+{
+	int i;
+
 	for (i = 0; i < MAX_SFX; i++)
 	{
 		if (sound_buffers[i])
@@ -1697,8 +1864,6 @@ void DestroySound( int /*flags*/ )
 			sound_buffers[i] = nullptr;
 		}
 	}
-
-	bSoundEnabled = false;
 }
 
 void SetPannedSourceParams( void* sound_source, VECTOR *SfxPos, float Freq, VECTOR *Temp, float Distance, long Volume, u_int16_t Effects );
@@ -1706,7 +1871,7 @@ void SetPannedSourceParams( void* sound_source, VECTOR *SfxPos, float Freq, VECT
 constexpr auto SPEECH_AMPLIFY = ( 1.0F / GLOBAL_MAX_SFX );
 constexpr int SFX_2D = 2;
 
-bool StartPannedSfx(int16_t Sfx, u_int16_t *Group , VECTOR * SfxPos, float Freq, int type, int HolderIndex, float VolModify, u_int16_t Effects, bool OverideDistanceCheck )
+bool SfxPlayer::start_panned( int16_t Sfx, u_int16_t *Group , VECTOR * SfxPos, float Freq, int type, int HolderIndex, float VolModify, u_int16_t Effects, bool OverideDistanceCheck )
 {
 	VECTOR	Temp;
 	float	Distance, MaxDistance;
@@ -1721,7 +1886,7 @@ bool StartPannedSfx(int16_t Sfx, u_int16_t *Group , VECTOR * SfxPos, float Freq,
 		return false;
 	}
 
-	flags = Sfx_Filenames[ Sfx ].Flags;
+	flags = g_sfx_catalog.flags( Sfx );
 
 	if( flags & SFX_Biker )
 		VolModify *= ( (float)BikerSpeechSlider.value / (float)BikerSpeechSlider.max ) * SPEECH_AMPLIFY;	// when multiplied with max value for GlobalSoundAttenuation, gives 1.0F;
@@ -1732,7 +1897,7 @@ bool StartPannedSfx(int16_t Sfx, u_int16_t *Group , VECTOR * SfxPos, float Freq,
 	if ( !VolModify )
 		return false;
 
-	switch ( SndLookup[ Sfx ].Num_Variants )
+	switch ( g_sfx_catalog.variants( Sfx ) )
 	{
 	case 0:
 		return false;
@@ -1741,7 +1906,7 @@ bool StartPannedSfx(int16_t Sfx, u_int16_t *Group , VECTOR * SfxPos, float Freq,
 		offset = 0;
 		break;
 	default:
-		offset = Random_Range( SndLookup[ Sfx ].Num_Variants );
+		offset = Random_Range( g_sfx_catalog.variants( Sfx ) );
 		sndobj_index = Sfx + offset;
 		break;
 	}
@@ -1859,12 +2024,12 @@ bool StartPannedSfx(int16_t Sfx, u_int16_t *Group , VECTOR * SfxPos, float Freq,
 		if ( Effects == SPOT_SFX_TYPE_Taunt )
 		{
 			_type = SFX_TYPE_Taunt;
-			file = TauntPath;
+			file = g_taunts.path();
 		}
 		else
 		{
 			_type = SFX_TYPE_Panned;
-			file = SfxFullPath[ Sfx ][ Random_Range( SndLookup[ Sfx ].Num_Variants )];
+			file = g_sfx_catalog.full_path( Sfx, Random_Range( g_sfx_catalog.variants( Sfx ) ) );
 		}
 
 		if( ! (SfxHolder[ HolderIndex ].source = sound_source_create( file, Sfx )) )
@@ -1897,7 +2062,7 @@ bool StartPannedSfx(int16_t Sfx, u_int16_t *Group , VECTOR * SfxPos, float Freq,
 	return true;
 }
 
-void InitSfxHolders( void )
+void SfxPlayer::init_holders()
 {
 	int i;
 
@@ -1909,7 +2074,7 @@ void InitSfxHolders( void )
 
 // TODO we should probably find the farthest sound and kill it?
 // isn't this done already in looping sfx or somewhere else ?
-int FindFreeSfxHolder( void )
+int SfxPlayer::find_free()
 {
 	int i;
 
@@ -1931,7 +2096,7 @@ int FindFreeSfxHolder( void )
 	return -1;
 }
 
-u_int32_t PlaySfxWithTrigger( int16_t Sfx, int16_t TriggeredSfx )
+u_int32_t SfxPlayer::play_with_trigger( int16_t Sfx, int16_t TriggeredSfx )
 {
 	int index;
 
@@ -1962,7 +2127,7 @@ u_int32_t PlaySfxWithTrigger( int16_t Sfx, int16_t TriggeredSfx )
 
 
 // note Dist is ignored - all 2D sfx assumed to be at zero distance
-u_int32_t PlaySfx( int16_t Sfx, float Vol )
+u_int32_t SfxPlayer::play( int16_t Sfx, float Vol )
 {
 	int index;
 
@@ -1988,7 +2153,7 @@ u_int32_t PlaySfx( int16_t Sfx, float Vol )
 	return 0;
 }
 
-u_int32_t PlayGeneralPannedSfx(int16_t Sfx, u_int16_t Group , VECTOR * SfxPos, float Freq, bool OverideDistanceCheck, u_int16_t Effects, float VolModify )
+u_int32_t SfxPlayer::play_general_panned( int16_t Sfx, u_int16_t Group , VECTOR * SfxPos, float Freq, bool OverideDistanceCheck, u_int16_t Effects, float VolModify )
 {
 	int index;
 
@@ -2029,7 +2194,7 @@ u_int32_t PlayPannedSfxWithVolModify(int16_t Sfx, u_int16_t Group, VECTOR * SfxP
 	return PlayGeneralPannedSfx( Sfx, Group, SfxPos, Freq, false, SPOT_SFX_TYPE_Normal, Vol );
 }
 
-u_int32_t PlaySpotSfx(int16_t Sfx, u_int16_t *Group , VECTOR * SfxPos, float Freq, float Vol, u_int16_t Effects )
+u_int32_t SfxPlayer::play_spot( int16_t Sfx, u_int16_t *Group , VECTOR * SfxPos, float Freq, float Vol, u_int16_t Effects )
 {
 	int index;
 
@@ -2055,7 +2220,7 @@ u_int32_t PlaySpotSfx(int16_t Sfx, u_int16_t *Group , VECTOR * SfxPos, float Fre
 	return 0;
 }
 
-u_int32_t PlayFixedSpotSfx(int16_t Sfx, u_int16_t Group , VECTOR * SfxPos, float Freq, float Vol, u_int16_t Effects )
+u_int32_t SfxPlayer::play_fixed_spot( int16_t Sfx, u_int16_t Group , VECTOR * SfxPos, float Freq, float Vol, u_int16_t Effects )
 {
 	int index;
 
@@ -2081,7 +2246,7 @@ u_int32_t PlayFixedSpotSfx(int16_t Sfx, u_int16_t Group , VECTOR * SfxPos, float
 	return 0;
 }
 
-int GetSfxHolderIndex( u_int32_t uid )
+int SfxPlayer::holder_index( u_int32_t uid )
 {
 	int i;
 	for( i = 0; i < MAX_ANY_SFX; i++ )
@@ -2090,7 +2255,7 @@ int GetSfxHolderIndex( u_int32_t uid )
 	return -1;
 }
 
-bool StopSfx( u_int32_t uid )
+bool SfxPlayer::stop( u_int32_t uid )
 {
 	int i;
 
@@ -2165,13 +2330,13 @@ void SetPannedSourceParams( void* sound_source, VECTOR * /*SfxPos*/, float Freq,
 	sound_set_pitch( (sound_source_t*)sound_source, Freq );
 }
 
-void SetSoundLevels( int * /*dummy*/ )
+void SfxPlayer::set_levels()
 {
 	GlobalSoundAttenuation = SfxSlider.value / ( SfxSlider.max / GLOBAL_MAX_SFX );
 }
 
 constexpr float TRIGGER_SFX_PAUSE_VALUE = 20.0F; // pause between triggered sfx ( 20.0F = 1/3 second )
-void CheckSBufferList( void )
+void SfxPlayer::check_buffer_list()
 {
 	int i;
 
@@ -2240,7 +2405,7 @@ void CheckSBufferList( void )
 // globals used in functions below:
 // SPOT_SFX_LIST *LoopingSfxListStart - set to NULL in InitializeSound
 
-int InitLoopingSfx( int16_t Sfx, int variant, u_int16_t *Group, VECTOR *SfxPos, float Freq, float Volume, int type, int /*SfxHolderIndex*/, u_int16_t Effects, u_int32_t uid )
+int SfxPlayer::init_looping( int16_t Sfx, int variant, u_int16_t *Group, VECTOR *SfxPos, float Freq, float Volume, int type, u_int16_t Effects, u_int32_t uid )
 {
 	int index, i;
 
@@ -2288,7 +2453,7 @@ int InitLoopingSfx( int16_t Sfx, int variant, u_int16_t *Group, VECTOR *SfxPos, 
 	return index;
 }
 
-void StopLoopingSfx( int index )
+void SfxPlayer::stop_looping( int index )
 {
 
 
@@ -2303,7 +2468,7 @@ void StopLoopingSfx( int index )
 	DebugPrintf("stopping looping sfx %d\n", SpotSfxList[ index ].sfxindex);
 }
 
-void ModifyLoopingSfx( u_int32_t uid, float Freq, float Volume )
+void SfxPlayer::modify_looping( u_int32_t uid, float Freq, float Volume )
 {
 	int index, LoopingSfxIndex;
 	index = GetSfxHolderIndex( uid );
@@ -2327,7 +2492,7 @@ void ModifyLoopingSfx( u_int32_t uid, float Freq, float Volume )
 }
 
 
-void ProcessLoopingSfx( void )
+void SfxPlayer::process_looping()
 {
 	float	Modify = 0.0f, Distance = 0.0f, MaxDistance = 0.0f;
 	int i=0;
@@ -2427,7 +2592,7 @@ void ProcessLoopingSfx( void )
 		started = false;
 		if ( !SpotSfxList[ i ].source )
 		{
-			char * file = SfxFullPath[ SpotSfxList[i].sfxindex ][ SpotSfxList[i].variant ];
+			char * file = g_sfx_catalog.full_path( SpotSfxList[i].sfxindex, SpotSfxList[i].variant );
 
 			if ( sfx_try_frame[ i ] != 0 &&
 				 ( maint_frame - sfx_try_frame[ i ] ) < 32UL )
@@ -2467,7 +2632,7 @@ void ProcessLoopingSfx( void )
 	}
 }
 
-FILE *SaveAllSfx( FILE *fp )
+FILE *SfxPlayer::save( FILE *fp )
 {
 	u_int16_t num_active_sfx = 0;
 	int16_t i;
@@ -2495,7 +2660,7 @@ FILE *SaveAllSfx( FILE *fp )
 
 // TODO: this code loads pointers !!!!!!!!!!
 // apparrently this is somehow possible if you save/load from same binary
-FILE *LoadAllSfx( FILE *fp )
+FILE *SfxPlayer::restore( FILE *fp )
 {
 	u_int16_t num_active_sfx = 0;
 	int16_t i;
@@ -2525,23 +2690,23 @@ FILE *LoadAllSfx( FILE *fp )
 	return( fp );
 }
 
-void PlaySpecificBikerSpeech( int16_t sfx, u_int16_t Group, VECTOR *SfxPos, float Freq, int biker, char variant, bool update )
+void Taunts::play_biker_speech( int16_t sfx, u_int16_t Group, VECTOR *SfxPos, float Freq, int biker, char variant, bool update )
 {
 	char *last_slash;
 	size_t rest;
 	char numstr[ 12 ];
 
-	if ( !( Sfx_Filenames[ sfx ].Flags & SFX_Biker ) )
+	if ( !( g_sfx_catalog.flags( sfx ) & SFX_Biker ) )
 		return;
 
 	if ( TauntID )
 		return;
 
 	// if no biker speech loaded, path ptr will be NULL
-	if ( !SfxFullPath[ sfx ][ 0 ] )
+	if ( !g_sfx_catalog.full_path( sfx, 0 ) )
 		return;
 
-	copy_string( TauntPath, sizeof( TauntPath ), SfxFullPath[ sfx ][ 0 ] );
+	copy_string( TauntPath, sizeof( TauntPath ), g_sfx_catalog.full_path( sfx, 0 ) );
 
 	last_slash = strrchr( TauntPath, 92 );	// look for last slash
 	if( !last_slash )
@@ -2554,7 +2719,7 @@ void PlaySpecificBikerSpeech( int16_t sfx, u_int16_t Group, VECTOR *SfxPos, floa
 	rest = sizeof( TauntPath ) - (size_t)( last_slash - TauntPath );	// room after the slash
 	copy_string( last_slash, rest, BikerSpeechNames[ biker ] );
 	append_string( last_slash, rest, "_" );
-	append_string( last_slash, rest, BikerSpeechEffects[ Sfx_Filenames[ sfx ].SfxLookup ] );
+	append_string( last_slash, rest, BikerSpeechEffects[ g_sfx_catalog.lookup( sfx ) ] );
 
 	if ( variant != -1 )
 	{
@@ -2562,9 +2727,9 @@ void PlaySpecificBikerSpeech( int16_t sfx, u_int16_t Group, VECTOR *SfxPos, floa
 		append_string( last_slash, rest, numstr );
 	}else
 	{
-		if( BikeSpeechVariants[ sfx - SFX_BIKER_START ][ biker ] > 1 )
+		if( g_sfx_catalog.bike_variants( sfx - SFX_BIKER_START, biker ) > 1 )
 		{
-			CurrentTauntVariant = (char)Random_Range( BikeSpeechVariants[ sfx - SFX_BIKER_START ][ biker ] );
+			CurrentTauntVariant = (char)Random_Range( g_sfx_catalog.bike_variants( sfx - SFX_BIKER_START, biker ) );
 
 			snprintf( numstr, sizeof( numstr ), "%02d", CurrentTauntVariant + 1 );	// file convention states that variant sounds start at 01.
 			append_string( TauntPath, sizeof( TauntPath ), numstr );
@@ -2578,7 +2743,7 @@ void PlaySpecificBikerSpeech( int16_t sfx, u_int16_t Group, VECTOR *SfxPos, floa
 }
 
 constexpr auto MAX_DISTANCE = ( 24 * BLOCKSIZE );
-float ReturnDistanceVolumeVector( VECTOR *sfxpos, u_int16_t sfxgroup, VECTOR *listenerpos, u_int16_t listenergroup, long *vol, VECTOR *sfxvector )
+float SfxPlayer::distance_volume( VECTOR *sfxpos, u_int16_t sfxgroup, VECTOR *listenerpos, u_int16_t listenergroup, long *vol, VECTOR *sfxvector )
 {
 	VECTOR	Temp;
 	float Modify;
@@ -2617,7 +2782,7 @@ float ReturnDistanceVolumeVector( VECTOR *sfxpos, u_int16_t sfxgroup, VECTOR *li
 	}
 }
 
-bool UpdateTaunt( u_int32_t uid, u_int16_t Group, VECTOR *SfxPos )
+bool SfxPlayer::update_taunt( u_int32_t uid, u_int16_t Group, VECTOR *SfxPos )
 {
 	int i;
 	float	Distance;
@@ -2671,10 +2836,7 @@ bool UpdateTaunt( u_int32_t uid, u_int16_t Group, VECTOR *SfxPos )
 	return true;
 }
 
-constexpr float TAUNT_PAUSE = 5.0F;
-float ProcessTauntPause = TAUNT_PAUSE;
-
-void ProcessEnemyBikerTaunt( void )
+void Taunts::process_enemy()
 {
 	if ( !TauntID  || !TauntUpdatable )
 	{
@@ -2700,7 +2862,7 @@ void ProcessEnemyBikerTaunt( void )
 constexpr float MAX_TAUNT_DISTANCE = 2240.0F;
 
 
-void PlayUpdatableBikerTaunt( VECTOR *pos, u_int16_t Group, u_int16_t bike, char variant )
+void Taunts::play_updatable( VECTOR *pos, u_int16_t Group, u_int16_t bike, char variant )
 {
 	float dist;
 
@@ -2730,7 +2892,7 @@ void PlayRecievedSpeechTaunt( BYTE player, char variant )
 	}
 }
 
-void StopTaunt( void )
+void Taunts::stop()
 {
 	// do not stop taunt if it is your own. ( this will be automatically cut out on death by death cry )
 	if ( TauntID && ( Taunter != 0xFF ))
@@ -2780,7 +2942,7 @@ int EnemyBikeNum( u_int16_t type )
 	}
 }
 
-void StopEnemyBikerTaunt( ENEMY *Enemy )
+void Taunts::stop_enemy( ENEMY *Enemy )
 {
 	u_int16_t bike;
 
@@ -2794,7 +2956,7 @@ void StopEnemyBikerTaunt( ENEMY *Enemy )
 	PlaySpecificBikerSpeech( SFX_Die, Enemy->Object.Group, &Enemy->Object.Pos, 0.0F, bike, -1, false );
 }
 
-void PlayEnemyBikerTaunt( ENEMY *Enemy )
+void Taunts::play_enemy( ENEMY *Enemy )
 {
 	u_int16_t bike;
 
@@ -2807,4 +2969,59 @@ void PlayEnemyBikerTaunt( ENEMY *Enemy )
 	PlayUpdatableBikerTaunt( &EnemyTaunter->Object.Pos, EnemyTaunter->Object.Group, bike, -1 );
 }
 
+/* The C API: one-line forwarders to the three instances. */
+sound_buffer_t * sound_buffer_create( char *file, int sfxnum ) { return g_sfx_catalog.buffer_create( file, sfxnum ); }
+void sound_buffer_delete( int sfx ) { g_sfx_catalog.buffer_delete( sfx ); }
+void GetSfxPath( int sfxnum, char *path, size_t size ) { g_sfx_catalog.sfx_path( sfxnum, path, size ); }
+void GetSfxFileNamePrefix( int sfxnum, char *file, size_t size ) { g_sfx_catalog.name_prefix( sfxnum, file, size ); }
+void ClearLevelSpecSfx( void ) { g_sfx_catalog.clear_level_spec(); }
+int16_t ReturnSFXIndex( char *file ) { return g_sfx_catalog.index_of( file ); }
+void GetFullBikeSfxPath( char *fullpath, size_t size, int sfxnum, int variant, int total_variants, int bike ) { g_sfx_catalog.full_bike_path( fullpath, size, sfxnum, variant, total_variants, bike ); }
+void GetFullBikeCompSfxPath( char *fullpath, size_t size, int sfxnum, int variant, int total_variants, int bikecomp ) { g_sfx_catalog.full_bike_comp_path( fullpath, size, sfxnum, variant, total_variants, bikecomp ); }
+void PreInitSfx( void ) { g_sfx_catalog.pre_init(); }
+void RequestSfx( int16_t sfxnum ) { g_sfx_catalog.request( sfxnum ); }
+void UpdateSfxForBiker( u_int16_t biker ) { g_sfx_catalog.update_for_biker( biker ); }
+void UpdateSfxForBikeComputer( u_int16_t bikecomp ) { g_sfx_catalog.update_for_bike_computer( bikecomp ); }
+void GetBikeVariants( void ) { g_sfx_catalog.find_bike_variants(); }
+void GetBikeCompVariants( void ) { g_sfx_catalog.find_bike_comp_variants(); }
+void PreProcessSfx( void ) { g_sfx_catalog.pre_process(); }
+void RequestMainSfx( void ) { g_sfx_catalog.request_main(); }
+void RequestTitleSfx( void ) { g_sfx_catalog.request_title(); }
 
+void CheckSpeech( int index ) { g_sfx_player.check_speech( index ); }
+void FreeSfxHolder( int index ) { g_sfx_player.free_holder( index ); }
+void PauseAllSfx( void ) { g_sfx_player.pause_all(); }
+bool RestoreSfxData( u_int32_t id, VECTOR *pos, u_int16_t *group ) { return g_sfx_player.restore_data( id, pos, group ); }
+void ReTriggerSfx( void ) { g_sfx_player.retrigger(); }
+bool InitializeSound( int flags ) { return g_sfx_player.initialize( flags ); }
+void DestroySound( int /*flags*/ ) { g_sfx_player.destroy(); }
+bool StartPannedSfx(int16_t Sfx, u_int16_t *Group , VECTOR * SfxPos, float Freq, int type, int HolderIndex, float VolModify, u_int16_t Effects, bool OverideDistanceCheck ) { return g_sfx_player.start_panned( Sfx, Group, SfxPos, Freq, type, HolderIndex, VolModify, Effects, OverideDistanceCheck ); }
+void InitSfxHolders( void ) { g_sfx_player.init_holders(); }
+int FindFreeSfxHolder( void ) { return g_sfx_player.find_free(); }
+u_int32_t PlaySfxWithTrigger( int16_t Sfx, int16_t TriggeredSfx ) { return g_sfx_player.play_with_trigger( Sfx, TriggeredSfx ); }
+/* Out of line, as they were: CheckSBufferList, StartPannedSfx and others
+ * call them too, and without this the members get a clone that these
+ * branch into, one more branch on every play and stop from the game. */
+[[gnu::noinline]] u_int32_t PlaySfx( int16_t Sfx, float Vol ) { return g_sfx_player.play( Sfx, Vol ); }
+[[gnu::noinline]] bool StopSfx( u_int32_t uid ) { return g_sfx_player.stop( uid ); }
+u_int32_t PlayGeneralPannedSfx(int16_t Sfx, u_int16_t Group , VECTOR * SfxPos, float Freq, bool OverideDistanceCheck, u_int16_t Effects, float VolModify ) { return g_sfx_player.play_general_panned( Sfx, Group, SfxPos, Freq, OverideDistanceCheck, Effects, VolModify ); }
+u_int32_t PlaySpotSfx(int16_t Sfx, u_int16_t *Group , VECTOR * SfxPos, float Freq, float Vol, u_int16_t Effects ) { return g_sfx_player.play_spot( Sfx, Group, SfxPos, Freq, Vol, Effects ); }
+u_int32_t PlayFixedSpotSfx(int16_t Sfx, u_int16_t Group , VECTOR * SfxPos, float Freq, float Vol, u_int16_t Effects ) { return g_sfx_player.play_fixed_spot( Sfx, Group, SfxPos, Freq, Vol, Effects ); }
+int GetSfxHolderIndex( u_int32_t uid ) { return g_sfx_player.holder_index( uid ); }
+void SetSoundLevels( int * /*dummy*/ ) { g_sfx_player.set_levels(); }
+void CheckSBufferList( void ) { g_sfx_player.check_buffer_list(); }
+int InitLoopingSfx( int16_t Sfx, int variant, u_int16_t *Group, VECTOR *SfxPos, float Freq, float Volume, int type, int /*SfxHolderIndex*/, u_int16_t Effects, u_int32_t uid ) { return g_sfx_player.init_looping( Sfx, variant, Group, SfxPos, Freq, Volume, type, Effects, uid ); }
+void StopLoopingSfx( int index ) { g_sfx_player.stop_looping( index ); }
+void ModifyLoopingSfx( u_int32_t uid, float Freq, float Volume ) { g_sfx_player.modify_looping( uid, Freq, Volume ); }
+void ProcessLoopingSfx( void ) { g_sfx_player.process_looping(); }
+FILE *SaveAllSfx( FILE *fp ) { return g_sfx_player.save( fp ); }
+FILE *LoadAllSfx( FILE *fp ) { return g_sfx_player.restore( fp ); }
+float ReturnDistanceVolumeVector( VECTOR *sfxpos, u_int16_t sfxgroup, VECTOR *listenerpos, u_int16_t listenergroup, long *vol, VECTOR *sfxvector ) { return g_sfx_player.distance_volume( sfxpos, sfxgroup, listenerpos, listenergroup, vol, sfxvector ); }
+bool UpdateTaunt( u_int32_t uid, u_int16_t Group, VECTOR *SfxPos ) { return g_sfx_player.update_taunt( uid, Group, SfxPos ); }
+
+void PlaySpecificBikerSpeech( int16_t sfx, u_int16_t Group, VECTOR *SfxPos, float Freq, int biker, char variant, bool update ) { g_taunts.play_biker_speech( sfx, Group, SfxPos, Freq, biker, variant, update ); }
+void ProcessEnemyBikerTaunt( void ) { g_taunts.process_enemy(); }
+void PlayUpdatableBikerTaunt( VECTOR *pos, u_int16_t Group, u_int16_t bike, char variant ) { g_taunts.play_updatable( pos, Group, bike, variant ); }
+void StopTaunt( void ) { g_taunts.stop(); }
+void StopEnemyBikerTaunt( ENEMY *Enemy ) { g_taunts.stop_enemy( Enemy ); }
+void PlayEnemyBikerTaunt( ENEMY *Enemy ) { g_taunts.play_enemy( Enemy ); }

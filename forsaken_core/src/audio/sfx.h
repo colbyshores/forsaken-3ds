@@ -314,9 +314,7 @@ u_int32_t PlayPannedSfxWithVolModify(int16_t Sfx, u_int16_t Group, VECTOR * SfxP
 /* Defined in sfx.cpp; shared with the modules that use it. */
 extern bool NoSFX;
 void SetSoundLevels( int *dummy );
-extern u_int32_t CurrentBikeCompSpeech;
 extern bool bSoundEnabled;
 extern float LastDistance[ MAX_SFX ];
 extern char CurrentTauntVariant;
 float ReturnDistanceVolumeVector( VECTOR *sfxpos, u_int16_t sfxgroup, VECTOR *listenerpos, u_int16_t listenergroup, long *vol, VECTOR *sfxvector );
-extern float GlobalSoundAttenuation;
