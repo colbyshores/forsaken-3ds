@@ -168,9 +168,10 @@
     {
       "file": "water.cpp",
       "symbols": [
-        "WaterProcess"
+        "WaterProcess",
+        "process"
       ],
-      "why": "per-frame water surface update"
+      "why": "per-frame water surface update; process is WaterProcess' body (WaterSurfaces::process)"
     },
     {
       "file": "aispline.cpp",

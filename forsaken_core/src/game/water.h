@@ -22,7 +22,7 @@ constexpr auto SPECIALROOTTWO = (1.0F / (4.0F+(1.0F / (float)sqrt(2.0F))*4.0F));
  * 1998 levels (largest is fedbankv at ~600 cells). Remaster /
  * Night-Dive levels can exceed this — tuben64's water is 37×29 =
  * 1073 cells. Bumped to 64×64 = 4096 to cover known cases plus
- * comfortable headroom; cost is ~12 KB of BSS for the global
+ * comfortable headroom; cost is ~12 KB of BSS for water.cpp's
  * Fc[MAXMESHX*MAXMESHY] scratch buffer. WaterLoad still validates
  * XVerts*YVerts against MAXMESHX*MAXMESHY, so a level with bigger
  * water will still bail (and now cleans up properly on bail). */
