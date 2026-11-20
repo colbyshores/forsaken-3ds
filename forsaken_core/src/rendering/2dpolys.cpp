@@ -1864,6 +1864,171 @@ bool DisplayGroupUnclippedFmPolys(RENDEROBJECT *renderObject )
 	return ( ( FmPolys[i].Flags & FM_FLAG_DONTCLIP ) != 0 );
 }
 
+/* the FmPoly's up, forward and left vectors: fixed (FM_FLAG_DIRCONST) or from its rotation, optionally relative to its own orientation, turned to face the camera */
+[[gnu::always_inline]] static inline void FmPolyOrient( u_int16_t i, VECTOR & XVector, VECTOR & YVector, VECTOR & ZVector )
+{
+	MATRIX			MatrixCopy;
+	MATRIX			TempMatrix;
+	QUAT			TempQuat;
+
+	if( FmPolys[ i ].Flags & FM_FLAG_DIRCONST )
+	{
+		YVector = FmPolys[ i ].UpVector;					/* Calc Up Vector */
+		ZVector = FmPolys[ i ].DirVector;					/* Calc Forward Vector */
+	}
+	else
+	{
+		fast_sincosf( D2R( FmPolys[ i ].Rot ), &YVector.x, &YVector.y ); /* Calc Up Vector */
+		YVector.z = 0.0F;
+		ZVector = Forward;
+
+		if( FmPolys[ i ].Flags & FM_FLAG_RELATIVE )
+		{
+			TempQuat.FromDirAndUp(&FmPolys[i].DirVector, &FmPolys[i].UpVector);
+			TempQuat.ToMatrix(&TempMatrix);
+			ApplyMatrix( &TempMatrix, &YVector, &YVector );
+			ApplyMatrix( &TempMatrix, &ZVector, &ZVector );
+		}
+
+		MatrixCopy = CurrentCamera.Mat;
+		MatrixCopy._41 = 0.0F;
+		MatrixCopy._42 = 0.0F;
+		MatrixCopy._43 = 0.0F;
+		ApplyMatrix( &MatrixCopy, &YVector, &YVector );		/* Calc Up Vector */
+		ApplyMatrix( &MatrixCopy, &ZVector, &ZVector );		/* Calc Forward Vector */
+	}
+
+	CrossProduct( &YVector, &ZVector, &XVector );			/* Calc Left Vector */
+}
+
+/* one bit of an FmPoly frame: its offset and size along the poly's axes (with flips), optional pull toward the camera, and its four vertices */
+[[gnu::always_inline]] static inline void FmPolyBuildQuad( RENDEROBJECT * renderObject, u_int16_t i, VECTOR & XVector, VECTOR & YVector, VECTOR & Xsize, VECTOR & Ysize, OFF_INFO * Off_Ptr, COLOR Colour, LVERTEX *& FmPolyVertPnt )
+{
+	VECTOR			TempVector;
+	VECTOR			Xoff;
+	VECTOR			Yoff;
+	VECTOR			NewPos;
+	BOX_INFO	*	Box_Ptr;
+	float			Distance;
+
+	Box_Ptr = ( (*FmPolys[ i ].Frm_Info)->Box_Info + ( Off_Ptr->box & 0x0fff ) );
+
+	Xoff.x = ( ( Off_Ptr->xoff * FmPolys[ i ].xsize ) * XVector.x );
+	Xoff.y = ( ( Off_Ptr->xoff * FmPolys[ i ].xsize ) * XVector.y );
+	Xoff.z = ( ( Off_Ptr->xoff * FmPolys[ i ].xsize ) * XVector.z );
+	Yoff.x = ( ( -Off_Ptr->yoff * FmPolys[ i ].ysize ) * YVector.x );
+	Yoff.y = ( ( -Off_Ptr->yoff * FmPolys[ i ].ysize ) * YVector.y );
+	Yoff.z = ( ( -Off_Ptr->yoff * FmPolys[ i ].ysize ) * YVector.z );
+
+	switch( Off_Ptr->box & BOX_BOTHFLIP )
+	{
+	case BOX_NOFLIP:
+		Xsize.x = ( ( Box_Ptr->xsize * FmPolys[ i ].xsize ) * XVector.x );
+		Xsize.y = ( ( Box_Ptr->xsize * FmPolys[ i ].xsize ) * XVector.y );
+		Xsize.z = ( ( Box_Ptr->xsize * FmPolys[ i ].xsize ) * XVector.z );
+		Ysize.x = ( ( Box_Ptr->ysize * FmPolys[ i ].ysize ) * YVector.x );
+		Ysize.y = ( ( Box_Ptr->ysize * FmPolys[ i ].ysize ) * YVector.y );
+		Ysize.z = ( ( Box_Ptr->ysize * FmPolys[ i ].ysize ) * YVector.z );
+		break;
+
+	case BOX_XFLIP:
+		Xsize.x = -( ( Box_Ptr->xsize * FmPolys[ i ].xsize ) * XVector.x );
+		Xsize.y = -( ( Box_Ptr->xsize * FmPolys[ i ].xsize ) * XVector.y );
+		Xsize.z = -( ( Box_Ptr->xsize * FmPolys[ i ].xsize ) * XVector.z );
+		Ysize.x = ( ( Box_Ptr->ysize * FmPolys[ i ].ysize ) * YVector.x );
+		Ysize.y = ( ( Box_Ptr->ysize * FmPolys[ i ].ysize ) * YVector.y );
+		Ysize.z = ( ( Box_Ptr->ysize * FmPolys[ i ].ysize ) * YVector.z );
+		break;
+
+	case BOX_YFLIP:
+		Xsize.x = ( ( Box_Ptr->xsize * FmPolys[ i ].xsize ) * XVector.x );
+		Xsize.y = ( ( Box_Ptr->xsize * FmPolys[ i ].xsize ) * XVector.y );
+		Xsize.z = ( ( Box_Ptr->xsize * FmPolys[ i ].xsize ) * XVector.z );
+		Ysize.x = -( ( Box_Ptr->ysize * FmPolys[ i ].ysize ) * YVector.x );
+		Ysize.y = -( ( Box_Ptr->ysize * FmPolys[ i ].ysize ) * YVector.y );
+		Ysize.z = -( ( Box_Ptr->ysize * FmPolys[ i ].ysize ) * YVector.z );
+		break;
+
+	case BOX_BOTHFLIP:
+		/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
+		Xsize.x = -( ( Box_Ptr->xsize * FmPolys[ i ].xsize ) * XVector.x );
+		Xsize.y = -( ( Box_Ptr->xsize * FmPolys[ i ].xsize ) * XVector.y );
+		/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
+		Xsize.z = -( ( Box_Ptr->xsize * FmPolys[ i ].xsize ) * XVector.z );
+		Ysize.x = -( ( Box_Ptr->ysize * FmPolys[ i ].ysize ) * YVector.x );
+		Ysize.y = -( ( Box_Ptr->ysize * FmPolys[ i ].ysize ) * YVector.y );
+		Ysize.z = -( ( Box_Ptr->ysize * FmPolys[ i ].ysize ) * YVector.z );
+		break;
+	}
+
+	/*-------------- MOVEOUT: draw pulled toward the camera ---------------*/
+	if( ( FmPolys[ i ].Flags & FM_FLAG_MOVEOUT ) )
+	{
+		renderObject->memoEpochPass = SMEMO_PASS_NO_REUSE;
+		TempVector.x = ( FmPolys[ i ].Pos.x - CurrentCamera.Pos.x );
+		TempVector.y = ( FmPolys[ i ].Pos.y - CurrentCamera.Pos.y );
+		TempVector.z = ( FmPolys[ i ].Pos.z - CurrentCamera.Pos.z );
+		Distance = VectorLength( &TempVector );
+		NormaliseVector( &TempVector );
+
+		/* @vfp-exempt R3 — explosion size from camera distance; integerizing changes the drawn size. measured n/a. Verified 2026-11-19. */
+		if( Distance >= ( EXPLO_DISTANCE + 110.0F ) )
+		{
+			Distance = EXPLO_DISTANCE;
+		}
+		else
+		{
+			Distance -= 110.0F;
+			if( Distance < 32.0F ) Distance = 32.0F;
+		}
+
+		NewPos.x = ( FmPolys[ i ].Pos.x + ( -Distance * TempVector.x ) );
+		NewPos.y = ( FmPolys[ i ].Pos.y + ( -Distance * TempVector.y ) );
+		NewPos.z = ( FmPolys[ i ].Pos.z + ( -Distance * TempVector.z ) );
+	}
+	else
+	{
+		NewPos = FmPolys[i].Pos;
+	}
+	/*-------------------------------------------*/
+
+	NewPos.x += ( Xoff.x + Yoff.x );
+	NewPos.y += ( Xoff.y + Yoff.y );
+	NewPos.z += ( Xoff.z + Yoff.z );
+
+	FmPolyVertPnt->x = NewPos.x;						// v1
+	FmPolyVertPnt->y = NewPos.y;
+	FmPolyVertPnt->z = NewPos.z;
+	FmPolyVertPnt->tu = Box_Ptr->u1;
+	FmPolyVertPnt->tv = Box_Ptr->v1;
+	FmPolyVertPnt->color = Colour;
+	FmPolyVertPnt++;
+
+	FmPolyVertPnt->x = ( NewPos.x + Xsize.x );			// v2
+	FmPolyVertPnt->y = ( NewPos.y + Xsize.y );
+	FmPolyVertPnt->z = ( NewPos.z + Xsize.z );
+	FmPolyVertPnt->tu = Box_Ptr->u2;
+	FmPolyVertPnt->tv = Box_Ptr->v1;
+	FmPolyVertPnt->color = Colour;
+	FmPolyVertPnt++;
+
+	FmPolyVertPnt->x = ( NewPos.x + Xsize.x - Ysize.x ); // v3
+	FmPolyVertPnt->y = ( NewPos.y + Xsize.y - Ysize.y );
+	FmPolyVertPnt->z = ( NewPos.z + Xsize.z - Ysize.z );
+	FmPolyVertPnt->tu = Box_Ptr->u2;
+	FmPolyVertPnt->tv = Box_Ptr->v2;
+	FmPolyVertPnt->color = Colour;
+	FmPolyVertPnt++;
+
+	FmPolyVertPnt->x = ( NewPos.x - Ysize.x );			// v4
+	FmPolyVertPnt->y = ( NewPos.y - Ysize.y );
+	FmPolyVertPnt->z = ( NewPos.z - Ysize.z );
+	FmPolyVertPnt->tu = Box_Ptr->u1;
+	FmPolyVertPnt->tv = Box_Ptr->v2;
+	FmPolyVertPnt->color = Colour;
+	FmPolyVertPnt++;
+}
+
 /* Fill one batch of FmPolys: the clippable ones of one group (Clipped) or
  * every FM_FLAG_DONTCLIP one (unclipped). The two public wrappers pass a
  * constant Clipped, so each compiles to its own specialised copy. */
@@ -1884,26 +2049,17 @@ bool DisplayGroupUnclippedFmPolys(RENDEROBJECT *renderObject )
 #endif
 	int16_t			NumVerts;
 	int16_t			NumTris;
-	VECTOR			TempVector;
 	VECTOR			XVector;
 	VECTOR			YVector;
 	VECTOR			ZVector;
-	VECTOR			Xoff;
-	VECTOR			Yoff;
 	VECTOR			Xsize; ZERO_STACK_MEM(Xsize);
 	VECTOR			Ysize; ZERO_STACK_MEM(Ysize);
-	VECTOR			NewPos;
 	BIT_INFO	*	Bit_Ptr;
-	BOX_INFO	*	Box_Ptr;
 	OFF_INFO	*	Off_Ptr;
-	float			Distance;
-	MATRIX			MatrixCopy;
 	COLOR		Colour;
 	LVERTEX	*FmPolyVertPnt;
 	TRIANGLE	*FmPolyFacePnt;
 	LVERTEX	*BufStart;
-	MATRIX			TempMatrix;
-	QUAT			TempQuat;
 	WORD			*Indices = nullptr;
 	int				start_index = 0;
 
@@ -1996,34 +2152,7 @@ bool DisplayGroupUnclippedFmPolys(RENDEROBJECT *renderObject )
 						/*===================================================================
 								Set Dir and Up Vectors
 						===================================================================*/
-						if( FmPolys[ i ].Flags & FM_FLAG_DIRCONST )
-						{
-							YVector = FmPolys[ i ].UpVector;					/* Calc Up Vector */
-							ZVector = FmPolys[ i ].DirVector;					/* Calc Forward Vector */
-						}
-						else
-						{
-							fast_sincosf( D2R( FmPolys[ i ].Rot ), &YVector.x, &YVector.y ); /* Calc Up Vector */
-							YVector.z = 0.0F;
-							ZVector = Forward;
-
-							if( FmPolys[ i ].Flags & FM_FLAG_RELATIVE )
-							{
-								TempQuat.FromDirAndUp(&FmPolys[i].DirVector, &FmPolys[i].UpVector);
-								TempQuat.ToMatrix(&TempMatrix);
-								ApplyMatrix( &TempMatrix, &YVector, &YVector );
-								ApplyMatrix( &TempMatrix, &ZVector, &ZVector );
-							}
-
-							MatrixCopy = CurrentCamera.Mat;
-							MatrixCopy._41 = 0.0F;
-							MatrixCopy._42 = 0.0F;
-							MatrixCopy._43 = 0.0F;
-							ApplyMatrix( &MatrixCopy, &YVector, &YVector );		/* Calc Up Vector */
-							ApplyMatrix( &MatrixCopy, &ZVector, &ZVector );		/* Calc Forward Vector */
-						}
-
-						CrossProduct( &YVector, &ZVector, &XVector );			/* Calc Left Vector */
+						FmPolyOrient( i, XVector, YVector, ZVector );
 
 						/*===================================================================
 								Setup FrameInfo description pointers
@@ -2035,122 +2164,7 @@ bool DisplayGroupUnclippedFmPolys(RENDEROBJECT *renderObject )
 						{
 							int ntris = 0;
 
-							Box_Ptr = ( (*FmPolys[ i ].Frm_Info)->Box_Info + ( Off_Ptr->box & 0x0fff ) );
-
-							Xoff.x = ( ( Off_Ptr->xoff * FmPolys[ i ].xsize ) * XVector.x );
-							Xoff.y = ( ( Off_Ptr->xoff * FmPolys[ i ].xsize ) * XVector.y );
-							Xoff.z = ( ( Off_Ptr->xoff * FmPolys[ i ].xsize ) * XVector.z );
-							Yoff.x = ( ( -Off_Ptr->yoff * FmPolys[ i ].ysize ) * YVector.x );
-							Yoff.y = ( ( -Off_Ptr->yoff * FmPolys[ i ].ysize ) * YVector.y );
-							Yoff.z = ( ( -Off_Ptr->yoff * FmPolys[ i ].ysize ) * YVector.z );
-
-							switch( Off_Ptr->box & BOX_BOTHFLIP )
-							{
-							case BOX_NOFLIP:
-								Xsize.x = ( ( Box_Ptr->xsize * FmPolys[ i ].xsize ) * XVector.x );
-								Xsize.y = ( ( Box_Ptr->xsize * FmPolys[ i ].xsize ) * XVector.y );
-								Xsize.z = ( ( Box_Ptr->xsize * FmPolys[ i ].xsize ) * XVector.z );
-								Ysize.x = ( ( Box_Ptr->ysize * FmPolys[ i ].ysize ) * YVector.x );
-								Ysize.y = ( ( Box_Ptr->ysize * FmPolys[ i ].ysize ) * YVector.y );
-								Ysize.z = ( ( Box_Ptr->ysize * FmPolys[ i ].ysize ) * YVector.z );
-								break;
-
-							case BOX_XFLIP:
-								Xsize.x = -( ( Box_Ptr->xsize * FmPolys[ i ].xsize ) * XVector.x );
-								Xsize.y = -( ( Box_Ptr->xsize * FmPolys[ i ].xsize ) * XVector.y );
-								Xsize.z = -( ( Box_Ptr->xsize * FmPolys[ i ].xsize ) * XVector.z );
-								Ysize.x = ( ( Box_Ptr->ysize * FmPolys[ i ].ysize ) * YVector.x );
-								Ysize.y = ( ( Box_Ptr->ysize * FmPolys[ i ].ysize ) * YVector.y );
-								Ysize.z = ( ( Box_Ptr->ysize * FmPolys[ i ].ysize ) * YVector.z );
-								break;
-
-							case BOX_YFLIP:
-								Xsize.x = ( ( Box_Ptr->xsize * FmPolys[ i ].xsize ) * XVector.x );
-								Xsize.y = ( ( Box_Ptr->xsize * FmPolys[ i ].xsize ) * XVector.y );
-								Xsize.z = ( ( Box_Ptr->xsize * FmPolys[ i ].xsize ) * XVector.z );
-								Ysize.x = -( ( Box_Ptr->ysize * FmPolys[ i ].ysize ) * YVector.x );
-								Ysize.y = -( ( Box_Ptr->ysize * FmPolys[ i ].ysize ) * YVector.y );
-								Ysize.z = -( ( Box_Ptr->ysize * FmPolys[ i ].ysize ) * YVector.z );
-								break;
-
-							case BOX_BOTHFLIP:
-								/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
-								Xsize.x = -( ( Box_Ptr->xsize * FmPolys[ i ].xsize ) * XVector.x );
-								Xsize.y = -( ( Box_Ptr->xsize * FmPolys[ i ].xsize ) * XVector.y );
-								/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
-								Xsize.z = -( ( Box_Ptr->xsize * FmPolys[ i ].xsize ) * XVector.z );
-								Ysize.x = -( ( Box_Ptr->ysize * FmPolys[ i ].ysize ) * YVector.x );
-								Ysize.y = -( ( Box_Ptr->ysize * FmPolys[ i ].ysize ) * YVector.y );
-								Ysize.z = -( ( Box_Ptr->ysize * FmPolys[ i ].ysize ) * YVector.z );
-								break;
-							}
-
-							/*-------------- MOVEOUT: draw pulled toward the camera ---------------*/
-							if( ( FmPolys[ i ].Flags & FM_FLAG_MOVEOUT ) )
-							{
-								renderObject->memoEpochPass = SMEMO_PASS_NO_REUSE;
-								TempVector.x = ( FmPolys[ i ].Pos.x - CurrentCamera.Pos.x );
-								TempVector.y = ( FmPolys[ i ].Pos.y - CurrentCamera.Pos.y );
-								TempVector.z = ( FmPolys[ i ].Pos.z - CurrentCamera.Pos.z );
-								Distance = VectorLength( &TempVector );
-								NormaliseVector( &TempVector );
-
-								/* @vfp-exempt R3 — explosion size from camera distance; integerizing changes the drawn size. measured n/a. Verified 2026-11-19. */
-								if( Distance >= ( EXPLO_DISTANCE + 110.0F ) )
-								{
-									Distance = EXPLO_DISTANCE;
-								}
-								else
-								{
-									Distance -= 110.0F;
-									if( Distance < 32.0F ) Distance = 32.0F;
-								}
-
-								NewPos.x = ( FmPolys[ i ].Pos.x + ( -Distance * TempVector.x ) );
-								NewPos.y = ( FmPolys[ i ].Pos.y + ( -Distance * TempVector.y ) );
-								NewPos.z = ( FmPolys[ i ].Pos.z + ( -Distance * TempVector.z ) );
-							}
-							else
-							{
-								NewPos = FmPolys[i].Pos;
-							}
-							/*-------------------------------------------*/
-
-							NewPos.x += ( Xoff.x + Yoff.x );
-							NewPos.y += ( Xoff.y + Yoff.y );
-							NewPos.z += ( Xoff.z + Yoff.z );
-
-							FmPolyVertPnt->x = NewPos.x;						// v1
-							FmPolyVertPnt->y = NewPos.y;
-							FmPolyVertPnt->z = NewPos.z;
-							FmPolyVertPnt->tu = Box_Ptr->u1;
-							FmPolyVertPnt->tv = Box_Ptr->v1;
-							FmPolyVertPnt->color = Colour;
-							FmPolyVertPnt++;
-
-							FmPolyVertPnt->x = ( NewPos.x + Xsize.x );			// v2
-							FmPolyVertPnt->y = ( NewPos.y + Xsize.y );
-							FmPolyVertPnt->z = ( NewPos.z + Xsize.z );
-							FmPolyVertPnt->tu = Box_Ptr->u2;
-							FmPolyVertPnt->tv = Box_Ptr->v1;
-							FmPolyVertPnt->color = Colour;
-							FmPolyVertPnt++;
-
-							FmPolyVertPnt->x = ( NewPos.x + Xsize.x - Ysize.x ); // v3
-							FmPolyVertPnt->y = ( NewPos.y + Xsize.y - Ysize.y );
-							FmPolyVertPnt->z = ( NewPos.z + Xsize.z - Ysize.z );
-							FmPolyVertPnt->tu = Box_Ptr->u2;
-							FmPolyVertPnt->tv = Box_Ptr->v2;
-							FmPolyVertPnt->color = Colour;
-							FmPolyVertPnt++;
-
-							FmPolyVertPnt->x = ( NewPos.x - Ysize.x );			// v4
-							FmPolyVertPnt->y = ( NewPos.y - Ysize.y );
-							FmPolyVertPnt->z = ( NewPos.z - Ysize.z );
-							FmPolyVertPnt->tu = Box_Ptr->u1;
-							FmPolyVertPnt->tv = Box_Ptr->v2;
-							FmPolyVertPnt->color = Colour;
-							FmPolyVertPnt++;
+							FmPolyBuildQuad( renderObject, i, XVector, YVector, Xsize, Ysize, Off_Ptr, Colour, FmPolyVertPnt );
 
 							FmPolyFacePnt->v1 = 0;
 							FmPolyFacePnt->v2 = 1;
