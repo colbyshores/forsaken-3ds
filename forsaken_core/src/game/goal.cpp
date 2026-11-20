@@ -34,44 +34,7 @@
 constexpr int GOAL_VERSION_NUMBER = (1);
 
 
-// globals
-int TeamFlag[ MAX_TEAMS ];
-
-namespace {
-
-/* The level's capture-the-flag goals (one instance, g_goals): the goals
- * loaded with the level, which goal each team scores at, the per-team
- * player counts, and the sparkle timer of the goal display. Loaded and
- * released with the level, processed each frame, and checked as ships
- * move. TeamFlag[] stays global (title and networking use it). */
-class Goals {
-	public:
-	bool  load();
-	void  release();
-	GOAL *team_goal( int team );
-	bool  generate_flag_at_home( int team );
-	void  set_team_goals( u_int16_t *TeamGoals );
-	void  process();
-	int   check_team( VECTOR * OldPos, VECTOR * NewPos, u_int16_t Group, int team );
-	int   display( u_int16_t group );
-
-	private:
-	float nearest_distance( int goal );
-	int   pick_team_goal( int team );
-	void  show( GOAL * goal, u_int8_t Red, u_int8_t Green, u_int8_t Blue, u_int8_t Trans );
-
-	GOAL   *Goal = nullptr;
-	int     NumGoals = 0;
-	int     GoalTeamMembers[ MAX_TEAMS ] = {};
-	int     LastTeamMembers[ MAX_TEAMS ] = {};
-	int16_t Teamgoal[ MAX_TEAMS ] = {};
-	int     LastEnable[ MAX_PLAYERS ] = {};
-	float   SparkleTime = 0.1F;
-};
-
-} // namespace
-
-bool Goals::load()
+bool GoalZones::load()
 {
 	int8_t		Filename[ 256 ];
 	const char	*	NewExt = ".GOL";
@@ -180,7 +143,7 @@ bool Goals::load()
 }
 
 
-void Goals::release()
+void GoalZones::release()
 {
 	int j;
 
@@ -228,7 +191,7 @@ static void GoalCheck( VECTOR * OldPos , VECTOR * NewPos , GOAL * goal )
 	}
 }
 
-GOAL *Goals::team_goal( int team )
+GOAL *GoalZones::team_goal( int team )
 {
 	int j;
 
@@ -242,7 +205,7 @@ GOAL *Goals::team_goal( int team )
 }
 
 
-bool Goals::generate_flag_at_home( int team )
+bool GoalZones::generate_flag_at_home( int team )
 {
 	int j;
 
@@ -277,7 +240,7 @@ bool Goals::generate_flag_at_home( int team )
 }
 
 
-float Goals::nearest_distance( int goal )
+float GoalZones::nearest_distance( int goal )
 {
 	int j;
 	float d, dmin;
@@ -301,7 +264,7 @@ float Goals::nearest_distance( int goal )
 }
 
 
-int Goals::pick_team_goal( int team )
+int GoalZones::pick_team_goal( int team )
 {
 	int j;
 	int goal;
@@ -339,7 +302,7 @@ int Goals::pick_team_goal( int team )
 	return goal;
 }
 
-void Goals::set_team_goals( u_int16_t *TeamGoals )
+void GoalZones::set_team_goals( u_int16_t *TeamGoals )
 {
 	int j;
 
@@ -378,7 +341,7 @@ void Goals::set_team_goals( u_int16_t *TeamGoals )
 	}
 }
 
-void Goals::process()
+void GoalZones::process()
 {
 	int j, k;
 	int NumFlags[ MAX_TEAMS ];
@@ -487,7 +450,7 @@ void Goals::process()
 }
 
 
-int Goals::check_team( VECTOR * OldPos , VECTOR * NewPos, u_int16_t Group, int team )
+int GoalZones::check_team( VECTOR * OldPos , VECTOR * NewPos, u_int16_t Group, int team )
 {
 	int j;
 
@@ -516,7 +479,7 @@ int Goals::check_team( VECTOR * OldPos , VECTOR * NewPos, u_int16_t Group, int t
 }
 
 
-int Goals::display( u_int16_t group )
+int GoalZones::display( u_int16_t group )
 {
 	int j, k;
 	int shown;
@@ -550,7 +513,7 @@ int Goals::display( u_int16_t group )
 				:	u_int8_t		Trans
 	Output		:	Nothing
 ===================================================================*/
-void Goals::show( GOAL * goal, u_int8_t Red, u_int8_t Green, u_int8_t Blue, u_int8_t Trans )
+void GoalZones::show( GOAL * goal, u_int8_t Red, u_int8_t Green, u_int8_t Blue, u_int8_t Trans )
 {
 	int16_t	Count;
 	u_int16_t	fmpoly;
@@ -609,13 +572,13 @@ void Goals::show( GOAL * goal, u_int8_t Red, u_int8_t Green, u_int8_t Blue, u_in
 	}
 }
 
-namespace { Goals g_goals; }
+GoalZones Goals;
 
-bool GoalLoad( void ) { return g_goals.load(); }
-void ReleaseGoal( void ) { g_goals.release(); }
-GOAL *TeamGoal( int team ) { return g_goals.team_goal( team ); }
-bool GenerateFlagAtHome( int team ) { return g_goals.generate_flag_at_home( team ); }
-void SetTeamGoals( u_int16_t *TeamGoals ) { g_goals.set_team_goals( TeamGoals ); }
-void ProcessGoals( void ) { g_goals.process(); }
-int GoalCheckTeam( VECTOR * OldPos , VECTOR * NewPos, u_int16_t Group, int team ) { return g_goals.check_team( OldPos, NewPos, Group, team ); }
-int DisplayGoal( u_int16_t group ) { return g_goals.display( group ); }
+bool GoalLoad( void ) { return Goals.load(); }
+void ReleaseGoal( void ) { Goals.release(); }
+GOAL *TeamGoal( int team ) { return Goals.team_goal( team ); }
+bool GenerateFlagAtHome( int team ) { return Goals.generate_flag_at_home( team ); }
+void SetTeamGoals( u_int16_t *TeamGoals ) { Goals.set_team_goals( TeamGoals ); }
+void ProcessGoals( void ) { Goals.process(); }
+int GoalCheckTeam( VECTOR * OldPos , VECTOR * NewPos, u_int16_t Group, int team ) { return Goals.check_team( OldPos, NewPos, Group, team ); }
+int DisplayGoal( u_int16_t group ) { return Goals.display( group ); }

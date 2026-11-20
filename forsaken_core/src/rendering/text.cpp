@@ -730,7 +730,7 @@ void HudText::print_score_sort()
 				show = false;
 				if ( CaptureTheFlag || CTF )
 				{
-					if ( !TeamFlag[ i ] || FlashToggle )
+					if ( !Goals.team_carrying_flag( i ) || FlashToggle )
 						show = true;
 				}
 				else if ( BountyHunt )
