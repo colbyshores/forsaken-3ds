@@ -1,75 +1,60 @@
-/* xmem.cpp -- DEBUG_ON allocation tracker and MemUsed; see xmem.h. */
-#define XMEM_INCLUDED // keep xmem.h (and its malloc/free redirects) out of this file
+/* xmem.cpp -- DEBUG_ON allocation tracker and the tracked-byte counter; see xmem.h. */
+#define XMEM_NO_REDIRECT // keep xmem.h's malloc/free redirects out of this file
+#include "util/xmem.h"
 #include <stdio.h>
 #include "game/main.h"
 #include "util/util.h"
 
-/* The block tracker below is state owned by this module (one instance,
- * reached through the X_* API that xmem.h's DEBUG_ON macros redirect to). */
-
-size_t	MemUsed = 0;
-
 namespace {
+constexpr int MAXBLOCKS = XMemTracker::MAXBLOCKS;
+}
 
-constexpr int MAXBLOCKS = 16384;
-
-/* Debug block tracker: one slot per live X_ allocation, recording
- * size and allocation site for leak reports. */
-struct XMemTracker {
-	bool   used[MAXBLOCKS];
-	void  *pnts[MAXBLOCKS];
-	size_t sizes[MAXBLOCKS];
-	const char *files[MAXBLOCKS];	/* __FILE__ of each live block */
-	int    lines[MAXBLOCKS];
-	int    blocks_used = 0;
-
-	void init()
-	{
-		for (int i = 0; i < MAXBLOCKS; i++) {
-			used[i] = false;
-			pnts[i] = nullptr;
-			sizes[i] = 0;
-		}
+void XMemTracker::init()
+{
+	for (int i = 0; i < MAXBLOCKS; i++) {
+		used[i] = false;
+		pnts[i] = nullptr;
+		sizes[i] = 0;
 	}
-	int find_free()
-	{
-		for (int i = 0; i < MAXBLOCKS; i++)
-			if (!used[i]) return i;
-		return -1;
-	}
-	int find_same(void *p) const
-	{
-		for (int i = 0; i < MAXBLOCKS; i++)
-			if (used[i] && pnts[i] == p) return i;
-		return -1;
-	}
-};
+}
+int XMemTracker::find_free()
+{
+	for (int i = 0; i < MAXBLOCKS; i++)
+		if (!used[i]) return i;
+	return -1;
+}
+int XMemTracker::find_same(void *p) const
+{
+	for (int i = 0; i < MAXBLOCKS; i++)
+		if (used[i] && pnts[i] == p) return i;
+	return -1;
+}
 
-XMemTracker g_mem;
+size_t	XMemTracker::MemUsed = 0;
+XMemTracker XMem;
 
-} // namespace
-
-#define BlockUsed   g_mem.used
-#define BlockPnts   g_mem.pnts
-#define BlockSize   g_mem.sizes
-#define BlockInFile g_mem.files
-#define BlockInLine g_mem.lines
-#define BlocksUsed  g_mem.blocks_used
+#define MemUsed     XMemTracker::MemUsed
+#define BlockUsed   XMem.used
+#define BlockPnts   XMem.pnts
+#define BlockSize   XMem.sizes
+#define BlockInFile XMem.files
+#define BlockInLine XMem.lines
+#define BlocksUsed  XMem.blocks_used
 
 void XMem_Init( void )
 {
 	MemUsed = 0;
-	g_mem.init();
+	XMem.init();
 }
 
 int XMem_FindFree( void )
 {
-	return g_mem.find_free();
+	return XMem.find_free();
 }
 
 int XMem_FindSame( void * Pnt )
 {
-	return g_mem.find_same(Pnt);
+	return XMem.find_same(Pnt);
 }
 
 char * X_strdup( const char *str, const char *in_file, int in_line )

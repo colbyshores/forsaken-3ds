@@ -4646,7 +4646,7 @@ bool Our_CalculateFrameRate(void)
 		CenterPrint4x5Text( (char *) &buf[0], (FontHeight+3)*3, 2 );
 
 		// memory information
-		snprintf(&buf[0], sizeof( buf ), "Mem %d",(int)MemUsed );
+		snprintf(&buf[0], sizeof( buf ), "Mem %d",(int)XMem.bytes_in_use() );
 		CenterPrint4x5Text( (char *) &buf[0], (FontHeight+3)*4, 2 );
 
 		// show polygon information
