@@ -2687,13 +2687,158 @@ void ReceiveGameMessages( void )
 	Ships[BikeNumMsg->WhoIAm].BikeNum = (int16_t) BikeNumMsg->BikeNum;
 }
 
-void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
+/* MSG_SECBULLPOSDIR -- false: EvaluateMessage returns */
+[[gnu::always_inline]] static inline bool EvaluatePreGameSecBullPosDir( BYTE *& MsgPnt )
 {
-	SHIPHEALTHMSG                 *ShipHealthMsg;
-	SECBULLPOSDIRMSG				*SecBullPosDirMsg;
-	DROPPICKUPMSG					*DropPickupMsg;
-	VERYSHORTDROPPICKUPMSG   *VeryShortDropPickupMsg;
-	KILLPICKUPMSG						*KillPickupMsg;
+	SECBULLPOSDIRMSG				* SecBullPosDirMsg;
+
+	SecBullPosDirMsg = (SECBULLPOSDIRMSG *)MsgPnt;
+
+	if( SecondaryWeaponAttribs[ SecBullPosDirMsg->SecBullPosDir.Weapon ].SecType == SEC_MINE )
+	{
+		if( NumMissedMines != MAXMISSEDMINES )
+		{
+			DebugPrintf( "MissedInitMine() %d\n", NumMissedMines );
+
+			MissedInitMines[ NumMissedInitMines ].OwnerType	= SecBullPosDirMsg->SecBullPosDir.OwnerType;
+			MissedInitMines[ NumMissedInitMines ].Owner		= SecBullPosDirMsg->SecBullPosDir.Owner;
+			MissedInitMines[ NumMissedInitMines ].BulletID		= SecBullPosDirMsg->SecBullPosDir.BulletID;
+			MissedInitMines[ NumMissedInitMines ].Group			= SecBullPosDirMsg->SecBullPosDir.Group;
+			MissedInitMines[ NumMissedInitMines ].Pos			= SecBullPosDirMsg->SecBullPosDir.Pos;
+			MissedInitMines[ NumMissedInitMines ].Offset		= SecBullPosDirMsg->SecBullPosDir.Offset;
+			MissedInitMines[ NumMissedInitMines ].Dir				= SecBullPosDirMsg->SecBullPosDir.Dir;
+			MissedInitMines[ NumMissedInitMines ].UpVector	= SecBullPosDirMsg->SecBullPosDir.UpVector;
+			MissedInitMines[ NumMissedInitMines ].DropDir		= SecBullPosDirMsg->SecBullPosDir.DropDir;
+			MissedInitMines[ NumMissedInitMines ].Weapon		= SecBullPosDirMsg->SecBullPosDir.Weapon;
+			MissedMines[ NumMissedMines ].Type = MM_TYPE_INIT;
+			MissedMines[ NumMissedMines ].Struct = &MissedInitMines[ NumMissedInitMines ];
+			NumMissedInitMines++;
+			NumMissedMines++;
+		}
+		else
+		{
+			DebugPrintf( "Overflowed mine que ( INIT )\n" );
+		}
+	}
+	return false;
+	return true;
+}
+
+/* MSG_DROPPICKUP -- false: EvaluateMessage returns */
+[[gnu::always_inline]] static inline bool EvaluatePreGameDropPickup( BYTE *& MsgPnt )
+{
+	DROPPICKUPMSG					* DropPickupMsg;
+
+	DropPickupMsg = (DROPPICKUPMSG *)MsgPnt;
+
+	if( NumMissedPickups != MAXMISSEDPICKUPS )
+	{
+		MissedInitPickups[ NumMissedInitPickups ].Pos				= DropPickupMsg->PickupInfo.Pos;
+		MissedInitPickups[ NumMissedInitPickups ].Group			= DropPickupMsg->PickupInfo.Group;
+		MissedInitPickups[ NumMissedInitPickups ].Dir				= DropPickupMsg->PickupInfo.Dir;
+		MissedInitPickups[ NumMissedInitPickups ].Speed			= DropPickupMsg->PickupInfo.Speed;
+		MissedInitPickups[ NumMissedInitPickups ].Type				= DropPickupMsg->PickupInfo.Type;
+		MissedInitPickups[ NumMissedInitPickups ].Owner			= DropPickupMsg->WhoIAm;
+		MissedInitPickups[ NumMissedInitPickups ].ID					= DropPickupMsg->PickupInfo.IDCount;
+		MissedInitPickups[ NumMissedInitPickups ].RegenSlot		= DropPickupMsg->PickupInfo.RegenSlot;
+		MissedInitPickups[ NumMissedInitPickups ].Sparkle			= DropPickupMsg->PickupInfo.Sparkle;
+		MissedInitPickups[ NumMissedInitPickups ].LifeCount		= DropPickupMsg->PickupInfo.LifeCount;
+		MissedInitPickups[ NumMissedInitPickups ].TriggerMod		= DropPickupMsg->PickupInfo.TriggerMod;
+		MissedPickups[ NumMissedPickups ].Type		= MPU_TYPE_INIT;
+		MissedPickups[ NumMissedPickups ].Struct	= &MissedInitPickups[ NumMissedInitPickups ];
+#if DEBUG_PICKUPS
+		DebugPrintf( "Added Init '%s' to Que\n", Messages[ DropPickupMsg->PickupInfo.Type ] );
+#endif
+		NumMissedInitPickups++;
+		NumMissedPickups++;
+	}
+	else
+	{
+#if DEBUG_PICKUPS
+		DebugPrintf( "Overflowed pickup que ( INIT )\n" );
+#endif
+	}
+	return false;
+	return true;
+}
+
+/* MSG_VERYSHORTDROPPICKUP -- false: EvaluateMessage returns */
+[[gnu::always_inline]] static inline bool EvaluatePreGameVeryShortDropPickup( BYTE *& MsgPnt )
+{
+	VERYSHORTDROPPICKUPMSG *VeryShortDropPickupMsg;
+
+	VeryShortDropPickupMsg = (VERYSHORTDROPPICKUPMSG *)MsgPnt;
+
+	if( NumMissedPickups != MAXMISSEDPICKUPS )
+	{
+		MissedInitPickups[ NumMissedInitPickups ].Pos.x			= (float)VeryShortDropPickupMsg->PickupInfo.Pos.x;
+		MissedInitPickups[ NumMissedInitPickups ].Pos.y			= (float)VeryShortDropPickupMsg->PickupInfo.Pos.y;
+		MissedInitPickups[ NumMissedInitPickups ].Pos.z			= (float)VeryShortDropPickupMsg->PickupInfo.Pos.z;
+		MissedInitPickups[ NumMissedInitPickups ].Dir.x				= VeryShortDropPickupMsg->PickupInfo.Dir.x * ONEOVER32767;
+		MissedInitPickups[ NumMissedInitPickups ].Dir.y				= VeryShortDropPickupMsg->PickupInfo.Dir.y * ONEOVER32767;
+		MissedInitPickups[ NumMissedInitPickups ].Dir.z				= VeryShortDropPickupMsg->PickupInfo.Dir.z * ONEOVER32767;
+		MissedInitPickups[ NumMissedInitPickups ].Group			= VeryShortDropPickupMsg->PickupInfo.Group;
+		MissedInitPickups[ NumMissedInitPickups ].Speed			= VeryShortDropPickupMsg->PickupInfo.Speed;
+		MissedInitPickups[ NumMissedInitPickups ].Type				= VeryShortDropPickupMsg->PickupInfo.Type;
+		MissedInitPickups[ NumMissedInitPickups ].Owner			= VeryShortDropPickupMsg->WhoIAm;
+		MissedInitPickups[ NumMissedInitPickups ].ID					= VeryShortDropPickupMsg->PickupInfo.IDCount;
+		MissedInitPickups[ NumMissedInitPickups ].RegenSlot		= VeryShortDropPickupMsg->PickupInfo.RegenSlot;
+		MissedInitPickups[ NumMissedInitPickups ].Sparkle			= VeryShortDropPickupMsg->PickupInfo.Sparkle;
+		MissedInitPickups[ NumMissedInitPickups ].LifeCount		= VeryShortDropPickupMsg->PickupInfo.LifeCount;
+		MissedInitPickups[ NumMissedInitPickups ].TriggerMod		= VeryShortDropPickupMsg->PickupInfo.TriggerMod;
+		MissedPickups[ NumMissedPickups ].Type		= MPU_TYPE_INIT;
+		MissedPickups[ NumMissedPickups ].Struct	= &MissedInitPickups[ NumMissedInitPickups ];
+#if DEBUG_PICKUPS
+		DebugPrintf( "Added Init '%s' to Que\n", Messages[ VeryShortDropPickupMsg->PickupInfo.Type ] );
+#endif
+		NumMissedInitPickups++;
+		NumMissedPickups++;
+	}
+	else
+	{
+#if DEBUG_PICKUPS
+		DebugPrintf( "Overflowed pickup que ( INIT )\n" );
+#endif
+	}
+	return false;
+	return true;
+}
+
+/* MSG_KILLPICKUP -- false: EvaluateMessage returns */
+[[gnu::always_inline]] static inline bool EvaluatePreGameKillPickup( BYTE *& MsgPnt )
+{
+	KILLPICKUPMSG						* KillPickupMsg;
+
+	KillPickupMsg = (KILLPICKUPMSG *)MsgPnt;
+	if( NumMissedPickups != MAXMISSEDPICKUPS )
+	{
+		MissedKillPickups[ NumMissedKillPickups ].Owner = KillPickupMsg->KillPickupInfo.Owner;
+		MissedKillPickups[ NumMissedKillPickups ].ID		= KillPickupMsg->KillPickupInfo.IDCount;
+		MissedKillPickups[ NumMissedKillPickups ].Style	= KillPickupMsg->KillPickupInfo.Style;
+		MissedPickups[ NumMissedPickups ].Type			= MPU_TYPE_KILL;
+		MissedPickups[ NumMissedPickups ].Struct		= &MissedKillPickups[ NumMissedKillPickups ];
+#if DEBUG_PICKUPS
+		DebugPrintf( "Added Kill pickup of Owner '%s', ID %d, to que\n",
+					&Names[ KillPickupMsg->KillPickupInfo.Owner ][ 0 ],
+					KillPickupMsg->KillPickupInfo.IDCount );
+#endif
+		NumMissedKillPickups++;
+		NumMissedPickups++;
+	}
+	else
+	{
+#if DEBUG_PICKUPS
+		DebugPrintf( "Overflowed pickup que ( KILL )\n" );
+#endif
+	}
+	return false;
+	return true;
+}
+
+/* MSG_SHIPHEALTH is handled before any validation: flash and store the sender's hull/shield. True: the message is done */
+[[gnu::always_inline]] static inline bool EvaluateShipHealthMsg( BYTE *& MsgPnt )
+{
+	SHIPHEALTHMSG *ShipHealthMsg;
 
 	switch (*MsgPnt)
 	{
@@ -2718,16 +2863,19 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 			PlayerHealths[ShipHealthMsg->WhoIAm].Hull = ShipHealthMsg->Hull;
 			PlayerHealths[ShipHealthMsg->WhoIAm].Shield = ShipHealthMsg->Shield;
 		}
-		return;
+		return true;
 	}
+	return false;
+}
 
-	// check if it's a valid packet
-
+/* validate an incoming message: known type, right size, a valid active sender id that is not me, and host-only messages from the host. True: drop it */
+[[gnu::always_inline]] static inline bool EvaluateMessageRejected( network_player_t *& from, DWORD & len, BYTE *& MsgPnt )
+{
 	if( ! msg_is_valid( *MsgPnt ) )
 	{
 		DebugPrintf("EvaluateMessage: from %s (%s:%d) dropping for unknown type: %d\n",
 			from->name, from->ip, from->port, *MsgPnt );
-		return;
+		return true;
 	}
 
 	// check the size of the packet is proper for message type
@@ -2736,7 +2884,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 	{
 		DebugPrintf("EvaluateMessage: from %s (%s:%d) dropping %s (%d) for invalid size of %d expected %d\n",
 			from->name, from->ip, from->port, msg_to_str(*MsgPnt), *MsgPnt, len, RealPacketSize[*MsgPnt]);
-		return;
+		return true;
 	}
 
 	// check player id is valid
@@ -2750,7 +2898,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 		{
 			DebugPrintf("EvaluateMessage: from %s (%s:%d) dropping %s (%d) for player id being out of range: %d\n",
 				from->name, from->ip, from->port, msg_to_str(*MsgPnt), *MsgPnt, id );
-			return;
+			return true;
 		}
 
 		// make sure packet doens't appear to come from my self
@@ -2759,7 +2907,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 		{
 			DebugPrintf("EvaluateMessage: from %s (%s:%d) dropping %s (%d) for using my player id: %d\n",
 				from->name, from->ip, from->port, msg_to_str(*MsgPnt), *MsgPnt, id );
-			return;
+			return true;
 		}
 
 		// make sure player id is a valid player
@@ -2771,7 +2919,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 			){
 			DebugPrintf("EvaluateMessage: from %s (%s:%d) dropping %s (%d) for using inactive player id: %d\n",
 				from->name, from->ip, from->port, msg_to_str(*MsgPnt), *MsgPnt, id );
-			return;
+			return true;
 		}
 	}
 
@@ -2805,7 +2953,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 					host_network_player->name, host_network_player->ip, host_network_player->port );
 			}
 			DebugPrintf_(" is allowed to send this.\n");
-			return;
+			return true;
 		}
 
 	default:
@@ -2826,6 +2974,18 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 	default:
 		break;
 	}
+	return false;
+}
+
+void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
+{
+	if( EvaluateShipHealthMsg( MsgPnt ) )
+		return;
+
+	// check if it's a valid packet
+
+	if( EvaluateMessageRejected( from, len, MsgPnt ) )
+		return;
 
 	// set flag sfx volume
 	FlagVolume = FlagSfxSlider.value / ( FlagSfxSlider.max / GLOBAL_MAX_SFX );
@@ -2855,131 +3015,23 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 		switch (*MsgPnt)
 		{
 		case MSG_SECBULLPOSDIR:
-			SecBullPosDirMsg = (SECBULLPOSDIRMSG *)MsgPnt;
-
-			if( SecondaryWeaponAttribs[ SecBullPosDirMsg->SecBullPosDir.Weapon ].SecType == SEC_MINE )
-			{
-				if( NumMissedMines != MAXMISSEDMINES )
-				{
-					DebugPrintf( "MissedInitMine() %d\n", NumMissedMines );
-
-					MissedInitMines[ NumMissedInitMines ].OwnerType	= SecBullPosDirMsg->SecBullPosDir.OwnerType;
-					MissedInitMines[ NumMissedInitMines ].Owner		= SecBullPosDirMsg->SecBullPosDir.Owner;
-					MissedInitMines[ NumMissedInitMines ].BulletID		= SecBullPosDirMsg->SecBullPosDir.BulletID;
-					MissedInitMines[ NumMissedInitMines ].Group			= SecBullPosDirMsg->SecBullPosDir.Group;
-					MissedInitMines[ NumMissedInitMines ].Pos			= SecBullPosDirMsg->SecBullPosDir.Pos;
-					MissedInitMines[ NumMissedInitMines ].Offset		= SecBullPosDirMsg->SecBullPosDir.Offset;
-					MissedInitMines[ NumMissedInitMines ].Dir				= SecBullPosDirMsg->SecBullPosDir.Dir;
-					MissedInitMines[ NumMissedInitMines ].UpVector	= SecBullPosDirMsg->SecBullPosDir.UpVector;
-					MissedInitMines[ NumMissedInitMines ].DropDir		= SecBullPosDirMsg->SecBullPosDir.DropDir;
-					MissedInitMines[ NumMissedInitMines ].Weapon		= SecBullPosDirMsg->SecBullPosDir.Weapon;
-					MissedMines[ NumMissedMines ].Type = MM_TYPE_INIT;
-					MissedMines[ NumMissedMines ].Struct = &MissedInitMines[ NumMissedInitMines ];
-					NumMissedInitMines++;
-					NumMissedMines++;
-				}
-				else
-				{
-					DebugPrintf( "Overflowed mine que ( INIT )\n" );
-				}
-			}
-			return;
+			if( !EvaluatePreGameSecBullPosDir( MsgPnt ) )
+				return;
 			break;
 
 		case MSG_DROPPICKUP:
-			DropPickupMsg = (DROPPICKUPMSG *)MsgPnt;
-
-			if( NumMissedPickups != MAXMISSEDPICKUPS )
-			{
-				MissedInitPickups[ NumMissedInitPickups ].Pos				= DropPickupMsg->PickupInfo.Pos;
-				MissedInitPickups[ NumMissedInitPickups ].Group			= DropPickupMsg->PickupInfo.Group;
-				MissedInitPickups[ NumMissedInitPickups ].Dir				= DropPickupMsg->PickupInfo.Dir;
-				MissedInitPickups[ NumMissedInitPickups ].Speed			= DropPickupMsg->PickupInfo.Speed;
-				MissedInitPickups[ NumMissedInitPickups ].Type				= DropPickupMsg->PickupInfo.Type;
-				MissedInitPickups[ NumMissedInitPickups ].Owner			= DropPickupMsg->WhoIAm;
-				MissedInitPickups[ NumMissedInitPickups ].ID					= DropPickupMsg->PickupInfo.IDCount;
-				MissedInitPickups[ NumMissedInitPickups ].RegenSlot		= DropPickupMsg->PickupInfo.RegenSlot;
-				MissedInitPickups[ NumMissedInitPickups ].Sparkle			= DropPickupMsg->PickupInfo.Sparkle;
-				MissedInitPickups[ NumMissedInitPickups ].LifeCount		= DropPickupMsg->PickupInfo.LifeCount;
-				MissedInitPickups[ NumMissedInitPickups ].TriggerMod		= DropPickupMsg->PickupInfo.TriggerMod;
-				MissedPickups[ NumMissedPickups ].Type		= MPU_TYPE_INIT;
-				MissedPickups[ NumMissedPickups ].Struct	= &MissedInitPickups[ NumMissedInitPickups ];
-#if DEBUG_PICKUPS
-				DebugPrintf( "Added Init '%s' to Que\n", Messages[ DropPickupMsg->PickupInfo.Type ] );
-#endif
-				NumMissedInitPickups++;
-				NumMissedPickups++;
-			}
-			else
-			{
-#if DEBUG_PICKUPS
-				DebugPrintf( "Overflowed pickup que ( INIT )\n" );
-#endif
-			}
-			return;
+			if( !EvaluatePreGameDropPickup( MsgPnt ) )
+				return;
 			break;
 
 		case MSG_VERYSHORTDROPPICKUP:
-			VeryShortDropPickupMsg = (VERYSHORTDROPPICKUPMSG *)MsgPnt;
-
-			if( NumMissedPickups != MAXMISSEDPICKUPS )
-			{
-				MissedInitPickups[ NumMissedInitPickups ].Pos.x			= (float)VeryShortDropPickupMsg->PickupInfo.Pos.x;
-				MissedInitPickups[ NumMissedInitPickups ].Pos.y			= (float)VeryShortDropPickupMsg->PickupInfo.Pos.y;
-				MissedInitPickups[ NumMissedInitPickups ].Pos.z			= (float)VeryShortDropPickupMsg->PickupInfo.Pos.z;
-				MissedInitPickups[ NumMissedInitPickups ].Dir.x				= VeryShortDropPickupMsg->PickupInfo.Dir.x * ONEOVER32767;
-				MissedInitPickups[ NumMissedInitPickups ].Dir.y				= VeryShortDropPickupMsg->PickupInfo.Dir.y * ONEOVER32767;
-				MissedInitPickups[ NumMissedInitPickups ].Dir.z				= VeryShortDropPickupMsg->PickupInfo.Dir.z * ONEOVER32767;
-				MissedInitPickups[ NumMissedInitPickups ].Group			= VeryShortDropPickupMsg->PickupInfo.Group;
-				MissedInitPickups[ NumMissedInitPickups ].Speed			= VeryShortDropPickupMsg->PickupInfo.Speed;
-				MissedInitPickups[ NumMissedInitPickups ].Type				= VeryShortDropPickupMsg->PickupInfo.Type;
-				MissedInitPickups[ NumMissedInitPickups ].Owner			= VeryShortDropPickupMsg->WhoIAm;
-				MissedInitPickups[ NumMissedInitPickups ].ID					= VeryShortDropPickupMsg->PickupInfo.IDCount;
-				MissedInitPickups[ NumMissedInitPickups ].RegenSlot		= VeryShortDropPickupMsg->PickupInfo.RegenSlot;
-				MissedInitPickups[ NumMissedInitPickups ].Sparkle			= VeryShortDropPickupMsg->PickupInfo.Sparkle;
-				MissedInitPickups[ NumMissedInitPickups ].LifeCount		= VeryShortDropPickupMsg->PickupInfo.LifeCount;
-				MissedInitPickups[ NumMissedInitPickups ].TriggerMod		= VeryShortDropPickupMsg->PickupInfo.TriggerMod;
-				MissedPickups[ NumMissedPickups ].Type		= MPU_TYPE_INIT;
-				MissedPickups[ NumMissedPickups ].Struct	= &MissedInitPickups[ NumMissedInitPickups ];
-#if DEBUG_PICKUPS
-				DebugPrintf( "Added Init '%s' to Que\n", Messages[ VeryShortDropPickupMsg->PickupInfo.Type ] );
-#endif
-				NumMissedInitPickups++;
-				NumMissedPickups++;
-			}
-			else
-			{
-#if DEBUG_PICKUPS
-				DebugPrintf( "Overflowed pickup que ( INIT )\n" );
-#endif
-			}
-			return;
+			if( !EvaluatePreGameVeryShortDropPickup( MsgPnt ) )
+				return;
 			break;
 
 		case MSG_KILLPICKUP:
-			KillPickupMsg = (KILLPICKUPMSG *)MsgPnt;
-			if( NumMissedPickups != MAXMISSEDPICKUPS )
-			{
-				MissedKillPickups[ NumMissedKillPickups ].Owner = KillPickupMsg->KillPickupInfo.Owner;
-				MissedKillPickups[ NumMissedKillPickups ].ID		= KillPickupMsg->KillPickupInfo.IDCount;
-				MissedKillPickups[ NumMissedKillPickups ].Style	= KillPickupMsg->KillPickupInfo.Style;
-				MissedPickups[ NumMissedPickups ].Type			= MPU_TYPE_KILL;
-				MissedPickups[ NumMissedPickups ].Struct		= &MissedKillPickups[ NumMissedKillPickups ];
-#if DEBUG_PICKUPS
-				DebugPrintf( "Added Kill pickup of Owner '%s', ID %d, to que\n",
-							&Names[ KillPickupMsg->KillPickupInfo.Owner ][ 0 ],
-							KillPickupMsg->KillPickupInfo.IDCount );
-#endif
-				NumMissedKillPickups++;
-				NumMissedPickups++;
-			}
-			else
-			{
-#if DEBUG_PICKUPS
-				DebugPrintf( "Overflowed pickup que ( KILL )\n" );
-#endif
-			}
-			return;
+			if( !EvaluatePreGameKillPickup( MsgPnt ) )
+				return;
 			break;
 
 		case MSG_SHORTREGENSLOT:
