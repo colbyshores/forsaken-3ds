@@ -13,6 +13,102 @@
 	Submits triangles directly with C3D_DrawArrays.
 ===================================================================*/
 
+/* Load the projection and modelview for this draw: the scene's matrices, or
+ * a tilted orthographic screen projection with identity modelview for 2D. */
+[[gnu::always_inline]] static inline void draw_set_view_matrices(bool orthographic)
+{
+	if (!orthographic)
+	{
+		upload_matrices();
+	}
+	else
+	{
+		C3D_Mtx ortho, identity;
+		Mtx_OrthoTilt(&ortho, 0.0f, render_info.ThisMode.w,
+			render_info.ThisMode.h, 0.0f, -1.0f, 1.0f, true);
+		Mtx_Identity(&identity);
+		C3D_FVUnifMtx4x4(GPU_VERTEX_SHADER, UNIFORM_PROJECTION, &ortho);
+		C3D_FVUnifMtx4x4(GPU_VERTEX_SHADER, UNIFORM_MODELVIEW, &identity);
+	}
+}
+
+/* Sort texture groups by texture pointer so consecutive groups share
+ * the same texture, maximizing draw call batching.  Uses a local index
+ * array (not modifying the renderObject) and insertion sort -- fast for
+ * the small N (max 64 on 3DS). */
+[[gnu::always_inline]] static inline void draw_sort_texture_groups(RENDEROBJECT *renderObject, int numGroups, int (&sorted_order)[MAX_TEXTURE_GROUPS])
+{
+	int si, sj;
+	for (si = 0; si < numGroups; si++)
+		sorted_order[si] = si;
+	for (si = 1; si < numGroups; si++)
+	{
+		int key = sorted_order[si];
+		void *key_tex = (void*)renderObject->textureGroups[key].texture;
+		sj = si - 1;
+		while (sj >= 0 &&
+			   (void*)renderObject->textureGroups[sorted_order[sj]].texture > key_tex)
+		{
+			sorted_order[sj + 1] = sorted_order[sj];
+			sj--;
+		}
+		sorted_order[sj + 1] = key;
+	}
+}
+
+/* After C3D_FrameSplit reset the scratch buffer: stop the stereo memo
+ * (scratch reset recycles eye-1 recorded offsets; the pending batch was
+ * already flushed with valid ranges, so the rest of the frame runs fully
+ * live) and re-establish the shader, attribute layout, texture/TexEnv cache
+ * and matrices the split dropped. */
+[[gnu::always_inline]] static inline void draw_restore_after_frame_split(bool orthographic)
+{
+	if (s_memoMode != SMEMO_OFF)
+		s_memoMode = SMEMO_OFF;
+	s_memoSaved = SMEMO_OFF;	/* a suspended pass must not re-arm it */
+	C3D_BindProgram(&s_shaderProgram);
+	{
+		C3D_AttrInfo *ai = C3D_GetAttrInfo();
+		AttrInfo_Init(ai);
+		AttrInfo_AddLoader(ai, 0, GPU_FLOAT, 3);
+		AttrInfo_AddLoader(ai, 1, GPU_FLOAT, 4);
+		AttrInfo_AddLoader(ai, 2, GPU_FLOAT, 2);
+	}
+	s_lastBoundTexture = nullptr;
+	s_lastTexEnvTextured = false;
+	s_lastTexEnvMode = TEXENV_MODE_NONE;
+	draw_set_view_matrices(orthographic);
+}
+
+/* One source vertex to the GPU layout: position, colour through the 0..255
+ * -> 0..1 table, texture coordinates. The TLVERTEX (screen-space) and
+ * LVERTEX (world-space) loaders share it. */
+[[gnu::always_inline]] static inline void draw_convert_vertex(gpu_vertex_t & d, const TLVERTEX *v)
+{
+	d.pos[0] = v->x;
+	d.pos[1] = v->y;
+	d.pos[2] = v->z;
+	d.color[0] = s_c255[(v->color >> 16) & 0xFF];
+	d.color[1] = s_c255[(v->color >> 8) & 0xFF];
+	d.color[2] = s_c255[(v->color) & 0xFF];
+	d.color[3] = s_c255[(v->color >> 24) & 0xFF];
+	d.texcoord[0] = v->tu;
+	d.texcoord[1] = v->tv;
+}
+
+[[gnu::always_inline]] static inline void draw_convert_vertex(gpu_vertex_t & d, const LVERTEX *v)
+{
+	d.pos[0] = v->x;
+	d.pos[1] = v->y;
+	d.pos[2] = v->z;
+	d.color[0] = s_c255[(v->color >> 16) & 0xFF];
+	d.color[1] = s_c255[(v->color >> 8) & 0xFF];
+	d.color[2] = s_c255[(v->color) & 0xFF];
+	d.color[3] = s_c255[(v->color >> 24) & 0xFF];
+	d.texcoord[0] = v->tu;
+	d.texcoord[1] = v->tv;
+}
+
 bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool orthographic)
 {
 	int group;
@@ -47,45 +143,12 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 	if (!s_shaderReady || !renderObject || !renderObject->vertexBuffer || !s_scratch)
 		return false;
 
-	if (!orthographic)
-	{
-		upload_matrices();
-	}
-	else
-	{
-		C3D_Mtx ortho, identity;
-		Mtx_OrthoTilt(&ortho, 0.0f, render_info.ThisMode.w,
-			render_info.ThisMode.h, 0.0f, -1.0f, 1.0f, true);
-		Mtx_Identity(&identity);
-		C3D_FVUnifMtx4x4(GPU_VERTEX_SHADER, UNIFORM_PROJECTION, &ortho);
-		C3D_FVUnifMtx4x4(GPU_VERTEX_SHADER, UNIFORM_MODELVIEW, &identity);
-	}
+	draw_set_view_matrices(orthographic);
 
-	/* ---- Texture sorting ----
-	 * Sort texture groups by texture pointer so consecutive groups share
-	 * the same texture, maximizing draw call batching below.  Uses a
-	 * local index array (not modifying the renderObject) and insertion
-	 * sort — fast for the small N (max 64 on 3DS). */
+	/* ---- Texture sorting: same-texture groups end up adjacent for batching ---- */
 	int sorted_order[MAX_TEXTURE_GROUPS];
 	int numGroups = renderObject->numTextureGroups;
-	{
-		int si, sj;
-		for (si = 0; si < numGroups; si++)
-			sorted_order[si] = si;
-		for (si = 1; si < numGroups; si++)
-		{
-			int key = sorted_order[si];
-			void *key_tex = (void*)renderObject->textureGroups[key].texture;
-			sj = si - 1;
-			while (sj >= 0 &&
-				   (void*)renderObject->textureGroups[sorted_order[sj]].texture > key_tex)
-			{
-				sorted_order[sj + 1] = sorted_order[sj];
-				sj--;
-			}
-			sorted_order[sj + 1] = key;
-		}
-	}
+	draw_sort_texture_groups(renderObject, numGroups, sorted_order);
 
 	/* ---- Draw call batching ----
 	 * Accumulate consecutive texture groups with the same GPU state
@@ -111,6 +174,7 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 	 * Zero-initialized for the same reason as above. */
 	gpu_vertex_t *tg_persist_buf[MAX_TEXTURE_GROUPS] = {0};
 	int   tg_persist_cnt[MAX_TEXTURE_GROUPS] = {0};
+
 
 	/* Macro: flush the current batch. Eye 1 (and memo off): one draw call,
 	 * exactly as before. Eye 2 in lookup mode: one draw per texgroup range
@@ -228,35 +292,7 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 				FLUSH_BATCH();
 				C3D_FrameSplit(0);
 				s_scratchUsed = 0;
-				/* Scratch reset recycles eye-1 recorded offsets: stop
-				 * reusing them. The pending batch was already flushed
-				 * above (valid ranges); the rest of the frame runs
-				 * fully live. */
-				if (s_memoMode != SMEMO_OFF)
-					s_memoMode = SMEMO_OFF;
-				s_memoSaved = SMEMO_OFF;	/* a suspended pass must not re-arm it */
-				C3D_BindProgram(&s_shaderProgram);
-				{
-					C3D_AttrInfo *ai = C3D_GetAttrInfo();
-					AttrInfo_Init(ai);
-					AttrInfo_AddLoader(ai, 0, GPU_FLOAT, 3);
-					AttrInfo_AddLoader(ai, 1, GPU_FLOAT, 4);
-					AttrInfo_AddLoader(ai, 2, GPU_FLOAT, 2);
-				}
-				s_lastBoundTexture = nullptr;
-				s_lastTexEnvTextured = false;
-				s_lastTexEnvMode = TEXENV_MODE_NONE;
-				if (!orthographic)
-					upload_matrices();
-				else
-				{
-					C3D_Mtx ortho, identity;
-					Mtx_OrthoTilt(&ortho, 0.0f, render_info.ThisMode.w,
-						render_info.ThisMode.h, 0.0f, -1.0f, 1.0f, true);
-					Mtx_Identity(&identity);
-					C3D_FVUnifMtx4x4(GPU_VERTEX_SHADER, UNIFORM_PROJECTION, &ortho);
-					C3D_FVUnifMtx4x4(GPU_VERTEX_SHADER, UNIFORM_MODELVIEW, &identity);
-				}
+				draw_restore_after_frame_split(orthographic);
 			}
 			if (s_scratchUsed + numIndices > s_scratchMax) {
 				tg_memo_cnt[group] = 0;
@@ -288,15 +324,7 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 					for (i = 0; i < numIndices; i++)
 					{
 						TLVERTEX *v = &verts[startVert + indices[i]];
-						dst[i].pos[0] = v->x;
-						dst[i].pos[1] = v->y;
-						dst[i].pos[2] = v->z;
-						dst[i].color[0] = s_c255[(v->color >> 16) & 0xFF];
-						dst[i].color[1] = s_c255[(v->color >> 8) & 0xFF];
-						dst[i].color[2] = s_c255[(v->color) & 0xFF];
-						dst[i].color[3] = s_c255[(v->color >> 24) & 0xFF];
-						dst[i].texcoord[0] = v->tu;
-						dst[i].texcoord[1] = v->tv;
+						draw_convert_vertex(dst[i], v);
 					}
 				}
 				else
@@ -306,15 +334,7 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 					{
 						int vi = startVert + indices[i];
 						LVERTEX *v = &verts[vi];
-						dst[i].pos[0] = v->x;
-						dst[i].pos[1] = v->y;
-						dst[i].pos[2] = v->z;
-						dst[i].color[0] = s_c255[(v->color >> 16) & 0xFF];
-						dst[i].color[1] = s_c255[(v->color >> 8) & 0xFF];
-						dst[i].color[2] = s_c255[(v->color) & 0xFF];
-						dst[i].color[3] = s_c255[(v->color >> 24) & 0xFF];
-						dst[i].texcoord[0] = v->tu;
-						dst[i].texcoord[1] = v->tv;
+						draw_convert_vertex(dst[i], v);
 					}
 					totalVerts = numIndices;
 				}
@@ -332,15 +352,7 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 				{
 					int vi = startVert + i;
 					LVERTEX *v = &verts[vi];
-					dst[i].pos[0] = v->x;
-					dst[i].pos[1] = v->y;
-					dst[i].pos[2] = v->z;
-					dst[i].color[0] = s_c255[(v->color >> 16) & 0xFF];
-					dst[i].color[1] = s_c255[(v->color >> 8) & 0xFF];
-					dst[i].color[2] = s_c255[(v->color) & 0xFF];
-					dst[i].color[3] = s_c255[(v->color >> 24) & 0xFF];
-					dst[i].texcoord[0] = v->tu;
-					dst[i].texcoord[1] = v->tv;
+					draw_convert_vertex(dst[i], v);
 				}
 				totalVerts = numVerts;
 			}
