@@ -1991,6 +1991,299 @@ float TomFrame = 0.0F;
 	}
 }
 
+/* timed spot FX (flame, smoke, steam, sparks, beams, trails, fire wall, bubbles, Beard/HK5 afterburners,
+   sound, and any unlisted type): once each SpotFXTimeInterval, place it and emit one */
+[[gnu::always_inline]] static inline void ModelSpotFXTimed( u_int16_t & i, float & Speed, VECTOR & Pos, VECTOR & UpVector, VECTOR & DirVector, PVSPOTFX *& SpotFXPtr, int16_t & Count, u_int16_t & SpotFXGroup, int16_t & VisNum, u_int16_t (&VisGroups)[ MAXGROUPS ], int16_t & Count2, float & ShipSpeed )
+{
+	Models[i].SpotFXTimeCount[ Count ] += framelag;
+
+	if( Models[i].SpotFXTimeCount[ Count ] >= Models[i].SpotFXTimeInterval[ Count ] )
+	{
+		Models[i].SpotFXTimeCount[ Count ] = (float) FMOD( Models[i].SpotFXTimeCount[ Count ], Models[i].SpotFXTimeInterval[ Count ] );
+
+		ApplyMatrix( &Models[i].Mat, &SpotFXPtr->Pos, &Pos );
+		ApplyMatrix( &Models[i].Mat, &SpotFXPtr->DirVector, &DirVector );
+		ApplyMatrix( &Models[i].Mat, &SpotFXPtr->UpVector, &UpVector );
+
+		Pos.x += Models[i].Pos.x;
+		Pos.y += Models[i].Pos.y;
+		Pos.z += Models[i].Pos.z;
+
+		SpotFXGroup = Models[i].Group;
+
+		for( Count2 = 0; Count2 < VisNum; Count2++ )
+		{
+			if( Bsp_Header[ 0 ].State )
+			{
+				if( PointInsideSkin( &Pos, VisGroups[ Count2 ] ) )
+				{
+					SpotFXGroup = VisGroups[ Count2 ];
+					break;
+				}
+			}
+			else
+			{
+				if( PointInGroupBoundingBox( &Mloadheader, &Pos, VisGroups[ Count2 ] ) )
+				{
+					SpotFXGroup = VisGroups[ Count2 ];
+					break;
+				}
+			}
+		}
+
+		if( CAMERA_VIEW_IS_VALID && GroupsAreVisible( SpotFXGroup, Ships[ Current_Camera_View ].Object.Group ) )
+		{
+			switch( SpotFXPtr->Type )
+			{
+			case SPOTFX_Flame:
+				CreateSpotFXFlame( &Pos, &DirVector, SpotFXGroup );
+				break;
+
+			case SPOTFX_Smoke:
+				CreateSpotFXSmoke( &Pos, &DirVector, SpotFXGroup, SpotFXPtr->Red, SpotFXPtr->Green, SpotFXPtr->Blue );
+				break;
+
+			case SPOTFX_Steam:
+				CreateSpotFXSteam( &Pos, &DirVector, SpotFXGroup, SpotFXPtr->Red, SpotFXPtr->Green, SpotFXPtr->Blue );
+				break;
+
+			case SPOTFX_Sparks:
+				CreateSpotFXSparks( &Pos, &DirVector, SpotFXGroup, SpotFXPtr->Red, SpotFXPtr->Green, SpotFXPtr->Blue );
+				break;
+
+			case SPOTFX_ElectricBeams:
+				CreateSpotFXElectricBeams( &Pos, &DirVector, &UpVector, SpotFXGroup );
+				break;
+
+			case SPOTFX_GravgonTrail:
+				CreateSpotFXGravgonTrail( &Pos, &DirVector, SpotFXGroup );
+				break;
+
+			case SPOTFX_NmeTrail:
+				CreateSpotFXNmeTrail( &Pos, &DirVector, SpotFXGroup, SpotFXPtr->Red, SpotFXPtr->Green, SpotFXPtr->Blue );
+				break;
+
+			case SPOTFX_NmeVapourTrail:
+				CreateSpotFXNmeVapourTrail( &Pos, &DirVector, SpotFXGroup, SpotFXPtr->Red, SpotFXPtr->Green, SpotFXPtr->Blue );
+				break;
+
+			case SPOTFX_FireWall:
+				CreateSpotFXFireWall( &Pos, &DirVector, &UpVector, SpotFXGroup );
+				break;
+
+			case SPOTFX_GravitySparks:
+				CreateSpotFXRealSparks(  &Pos, &DirVector, SpotFXGroup, SpotFXPtr->Red, SpotFXPtr->Green, SpotFXPtr->Blue );
+				break;
+
+			case SPOTFX_Bubbles:
+				CreateSpotFXBubbles( &Pos, &DirVector, SpotFXGroup, SpotFXPtr->Red, SpotFXPtr->Green, SpotFXPtr->Blue, ( 2.0F * BLOCKSIZE ) );
+				break;
+
+			case SPOTFX_BeardAfterburner:
+				if( BikeExhausts ) CreateSpotFXBeardAfterburner( &Pos, &DirVector, SpotFXGroup, Speed );
+				break;
+
+			case SPOTFX_Hk5Afterburner:
+				if( BikeExhausts ) CreateSpotFXHk5Afterburner( &Pos, &DirVector, SpotFXGroup, ShipSpeed, 32, 32, 128 );
+				break;
+
+			case SPOTFX_SoundFX:
+				if( !( Models[ i ].SpotFXFlags[ Count ] & SPOTFX_FLAGS_DoneOnce ) )
+				{
+					if( SpotFXPtr->SoundFX != -1 )
+					{
+						if( EngineEnabled( Models[i].OwnerType, Models[i].Owner ) )
+						{
+							if( !Models[ i ].SpotFXSFX_ID[ Count ] )
+							{
+								Models[ i ].SpotFXSFX_ID[ Count ] = PlaySpotSfx( SpotFXPtr->SoundFX, &Models[i].Group, &Models[i].Pos,
+																  SpotFXPtr->SoundFXSpeed, SpotFXPtr->SoundFXVolume, SPOT_SFX_TYPE_Normal );
+								Models[ i ].SpotFXFlags[ Count ] |= SPOTFX_FLAGS_DoneOnce;
+							}
+							else
+							{
+								StopSfx( Models[i].SpotFXSFX_ID[ Count ] );
+								Models[i].SpotFXSFX_ID[ Count ] = 0;
+
+								Models[ i ].SpotFXSFX_ID[ Count ] = PlaySpotSfx( SpotFXPtr->SoundFX, &Models[i].Group, &Models[i].Pos,
+																  SpotFXPtr->SoundFXSpeed, SpotFXPtr->SoundFXVolume, SPOT_SFX_TYPE_Normal );
+								Models[ i ].SpotFXFlags[ Count ] |= SPOTFX_FLAGS_DoneOnce;
+#ifdef DEBUG_SPOTFX_SOUND
+								Msg( "Model:SpotFX_SoundFX Overwriting SFX ID %d\n", Models[i].ModelNum );
+#endif
+							}
+						}
+						else
+						{
+							if( Models[ i ].SpotFXSFX_ID[ Count ] )
+							{
+								StopSfx( Models[i].SpotFXSFX_ID[ Count ] );
+								Models[i].SpotFXSFX_ID[ Count ] = 0;
+							}
+						}
+					}
+
+				}
+				break;
+
+			default:
+				break;
+			}
+		}
+	}
+}
+
+/* every-frame spot FX: one-shot explosions, weapon fire, shrapnel and drips, and bike afterburners */
+[[gnu::always_inline]] static inline void ModelSpotFXEveryFrame( u_int16_t & i, VECTOR & Pos, VECTOR & UpVector, VECTOR & DirVector, PVSPOTFX *& SpotFXPtr, int16_t & Count, u_int16_t & SpotFXGroup, int16_t & VisNum, u_int16_t (&VisGroups)[ MAXGROUPS ], int16_t & Count2, float & ShipSpeed )
+{
+	ApplyMatrix( &Models[i].Mat, &SpotFXPtr->Pos, &Pos );
+	ApplyMatrix( &Models[i].Mat, &SpotFXPtr->DirVector, &DirVector );
+	ApplyMatrix( &Models[i].Mat, &SpotFXPtr->UpVector, &UpVector );
+
+	Pos.x += Models[i].Pos.x;
+	Pos.y += Models[i].Pos.y;
+	Pos.z += Models[i].Pos.z;
+
+	SpotFXGroup = Models[i].Group;
+
+	for( Count2 = 0; Count2 < VisNum; Count2++ )
+	{
+		if( Bsp_Header[ 0 ].State )
+		{
+			if( PointInsideSkin( &Pos, VisGroups[ Count2 ] ) )
+			{
+				SpotFXGroup = VisGroups[ Count2 ];
+				break;
+			}
+		}
+		else
+		{
+			if( PointInGroupBoundingBox( &Mloadheader, &Pos, VisGroups[ Count2 ] ) )
+			{
+				SpotFXGroup = VisGroups[ Count2 ];
+				break;
+			}
+		}
+	}
+
+	if( CAMERA_VIEW_IS_VALID && GroupsAreVisible( SpotFXGroup, Ships[ Current_Camera_View ].Object.Group ) )
+	{
+		switch( SpotFXPtr->Type )
+		{
+		case SPOTFX_Explosion:
+			if( !( Models[ i ].SpotFXFlags[ Count ] & SPOTFX_FLAGS_DoneOnce ) )
+			{
+				CreateSpotFXExplosion( &Pos, &DirVector, SpotFXGroup );
+				Models[ i ].SpotFXFlags[ Count ] |= SPOTFX_FLAGS_DoneOnce;
+			}
+			break;
+
+		case SPOTFX_FireSecondary:
+			if( !( Models[ i ].SpotFXFlags[ Count ] & SPOTFX_FLAGS_DoneOnce ) )
+			{
+				CreateSpotFXFireSecondary( &Pos, &DirVector, &UpVector, SpotFXGroup, SpotFXPtr->Secondary, Models[ i ].OwnerType, Models[ i ].Owner );
+				Models[ i ].SpotFXFlags[ Count ] |= SPOTFX_FLAGS_DoneOnce;
+			}
+			break;
+
+		case SPOTFX_FirePrimary:
+			if( !( Models[ i ].SpotFXFlags[ Count ] & SPOTFX_FLAGS_DoneOnce ) )
+			{
+				CreateModelSpotFXFirePrimary( &Pos, &DirVector, &UpVector, SpotFXGroup, SpotFXPtr->Primary, i, Count );
+				Models[ i ].SpotFXFlags[ Count ] |= SPOTFX_FLAGS_DoneOnce;
+			}
+			break;
+
+		case SPOTFX_NmeGlow:
+			CreateSpotFXNmeGlow( &Pos, SpotFXGroup, SpotFXPtr->Red, SpotFXPtr->Green, SpotFXPtr->Blue );
+			break;
+
+		case SPOTFX_Shrapnel:
+			if( !( Models[ i ].SpotFXFlags[ Count ] & SPOTFX_FLAGS_DoneOnce ) )
+			{
+				CreateSpotFXShrapnel( &Pos, &DirVector, SpotFXGroup );
+				Models[ i ].SpotFXFlags[ Count ] |= SPOTFX_FLAGS_DoneOnce;
+			}
+			break;
+
+		case SPOTFX_Drip:
+			if( !( Models[ i ].SpotFXFlags[ Count ] & SPOTFX_FLAGS_DoneOnce ) )
+			{
+				CreateSpotFXDrip( &Pos, &DirVector, SpotFXGroup, SpotFXPtr->Red, SpotFXPtr->Green, SpotFXPtr->Blue );
+				Models[ i ].SpotFXFlags[ Count ] |= SPOTFX_FLAGS_DoneOnce;
+			}
+			break;
+
+		case SPOTFX_BorgAfterburner:
+			if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
+			break;
+
+		case SPOTFX_ExcopAfterburner:
+			if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
+			break;
+
+		case SPOTFX_TruckerAfterburner:
+			if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
+			break;
+
+		case SPOTFX_NubiaAfterburner:
+			if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
+			break;
+
+		case SPOTFX_CerberoAfterburner:
+			if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
+			break;
+
+		case SPOTFX_FoetoidAfterburner:
+			if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
+			break;
+
+		case SPOTFX_FoetoidSmallAfterburner:
+			if( BikeExhausts ) CreateSpotFXSmallAfterburner( &Pos, SpotFXGroup, ShipSpeed );
+			break;
+
+		case SPOTFX_JapBirdAfterburner:
+			if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
+			break;
+
+		case SPOTFX_JoAfterburner:
+			if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
+			break;
+
+		case SPOTFX_JoSmallAfterburner:
+			if( BikeExhausts ) CreateSpotFXSmallAfterburner( &Pos, SpotFXGroup, ShipSpeed );
+			break;
+
+		case SPOTFX_LaJayAfterburner:
+			if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
+			break;
+
+		case SPOTFX_MofistoAfterburner:
+			if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
+			break;
+
+		case SPOTFX_NutterAfterburner:
+			if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
+			break;
+
+		case SPOTFX_RhesusAfterburner:
+			if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
+			break;
+
+		case SPOTFX_SharkAfterburner:
+			if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
+			break;
+
+		case SPOTFX_SlickAfterburner:
+			if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
+			break;
+
+		default:
+			break;
+		}
+	}
+}
+
 /* MODFUNC_ProcessSpotFX -- false: ProcessModels returns */
 [[gnu::always_inline]] static inline bool ModelProcessSpotFX( u_int16_t & i, float & Speed, VECTOR & Pos, VECTOR & TempDir, VECTOR & UpVector, VECTOR & DirVector, u_int16_t & NumSpotFX, PVSPOTFX *& SpotFXPtr, int16_t & Count, u_int16_t & SpotFXGroup, int16_t & VisNum, u_int16_t (&VisGroups)[ MAXGROUPS ], int16_t & Count2, float & ShipSpeed )
 {
@@ -2070,142 +2363,7 @@ float TomFrame = 0.0F;
 					case SPOTFX_Hk5Afterburner:
 					case SPOTFX_SoundFX:
 					default:
-						Models[i].SpotFXTimeCount[ Count ] += framelag;
-
-						if( Models[i].SpotFXTimeCount[ Count ] >= Models[i].SpotFXTimeInterval[ Count ] )
-						{
-							Models[i].SpotFXTimeCount[ Count ] = (float) FMOD( Models[i].SpotFXTimeCount[ Count ], Models[i].SpotFXTimeInterval[ Count ] );
-
-							ApplyMatrix( &Models[i].Mat, &SpotFXPtr->Pos, &Pos );
-							ApplyMatrix( &Models[i].Mat, &SpotFXPtr->DirVector, &DirVector );
-							ApplyMatrix( &Models[i].Mat, &SpotFXPtr->UpVector, &UpVector );
-
-							Pos.x += Models[i].Pos.x;
-							Pos.y += Models[i].Pos.y;
-							Pos.z += Models[i].Pos.z;
-
-							SpotFXGroup = Models[i].Group;
-
-							for( Count2 = 0; Count2 < VisNum; Count2++ )
-							{
-								if( Bsp_Header[ 0 ].State )
-								{
-									if( PointInsideSkin( &Pos, VisGroups[ Count2 ] ) )
-									{
-										SpotFXGroup = VisGroups[ Count2 ];
-										break;
-									}
-								}
-								else
-								{
-									if( PointInGroupBoundingBox( &Mloadheader, &Pos, VisGroups[ Count2 ] ) )
-									{
-										SpotFXGroup = VisGroups[ Count2 ];
-										break;
-									}
-								}
-							}
-
-							if( CAMERA_VIEW_IS_VALID && GroupsAreVisible( SpotFXGroup, Ships[ Current_Camera_View ].Object.Group ) )
-							{
-								switch( SpotFXPtr->Type )
-								{
-								case SPOTFX_Flame:
-									CreateSpotFXFlame( &Pos, &DirVector, SpotFXGroup );
-									break;
-
-								case SPOTFX_Smoke:
-									CreateSpotFXSmoke( &Pos, &DirVector, SpotFXGroup, SpotFXPtr->Red, SpotFXPtr->Green, SpotFXPtr->Blue );
-									break;
-
-								case SPOTFX_Steam:
-									CreateSpotFXSteam( &Pos, &DirVector, SpotFXGroup, SpotFXPtr->Red, SpotFXPtr->Green, SpotFXPtr->Blue );
-									break;
-
-								case SPOTFX_Sparks:
-									CreateSpotFXSparks( &Pos, &DirVector, SpotFXGroup, SpotFXPtr->Red, SpotFXPtr->Green, SpotFXPtr->Blue );
-									break;
-
-								case SPOTFX_ElectricBeams:
-									CreateSpotFXElectricBeams( &Pos, &DirVector, &UpVector, SpotFXGroup );
-									break;
-
-								case SPOTFX_GravgonTrail:
-									CreateSpotFXGravgonTrail( &Pos, &DirVector, SpotFXGroup );
-									break;
-
-								case SPOTFX_NmeTrail:
-									CreateSpotFXNmeTrail( &Pos, &DirVector, SpotFXGroup, SpotFXPtr->Red, SpotFXPtr->Green, SpotFXPtr->Blue );
-									break;
-
-								case SPOTFX_NmeVapourTrail:
-									CreateSpotFXNmeVapourTrail( &Pos, &DirVector, SpotFXGroup, SpotFXPtr->Red, SpotFXPtr->Green, SpotFXPtr->Blue );
-									break;
-
-								case SPOTFX_FireWall:
-									CreateSpotFXFireWall( &Pos, &DirVector, &UpVector, SpotFXGroup );
-									break;
-
-								case SPOTFX_GravitySparks:
-									CreateSpotFXRealSparks(  &Pos, &DirVector, SpotFXGroup, SpotFXPtr->Red, SpotFXPtr->Green, SpotFXPtr->Blue );
-									break;
-
-								case SPOTFX_Bubbles:
-									CreateSpotFXBubbles( &Pos, &DirVector, SpotFXGroup, SpotFXPtr->Red, SpotFXPtr->Green, SpotFXPtr->Blue, ( 2.0F * BLOCKSIZE ) );
-									break;
-
-								case SPOTFX_BeardAfterburner:
-									if( BikeExhausts ) CreateSpotFXBeardAfterburner( &Pos, &DirVector, SpotFXGroup, Speed );
-									break;
-
-								case SPOTFX_Hk5Afterburner:
-									if( BikeExhausts ) CreateSpotFXHk5Afterburner( &Pos, &DirVector, SpotFXGroup, ShipSpeed, 32, 32, 128 );
-									break;
-
-								case SPOTFX_SoundFX:
-									if( !( Models[ i ].SpotFXFlags[ Count ] & SPOTFX_FLAGS_DoneOnce ) )
-									{
-										if( SpotFXPtr->SoundFX != -1 )
-										{
-											if( EngineEnabled( Models[i].OwnerType, Models[i].Owner ) )
-											{
-												if( !Models[ i ].SpotFXSFX_ID[ Count ] )
-												{
-													Models[ i ].SpotFXSFX_ID[ Count ] = PlaySpotSfx( SpotFXPtr->SoundFX, &Models[i].Group, &Models[i].Pos,
-																					  SpotFXPtr->SoundFXSpeed, SpotFXPtr->SoundFXVolume, SPOT_SFX_TYPE_Normal );
-													Models[ i ].SpotFXFlags[ Count ] |= SPOTFX_FLAGS_DoneOnce;
-												}
-												else
-												{
-													StopSfx( Models[i].SpotFXSFX_ID[ Count ] );
-													Models[i].SpotFXSFX_ID[ Count ] = 0;
-
-													Models[ i ].SpotFXSFX_ID[ Count ] = PlaySpotSfx( SpotFXPtr->SoundFX, &Models[i].Group, &Models[i].Pos,
-																					  SpotFXPtr->SoundFXSpeed, SpotFXPtr->SoundFXVolume, SPOT_SFX_TYPE_Normal );
-													Models[ i ].SpotFXFlags[ Count ] |= SPOTFX_FLAGS_DoneOnce;
-#ifdef DEBUG_SPOTFX_SOUND
-													Msg( "Model:SpotFX_SoundFX Overwriting SFX ID %d\n", Models[i].ModelNum );
-#endif
-												}
-											}
-											else
-											{
-												if( Models[ i ].SpotFXSFX_ID[ Count ] )
-												{
-													StopSfx( Models[i].SpotFXSFX_ID[ Count ] );
-													Models[i].SpotFXSFX_ID[ Count ] = 0;
-												}
-											}
-										}
-
-									}
-									break;
-
-								default:
-									break;
-								}
-							}
-						}
+						ModelSpotFXTimed( i, Speed, Pos, UpVector, DirVector, SpotFXPtr, Count, SpotFXGroup, VisNum, VisGroups, Count2, ShipSpeed );
 						break;
 
 					case SPOTFX_Explosion:
@@ -2230,152 +2388,7 @@ float TomFrame = 0.0F;
 					case SPOTFX_RhesusAfterburner:
 					case SPOTFX_SharkAfterburner:
 					case SPOTFX_SlickAfterburner:
-						ApplyMatrix( &Models[i].Mat, &SpotFXPtr->Pos, &Pos );
-						ApplyMatrix( &Models[i].Mat, &SpotFXPtr->DirVector, &DirVector );
-						ApplyMatrix( &Models[i].Mat, &SpotFXPtr->UpVector, &UpVector );
-
-						Pos.x += Models[i].Pos.x;
-						Pos.y += Models[i].Pos.y;
-						Pos.z += Models[i].Pos.z;
-
-						SpotFXGroup = Models[i].Group;
-
-						for( Count2 = 0; Count2 < VisNum; Count2++ )
-						{
-							if( Bsp_Header[ 0 ].State )
-							{
-								if( PointInsideSkin( &Pos, VisGroups[ Count2 ] ) )
-								{
-									SpotFXGroup = VisGroups[ Count2 ];
-									break;
-								}
-							}
-							else
-							{
-								if( PointInGroupBoundingBox( &Mloadheader, &Pos, VisGroups[ Count2 ] ) )
-								{
-									SpotFXGroup = VisGroups[ Count2 ];
-									break;
-								}
-							}
-						}
-
-						if( CAMERA_VIEW_IS_VALID && GroupsAreVisible( SpotFXGroup, Ships[ Current_Camera_View ].Object.Group ) )
-						{
-							switch( SpotFXPtr->Type )
-							{
-							case SPOTFX_Explosion:
-								if( !( Models[ i ].SpotFXFlags[ Count ] & SPOTFX_FLAGS_DoneOnce ) )
-								{
-									CreateSpotFXExplosion( &Pos, &DirVector, SpotFXGroup );
-									Models[ i ].SpotFXFlags[ Count ] |= SPOTFX_FLAGS_DoneOnce;
-								}
-								break;
-
-							case SPOTFX_FireSecondary:
-								if( !( Models[ i ].SpotFXFlags[ Count ] & SPOTFX_FLAGS_DoneOnce ) )
-								{
-									CreateSpotFXFireSecondary( &Pos, &DirVector, &UpVector, SpotFXGroup, SpotFXPtr->Secondary, Models[ i ].OwnerType, Models[ i ].Owner );
-									Models[ i ].SpotFXFlags[ Count ] |= SPOTFX_FLAGS_DoneOnce;
-								}
-								break;
-
-							case SPOTFX_FirePrimary:
-								if( !( Models[ i ].SpotFXFlags[ Count ] & SPOTFX_FLAGS_DoneOnce ) )
-								{
-									CreateModelSpotFXFirePrimary( &Pos, &DirVector, &UpVector, SpotFXGroup, SpotFXPtr->Primary, i, Count );
-									Models[ i ].SpotFXFlags[ Count ] |= SPOTFX_FLAGS_DoneOnce;
-								}
-								break;
-
-							case SPOTFX_NmeGlow:
-								CreateSpotFXNmeGlow( &Pos, SpotFXGroup, SpotFXPtr->Red, SpotFXPtr->Green, SpotFXPtr->Blue );
-								break;
-
-							case SPOTFX_Shrapnel:
-								if( !( Models[ i ].SpotFXFlags[ Count ] & SPOTFX_FLAGS_DoneOnce ) )
-								{
-									CreateSpotFXShrapnel( &Pos, &DirVector, SpotFXGroup );
-									Models[ i ].SpotFXFlags[ Count ] |= SPOTFX_FLAGS_DoneOnce;
-								}
-								break;
-
-							case SPOTFX_Drip:
-								if( !( Models[ i ].SpotFXFlags[ Count ] & SPOTFX_FLAGS_DoneOnce ) )
-								{
-									CreateSpotFXDrip( &Pos, &DirVector, SpotFXGroup, SpotFXPtr->Red, SpotFXPtr->Green, SpotFXPtr->Blue );
-									Models[ i ].SpotFXFlags[ Count ] |= SPOTFX_FLAGS_DoneOnce;
-								}
-								break;
-
-							case SPOTFX_BorgAfterburner:
-								if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
-								break;
-
-							case SPOTFX_ExcopAfterburner:
-								if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
-								break;
-
-							case SPOTFX_TruckerAfterburner:
-								if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
-								break;
-
-							case SPOTFX_NubiaAfterburner:
-								if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
-								break;
-
-							case SPOTFX_CerberoAfterburner:
-								if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
-								break;
-
-							case SPOTFX_FoetoidAfterburner:
-								if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
-								break;
-
-							case SPOTFX_FoetoidSmallAfterburner:
-								if( BikeExhausts ) CreateSpotFXSmallAfterburner( &Pos, SpotFXGroup, ShipSpeed );
-								break;
-
-							case SPOTFX_JapBirdAfterburner:
-								if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
-								break;
-
-							case SPOTFX_JoAfterburner:
-								if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
-								break;
-
-							case SPOTFX_JoSmallAfterburner:
-								if( BikeExhausts ) CreateSpotFXSmallAfterburner( &Pos, SpotFXGroup, ShipSpeed );
-								break;
-
-							case SPOTFX_LaJayAfterburner:
-								if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
-								break;
-
-							case SPOTFX_MofistoAfterburner:
-								if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
-								break;
-
-							case SPOTFX_NutterAfterburner:
-								if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
-								break;
-
-							case SPOTFX_RhesusAfterburner:
-								if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
-								break;
-
-							case SPOTFX_SharkAfterburner:
-								if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
-								break;
-
-							case SPOTFX_SlickAfterburner:
-								if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
-								break;
-
-							default:
-								break;
-							}
-						}
+						ModelSpotFXEveryFrame( i, Pos, UpVector, DirVector, SpotFXPtr, Count, SpotFXGroup, VisNum, VisGroups, Count2, ShipSpeed );
 						break;
 					}
 				}
