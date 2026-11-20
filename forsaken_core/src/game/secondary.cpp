@@ -3420,65 +3420,9 @@ bool ProcessMines( u_int16_t i )
 	return true;
 }
 
-bool ProcessMissiles( u_int16_t i, u_int16_t * NextMissile )
+/* per-weapon work before the state update: tentacle segments, scatter/homing/thief targeting, Titan shrapnel and depth-charge timers. True: ProcessMissiles returns false */
+[[gnu::always_inline]] static inline bool MissileWeaponUpdate( u_int16_t & i, VECTOR & NormVector, QUAT & TempQuat, VECTOR & FrameLag_Rot, float & NewFramelag )
 {
-	QUATLERP		qlerp;
-	VECTOR			NewPos;
-	VECTOR			DirVector;
-	VECTOR			TempVector;
-	VECTOR			NormVector;
-	VECTOR			temp;
-	float			Length;
-	float			Speed;
-	float			Cos;
-	float			Angle;
-	float			DistToInt;
-	float			DistToTarget;
-	float			DistFromStart;
-	u_int16_t			Light;
-	u_int16_t			HitTarget;
-	u_int16_t			HitWall;
-	u_int16_t			HitSecondary;
-	VECTOR			Int_Point;
-	VECTOR			Int_Point2;
-	VECTOR			MInt_Point;
-	VECTOR			MInt_Point2;
-	VECTOR			Recoil;
-	BGOBJECT	*	BGObject;
-	ENEMY		*	HitEnemy;
-	VECTOR			EInt_Point;
-	VECTOR			EInt_Point2;
-	NORMAL			ENormal;
-	MATRIX			UpMatrix;
-	MATRIX			InvUpMatrix;
-	QUAT			TempQuat;
-	VECTOR			FrameLag_Rot;
-	VECTOR			NewDir;
-	float			Damage;
-	float			ClosestCos = -1.0F;
-	u_int16_t			Ship;
-	u_int16_t			Enemy;
-	u_int16_t			Secondary;
-	u_int16_t			OldGroup;
-	float			LifeCount;
-	VECTOR			Rotation;
-	VECTOR			UpVector;
-	VECTOR			TempPoint1;
-	VECTOR			TempPoint2;
-	u_int16_t			TempGroup;
-	u_int16_t			TempEnemyIndex;
-	float			NewFramelag;
-
-	NewFramelag = ( framelag + SecBulls[i].FramelagAddition );
-	if( SecBulls[i].FramelagAddition != 0.0F )
-	{
-		SecBulls[i].FramelagAddition = 0.0F;
-	}
-
-	*NextMissile = SecBulls[ i ].Prev;
-
-	OldGroup = SecBulls[ i ].GroupImIn;
-
 	switch( SecBulls[ i ].Weapon )
 	{
 	case ENEMYTENTACLE:
@@ -3541,7 +3485,7 @@ bool ProcessMissiles( u_int16_t i, u_int16_t * NextMissile )
 		{
 			CreateExplosion( &SecBulls[i].Pos, SecBulls[i].GroupImIn );
 			CleanUpSecBull( i );
-			return( false );
+			return true;
 		}
 		break;
 
@@ -3549,7 +3493,7 @@ bool ProcessMissiles( u_int16_t i, u_int16_t * NextMissile )
 		if( SecBulls[i].LifeCount > SecBulls[i].LifeSpan )
 		{
 			DestroySecondary( i, &SecBulls[i].Pos );
-			return( false );
+			return true;
 		}
 		else
 		{
@@ -3564,7 +3508,7 @@ bool ProcessMissiles( u_int16_t i, u_int16_t * NextMissile )
 		if( SecBulls[i].LifeCount > SecBulls[i].LifeSpan )
 		{
 			DestroySecondary( i, &SecBulls[i].Pos );
-			return( false );
+			return true;
 		}
 		else
 		{
@@ -3578,7 +3522,12 @@ bool ProcessMissiles( u_int16_t i, u_int16_t * NextMissile )
 		break;
 
 	}
+	return false;
+}
 
+/* advance the missile by state (drop, accelerate, straight, homing, gravity, spiral, tentacle retract). True: ProcessMissiles returns false */
+[[gnu::always_inline]] static inline bool MissileStateUpdate( u_int16_t & i, QUATLERP & qlerp, VECTOR & DirVector, VECTOR & TempVector, VECTOR & NormVector, float & Speed, float & Cos, float & Angle, float & DistToTarget, u_int16_t & Light, MATRIX & UpMatrix, MATRIX & InvUpMatrix, QUAT & TempQuat, float & ClosestCos, u_int16_t & Ship, u_int16_t & Enemy, u_int16_t & Secondary, u_int16_t & OldGroup, VECTOR & Rotation, VECTOR & UpVector, VECTOR & TempPoint1, VECTOR & TempPoint2, float & NewFramelag )
+{
 	switch( SecBulls[ i ].State )
 	{
 		/*===================================================================
@@ -3636,7 +3585,7 @@ bool ProcessMissiles( u_int16_t i, u_int16_t * NextMissile )
 		===================================================================*/
 	case MIS_RETRACTTENTACLE:
 		if( !MissileRetractTentacle( i, TempVector, OldGroup, NewFramelag ) )
-			return false;
+			return true;
 		break;
 
 		/*===================================================================
@@ -3645,6 +3594,73 @@ bool ProcessMissiles( u_int16_t i, u_int16_t * NextMissile )
 	default:															/* Unknown/Undefined Missile */
 		break;
 	}
+	return false;
+}
+
+bool ProcessMissiles( u_int16_t i, u_int16_t * NextMissile )
+{
+	QUATLERP		qlerp;
+	VECTOR			NewPos;
+	VECTOR			DirVector;
+	VECTOR			TempVector;
+	VECTOR			NormVector;
+	VECTOR			temp;
+	float			Length;
+	float			Speed;
+	float			Cos;
+	float			Angle;
+	float			DistToInt;
+	float			DistToTarget;
+	float			DistFromStart;
+	u_int16_t			Light;
+	u_int16_t			HitTarget;
+	u_int16_t			HitWall;
+	u_int16_t			HitSecondary;
+	VECTOR			Int_Point;
+	VECTOR			Int_Point2;
+	VECTOR			MInt_Point;
+	VECTOR			MInt_Point2;
+	VECTOR			Recoil;
+	BGOBJECT	*	BGObject;
+	ENEMY		*	HitEnemy;
+	VECTOR			EInt_Point;
+	VECTOR			EInt_Point2;
+	NORMAL			ENormal;
+	MATRIX			UpMatrix;
+	MATRIX			InvUpMatrix;
+	QUAT			TempQuat;
+	VECTOR			FrameLag_Rot;
+	VECTOR			NewDir;
+	float			Damage;
+	float			ClosestCos = -1.0F;
+	u_int16_t			Ship;
+	u_int16_t			Enemy;
+	u_int16_t			Secondary;
+	u_int16_t			OldGroup;
+	float			LifeCount;
+	VECTOR			Rotation;
+	VECTOR			UpVector;
+	VECTOR			TempPoint1;
+	VECTOR			TempPoint2;
+	u_int16_t			TempGroup;
+	u_int16_t			TempEnemyIndex;
+	float			NewFramelag;
+
+	NewFramelag = ( framelag + SecBulls[i].FramelagAddition );
+	if( SecBulls[i].FramelagAddition != 0.0F )
+	{
+		SecBulls[i].FramelagAddition = 0.0F;
+	}
+
+	*NextMissile = SecBulls[ i ].Prev;
+
+	OldGroup = SecBulls[ i ].GroupImIn;
+
+	if( MissileWeaponUpdate( i, NormVector, TempQuat, FrameLag_Rot, NewFramelag ) )
+		return( false );
+
+	if( MissileStateUpdate( i, qlerp, DirVector, TempVector, NormVector, Speed, Cos, Angle, DistToTarget, Light, UpMatrix, InvUpMatrix, TempQuat, ClosestCos, Ship, Enemy, Secondary, OldGroup, Rotation, UpVector, TempPoint1, TempPoint2, NewFramelag ) )
+		return( false );
 
 	/*===================================================================
 				Do Collision Routines
