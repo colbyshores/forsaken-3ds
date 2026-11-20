@@ -983,6 +983,247 @@ void ModelVisCache_NewFrame( void )
 		ModelVisBucket_Build( InTitle ); } while(0)
 
 
+/* draw a static (.mx) model: set up its LOD/visibility and execute it, with 3DS object shine off for BG objects. True: ModelDisp fails */
+[[gnu::always_inline]] static inline bool ModelDispDrawMx( u_int16_t i, u_int16_t ModelNum )
+{
+	MATRIX	TempMatrix;
+	VECTOR	x1, x2;
+	float r , g , b;
+	bool	DoDisplay = true;
+
+	x1.x = 0.0F;
+	x1.y = 0.0F;
+	x1.z = 0.0F;
+	x2 = x1;
+
+	CreateMXBoundingBox( &ModelHeaders[ ModelNum ],	&Models[i].Mat, &Models[i].Pos,
+						 &Models[i].TempLines[ 0 ], Models[i].Group );
+
+	if( Models[i].Flags & MODFLAG_AmbientLight )
+	{
+		GetRealLightAmbient( &Models[i].Pos , &r , &g , &b );
+		AmbientLightMxModel( &ModelHeaders[ ModelNum ],
+						Models[i].Red, Models[i].Green, Models[i].Blue, 0 , r , g , b);
+	}else if( Models[i].Flags & MODFLAG_RealLight )
+	{
+		TempMatrix = Models[i].Mat;
+		TempMatrix._41 = Models[i].Pos.x;
+		TempMatrix._42 = Models[i].Pos.y;
+		TempMatrix._43 = Models[i].Pos.z;
+		XLightMxloadHeader( &ModelHeaders[ ModelNum ], &Models[i].Pos,
+			Models[i].Radius, &TempMatrix );
+	}
+
+	if( Models[i].Flags & MODFLAG_Stealth )
+	{
+		if( Models[i].Flags & MODFLAG_StealthOffset )
+		{
+			ModelNum += Models[i].StealthOffset;
+		}
+		else
+		{
+			ModelNum += ( ModelHeaders[Models[i].ModelNum].LOD + 1 );
+		}
+
+		if( !LightMxModel( ModelNum, &Models[i].Pos, (float) Models[i].Red, (float) Models[i].Green, (float) Models[i].Blue, 255.0F ) ) DoDisplay = false;
+
+	}
+
+
+	if( DoDisplay )
+	{
+#ifdef __3DS__
+		/* Phong specular reads as tacky on
+		 * BGOBJECT models (doors, vents, large
+		 * flat decorations). Disable shine for
+		 * those, keep it on enemies / pickups /
+		 * mines / nobody-owned. */
+		{
+			c3d_set_object_shine_eligible(
+				Models[i].OwnerType != OWNER_BGOBJECT);
+		}
+#endif
+		if( ExecuteMxloadHeader( &ModelHeaders[ ModelNum ], i ) != true)
+		{
+#ifdef __3DS__
+			{ c3d_set_object_shine_eligible(true); }
+#endif
+			Msg( "ModelDisp() ExecuteMxloadHeader for %s Failed\n",
+				&ModelNames[ Models[i].ModelNum ].Name[ 0 ] );
+			return true;
+		}
+#ifdef __3DS__
+		{ c3d_set_object_shine_eligible(true); }
+#endif
+	}
+	return false;
+}
+
+/* draw a morphing (.mxa) model: advance its animation and execute it, with 3DS object shine off for BG objects. True: ModelDisp fails */
+[[gnu::always_inline]] static inline bool ModelDispDrawMxa( u_int16_t i, u_int16_t ModelNum, u_int16_t ClipGroup )
+{
+	MATRIX	TempMatrix;
+	VECTOR	x1, x2;
+	float r , g , b;
+	bool	DoDisplay = true;
+
+	if( ( Models[i].Flags & MODFLAG_StealthOffset ) && ( Models[i].Flags & MODFLAG_Stealth ) )
+	{
+		if( !InterpFrames( &MxaModelHeaders[ ModelNum + Models[i].StealthOffset ], Models[i].Frame, Models[i].InterpFrame, Models[i].InterpTime ) )
+		{
+			Msg( "ModelDisp() InterpFrames() Failed\n" );
+			return true;
+		}
+	}
+	else
+	{
+		if( !InterpFrames( &MxaModelHeaders[ ModelNum ], Models[i].Frame, Models[i].InterpFrame, Models[i].InterpTime ) )
+		{
+			Msg( "ModelDisp() InterpFrames() Failed\n" );
+			return true;
+		}
+	}
+
+	x1.x = 0.0F;
+	x1.y = 0.0F;
+	x1.z = 0.0F;
+	x2 = x1;
+
+	CreateMXABoundingBox( &MxaModelHeaders[ ModelNum ],	&Models[i].Mat, &Models[i].Pos,
+						  &Models[i].TempLines[ 0 ], Models[i].Group );
+
+	ENVMxa( &MxaModelHeaders[ ModelNum ] , &Models[i].Mat , &Models[i].Pos);
+
+
+	if( Models[i].Flags & MODFLAG_AmbientLight )
+	{
+		GetRealLightAmbient( &Models[i].Pos , &r , &g , &b );
+		AmbientLightMxaModel( &MxaModelHeaders[ ModelNum ],
+						Models[i].Red, Models[i].Green, Models[i].Blue, 0 , r , g , b);
+	}else if( Models[i].Flags & MODFLAG_RealLight )
+	{
+		TempMatrix = Models[i].Mat;
+		TempMatrix._41 = Models[i].Pos.x;
+		TempMatrix._42 = Models[i].Pos.y;
+		TempMatrix._43 = Models[i].Pos.z;
+		XLightMxaloadHeader( &MxaModelHeaders[ ModelNum ], &Models[i].Pos, Models[i].Radius, &TempMatrix );
+	}
+
+	if( Models[i].Flags & MODFLAG_Stealth )
+	{
+		if( Models[i].Flags & MODFLAG_StealthOffset )
+		{
+			ModelNum += Models[i].StealthOffset;
+		}
+		else
+		{
+			ModelNum += ( ModelHeaders[Models[i].ModelNum].LOD + 1 );
+		}
+
+		if( !LightMxaModel( ModelNum, &Models[i].Pos, (float) Models[i].Red, (float) Models[i].Green, (float) Models[i].Blue, 255.0F ) ) DoDisplay = false;
+	}
+
+	if( !( Models[i].Flags & MODFLAG_RealLight ) &&
+		!( Models[i].Flags & MODFLAG_Stealth ) &&
+		!( Models[i].Flags & MODFLAG_AmbientLight ) &&
+		!( Models[i].Flags & MODFLAG_Original ) )
+	{
+		UpdateMxaModel( &MxaModelHeaders[ ModelNum ] );
+	}
+
+
+	if( DoDisplay )
+	{
+#ifdef __3DS__
+		/* Same eligibility check as the
+		 * static-mxload path: BGOBJECT models
+		 * (animated doors, vents) get no shine. */
+		{
+			c3d_set_object_shine_eligible(
+				Models[i].OwnerType != OWNER_BGOBJECT);
+		}
+#endif
+		if( ExecuteMxaloadHeader( &MxaModelHeaders[ModelNum], ClipGroup ) != true)
+		{
+#ifdef __3DS__
+			{ c3d_set_object_shine_eligible(true); }
+#endif
+			Msg( "ModelDisp() ExecuteMxaloadHeader for %s Failed\n", &ModelNames[ Models[ i ].ModelNum ].Name[ 0 ] );
+			return true;
+		}
+#ifdef __3DS__
+		{ c3d_set_object_shine_eligible(true); }
+#endif
+	}
+	return false;
+}
+
+/* apply the model function's scale or rotation to its matrices before drawing (fade, rescale, explode/regen, sphere zone, real scale, scale+rotate, donut) */
+[[gnu::always_inline]] static inline void ModelDispScale( u_int16_t i )
+{
+	VECTOR	TempVector;
+	QUAT	TempQuat;
+	MATRIX	TempMatrix, TempRotMatrix;
+
+	switch( Models[i].Func )
+	{
+	case MODFUNC_Fade:
+		break;
+	case MODFUNC_ReScale:
+		break;
+
+	case MODFUNC_Explode:
+	case MODFUNC_Regen:
+	case MODFUNC_Scale:
+	case MODFUNC_Scale2:
+	case MODFUNC_SphereZone:
+		ApplyMatrix( &CurrentCamera.Mat, &Forward, &TempVector );
+		TempQuat.FromVector2(&TempVector);
+		TempQuat.ToMatrix(&Models[ i ].Mat);
+		TempMatrix = MATRIX_Identity;
+		TempMatrix._11 = Models[i].Scale;
+		TempMatrix._22 = Models[i].Scale;
+		TempMatrix._33 = Models[i].Scale;
+		MatrixMultiply( &TempMatrix, &Models[i].Mat, &Models[i].Mat );
+		MatrixTranspose( &Models[ i ].Mat, &Models[ i ].InvMat );
+		break;
+
+	case MODFUNC_RealScale:
+		Models[ i ].Mat = MATRIX_Identity;
+		Models[ i ].Mat._11 = Models[i].Scale;
+		Models[ i ].Mat._22 = 1.0F; //Models[i].Scale;
+		Models[ i ].Mat._33 = Models[i].Scale;
+		MatrixTranspose( &Models[ i ].Mat, &Models[ i ].InvMat );
+		break;
+
+	case MODFUNC_ScaleXYZandRotate:
+		TempMatrix = MATRIX_Identity;
+		TempMatrix._11 *= Models[i].Xscale;
+		TempMatrix._22 *= Models[i].Yscale;
+		TempMatrix._33 *= Models[i].Zscale;
+
+		BuildRotMatrix(HoloRot.x, HoloRot.y, HoloRot.z, &TempRotMatrix);
+
+
+		MatrixMultiply( &TempMatrix, &TempRotMatrix, &Models[i].Mat );
+		MatrixTranspose( &Models[ i ].Mat, &Models[ i ].InvMat );
+		break;
+
+	case MODFUNC_ScaleDonut:
+		Models[ i ].Mat = MATRIX_Identity;
+		Models[ i ].Mat._11 = Models[i].Scale;
+		Models[ i ].Mat._22 = Models[i].Scale;
+		Models[ i ].Mat._33 = Models[i].Scale;
+		MatrixTranspose( &Models[ i ].Mat, &Models[ i ].InvMat );
+		break;
+
+	case MODFUNC_Nothing:
+	default:
+		break;
+
+	}
+}
+
 bool ModelDisp( u_int16_t group, MODELNAME * NamePnt  )
 {
 	RENDERMATRIX TempWorld;
@@ -990,14 +1231,8 @@ bool ModelDisp( u_int16_t group, MODELNAME * NamePnt  )
 	u_int16_t	nextmodel;
 	u_int16_t	ModelNum;
 	float	temp, temp2;
-	VECTOR	TempVector;
-	QUAT	TempQuat;
-	MATRIX	TempMatrix, TempRotMatrix;
-	VECTOR	x1, x2;
 	u_int16_t	ClipGroup;
-	float r , g , b;
 	bool	InTitle;
-	bool	DoDisplay;
 
 	if( NamePnt == &ModelNames[0] ) InTitle = false;
 	else InTitle = true;
@@ -1013,63 +1248,7 @@ bool ModelDisp( u_int16_t group, MODELNAME * NamePnt  )
 
 		if( ClipGroup == group )
 		{
-			switch( Models[i].Func )
-			{
-			case MODFUNC_Fade:
-				break;
-			case MODFUNC_ReScale:
-				break;
-
-			case MODFUNC_Explode:
-			case MODFUNC_Regen:
-			case MODFUNC_Scale:
-			case MODFUNC_Scale2:
-			case MODFUNC_SphereZone:
-				ApplyMatrix( &CurrentCamera.Mat, &Forward, &TempVector );
-				TempQuat.FromVector2(&TempVector);
-				TempQuat.ToMatrix(&Models[ i ].Mat);
-				TempMatrix = MATRIX_Identity;
-				TempMatrix._11 = Models[i].Scale;
-				TempMatrix._22 = Models[i].Scale;
-				TempMatrix._33 = Models[i].Scale;
-				MatrixMultiply( &TempMatrix, &Models[i].Mat, &Models[i].Mat );
-				MatrixTranspose( &Models[ i ].Mat, &Models[ i ].InvMat );
-				break;
-
-			case MODFUNC_RealScale:
-				Models[ i ].Mat = MATRIX_Identity;
-				Models[ i ].Mat._11 = Models[i].Scale;
-				Models[ i ].Mat._22 = 1.0F; //Models[i].Scale;
-				Models[ i ].Mat._33 = Models[i].Scale;
-				MatrixTranspose( &Models[ i ].Mat, &Models[ i ].InvMat );
-				break;
-
-			case MODFUNC_ScaleXYZandRotate:
-				TempMatrix = MATRIX_Identity;
-				TempMatrix._11 *= Models[i].Xscale;
-				TempMatrix._22 *= Models[i].Yscale;
-				TempMatrix._33 *= Models[i].Zscale;
-
-				BuildRotMatrix(HoloRot.x, HoloRot.y, HoloRot.z, &TempRotMatrix);
-
-
-				MatrixMultiply( &TempMatrix, &TempRotMatrix, &Models[i].Mat );
-				MatrixTranspose( &Models[ i ].Mat, &Models[ i ].InvMat );
-				break;
-
-			case MODFUNC_ScaleDonut:
-				Models[ i ].Mat = MATRIX_Identity;
-				Models[ i ].Mat._11 = Models[i].Scale;
-				Models[ i ].Mat._22 = Models[i].Scale;
-				Models[ i ].Mat._33 = Models[i].Scale;
-				MatrixTranspose( &Models[ i ].Mat, &Models[ i ].InvMat );
-				break;
-
-			case MODFUNC_Nothing:
-			default:
-				break;
-
-			}
+			ModelDispScale( i );
 
 			ENV( &ModelHeaders[Models[i].ModelNum] , &Models[i].Mat , &Models[i].Pos);
 
@@ -1155,167 +1334,16 @@ bool ModelDisp( u_int16_t group, MODELNAME * NamePnt  )
 
 			if( ( temp > ( PICKUP_RADIUS * 0.75F ) ) || ( Models[i].Type == MODTYPE_Field ) )
 			{
-				DoDisplay = true;
-
 				if( NamePnt[ ModelNum ].DoIMorph )
 				{
-					if( ( Models[i].Flags & MODFLAG_StealthOffset ) && ( Models[i].Flags & MODFLAG_Stealth ) )
-					{
-						if( !InterpFrames( &MxaModelHeaders[ ModelNum + Models[i].StealthOffset ], Models[i].Frame, Models[i].InterpFrame, Models[i].InterpTime ) )
-						{
-							Msg( "ModelDisp() InterpFrames() Failed\n" );
-							return false;
-						}
-					}
-					else
-					{
-						if( !InterpFrames( &MxaModelHeaders[ ModelNum ], Models[i].Frame, Models[i].InterpFrame, Models[i].InterpTime ) )
-						{
-							Msg( "ModelDisp() InterpFrames() Failed\n" );
-							return false;
-						}
-					}
-
-					x1.x = 0.0F;
-					x1.y = 0.0F;
-					x1.z = 0.0F;
-					x2 = x1;
-
-					CreateMXABoundingBox( &MxaModelHeaders[ ModelNum ],	&Models[i].Mat, &Models[i].Pos,
-										  &Models[i].TempLines[ 0 ], Models[i].Group );
-
-					ENVMxa( &MxaModelHeaders[ ModelNum ] , &Models[i].Mat , &Models[i].Pos);
-
-
-					if( Models[i].Flags & MODFLAG_AmbientLight )
-					{
-						GetRealLightAmbient( &Models[i].Pos , &r , &g , &b );
-						AmbientLightMxaModel( &MxaModelHeaders[ ModelNum ],
-										Models[i].Red, Models[i].Green, Models[i].Blue, 0 , r , g , b);
-					}else if( Models[i].Flags & MODFLAG_RealLight )
-					{
-						TempMatrix = Models[i].Mat;
-						TempMatrix._41 = Models[i].Pos.x;
-						TempMatrix._42 = Models[i].Pos.y;
-						TempMatrix._43 = Models[i].Pos.z;
-						XLightMxaloadHeader( &MxaModelHeaders[ ModelNum ], &Models[i].Pos, Models[i].Radius, &TempMatrix );
-					}
-
-					if( Models[i].Flags & MODFLAG_Stealth )
-					{
-						if( Models[i].Flags & MODFLAG_StealthOffset )
-						{
-							ModelNum += Models[i].StealthOffset;
-						}
-						else
-						{
-							ModelNum += ( ModelHeaders[Models[i].ModelNum].LOD + 1 );
-						}
-
-						if( !LightMxaModel( ModelNum, &Models[i].Pos, (float) Models[i].Red, (float) Models[i].Green, (float) Models[i].Blue, 255.0F ) ) DoDisplay = false;
-					}
-
-					if( !( Models[i].Flags & MODFLAG_RealLight ) &&
-						!( Models[i].Flags & MODFLAG_Stealth ) &&
-						!( Models[i].Flags & MODFLAG_AmbientLight ) &&
-						!( Models[i].Flags & MODFLAG_Original ) )
-					{
-						UpdateMxaModel( &MxaModelHeaders[ ModelNum ] );
-					}
-
-
-					if( DoDisplay )
-					{
-#ifdef __3DS__
-						/* Same eligibility check as the
-						 * static-mxload path: BGOBJECT models
-						 * (animated doors, vents) get no shine. */
-						{
-							c3d_set_object_shine_eligible(
-								Models[i].OwnerType != OWNER_BGOBJECT);
-						}
-#endif
-						if( ExecuteMxaloadHeader( &MxaModelHeaders[ModelNum], ClipGroup ) != true)
-						{
-#ifdef __3DS__
-							{ c3d_set_object_shine_eligible(true); }
-#endif
-							Msg( "ModelDisp() ExecuteMxaloadHeader for %s Failed\n", &ModelNames[ Models[ i ].ModelNum ].Name[ 0 ] );
-							return false;
-						}
-#ifdef __3DS__
-						{ c3d_set_object_shine_eligible(true); }
-#endif
-					}
+					if( ModelDispDrawMxa( i, ModelNum, ClipGroup ) )
+						return false;
 
 				}
 				else
 				{
-					x1.x = 0.0F;
-					x1.y = 0.0F;
-					x1.z = 0.0F;
-					x2 = x1;
-
-					CreateMXBoundingBox( &ModelHeaders[ ModelNum ],	&Models[i].Mat, &Models[i].Pos,
-										 &Models[i].TempLines[ 0 ], Models[i].Group );
-
-					if( Models[i].Flags & MODFLAG_AmbientLight )
-					{
-						GetRealLightAmbient( &Models[i].Pos , &r , &g , &b );
-						AmbientLightMxModel( &ModelHeaders[ ModelNum ],
-										Models[i].Red, Models[i].Green, Models[i].Blue, 0 , r , g , b);
-					}else if( Models[i].Flags & MODFLAG_RealLight )
-					{
-						TempMatrix = Models[i].Mat;
-						TempMatrix._41 = Models[i].Pos.x;
-						TempMatrix._42 = Models[i].Pos.y;
-						TempMatrix._43 = Models[i].Pos.z;
-						XLightMxloadHeader( &ModelHeaders[ ModelNum ], &Models[i].Pos,
-							Models[i].Radius, &TempMatrix );
-					}
-
-					if( Models[i].Flags & MODFLAG_Stealth )
-					{
-						if( Models[i].Flags & MODFLAG_StealthOffset )
-						{
-							ModelNum += Models[i].StealthOffset;
-						}
-						else
-						{
-							ModelNum += ( ModelHeaders[Models[i].ModelNum].LOD + 1 );
-						}
-
-						if( !LightMxModel( ModelNum, &Models[i].Pos, (float) Models[i].Red, (float) Models[i].Green, (float) Models[i].Blue, 255.0F ) ) DoDisplay = false;
-
-					}
-
-
-					if( DoDisplay )
-					{
-#ifdef __3DS__
-						/* Phong specular reads as tacky on
-						 * BGOBJECT models (doors, vents, large
-						 * flat decorations). Disable shine for
-						 * those, keep it on enemies / pickups /
-						 * mines / nobody-owned. */
-						{
-							c3d_set_object_shine_eligible(
-								Models[i].OwnerType != OWNER_BGOBJECT);
-						}
-#endif
-						if( ExecuteMxloadHeader( &ModelHeaders[ ModelNum ], i ) != true)
-						{
-#ifdef __3DS__
-							{ c3d_set_object_shine_eligible(true); }
-#endif
-							Msg( "ModelDisp() ExecuteMxloadHeader for %s Failed\n",
-								&ModelNames[ Models[i].ModelNum ].Name[ 0 ] );
-							return false;
-						}
-#ifdef __3DS__
-						{ c3d_set_object_shine_eligible(true); }
-#endif
-					}
+					if( ModelDispDrawMx( i, ModelNum ) )
+						return false;
 
 				}
 			}
