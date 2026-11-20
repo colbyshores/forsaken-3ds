@@ -96,6 +96,4 @@ FILE * LoadXLights( FILE * fp );
 /* Defined in lights.cpp; shared with the modules that use it. */
 extern XLIGHT * FirstLightVisible;
 extern XLIGHT XLights[ MAXXLIGHTS ];
-extern u_int16_t FirstXLightUsed;
-extern u_int16_t FirstXLightFree;
 extern float cral;

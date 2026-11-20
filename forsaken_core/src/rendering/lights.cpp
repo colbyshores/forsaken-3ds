@@ -29,8 +29,32 @@
 
 XLIGHT * FirstLightVisible = nullptr;
 XLIGHT	XLights[MAXXLIGHTS];
-u_int16_t	FirstXLightUsed;
-u_int16_t	FirstXLightFree;
+
+namespace {
+
+/* The XLights[] pool's list heads (one instance, g_xlights): the newest used
+ * light and the first free one. Reset with the scene, changed as lights are
+ * made and die, walked each frame and by each group's visible-light list,
+ * and saved with the game. XLights[] itself stays global (owners keep
+ * indices into it, and the 3DS renderer uploads it). */
+class XLightPool {
+	public:
+	void      init();
+	u_int16_t find_free();
+	/* Out of line, as KillUsedXLight was: process() calls it only when a
+	 * light dies, and inlining it would bulk up the per-frame walk. */
+	[[gnu::noinline]] void kill_used( u_int16_t light );
+	bool      process();
+	void      build_visible_list( u_int16_t Group );
+	FILE     *save( FILE * fp );
+	FILE     *restore( FILE * fp );
+
+	private:
+	u_int16_t FirstXLightUsed = 0;
+	u_int16_t FirstXLightFree = 0;
+};
+
+} // namespace
 
 
 /*===================================================================
@@ -38,7 +62,7 @@ u_int16_t	FirstXLightFree;
 	Input		:	nothing
 	Output		:	nothing
 ===================================================================*/
-void	InitXLights()
+void	XLightPool::init()
 {
 	u_int16_t	i;
 	FirstXLightUsed = INDEX_NONE;
@@ -59,7 +83,7 @@ void	InitXLights()
 	Input		:	nothing
 	Output		:	u_int16_t number of light free....
 ===================================================================*/
-u_int16_t	FindFreeXLight()
+u_int16_t	XLightPool::find_free()
 {
 	u_int16_t i;
 
@@ -86,7 +110,7 @@ u_int16_t	FindFreeXLight()
 	Input		:	u_int16_t number of light free....
 	Output		:	nothing
 ===================================================================*/
-void	KillUsedXLight( u_int16_t light )
+void	XLightPool::kill_used( u_int16_t light )
 {
 	u_int16_t	its_prev;
 	u_int16_t	its_next;
@@ -115,7 +139,7 @@ void	KillUsedXLight( u_int16_t light )
 	Output		:	true
 ===================================================================*/
 /* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
-bool	ProcessXLights( MLOADHEADER * /*Mloadheader*/ )
+bool	XLightPool::process()
 {
 	u_int16_t	light;
 	u_int16_t	oldlight;
@@ -1317,7 +1341,7 @@ COLOR FindNearestCellColour( MLOADHEADER * Mloadheader,VECTOR * Pos, u_int16_t g
 				:	every used light
 	Output		:	nothing
 ===================================================================*/
-void BuildVisibleLightList( u_int16_t Group )
+void XLightPool::build_visible_list( u_int16_t Group )
 {
 	int		light;
 	XLIGHT * XLightPnt;
@@ -1343,7 +1367,7 @@ void BuildVisibleLightList( u_int16_t Group )
 	Input		:	FILE	*	File Pointer
 	Output		:	FILE	*	Updated File Pointer
 ===================================================================*/
-FILE * SaveXLights( FILE * fp )
+FILE * XLightPool::save( FILE * fp )
 {
 	int		i;
 	u_int16_t	TempIndex = INDEX_NONE;
@@ -1383,7 +1407,7 @@ FILE * SaveXLights( FILE * fp )
 	Input		:	FILE	*	File Pointer
 	Output		:	FILE	*	Updated File Pointer
 ===================================================================*/
-FILE * LoadXLights( FILE * fp )
+FILE * XLightPool::restore( FILE * fp )
 {
 	int		i;
 	u_int16_t	TempIndex;
@@ -1419,3 +1443,13 @@ FILE * LoadXLights( FILE * fp )
 
 	return( fp );
 }
+
+namespace { XLightPool g_xlights; }
+
+void InitXLights() { g_xlights.init(); }
+u_int16_t FindFreeXLight() { return g_xlights.find_free(); }
+void KillUsedXLight( u_int16_t light ) { g_xlights.kill_used( light ); }
+bool ProcessXLights( MLOADHEADER * /*Mloadheader*/ ) { return g_xlights.process(); }
+void BuildVisibleLightList( u_int16_t Group ) { g_xlights.build_visible_list( Group ); }
+FILE * SaveXLights( FILE * fp ) { return g_xlights.save( fp ); }
+FILE * LoadXLights( FILE * fp ) { return g_xlights.restore( fp ); }

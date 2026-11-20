@@ -128,9 +128,10 @@
       "file": "lights.cpp",
       "symbols": [
         "ProcessXLights",
+        "process",
         "XLight1Group"
       ],
-      "why": "CPU lighting path (partly compiled out under GPU_LIGHTING)"
+      "why": "CPU lighting path (partly compiled out under GPU_LIGHTING); process is ProcessXLights' body (XLightPool::process)"
     },
     {
       "file": "quat.cpp",
