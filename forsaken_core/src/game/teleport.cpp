@@ -38,18 +38,36 @@ constexpr int TELEPORTS_VERSION_NUMBER = 2;
 /*===================================================================
 		Globals ...
 ===================================================================*/
-int16_t	NumOfTeleports = 0;
-
-TELEPORT * TeleportsGroupLink[MAXGROUPS];
-
 TELEPORT * Teleports = nullptr;
+
+namespace {
+
+/* The level's teleport bookkeeping (one instance, g_teleporters): how many
+ * entries Teleports[] holds and each group's chain through it. Loaded with
+ * the level, walked when objects move and in the zone display, and saved
+ * with the game. Teleports[] itself stays global (triggers index it). */
+class Teleporters {
+	public:
+	bool  load( char * Filename );
+	void  release();
+	bool  area_check( VECTOR * NewPos, VECTOR * OldPos, u_int16_t Group, OBJECT *obj );
+	void  display_in_group( u_int16_t Group );
+	FILE *save( FILE * fp );
+	FILE *restore( FILE * fp );
+
+	private:
+	TELEPORT * TeleportsGroupLink[MAXGROUPS] = {};
+	int16_t    NumOfTeleports = 0;
+};
+
+} // namespace
 
 /*===================================================================
 	Procedure	:	Teleports load...
 	Input		:	char * filename....
 	Output		:	bool
 ===================================================================*/
-bool TeleportsLoad( char * Filename )
+bool Teleporters::load( char * Filename )
 {
 	long			File_Size;
 	long			Read_Size;
@@ -179,7 +197,7 @@ bool TeleportsLoad( char * Filename )
 	Input		:	void
 	Output		:	void
 ===================================================================*/
-void ReleaseTeleports( void )
+void Teleporters::release()
 {
 	int i;
 	TELEPORT * TPpnt;
@@ -206,7 +224,7 @@ void ReleaseTeleports( void )
 	Input		:	void
 	Output		:	true/false
 ===================================================================*/
-bool TeleportsAreaCheck( VECTOR * NewPos , VECTOR * OldPos ,u_int16_t Group, OBJECT *obj )
+bool Teleporters::area_check( VECTOR * NewPos , VECTOR * OldPos ,u_int16_t Group, OBJECT *obj )
 {
 	TELEPORT * TPpnt;
 	TELEPORT * newTPpnt;
@@ -243,7 +261,7 @@ bool TeleportsAreaCheck( VECTOR * NewPos , VECTOR * OldPos ,u_int16_t Group, OBJ
 	Input		:	u_int16_t	Group
 	Output		:	Nothing
 ===================================================================*/
-void DisplayTeleportsInGroup( u_int16_t Group )
+void Teleporters::display_in_group( u_int16_t Group )
 {
 	TELEPORT * TPpnt;
 
@@ -346,7 +364,7 @@ void StopTeleport( u_int16_t * Data )
 	Input		:	FILE	*	File Pointer
 	Output		:	FILE	*	Updated File Pointer
 ===================================================================*/
-FILE * SaveTeleports( FILE * fp )
+FILE * Teleporters::save( FILE * fp )
 {
 	int				i;
 	TELEPORT	*	TeleportPtr;
@@ -372,7 +390,7 @@ FILE * SaveTeleports( FILE * fp )
 	Input		:	FILE	*	File Pointer
 	Output		:	FILE	*	Updated File Pointer
 ===================================================================*/
-FILE * LoadTeleports( FILE * fp )
+FILE * Teleporters::restore( FILE * fp )
 {
 	int				i;
 	TELEPORT	*	TeleportPtr;
@@ -399,3 +417,12 @@ FILE * LoadTeleports( FILE * fp )
 
 	return( fp );
 }
+
+namespace { Teleporters g_teleporters; }
+
+bool TeleportsLoad( char * Filename ) { return g_teleporters.load( Filename ); }
+void ReleaseTeleports( void ) { g_teleporters.release(); }
+bool TeleportsAreaCheck( VECTOR * NewPos , VECTOR * OldPos ,u_int16_t Group, OBJECT *obj ) { return g_teleporters.area_check( NewPos, OldPos, Group, obj ); }
+void DisplayTeleportsInGroup( u_int16_t Group ) { g_teleporters.display_in_group( Group ); }
+FILE * SaveTeleports( FILE * fp ) { return g_teleporters.save( fp ); }
+FILE * LoadTeleports( FILE * fp ) { return g_teleporters.restore( fp ); }
