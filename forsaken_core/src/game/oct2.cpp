@@ -4404,7 +4404,7 @@ bool RenderCurrentCamera( void )
 	int16_t Count;
 	VISGROUP  *g;
 	u_int16_t  group;
-	NumOfTransExe = 0;
+	Translucents.clear();
 	Build_View();
 	CurrentCamera.View = view;
 	if (!FSSetView(&view))

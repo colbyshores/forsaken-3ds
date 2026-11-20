@@ -21,8 +21,8 @@
 /*===================================================================
 		Globals...
 ===================================================================*/
-int16_t	NumOfTransExe = 0;
-TRANSEXE TransExe[MAXTRANSEXE];
+int16_t	TranslucentQueue::NumOfTransExe = 0;
+TranslucentQueue Translucents;
 
 
 /*===================================================================
@@ -31,7 +31,7 @@ TRANSEXE TransExe[MAXTRANSEXE];
 			  renderObject... the render object to draw later (copied)
 			  int UseIdentity....set to 0 for normal background...1 for Bikes etc..
 ===================================================================*/
-void AddTransExe( RENDERMATRIX *Matrix , RENDEROBJECT *renderObject , int UseIdentity, u_int16_t Model, u_int16_t group, int16_t NumVerts )
+inline void TranslucentQueue::add( RENDERMATRIX *Matrix , RENDEROBJECT *renderObject , int UseIdentity, u_int16_t Model, u_int16_t group, int16_t NumVerts )
 {
 	if( NumOfTransExe < MAXTRANSEXE	)
 	{
@@ -71,7 +71,7 @@ void AddTransExe( RENDERMATRIX *Matrix , RENDEROBJECT *renderObject , int UseIde
 /*===================================================================
 		Execute Translucent Execute Buffers for specific group...
 ===================================================================*/
-void ExecuteTransExe( u_int16_t group )
+inline void TranslucentQueue::execute( u_int16_t group )
 {
 	int16_t	i;
 	u_int16_t	Model;
@@ -173,7 +173,7 @@ void ExecuteTransExe( u_int16_t group )
 }
 
 
-void ExecuteTransExeUnclipped( u_int16_t group )
+inline void TranslucentQueue::execute_unclipped( u_int16_t group )
 {
 	int16_t	i;
 	u_int16_t	Model;
@@ -268,3 +268,7 @@ void ExecuteTransExeUnclipped( u_int16_t group )
 	}
 	FSSetWorld(&identity);
 }
+
+void AddTransExe( RENDERMATRIX *Matrix , RENDEROBJECT *renderObject , int UseIdentity, u_int16_t Model, u_int16_t group, int16_t NumVerts ) { Translucents.add( Matrix, renderObject, UseIdentity, Model, group, NumVerts ); }
+void ExecuteTransExe( u_int16_t group ) { Translucents.execute( group ); }
+void ExecuteTransExeUnclipped( u_int16_t group ) { Translucents.execute_unclipped( group ); }

@@ -4013,7 +4013,7 @@ bool DisplayTitle(void)
 
 	}
 
-	NumOfTransExe = 0;
+	Translucents.clear();
 
 	if( TitleOnceOnly )
 	{
