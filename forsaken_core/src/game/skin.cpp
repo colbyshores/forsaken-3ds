@@ -28,28 +28,74 @@ constexpr auto NODECUBE_Array = true;
 ===================================================================*/
 static	LVERTEX		PortalVerts[ 310 * 3 ];
 static	TRIANGLE		PortalTris[ 310 ];
-static	int16_t			PortalVertCount;
-static	int16_t			PortalTriCount;
 RENDEROBJECT			Portal_Execs[ MAXPORTALEXECS ];
-int16_t					Num_Portal_Execs = 0;
 int16_t					ShowPortal = 0;
 
 static	LVERTEX		SkinVerts[ 310 * 3 ];
 static	TRIANGLE		SkinTris[ 310 ];
-static	int16_t			SkinVertCount;
-static	int16_t			SkinTriCount;
 RENDEROBJECT			Skin_Execs[ MAXSKINEXECS ];
-int16_t					Num_Skin_Execs = 0;
 bool					ShowTrigZones = false;
 bool					ShowEFZones = false;
 bool					ShowTeleports = false;
 
-static int16_t			NumNodeCubeLines = 0;
-u_int16_t					NodeCubeLines[ MAXLINES ];
-
 VECTOR					TempVerts[ 64 ];
-u_int16_t					SphereZones[ MAXNUMOFMODELS ];
-int16_t					NumSphereZones = 0;
+
+namespace {
+
+/* What the debug views own between passes (one instance, g_skin_views):
+ * how many skin and portal vertex buffers are live, the fill counts of the
+ * staging arrays they are built from, and the debug lines (node cube, zone
+ * edges, the line box round the player) and sphere-zone models borrowed
+ * from Lines[] / Models[]. DisplayBSPNode and CreatePortalExecList release
+ * and rebuild it every camera pass, the zone owners add to it per visible
+ * group, and level change kills the borrowed lines. The staging and
+ * scratch arrays themselves (SkinVerts, PortalVerts, TempVerts, ...) and
+ * the Skin_Execs / Portal_Execs buffers that oct2.cpp draws stay
+ * file-scope arrays.
+ * Counts first so each is one ldrh/strh away from the base; SphereZones
+ * before NodeCubeLines so its offset stays an ARM immediate. BoxLines starts
+ * at INDEX_NONE (nothing to kill before the first box), which puts the
+ * instance in .data. */
+class SkinViews {
+	public:
+	void init_skin_execs( void );
+	void release_skin_execs( void );
+	bool make_new_skin_exec( LVERTEX *Verts, TRIANGLE *Tris, int16_t NumVerts, int16_t NumTris );
+	void display_bsp_node( BSP_NODE * Node );
+	void display_new_bsp_node( BSP_NODE * Node );
+	void init_portal_execs( void );
+	void release_portal_execs( void );
+	bool make_new_portal_exec( LVERTEX *Verts, TRIANGLE *Tris, int16_t NumVerts, int16_t NumTris );
+	bool create_portal_exec_list( MLOADHEADER * Mloadheader, int16_t NumVisible );
+	void kill_node_cube_lines( void );
+	void create_line_box( void );
+	void kill_box_lines( void );
+	void kill_all_sphere_zones( void );
+	void display_sphere_zone( VECTOR * Pos, float Radius, u_int16_t Group,
+							  u_int8_t Red, u_int8_t Green, u_int8_t Blue, u_int8_t Trans );
+	void display_zone_direction( VECTOR * Pos, VECTOR * Dir, u_int16_t Group );
+	void display_dir_and_up( VECTOR * Pos, VECTOR * Dir, VECTOR *Up, u_int16_t Group );
+	void display_trigger_zone( TRIGGER_ZONE * Sides, int16_t NumSides, u_int16_t Group,
+							   u_int8_t Red, u_int8_t Green, u_int8_t Blue, u_int8_t Trans );
+	void display_col_zone( ZONESIDE * Sides, int16_t NumSides, u_int16_t Group, int16_t Sensitive );
+
+	private:
+	int16_t		Num_Skin_Execs = 0;
+	int16_t		Num_Portal_Execs = 0;
+	int16_t		SkinVertCount = 0;
+	int16_t		SkinTriCount = 0;
+	int16_t		PortalVertCount = 0;
+	int16_t		PortalTriCount = 0;
+	int16_t		NumNodeCubeLines = 0;
+	int16_t		NumSphereZones = 0;
+	u_int16_t	BoxLines[ 12 ] = { 0xffff, 0xffff, 0xffff, 0xffff,
+								   0xffff, 0xffff, 0xffff, 0xffff,
+								   0xffff, 0xffff, 0xffff, 0xffff };
+	u_int16_t	SphereZones[ MAXNUMOFMODELS ] = {};
+	u_int16_t	NodeCubeLines[ MAXLINES ] = {};
+};
+
+} // namespace
 
 
 /*===================================================================
@@ -57,7 +103,7 @@ int16_t					NumSphereZones = 0;
 	Input		:		Nothing
 	Output		:		Nothing
 ===================================================================*/
-void InitSkinExecs( void )
+void SkinViews::init_skin_execs( void )
 {
 	int16_t	Count;
 
@@ -80,7 +126,7 @@ void InitSkinExecs( void )
 					NodeCubeType is set. NodeCube draws the node
 					volumes (DisplayNewBSPNode).
 ===================================================================*/
-void DisplayBSPNode( BSP_NODE * Node )
+void SkinViews::display_bsp_node( BSP_NODE * Node )
 {
 	int16_t			Count;
 	int16_t			Vnum;
@@ -250,7 +296,7 @@ void DisplayBSPNode( BSP_NODE * Node )
 	Input		:		BSP_NODE	*	Node
 	Output		:		Nothing
 ===================================================================*/
-void DisplayNewBSPNode( BSP_NODE * Node )
+void SkinViews::display_new_bsp_node( BSP_NODE * Node )
 {
 	int16_t			Count;
 	int16_t			Vnum;
@@ -341,7 +387,7 @@ void DisplayNewBSPNode( BSP_NODE * Node )
 	Input		:		Nothing
 	Output		:		Nothing
 ===================================================================*/
-void KillAllSphereZones( void )
+void SkinViews::kill_all_sphere_zones( void )
 {
 	int16_t	Count;
 
@@ -368,8 +414,8 @@ void KillAllSphereZones( void )
 				:		u_int8_t			Trans
 	Output		:		Nothing
 ===================================================================*/
-void DisplaySphereZone( VECTOR * Pos, float Radius, u_int16_t Group,
-					   u_int8_t Red, u_int8_t Green, u_int8_t Blue, u_int8_t /*Trans*/ )
+void SkinViews::display_sphere_zone( VECTOR * Pos, float Radius, u_int16_t Group,
+									  u_int8_t Red, u_int8_t Green, u_int8_t Blue, u_int8_t /*Trans*/ )
 {
 	float	Scale;
 	u_int16_t	Model;
@@ -410,7 +456,7 @@ void DisplaySphereZone( VECTOR * Pos, float Radius, u_int16_t Group,
 				:		u_int16_t			Group
 	Output		:		Nothing
 ===================================================================*/
-void DisplayZoneDirection( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
+void SkinViews::display_zone_direction( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 {
 	u_int16_t	Model;
 	QUAT	TempQuat;
@@ -453,7 +499,7 @@ void DisplayZoneDirection( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 				:		u_int16_t			Group
 	Output		:		Nothing
 ===================================================================*/
-void DisplayDirAndUp( VECTOR * Pos, VECTOR * Dir, VECTOR *Up, u_int16_t Group )
+void SkinViews::display_dir_and_up( VECTOR * Pos, VECTOR * Dir, VECTOR *Up, u_int16_t Group )
 {
 	u_int16_t	Model;
 	QUAT	TempQuat;
@@ -492,8 +538,8 @@ void DisplayDirAndUp( VECTOR * Pos, VECTOR * Dir, VECTOR *Up, u_int16_t Group )
 				:		u_int8_t			Red, Green, Blue, Trans
 	Output		:		Nothing
 ===================================================================*/
-void DisplayTriggerZone( TRIGGER_ZONE * Sides, int16_t NumSides, u_int16_t Group,
-						 u_int8_t Red, u_int8_t Green, u_int8_t Blue, u_int8_t Trans )
+void SkinViews::display_trigger_zone( TRIGGER_ZONE * Sides, int16_t NumSides, u_int16_t Group,
+									   u_int8_t Red, u_int8_t Green, u_int8_t Blue, u_int8_t Trans )
 {
 	int16_t			Count;
 	int16_t			Vnum;
@@ -586,7 +632,7 @@ void DisplayTriggerZone( TRIGGER_ZONE * Sides, int16_t NumSides, u_int16_t Group
 				:		int16_t			Sensitive
 	Output		:		Nothing
 ===================================================================*/
-void DisplayColZone( ZONESIDE * Sides, int16_t NumSides, u_int16_t Group, int16_t Sensitive )
+void SkinViews::display_col_zone( ZONESIDE * Sides, int16_t NumSides, u_int16_t Group, int16_t Sensitive )
 {
 	int16_t			Count;
 	int16_t			Vnum;
@@ -686,7 +732,7 @@ void DisplayColZone( ZONESIDE * Sides, int16_t NumSides, u_int16_t Group, int16_
 	Input		:		Nothing
 	Output		:		Nothing
 ===================================================================*/
-void KillNodeCubeLines( void )
+void SkinViews::kill_node_cube_lines( void )
 {
 	int16_t	Count;
 
@@ -710,7 +756,7 @@ void KillNodeCubeLines( void )
 				:		int16_t			NumTris ( unused )
 	Output		:		bool		True/False
 ===================================================================*/
-bool MakeNewSkinExec( LVERTEX *Verts, TRIANGLE * /*Tris*/, int16_t	NumVerts, int16_t /*NumTris*/ )
+bool SkinViews::make_new_skin_exec( LVERTEX *Verts, TRIANGLE * /*Tris*/, int16_t	NumVerts, int16_t /*NumTris*/ )
 {
 	LVERTEX	*BufStart = nullptr;
 
@@ -746,7 +792,7 @@ bool MakeNewSkinExec( LVERTEX *Verts, TRIANGLE * /*Tris*/, int16_t	NumVerts, int
 	Input		:		Nothing
 	Output		:		Nothing
 ===================================================================*/
-void ReleaseSkinExecs( void )
+void SkinViews::release_skin_execs( void )
 {
 	int16_t	Count;
 
@@ -770,7 +816,7 @@ void ReleaseSkinExecs( void )
 	Notes		:		ShowPortal 2 and 4 show only the first visible
 					group.
 ===================================================================*/
-bool CreatePortalExecList( MLOADHEADER * Mloadheader, int16_t NumVisible )
+bool SkinViews::create_portal_exec_list( MLOADHEADER * Mloadheader, int16_t NumVisible )
 {
 	COLOR		color;
 	int16_t			g;
@@ -899,7 +945,7 @@ bool CreatePortalExecList( MLOADHEADER * Mloadheader, int16_t NumVisible )
 				:		int16_t			NumTris ( unused )
 	Output		:		bool		True/False
 ===================================================================*/
-bool MakeNewPortalExec( LVERTEX *Verts, TRIANGLE * /*Tris*/, int16_t NumVerts, int16_t /*NumTris*/ )
+bool SkinViews::make_new_portal_exec( LVERTEX *Verts, TRIANGLE * /*Tris*/, int16_t NumVerts, int16_t /*NumTris*/ )
 {
 	LVERTEX	*BufStart = nullptr;
 
@@ -937,7 +983,7 @@ bool MakeNewPortalExec( LVERTEX *Verts, TRIANGLE * /*Tris*/, int16_t NumVerts, i
 	Input		:		Nothing
 	Output		:		Nothing
 ===================================================================*/
-void InitPortalExecs( void )
+void SkinViews::init_portal_execs( void )
 {
 	int16_t	Count;
 
@@ -954,7 +1000,7 @@ void InitPortalExecs( void )
 	Input		:		Nothing
 	Output		:		Nothing
 ===================================================================*/
-void ReleasePortalExecs( void )
+void SkinViews::release_portal_execs( void )
 {
 	int16_t	Count;
 
@@ -1233,10 +1279,6 @@ int PlaneToCubeIntersectionShape( VECTOR * min_ptr, VECTOR * max_ptr, VECTOR * v
 	return count;
 }
 
-u_int16_t	BoxLines[ 12 ] = { 0xffff, 0xffff, 0xffff, 0xffff,
-						   0xffff, 0xffff, 0xffff, 0xffff,
-						   0xffff, 0xffff, 0xffff, 0xffff };
-
 VECTOR	BoxOffsets[ 24 ] = {
 	{ -BOXSIZE, -BOXSIZE, -BOXSIZE },
 	{  BOXSIZE, -BOXSIZE, -BOXSIZE },
@@ -1266,7 +1308,7 @@ VECTOR	BoxOffsets[ 24 ] = {
 	{ -BOXSIZE,  BOXSIZE, -BOXSIZE },
 };
 
-void CreateLineBox( void )
+void SkinViews::create_line_box( void )
 {
 	int16_t	Count;
 	u_int16_t	line;
@@ -1303,7 +1345,7 @@ void CreateLineBox( void )
 	}
 }
 
-void KillBoxLines( void )
+void SkinViews::kill_box_lines( void )
 {
 	int16_t	Count;
 
@@ -2248,3 +2290,25 @@ int GimmeColZoneVertices( ZONESIDE * plane_ptr, ZONESIDE * space_ptr, int NumSid
 	return count;
 }
 
+namespace { SkinViews g_skin_views; }
+
+void InitSkinExecs( void ) { g_skin_views.init_skin_execs(); }
+void ReleaseSkinExecs( void ) { g_skin_views.release_skin_execs(); }
+bool MakeNewSkinExec( LVERTEX *Verts, TRIANGLE *Tris, int16_t NumVerts, int16_t NumTris ) { return g_skin_views.make_new_skin_exec( Verts, Tris, NumVerts, NumTris ); }
+void DisplayBSPNode( BSP_NODE * Node ) { g_skin_views.display_bsp_node( Node ); }
+void DisplayNewBSPNode( BSP_NODE * Node ) { g_skin_views.display_new_bsp_node( Node ); }
+void InitPortalExecs( void ) { g_skin_views.init_portal_execs(); }
+void ReleasePortalExecs( void ) { g_skin_views.release_portal_execs(); }
+bool MakeNewPortalExec( LVERTEX *Verts, TRIANGLE *Tris, int16_t NumVerts, int16_t NumTris ) { return g_skin_views.make_new_portal_exec( Verts, Tris, NumVerts, NumTris ); }
+bool CreatePortalExecList( MLOADHEADER * Mloadheader, int16_t NumVisible ) { return g_skin_views.create_portal_exec_list( Mloadheader, NumVisible ); }
+void KillNodeCubeLines( void ) { g_skin_views.kill_node_cube_lines(); }
+void CreateLineBox( void ) { g_skin_views.create_line_box(); }
+void KillBoxLines( void ) { g_skin_views.kill_box_lines(); }
+void KillAllSphereZones( void ) { g_skin_views.kill_all_sphere_zones(); }
+void DisplaySphereZone( VECTOR * Pos, float Radius, u_int16_t Group,
+					   u_int8_t Red, u_int8_t Green, u_int8_t Blue, u_int8_t Trans ) { g_skin_views.display_sphere_zone( Pos, Radius, Group, Red, Green, Blue, Trans ); }
+void DisplayZoneDirection( VECTOR * Pos, VECTOR * Dir, u_int16_t Group ) { g_skin_views.display_zone_direction( Pos, Dir, Group ); }
+void DisplayDirAndUp( VECTOR * Pos, VECTOR * Dir, VECTOR *Up, u_int16_t Group ) { g_skin_views.display_dir_and_up( Pos, Dir, Up, Group ); }
+void DisplayTriggerZone( TRIGGER_ZONE * Sides, int16_t NumSides, u_int16_t Group,
+						 u_int8_t Red, u_int8_t Green, u_int8_t Blue, u_int8_t Trans ) { g_skin_views.display_trigger_zone( Sides, NumSides, Group, Red, Green, Blue, Trans ); }
+void DisplayColZone( ZONESIDE * Sides, int16_t NumSides, u_int16_t Group, int16_t Sensitive ) { g_skin_views.display_col_zone( Sides, NumSides, Group, Sensitive ); }
