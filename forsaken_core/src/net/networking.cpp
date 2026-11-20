@@ -3232,8 +3232,10 @@ enum channel_t {
 };
 
 /* MSG_INIT -- false: SendGameMessage returns */
-[[gnu::always_inline]] static inline bool SendInitMsg( BYTE & msg, network_player_t *& to, BYTE & ShipNum, BYTE & mask, INITMSG *& InitMsg, DWORD & nBytes, int & flags, int & i )
+[[gnu::always_inline]] static inline bool SendInitMsg( BYTE & msg, network_player_t *& to, BYTE & ShipNum, BYTE & mask, DWORD & nBytes, int & flags, int & i )
 {
+	INITMSG *InitMsg;
+
 	DebugPrintf("net_msg: MSG_INIT\n");
 
 	// only host is allowed to send a MSG_INIT
@@ -3403,8 +3405,10 @@ enum channel_t {
 }
 
 /* MSG_STATUS */
-[[gnu::always_inline]] static inline void SendStatusMsg( BYTE & msg, STATUSMSG *& StatusMsg, DWORD & nBytes, int & flags )
+[[gnu::always_inline]] static inline void SendStatusMsg( BYTE & msg, DWORD & nBytes, int & flags )
 {
+	STATUSMSG *StatusMsg;
+
 	DebugPrintf("net_msg: MSG_STATUS\n");
 
 	StatusMsg							= (STATUSMSG *)&CommBuff[0];
@@ -3424,8 +3428,10 @@ enum channel_t {
 }
 
 /* MSG_LONGSTATUS */
-[[gnu::always_inline]] static inline void SendLongStatusMsg( BYTE & msg, LONGSTATUSMSG *& LongStatusMsg, DWORD & nBytes, int & flags )
+[[gnu::always_inline]] static inline void SendLongStatusMsg( BYTE & msg, DWORD & nBytes, int & flags )
 {
+	LONGSTATUSMSG *LongStatusMsg;
+
 	DebugPrintf("net_msg: MSG_LONGSTATUS\n");
 
 	LongStatusMsg = (LONGSTATUSMSG *)&CommBuff[0];
@@ -3455,8 +3461,10 @@ enum channel_t {
 }
 
 /* MSG_TEXTMSG */
-[[gnu::always_inline]] static inline void SendTextMsg( BYTE & msg, BYTE & Type, TEXTMSG *& TextMsg, DWORD & nBytes, int & flags, int & MessageColour )
+[[gnu::always_inline]] static inline void SendTextMsg( BYTE & msg, BYTE & Type, DWORD & nBytes, int & flags, int & MessageColour )
 {
+	TEXTMSG *TextMsg;
+
 	DebugPrintf("net_msg: MSG_TEXTMSG\n");
 
 	TextMsg = (TEXTMSG *)&CommBuff[0];
@@ -3571,42 +3579,461 @@ enum channel_t {
 		AddColourMessageToQue( MessageColour, "%s", (char*) &TextMsg->Text[0] );
 }
 
+/* MSG_SHIPHEALTH */
+[[gnu::always_inline]] static inline void SendShipHealthMsg( BYTE & msg, DWORD & nBytes, int & flags )
+{
+	SHIPHEALTHMSG *ShipHealthMsg;
+
+	DebugPrintf("net_msg: MSG_SHIPHEALTH\n");
+
+	ShipHealthMsg = (SHIPHEALTHMSG *)&CommBuff[0];
+	ShipHealthMsg->MsgCode = msg;
+	ShipHealthMsg->WhoIAm = WhoIAm;
+	ShipHealthMsg->Hull = (u_int8_t) Ships[WhoIAm].Object.Hull;
+	ShipHealthMsg->Shield = (u_int8_t) Ships[WhoIAm].Object.Shield;
+	nBytes = sizeof( SHIPHEALTHMSG );
+	flags |= NETWORK_RELIABLE;
+}
+
+/* MSG_YOUQUIT */
+[[gnu::always_inline]] static inline void SendYouQuitMsg( BYTE & msg, network_player_t *& to, BYTE & ShipNum, DWORD & nBytes, int & flags )
+{
+	YOUQUITMSG *YouQuitMsg;
+
+	DebugPrintf("net_msg: MSG_YOUQUIT\n");
+
+	YouQuitMsg = (YOUQUITMSG *)&CommBuff[0];
+	YouQuitMsg->MsgCode = msg;
+	YouQuitMsg->WhoIAm = WhoIAm;
+	YouQuitMsg->You = ShipNum;
+	nBytes = sizeof( YOUQUITMSG );
+	to = Ships[ShipNum].network_player;
+	flags |= NETWORK_RELIABLE;
+}
+
+/* MSG_BIKENUM */
+[[gnu::always_inline]] static inline void SendBikeNumMsg( BYTE & msg, DWORD & nBytes, int & flags )
+{
+	BIKENUMMSG *BikeNumMsg;
+
+	DebugPrintf("net_msg: MSG_BIKENUM\n");
+
+	BikeNumMsg = (BIKENUMMSG *)&CommBuff[0];
+	BikeNumMsg->MsgCode = msg;
+	BikeNumMsg->WhoIAm = WhoIAm;
+	BikeNumMsg->BikeNum = (BYTE) Ships[WhoIAm].BikeNum;
+	nBytes = sizeof( BIKENUMMSG );
+	flags |= NETWORK_RELIABLE;
+}
+
+/* MSG_HEREIAM */
+[[gnu::always_inline]] static inline void SendHereIAmMsg( BYTE & msg, DWORD & nBytes, int & flags )
+{
+	HEREIAMMSG *HereIAmMsg;
+
+	DebugPrintf("net_msg: MSG_HEREIAM\n");
+
+	HereIAmMsg = (HEREIAMMSG *)&CommBuff[0];
+	HereIAmMsg->MsgCode = msg;
+	HereIAmMsg->WhoIAm = WhoIAm;
+	HereIAmMsg->MPVersion = PXMPVINT;
+	nBytes = sizeof( HEREIAMMSG );
+	flags |= NETWORK_RELIABLE;
+}
+
+/* MSG_VERYSHORTUPDATE */
+[[gnu::always_inline]] static inline void SendVeryShortUpdateMsg( BYTE & msg, DWORD & nBytes, int & flags, channel_t & channel )
+{
+	VERYSHORTUPDATEMSG *VeryShortUpdateMsg;
+
+	VeryShortUpdateMsg = (VERYSHORTUPDATEMSG *)&CommBuff[0];
+	VeryShortUpdateMsg->MsgCode = msg;
+	VeryShortUpdateMsg->WhoIAm = WhoIAm;
+	VeryShortUpdateMsg->ShortGlobalShip = VeryShortGlobalShip;
+	nBytes = sizeof( VERYSHORTUPDATEMSG );
+	channel = CHANNEL_BIKE_POSITIONS;
+	flags = NETWORK_SEQUENCED;
+}
+
+/* MSG_UPDATE */
+[[gnu::always_inline]] static inline void SendUpdateMsg( BYTE & msg, DWORD & nBytes, int & flags, channel_t & channel )
+{
+	UPDATEMSG *UpdateMsg;
+
+	UpdateMsg = (UPDATEMSG *)&CommBuff[0];
+	UpdateMsg->MsgCode = msg;
+	UpdateMsg->WhoIAm = WhoIAm;
+	UpdateMsg->ShortGlobalShip = ShortGlobalShip;
+	nBytes = sizeof( UPDATEMSG );
+	channel = CHANNEL_BIKE_POSITIONS;
+	flags = NETWORK_SEQUENCED;
+}
+
+/* MSG_FUPDATE */
+[[gnu::always_inline]] static inline void SendFUpdateMsg( BYTE & msg, DWORD & nBytes, int & flags, channel_t & channel )
+{
+	FUPDATEMSG *FUpdateMsg;
+
+	DebugPrintf("net_msg: MSG_FUPDATE\n");
+
+	FUpdateMsg = (FUPDATEMSG *)&CommBuff[0];
+	FUpdateMsg->MsgCode = msg;
+	FUpdateMsg->WhoIAm = WhoIAm;
+	FUpdateMsg->ShortGlobalShip = FShortGlobalShip;
+	nBytes = sizeof( FUPDATEMSG );
+	channel = CHANNEL_BIKE_POSITIONS;
+	flags = NETWORK_SEQUENCED;
+	Interval = NetUpdateInterval; // reset pps timer
+}
+
+/* MSG_VERYSHORTFUPDATE */
+[[gnu::always_inline]] static inline void SendVeryShortFUpdateMsg( BYTE & msg, DWORD & nBytes, int & flags, channel_t & channel )
+{
+	VERYSHORTFUPDATEMSG *VeryShortFUpdateMsg;
+
+	DebugPrintf("net_msg: MSG_VERYSHORTFUPDATE\n");
+
+	VeryShortFUpdateMsg = (VERYSHORTFUPDATEMSG *)&CommBuff[0];
+	VeryShortFUpdateMsg->MsgCode = msg;
+	VeryShortFUpdateMsg->WhoIAm = WhoIAm;
+	VeryShortFUpdateMsg->ShortGlobalShip = FVeryShortGlobalShip;
+	nBytes = sizeof( VERYSHORTFUPDATEMSG );
+	channel = CHANNEL_BIKE_POSITIONS;
+	flags = NETWORK_SEQUENCED;
+	Interval = NetUpdateInterval; // reset pps timer
+}
+
+/* MSG_GROUPONLY_VERYSHORTFUPDATE */
+[[gnu::always_inline]] static inline void SendGroupOnlyVeryShortFUpdateMsg( BYTE & msg, DWORD & nBytes, int & flags, channel_t & channel )
+{
+	GROUPONLY_VERYSHORTFUPDATEMSG *GroupOnly_VeryShortFUpdateMsg;
+
+	DebugPrintf("net_msg: MSG_GROUPONLY_VERYSHORTFUPDATE\n");
+
+	GroupOnly_VeryShortFUpdateMsg = (GROUPONLY_VERYSHORTFUPDATEMSG *)&CommBuff[0];
+	GroupOnly_VeryShortFUpdateMsg->MsgCode = msg;
+	GroupOnly_VeryShortFUpdateMsg->WhoIAm = WhoIAm;
+	GroupOnly_VeryShortFUpdateMsg->ShortGlobalShip = GroupOnly_FVeryShortGlobalShip;
+	nBytes = sizeof( GROUPONLY_VERYSHORTFUPDATEMSG );
+	channel = CHANNEL_BIKE_POSITIONS;
+	flags = NETWORK_SEQUENCED;
+}
+
+/* MSG_DROPPICKUP */
+[[gnu::always_inline]] static inline void SendDropPickupMsg( BYTE & msg, DWORD & nBytes, int & flags )
+{
+	DROPPICKUPMSG *DropPickupMsg;
+
+	DebugPrintf("net_msg: MSG_DROPPICKUP\n");
+
+	DropPickupMsg = (DROPPICKUPMSG *) &CommBuff[0];
+	DropPickupMsg->MsgCode = msg;
+	DropPickupMsg->WhoIAm = WhoIAm;
+	DropPickupMsg->PickupInfo = TempPickup;
+	nBytes = sizeof( DROPPICKUPMSG );
+	flags |= NETWORK_RELIABLE;
+}
+
+/* MSG_VERYSHORTDROPPICKUP */
+[[gnu::always_inline]] static inline void SendVeryShortDropPickupMsg( BYTE & msg, DWORD & nBytes, int & flags )
+{
+	VERYSHORTDROPPICKUPMSG *VeryShortDropPickupMsg;
+
+	DebugPrintf("net_msg: MSG_VERYSHORTDROPPICKUP\n");
+
+	VeryShortDropPickupMsg = (VERYSHORTDROPPICKUPMSG *) &CommBuff[0];
+	VeryShortDropPickupMsg->MsgCode = msg;
+	VeryShortDropPickupMsg->WhoIAm = WhoIAm;
+	VeryShortDropPickupMsg->PickupInfo = VeryShortTempPickup;
+	nBytes = sizeof( VERYSHORTDROPPICKUPMSG );
+	flags |= NETWORK_RELIABLE;
+}
+
+/* MSG_KILLPICKUP */
+[[gnu::always_inline]] static inline void SendKillPickupMsg( BYTE & msg, DWORD & nBytes, int & flags )
+{
+	KILLPICKUPMSG *KillPickupMsg;
+
+	DebugPrintf("net_msg: MSG_KILLPICKUP\n");
+
+	KillPickupMsg = (KILLPICKUPMSG *) &CommBuff[0];
+	KillPickupMsg->MsgCode = msg;
+	KillPickupMsg->WhoIAm = WhoIAm;
+	KillPickupMsg->KillPickupInfo = TempKillPickup;
+	nBytes = sizeof( KILLPICKUPMSG );
+	flags |= NETWORK_RELIABLE;
+}
+
+/* MSG_TEAMGOALS */
+[[gnu::always_inline]] static inline void SendTeamGoalsMsg( BYTE & msg, DWORD & nBytes, int & flags )
+{
+	TEAMGOALSMSG *TeamGoalsMsg;
+
+	DebugPrintf("net_msg: MSG_TEAMGOALS\n");
+
+	TeamGoalsMsg = (TEAMGOALSMSG *) &CommBuff[0];
+	TeamGoalsMsg->MsgCode = msg;
+	TeamGoalsMsg->WhoIAm = WhoIAm;
+	TeamGoalsMsg->TeamGoalsInfo = TempTeamGoals;
+	nBytes = sizeof( TEAMGOALSMSG );
+	flags |= NETWORK_RELIABLE;
+}
+
+/* MSG_SHOCKWAVE */
+[[gnu::always_inline]] static inline void SendShockwaveMsg( BYTE & msg, DWORD & nBytes )
+{
+	SHOCKWAVEMSG *ShockwaveMsg;
+
+	DebugPrintf("net_msg: MSG_SHOCKWAVE\n");
+
+	ShockwaveMsg = (SHOCKWAVEMSG *) &CommBuff[0];
+	ShockwaveMsg->MsgCode = msg;
+	ShockwaveMsg->WhoIAm = WhoIAm;
+	ShockwaveMsg->ShockwaveInfo = TempShockwave;
+	nBytes = sizeof( SHOCKWAVEMSG );
+}
+
+/* MSG_BGOUPDATE */
+[[gnu::always_inline]] static inline void SendBGOUpdateMsg( BYTE & msg, DWORD & nBytes, int & flags )
+{
+	BGOUPDATEMSG *BGOUpdateMsg;
+
+	DebugPrintf("net_msg: MSG_BGOUPDATE\n");
+
+	BGOUpdateMsg = (BGOUPDATEMSG *) &CommBuff[0];
+	BGOUpdateMsg->MsgCode = msg;
+	BGOUpdateMsg->WhoIAm = WhoIAm;
+	BGOUpdateMsg->BGOUpdateInfo = TempBGOUpdate;
+	nBytes = sizeof( BGOUPDATEMSG );
+	flags |= NETWORK_RELIABLE;
+}
+
+/* MSG_PRIMBULLPOSDIR */
+[[gnu::always_inline]] static inline void SendPrimBullPosDirMsg( BYTE & msg, DWORD & nBytes )
+{
+	PRIMBULLPOSDIRMSG *PrimBullPosDirMsg;
+
+	DebugPrintf("net_msg: MSG_PRIMBULLPOSDIR\n");
+	PrimBullPosDirMsg = (PRIMBULLPOSDIRMSG *)&CommBuff[0];
+	PrimBullPosDirMsg->MsgCode = msg;
+	PrimBullPosDirMsg->WhoIAm = WhoIAm;
+	PrimBullPosDirMsg->PrimBullPosDir = TempPrimBullPosDir;
+	nBytes = sizeof( PRIMBULLPOSDIRMSG );
+}
+
+/* MSG_SECBULLPOSDIR */
+[[gnu::always_inline]] static inline void SendSecBullPosDirMsg( BYTE & msg, DWORD & nBytes, int & flags )
+{
+	SECBULLPOSDIRMSG *SecBullPosDirMsg;
+
+	DebugPrintf("net_msg: MSG_SECBULLPOSDIR\n");
+	SecBullPosDirMsg = (SECBULLPOSDIRMSG *)&CommBuff[0];
+	SecBullPosDirMsg->MsgCode = msg;
+	SecBullPosDirMsg->WhoIAm = WhoIAm;
+	SecBullPosDirMsg->SecBullPosDir = TempSecBullPosDir;
+	nBytes = sizeof( SECBULLPOSDIRMSG );
+	flags |= NETWORK_RELIABLE;
+}
+
+/* MSG_TITANBITS */
+[[gnu::always_inline]] static inline void SendTitanBitsMsg( BYTE & msg, DWORD & nBytes, int & flags )
+{
+	TITANBITSMSG *TitanBitsMsg;
+
+	DebugPrintf("net_msg: MSG_TITANBITS\n");
+
+	TitanBitsMsg = (TITANBITSMSG *)&CommBuff[0];
+	TitanBitsMsg->MsgCode = msg;
+	TitanBitsMsg->WhoIAm = WhoIAm;
+	TitanBitsMsg->TitanBits = TempTitanBits;
+	nBytes = sizeof( TITANBITSMSG );
+	flags |= NETWORK_RELIABLE;
+}
+
+/* MSG_SHIPHIT */
+[[gnu::always_inline]] static inline void SendShipHitMsg( BYTE & msg, BYTE & ShipNum, DWORD & nBytes, int & flags )
+{
+	SHIPHITMSG *ShipHitMsg;
+
+	DebugPrintf("net_msg: MSG_SHIPHIT\n");
+
+	ShipHitMsg = (SHIPHITMSG *)&CommBuff[0];
+	ShipHitMsg->MsgCode = msg;
+	ShipHitMsg->You = ShipNum;
+	ShipHitMsg->WhoHitYou = WhoIAm;
+	ShipHitMsg->ShipHit = TempShipHit;
+	nBytes = sizeof( SHIPHITMSG );
+	flags |= NETWORK_RELIABLE;
+}
+
+/* MSG_SHORTSHIPHIT */
+[[gnu::always_inline]] static inline void SendShortShipHitMsg( BYTE & msg, BYTE & ShipNum, DWORD & nBytes, int & flags )
+{
+	SHORTSHIPHITMSG *ShortShipHitMsg;
+
+	DebugPrintf("net_msg: MSG_SHORTSHIPHIT\n");
+
+	ShortShipHitMsg = (SHORTSHIPHITMSG *)&CommBuff[0];
+	ShortShipHitMsg->MsgCode = msg;
+	ShortShipHitMsg->You = ShipNum;
+	ShortShipHitMsg->WhoHitYou = WhoIAm;
+	ShortShipHitMsg->ShipHit = ShortTempShipHit;
+	nBytes = sizeof( SHORTSHIPHITMSG );
+	flags |= NETWORK_RELIABLE;
+}
+
+/* MSG_SHIPDIED */
+[[gnu::always_inline]] static inline void SendShipDiedMsg( BYTE & msg, BYTE & Type, DWORD & nBytes, int & flags )
+{
+	SHIPDIEDMSG *ShipDiedMsg;
+
+	DebugPrintf("net_msg: MSG_SHIPDIED\n");
+
+	ShipDiedMsg = (SHIPDIEDMSG *)&CommBuff[0];
+	ShipDiedMsg->MsgCode = msg;
+	ShipDiedMsg->WhoIAm = WhoIAm;
+	ShipDiedMsg->Pos = Ships[WhoIAm].Object.Pos;
+	ShipDiedMsg->WhoKilledMe = Ships[WhoIAm].ShipThatLastKilledMe;
+	ShipDiedMsg->Type	= Type;
+	ShipDiedMsg->WeaponType = TempDied.WeaponType;
+	ShipDiedMsg->Weapon = TempDied.Weapon;
+	nBytes = sizeof( SHIPDIEDMSG );
+	flags |= NETWORK_RELIABLE;
+}
+
+/* MSG_REQTIME */
+[[gnu::always_inline]] static inline void SendReqTimeMsg( BYTE & msg, DWORD & nBytes, int & flags )
+{
+	REQTIMEMSG *ReqTimeMsg;
+
+	DebugPrintf("net_msg: MSG_REQTIME\n");
+	ReqTimeMsg = (REQTIMEMSG *)&CommBuff[0];
+	ReqTimeMsg->MsgCode = msg;
+	ReqTimeMsg->WhoIAm = WhoIAm;
+	nBytes = sizeof( REQTIMEMSG );
+	flags |= NETWORK_RELIABLE;
+}
+
+/* MSG_SETTIME */
+[[gnu::always_inline]] static inline void SendSetTimeMsg( BYTE & msg, DWORD & nBytes, int & flags )
+{
+	SETTIMEMSG *SetTimeMsg;
+
+	DebugPrintf("net_msg: MSG_SETTIME\n");
+
+	SetTimeMsg = (SETTIMEMSG *)&CommBuff[0];
+	SetTimeMsg->MsgCode = msg;
+	SetTimeMsg->WhoIAm = WhoIAm;
+	SetTimeMsg->TimeInfo = TempTimeSet;
+	nBytes = sizeof( SETTIMEMSG );
+	flags |= NETWORK_RELIABLE;
+}
+
+/* MSG_NETSETTINGS */
+[[gnu::always_inline]] static inline void SendNetSettingsMsg( BYTE & msg, DWORD & nBytes, int & flags )
+{
+	NETSETTINGSMSG *NetSettingsMsg;
+
+	DebugPrintf("net_msg: MSG_NETSETTINGS\n");
+
+	NetSettingsMsg						= (NETSETTINGSMSG *)&CommBuff[0];
+	NetSettingsMsg->MsgCode				= msg;
+	NetSettingsMsg->WhoIAm				= WhoIAm;
+	NetSettingsMsg->IsHost				= IsHost;
+	NetSettingsMsg->PacketsPerSecond		= NetUpdateInterval;
+	NetSettingsMsg->CollisionPerspective	= ColPerspective;
+	NetSettingsMsg->ShortPackets			= UseShortPackets;
+	nBytes = sizeof( NETSETTINGSMSG );
+	flags |= NETWORK_RELIABLE;
+}
+
+/* MSG_SHORTPICKUP */
+[[gnu::always_inline]] static inline void SendShortPickupMsg( BYTE & msg, network_player_t *& to, BYTE & ShipNum, DWORD & nBytes, int & flags )
+{
+	SHORTPICKUPMSG *ShortPickupMsg;
+
+	DebugPrintf("net_msg: MSG_SHORTPICKUP\n");
+
+	ShortPickupMsg = (SHORTPICKUPMSG *)&CommBuff[0];
+	ShortPickupMsg->MsgCode	= msg;
+	ShortPickupMsg->WhoIAm	= WhoIAm;
+	ShortPickupMsg->Pickups	= Ships[ShipNum].Pickups;
+	GenPickupList( ShipNum, &ShortPickupMsg->ShortPickup[0] , &ShortPickupMsg->HowManyPickups , Ships[ShipNum].Pickups );
+	nBytes = sizeof( SHORTPICKUPMSG );
+	to = Ships[ShipNum].network_player;
+	flags |= NETWORK_RELIABLE;
+}
+
+/* MSG_SHORTREGENSLOT */
+[[gnu::always_inline]] static inline void SendShortRegenSlotMsg( BYTE & msg, network_player_t *& to, BYTE & ShipNum, DWORD & nBytes, int & flags )
+{
+	SHORTREGENSLOTMSG *ShortRegenSlotMsg;
+
+	DebugPrintf("net_msg: MSG_SHORTREGENSLOT\n");
+
+	ShortRegenSlotMsg = (SHORTREGENSLOTMSG *)&CommBuff[0];
+	ShortRegenSlotMsg->MsgCode		= msg;
+	ShortRegenSlotMsg->WhoIAm		= WhoIAm;
+	ShortRegenSlotMsg->RegenSlots	= Ships[ShipNum].RegenSlots;
+	GenRegenSlotList( ShipNum, &ShortRegenSlotMsg->ShortRegenSlot[0] , &ShortRegenSlotMsg->HowManyRegenSlots , Ships[ShipNum].RegenSlots );
+	nBytes	= sizeof( SHORTREGENSLOTMSG );
+	to = Ships[ShipNum].network_player;
+	flags |= NETWORK_RELIABLE;
+}
+
+/* MSG_SHORTTRIGGER */
+[[gnu::always_inline]] static inline void SendShortTriggerMsg( BYTE & msg, network_player_t *& to, BYTE & ShipNum, DWORD & nBytes, int & flags )
+{
+	SHORTTRIGGERMSG *ShortTriggerMsg;
+
+	DebugPrintf("net_msg: MSG_SHORTTRIGGER\n");
+
+	ShortTriggerMsg = (SHORTTRIGGERMSG *)&CommBuff[0];
+	ShortTriggerMsg->MsgCode		= msg;
+	ShortTriggerMsg->WhoIAm		= WhoIAm;
+	ShortTriggerMsg->Triggers	= Ships[ShipNum].Triggers;
+	GenTriggerList( ShipNum, &ShortTriggerMsg->ShortTrigger[0] , &ShortTriggerMsg->HowManyTriggers, Ships[ShipNum].Triggers );
+	nBytes	= sizeof( SHORTTRIGGERMSG );
+	to	= Ships[ShipNum].network_player;
+	flags |= NETWORK_RELIABLE;
+}
+
+/* MSG_SHORTTRIGVAR */
+[[gnu::always_inline]] static inline void SendShortTrigVarMsg( BYTE & msg, network_player_t *& to, BYTE & ShipNum, DWORD & nBytes, int & flags )
+{
+	SHORTTRIGVARMSG *ShortTrigVarMsg;
+
+	DebugPrintf("net_msg: MSG_SHORTTRIGVAR\n");
+
+	ShortTrigVarMsg = (SHORTTRIGVARMSG *)&CommBuff[0];
+	ShortTrigVarMsg->MsgCode		= msg;
+	ShortTrigVarMsg->WhoIAm		= WhoIAm;
+	ShortTrigVarMsg->TrigVars	= Ships[ShipNum].TrigVars;
+	GenTrigVarList( ShipNum, &ShortTrigVarMsg->ShortTrigVar[0] , &ShortTrigVarMsg->HowManyTrigVars, Ships[ShipNum].TrigVars );
+	nBytes = sizeof( SHORTTRIGVARMSG );
+	to = Ships[ShipNum].network_player;
+	flags |= NETWORK_RELIABLE;
+}
+
+/* MSG_SHORTMINE */
+[[gnu::always_inline]] static inline void SendShortMineMsg( BYTE & msg, network_player_t *& to, BYTE & ShipNum, DWORD & nBytes, int & flags )
+{
+	SHORTMINEMSG *ShortMineMsg;
+
+	DebugPrintf("net_msg: MSG_SHORTMINE\n");
+
+	ShortMineMsg				= (SHORTMINEMSG *)&CommBuff[0];
+	ShortMineMsg->MsgCode	= msg;
+	ShortMineMsg->WhoIAm		= WhoIAm;
+	ShortMineMsg->Mines		= Ships[ShipNum].Mines;
+	GenMineList( ShipNum, &ShortMineMsg->ShortMine[0] , &ShortMineMsg->HowManyMines, Ships[ShipNum].Mines );
+	nBytes	= sizeof( SHORTMINEMSG );
+	to = Ships[ShipNum].network_player;
+	flags |= NETWORK_RELIABLE;
+}
+
 void SendGameMessage( BYTE msg, network_player_t * to, BYTE ShipNum, BYTE Type, BYTE mask )
 {
-	SHIPHEALTHMSG                     *ShipHealthMsg;
-	VERYSHORTUPDATEMSG				*VeryShortUpdateMsg;
-	UPDATEMSG							*UpdateMsg;
-	FUPDATEMSG						*FUpdateMsg;
-	VERYSHORTFUPDATEMSG				*VeryShortFUpdateMsg;
-	GROUPONLY_VERYSHORTFUPDATEMSG		*GroupOnly_VeryShortFUpdateMsg;
-	HEREIAMMSG						*HereIAmMsg;
-	INITMSG							*InitMsg;
-	PRIMBULLPOSDIRMSG					*PrimBullPosDirMsg;
-	SECBULLPOSDIRMSG					*SecBullPosDirMsg;
-	TITANBITSMSG						*TitanBitsMsg;
-	SHIPHITMSG						*ShipHitMsg;
-	SHORTSHIPHITMSG					*ShortShipHitMsg;
-	SHIPDIEDMSG						*ShipDiedMsg;
-	DROPPICKUPMSG						*DropPickupMsg;
-	VERYSHORTDROPPICKUPMSG			*VeryShortDropPickupMsg;
-	KILLPICKUPMSG						*KillPickupMsg;
-	TEAMGOALSMSG						*TeamGoalsMsg;
-	SHOCKWAVEMSG						*ShockwaveMsg;
-	BGOUPDATEMSG						*BGOUpdateMsg;
-	STATUSMSG							*StatusMsg;
-	LONGSTATUSMSG						*LongStatusMsg;
-	SHORTPICKUPMSG					*ShortPickupMsg;
-	SHORTREGENSLOTMSG					*ShortRegenSlotMsg;
-	SHORTTRIGGERMSG					*ShortTriggerMsg;
-	SHORTTRIGVARMSG					*ShortTrigVarMsg;
-	SHORTMINEMSG						*ShortMineMsg;
-	TEXTMSG							*TextMsg;
-	BIKENUMMSG						*BikeNumMsg;
-	YOUQUITMSG						*YouQuitMsg;
-	SETTIMEMSG						*SetTimeMsg;
-	REQTIMEMSG						*ReqTimeMsg;
-	NETSETTINGSMSG					*NetSettingsMsg;
-
 	// network variables
 	DWORD			nBytes = 0;
 	int				flags  = 0;
@@ -3625,50 +4052,20 @@ void SendGameMessage( BYTE msg, network_player_t * to, BYTE ShipNum, BYTE Type, 
 	{
 
 	case MSG_SHIPHEALTH:
-		DebugPrintf("net_msg: MSG_SHIPHEALTH\n");
-
-		ShipHealthMsg = (SHIPHEALTHMSG *)&CommBuff[0];
-		ShipHealthMsg->MsgCode = msg;
-		ShipHealthMsg->WhoIAm = WhoIAm;
-		ShipHealthMsg->Hull = (u_int8_t) Ships[WhoIAm].Object.Hull;
-		ShipHealthMsg->Shield = (u_int8_t) Ships[WhoIAm].Object.Shield;
-		nBytes = sizeof( SHIPHEALTHMSG );
-		flags |= NETWORK_RELIABLE;
+		SendShipHealthMsg( msg, nBytes, flags );
 		break;
 
 	case MSG_YOUQUIT:
-		DebugPrintf("net_msg: MSG_YOUQUIT\n");
-
-		YouQuitMsg = (YOUQUITMSG *)&CommBuff[0];
-		YouQuitMsg->MsgCode = msg;
-		YouQuitMsg->WhoIAm = WhoIAm;
-		YouQuitMsg->You = ShipNum;
-		nBytes = sizeof( YOUQUITMSG );
-		to = Ships[ShipNum].network_player;
-		flags |= NETWORK_RELIABLE;
+		SendYouQuitMsg( msg, to, ShipNum, nBytes, flags );
 		break;
 
 
 	case MSG_BIKENUM:
-		DebugPrintf("net_msg: MSG_BIKENUM\n");
-
-		BikeNumMsg = (BIKENUMMSG *)&CommBuff[0];
-		BikeNumMsg->MsgCode = msg;
-		BikeNumMsg->WhoIAm = WhoIAm;
-		BikeNumMsg->BikeNum = (BYTE) Ships[WhoIAm].BikeNum;
-		nBytes = sizeof( BIKENUMMSG );
-		flags |= NETWORK_RELIABLE;
+		SendBikeNumMsg( msg, nBytes, flags );
 		break;
 
 	case MSG_HEREIAM:
-		DebugPrintf("net_msg: MSG_HEREIAM\n");
-
-		HereIAmMsg = (HEREIAMMSG *)&CommBuff[0];
-		HereIAmMsg->MsgCode = msg;
-		HereIAmMsg->WhoIAm = WhoIAm;
-		HereIAmMsg->MPVersion = PXMPVINT;
-		nBytes = sizeof( HEREIAMMSG );
-		flags |= NETWORK_RELIABLE;
+		SendHereIAmMsg( msg, nBytes, flags );
 		break;
 
 
@@ -3680,32 +4077,18 @@ void SendGameMessage( BYTE msg, network_player_t * to, BYTE ShipNum, BYTE Type, 
 		// other wise whats the point of sending all this extra stuff...
 
 	case MSG_INIT:
-		if( !SendInitMsg( msg, to, ShipNum, mask, InitMsg, nBytes, flags, i ) )
+		if( !SendInitMsg( msg, to, ShipNum, mask, nBytes, flags, i ) )
 			return;
 		break;
 
 
 	case MSG_VERYSHORTUPDATE: // short packets on
-
-		VeryShortUpdateMsg = (VERYSHORTUPDATEMSG *)&CommBuff[0];
-		VeryShortUpdateMsg->MsgCode = msg;
-		VeryShortUpdateMsg->WhoIAm = WhoIAm;
-		VeryShortUpdateMsg->ShortGlobalShip = VeryShortGlobalShip;
-		nBytes = sizeof( VERYSHORTUPDATEMSG );
-		channel = CHANNEL_BIKE_POSITIONS;
-		flags = NETWORK_SEQUENCED;
+		SendVeryShortUpdateMsg( msg, nBytes, flags, channel );
 		break;
 
 
 	case MSG_UPDATE: // short packets off
-
-		UpdateMsg = (UPDATEMSG *)&CommBuff[0];
-		UpdateMsg->MsgCode = msg;
-		UpdateMsg->WhoIAm = WhoIAm;
-		UpdateMsg->ShortGlobalShip = ShortGlobalShip;
-		nBytes = sizeof( UPDATEMSG );
-		channel = CHANNEL_BIKE_POSITIONS;
-		flags = NETWORK_SEQUENCED;
+		SendUpdateMsg( msg, nBytes, flags, channel );
 		break;
 
 		// following 3 pkts are bullet pkts
@@ -3717,308 +4100,129 @@ void SendGameMessage( BYTE msg, network_player_t * to, BYTE ShipNum, BYTE Type, 
 		// probably just use those and turn off the f updates...
 
 	case MSG_FUPDATE: // short packets off + fire weapon data
-		DebugPrintf("net_msg: MSG_FUPDATE\n");
-
-		FUpdateMsg = (FUPDATEMSG *)&CommBuff[0];
-		FUpdateMsg->MsgCode = msg;
-		FUpdateMsg->WhoIAm = WhoIAm;
-		FUpdateMsg->ShortGlobalShip = FShortGlobalShip;
-		nBytes = sizeof( FUPDATEMSG );
-		channel = CHANNEL_BIKE_POSITIONS;
-		flags = NETWORK_SEQUENCED;
-		Interval = NetUpdateInterval; // reset pps timer
+		SendFUpdateMsg( msg, nBytes, flags, channel );
 		break;
 
 
 	case MSG_VERYSHORTFUPDATE: // short packets on + fire weapon data
-		DebugPrintf("net_msg: MSG_VERYSHORTFUPDATE\n");
-
-		VeryShortFUpdateMsg = (VERYSHORTFUPDATEMSG *)&CommBuff[0];
-		VeryShortFUpdateMsg->MsgCode = msg;
-		VeryShortFUpdateMsg->WhoIAm = WhoIAm;
-		VeryShortFUpdateMsg->ShortGlobalShip = FVeryShortGlobalShip;
-		nBytes = sizeof( VERYSHORTFUPDATEMSG );
-		channel = CHANNEL_BIKE_POSITIONS;
-		flags = NETWORK_SEQUENCED;
-		Interval = NetUpdateInterval; // reset pps timer
+		SendVeryShortFUpdateMsg( msg, nBytes, flags, channel );
 		break;
 
 
 	case MSG_GROUPONLY_VERYSHORTFUPDATE:
-		DebugPrintf("net_msg: MSG_GROUPONLY_VERYSHORTFUPDATE\n");
-
-		GroupOnly_VeryShortFUpdateMsg = (GROUPONLY_VERYSHORTFUPDATEMSG *)&CommBuff[0];
-		GroupOnly_VeryShortFUpdateMsg->MsgCode = msg;
-		GroupOnly_VeryShortFUpdateMsg->WhoIAm = WhoIAm;
-		GroupOnly_VeryShortFUpdateMsg->ShortGlobalShip = GroupOnly_FVeryShortGlobalShip;
-		nBytes = sizeof( GROUPONLY_VERYSHORTFUPDATEMSG );
-		channel = CHANNEL_BIKE_POSITIONS;
-		flags = NETWORK_SEQUENCED;
+		SendGroupOnlyVeryShortFUpdateMsg( msg, nBytes, flags, channel );
 		break;
 
 
 	case MSG_DROPPICKUP:
-		DebugPrintf("net_msg: MSG_DROPPICKUP\n");
-
-		DropPickupMsg = (DROPPICKUPMSG *) &CommBuff[0];
-		DropPickupMsg->MsgCode = msg;
-		DropPickupMsg->WhoIAm = WhoIAm;
-		DropPickupMsg->PickupInfo = TempPickup;
-		nBytes = sizeof( DROPPICKUPMSG );
-		flags |= NETWORK_RELIABLE;
+		SendDropPickupMsg( msg, nBytes, flags );
 		break;
 
 
 	case MSG_VERYSHORTDROPPICKUP:
-		DebugPrintf("net_msg: MSG_VERYSHORTDROPPICKUP\n");
-
-		VeryShortDropPickupMsg = (VERYSHORTDROPPICKUPMSG *) &CommBuff[0];
-		VeryShortDropPickupMsg->MsgCode = msg;
-		VeryShortDropPickupMsg->WhoIAm = WhoIAm;
-		VeryShortDropPickupMsg->PickupInfo = VeryShortTempPickup;
-		nBytes = sizeof( VERYSHORTDROPPICKUPMSG );
-		flags |= NETWORK_RELIABLE;
+		SendVeryShortDropPickupMsg( msg, nBytes, flags );
 		break;
 
 
 	case MSG_KILLPICKUP:
-		DebugPrintf("net_msg: MSG_KILLPICKUP\n");
-
-		KillPickupMsg = (KILLPICKUPMSG *) &CommBuff[0];
-		KillPickupMsg->MsgCode = msg;
-		KillPickupMsg->WhoIAm = WhoIAm;
-		KillPickupMsg->KillPickupInfo = TempKillPickup;
-		nBytes = sizeof( KILLPICKUPMSG );
-		flags |= NETWORK_RELIABLE;
+		SendKillPickupMsg( msg, nBytes, flags );
 		break;
 
 
 	case MSG_TEAMGOALS:
-		DebugPrintf("net_msg: MSG_TEAMGOALS\n");
-
-		TeamGoalsMsg = (TEAMGOALSMSG *) &CommBuff[0];
-		TeamGoalsMsg->MsgCode = msg;
-		TeamGoalsMsg->WhoIAm = WhoIAm;
-		TeamGoalsMsg->TeamGoalsInfo = TempTeamGoals;
-		nBytes = sizeof( TEAMGOALSMSG );
-		flags |= NETWORK_RELIABLE;
+		SendTeamGoalsMsg( msg, nBytes, flags );
 		break;
 
 
 	case MSG_SHOCKWAVE:
-		DebugPrintf("net_msg: MSG_SHOCKWAVE\n");
-
-		ShockwaveMsg = (SHOCKWAVEMSG *) &CommBuff[0];
-		ShockwaveMsg->MsgCode = msg;
-		ShockwaveMsg->WhoIAm = WhoIAm;
-		ShockwaveMsg->ShockwaveInfo = TempShockwave;
-		nBytes = sizeof( SHOCKWAVEMSG );
+		SendShockwaveMsg( msg, nBytes );
 		break;
 
 
 	case MSG_BGOUPDATE:
-		DebugPrintf("net_msg: MSG_BGOUPDATE\n");
-
-		BGOUpdateMsg = (BGOUPDATEMSG *) &CommBuff[0];
-		BGOUpdateMsg->MsgCode = msg;
-		BGOUpdateMsg->WhoIAm = WhoIAm;
-		BGOUpdateMsg->BGOUpdateInfo = TempBGOUpdate;
-		nBytes = sizeof( BGOUPDATEMSG );
-		flags |= NETWORK_RELIABLE;
+		SendBGOUpdateMsg( msg, nBytes, flags );
 		break;
 
 
 	case MSG_PRIMBULLPOSDIR:
-		DebugPrintf("net_msg: MSG_PRIMBULLPOSDIR\n");
-		PrimBullPosDirMsg = (PRIMBULLPOSDIRMSG *)&CommBuff[0];
-		PrimBullPosDirMsg->MsgCode = msg;
-		PrimBullPosDirMsg->WhoIAm = WhoIAm;
-		PrimBullPosDirMsg->PrimBullPosDir = TempPrimBullPosDir;
-		nBytes = sizeof( PRIMBULLPOSDIRMSG );
+		SendPrimBullPosDirMsg( msg, nBytes );
 		break;
 
 		// appears to be mines..
 
 	case MSG_SECBULLPOSDIR:
-		DebugPrintf("net_msg: MSG_SECBULLPOSDIR\n");
-		SecBullPosDirMsg = (SECBULLPOSDIRMSG *)&CommBuff[0];
-		SecBullPosDirMsg->MsgCode = msg;
-		SecBullPosDirMsg->WhoIAm = WhoIAm;
-		SecBullPosDirMsg->SecBullPosDir = TempSecBullPosDir;
-		nBytes = sizeof( SECBULLPOSDIRMSG );
-		flags |= NETWORK_RELIABLE;
+		SendSecBullPosDirMsg( msg, nBytes, flags );
 		break;
 
 
 	case MSG_TITANBITS:
-		DebugPrintf("net_msg: MSG_TITANBITS\n");
-
-		TitanBitsMsg = (TITANBITSMSG *)&CommBuff[0];
-		TitanBitsMsg->MsgCode = msg;
-		TitanBitsMsg->WhoIAm = WhoIAm;
-		TitanBitsMsg->TitanBits = TempTitanBits;
-		nBytes = sizeof( TITANBITSMSG );
-		flags |= NETWORK_RELIABLE;
+		SendTitanBitsMsg( msg, nBytes, flags );
 		break;
 
 
 	case MSG_SHIPHIT:
-		DebugPrintf("net_msg: MSG_SHIPHIT\n");
-
-		ShipHitMsg = (SHIPHITMSG *)&CommBuff[0];
-		ShipHitMsg->MsgCode = msg;
-		ShipHitMsg->You = ShipNum;
-		ShipHitMsg->WhoHitYou = WhoIAm;
-		ShipHitMsg->ShipHit = TempShipHit;
-		nBytes = sizeof( SHIPHITMSG );
-		flags |= NETWORK_RELIABLE;
+		SendShipHitMsg( msg, ShipNum, nBytes, flags );
 		break;
 
 
 	case MSG_SHORTSHIPHIT:
-		DebugPrintf("net_msg: MSG_SHORTSHIPHIT\n");
-
-		ShortShipHitMsg = (SHORTSHIPHITMSG *)&CommBuff[0];
-		ShortShipHitMsg->MsgCode = msg;
-		ShortShipHitMsg->You = ShipNum;
-		ShortShipHitMsg->WhoHitYou = WhoIAm;
-		ShortShipHitMsg->ShipHit = ShortTempShipHit;
-		nBytes = sizeof( SHORTSHIPHITMSG );
-		flags |= NETWORK_RELIABLE;
+		SendShortShipHitMsg( msg, ShipNum, nBytes, flags );
 		break;
 
 
 	case MSG_SHIPDIED:
-		DebugPrintf("net_msg: MSG_SHIPDIED\n");
-
-		ShipDiedMsg = (SHIPDIEDMSG *)&CommBuff[0];
-		ShipDiedMsg->MsgCode = msg;
-		ShipDiedMsg->WhoIAm = WhoIAm;
-		ShipDiedMsg->Pos = Ships[WhoIAm].Object.Pos;
-		ShipDiedMsg->WhoKilledMe = Ships[WhoIAm].ShipThatLastKilledMe;
-		ShipDiedMsg->Type	= Type;
-		ShipDiedMsg->WeaponType = TempDied.WeaponType;
-		ShipDiedMsg->Weapon = TempDied.Weapon;
-		nBytes = sizeof( SHIPDIEDMSG );
-		flags |= NETWORK_RELIABLE;
+		SendShipDiedMsg( msg, Type, nBytes, flags );
 		break;
 
 
 	case MSG_REQTIME:
-		DebugPrintf("net_msg: MSG_REQTIME\n");
-		ReqTimeMsg = (REQTIMEMSG *)&CommBuff[0];
-		ReqTimeMsg->MsgCode = msg;
-		ReqTimeMsg->WhoIAm = WhoIAm;
-		nBytes = sizeof( REQTIMEMSG );
-		flags |= NETWORK_RELIABLE;
+		SendReqTimeMsg( msg, nBytes, flags );
 		break;
 
 
 	case MSG_SETTIME:
-		DebugPrintf("net_msg: MSG_SETTIME\n");
-
-		SetTimeMsg = (SETTIMEMSG *)&CommBuff[0];
-		SetTimeMsg->MsgCode = msg;
-		SetTimeMsg->WhoIAm = WhoIAm;
-		SetTimeMsg->TimeInfo = TempTimeSet;
-		nBytes = sizeof( SETTIMEMSG );
-		flags |= NETWORK_RELIABLE;
+		SendSetTimeMsg( msg, nBytes, flags );
 		break;
 
 	case MSG_STATUS:
-		SendStatusMsg( msg, StatusMsg, nBytes, flags );
+		SendStatusMsg( msg, nBytes, flags );
 		break;
 
 	case MSG_NETSETTINGS:
-		DebugPrintf("net_msg: MSG_NETSETTINGS\n");
-
-		NetSettingsMsg						= (NETSETTINGSMSG *)&CommBuff[0];
-		NetSettingsMsg->MsgCode				= msg;
-		NetSettingsMsg->WhoIAm				= WhoIAm;
-		NetSettingsMsg->IsHost				= IsHost;
-		NetSettingsMsg->PacketsPerSecond		= NetUpdateInterval;
-		NetSettingsMsg->CollisionPerspective	= ColPerspective;
-		NetSettingsMsg->ShortPackets			= UseShortPackets;
-		nBytes = sizeof( NETSETTINGSMSG );
-		flags |= NETWORK_RELIABLE;
+		SendNetSettingsMsg( msg, nBytes, flags );
 		break;
 
 	case MSG_LONGSTATUS:
-		SendLongStatusMsg( msg, LongStatusMsg, nBytes, flags );
+		SendLongStatusMsg( msg, nBytes, flags );
 		break;
 
 
 	case MSG_SHORTPICKUP:
-		DebugPrintf("net_msg: MSG_SHORTPICKUP\n");
-
-		ShortPickupMsg = (SHORTPICKUPMSG *)&CommBuff[0];
-		ShortPickupMsg->MsgCode	= msg;
-		ShortPickupMsg->WhoIAm	= WhoIAm;
-		ShortPickupMsg->Pickups	= Ships[ShipNum].Pickups;
-		GenPickupList( ShipNum, &ShortPickupMsg->ShortPickup[0] , &ShortPickupMsg->HowManyPickups , Ships[ShipNum].Pickups );
-		nBytes = sizeof( SHORTPICKUPMSG );
-		to = Ships[ShipNum].network_player;
-		flags |= NETWORK_RELIABLE;
+		SendShortPickupMsg( msg, to, ShipNum, nBytes, flags );
 		break;
 
 
 	case MSG_SHORTREGENSLOT:
-		DebugPrintf("net_msg: MSG_SHORTREGENSLOT\n");
-
-		ShortRegenSlotMsg = (SHORTREGENSLOTMSG *)&CommBuff[0];
-		ShortRegenSlotMsg->MsgCode		= msg;
-		ShortRegenSlotMsg->WhoIAm		= WhoIAm;
-		ShortRegenSlotMsg->RegenSlots	= Ships[ShipNum].RegenSlots;
-		GenRegenSlotList( ShipNum, &ShortRegenSlotMsg->ShortRegenSlot[0] , &ShortRegenSlotMsg->HowManyRegenSlots , Ships[ShipNum].RegenSlots );
-		nBytes	= sizeof( SHORTREGENSLOTMSG );
-		to = Ships[ShipNum].network_player;
-		flags |= NETWORK_RELIABLE;
+		SendShortRegenSlotMsg( msg, to, ShipNum, nBytes, flags );
 		break;
 
 
 	case MSG_SHORTTRIGGER:
-		DebugPrintf("net_msg: MSG_SHORTTRIGGER\n");
-
-		ShortTriggerMsg = (SHORTTRIGGERMSG *)&CommBuff[0];
-		ShortTriggerMsg->MsgCode		= msg;
-		ShortTriggerMsg->WhoIAm		= WhoIAm;
-		ShortTriggerMsg->Triggers	= Ships[ShipNum].Triggers;
-		GenTriggerList( ShipNum, &ShortTriggerMsg->ShortTrigger[0] , &ShortTriggerMsg->HowManyTriggers, Ships[ShipNum].Triggers );
-		nBytes	= sizeof( SHORTTRIGGERMSG );
-		to	= Ships[ShipNum].network_player;
-		flags |= NETWORK_RELIABLE;
+		SendShortTriggerMsg( msg, to, ShipNum, nBytes, flags );
 		break;
 
 
 	case MSG_SHORTTRIGVAR:
-		DebugPrintf("net_msg: MSG_SHORTTRIGVAR\n");
-
-		ShortTrigVarMsg = (SHORTTRIGVARMSG *)&CommBuff[0];
-		ShortTrigVarMsg->MsgCode		= msg;
-		ShortTrigVarMsg->WhoIAm		= WhoIAm;
-		ShortTrigVarMsg->TrigVars	= Ships[ShipNum].TrigVars;
-		GenTrigVarList( ShipNum, &ShortTrigVarMsg->ShortTrigVar[0] , &ShortTrigVarMsg->HowManyTrigVars, Ships[ShipNum].TrigVars );
-		nBytes = sizeof( SHORTTRIGVARMSG );
-		to = Ships[ShipNum].network_player;
-		flags |= NETWORK_RELIABLE;
+		SendShortTrigVarMsg( msg, to, ShipNum, nBytes, flags );
 		break;
 
 
 	case MSG_SHORTMINE:
-		DebugPrintf("net_msg: MSG_SHORTMINE\n");
-
-		ShortMineMsg				= (SHORTMINEMSG *)&CommBuff[0];
-		ShortMineMsg->MsgCode	= msg;
-		ShortMineMsg->WhoIAm		= WhoIAm;
-		ShortMineMsg->Mines		= Ships[ShipNum].Mines;
-		GenMineList( ShipNum, &ShortMineMsg->ShortMine[0] , &ShortMineMsg->HowManyMines, Ships[ShipNum].Mines );
-		nBytes	= sizeof( SHORTMINEMSG );
-		to = Ships[ShipNum].network_player;
-		flags |= NETWORK_RELIABLE;
+		SendShortMineMsg( msg, to, ShipNum, nBytes, flags );
 		break;
 
 	case MSG_TEXTMSG:
-		SendTextMsg( msg, Type, TextMsg, nBytes, flags, MessageColour );
+		SendTextMsg( msg, Type, nBytes, flags, MessageColour );
 		break;
 
 	}
