@@ -2024,14 +2024,20 @@ bool DisplayNonSolidScrPolys( RENDEROBJECT *renderObject )
 	return( false );
 }
 
-/*===================================================================
-	Procedure	:	Display All Solid Screen Polygons
-	Input		:	RENDEROBJECT *			Render object
-				:	int16_t	*					Current TPage List
-				:	u_int16_t	*					Current ScrPoly
-	Output		:	True/False
-===================================================================*/
-bool ScrPolyDispSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * NextScrPoly )
+/* Is ScrPoly i in this fill? Not skipped, and solid (Solid) or not solid. */
+[[gnu::always_inline]] static inline bool ScrPolyInFill( u_int16_t i, bool Solid )
+{
+	if( scrpoly_skip( i ) )
+		return false;
+	if( Solid )
+		return ( ScrPolys[ i ].Flags & SCRFLAG_Solid ) != 0;
+	return !( ScrPolys[ i ].Flags & SCRFLAG_Solid );
+}
+
+/* Fill one batch of screen polys: the solid ones (one colour per quad) or the
+ * non-solid ones (a colour per vertex). The two public wrappers pass a constant
+ * Solid, so each compiles to its own specialised copy. */
+[[gnu::always_inline]] static inline bool ScrPolyDispFill( bool Solid, RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * NextScrPoly )
 {
 	u_int16_t			i;
 	int16_t			Count;
@@ -2079,7 +2085,7 @@ bool ScrPolyDispSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * 
 
 		while( ( i != INDEX_NONE ) && ( ( StartVert + NumVerts ) < MAXSCREENPOLYVERTS ) )
 		{
-			if( !scrpoly_skip( i ) && ( ScrPolys[ i ].Flags & SCRFLAG_Solid ) )
+			if( ScrPolyInFill( i, Solid ) )
 			{
 				if( Textured )
 				{
@@ -2162,9 +2168,9 @@ bool ScrPolyDispSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * 
 			if( Count == *TPage ) i = *NextScrPoly;
 			else i = ScrPolyTPages[ Count ].FirstPoly;
 
-			while( ( i != INDEX_NONE ) && ( StartVert < MAXSCREENPOLYVERTS ) )
+			while( ( i != INDEX_NONE ) && ( Solid || ( i < MAXNUMOFSCRPOLYS ) ) && ( StartVert < MAXSCREENPOLYVERTS ) )
 			{
-				if( !scrpoly_skip( i ) && ( ScrPolys[ i ].Flags & SCRFLAG_Solid ) )
+				if( ScrPolyInFill( i, Solid ) )
 				{
 					if( Textured && ScrPolys[i].Frm_Info && (*ScrPolys[i].Frm_Info ) )
 					{
@@ -2432,7 +2438,10 @@ bool ScrPolyDispSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * 
 							x3 = ScrPolys[ i ].x3;
 							y3 = ScrPolys[ i ].y3;
 
-							Colour = RGBA_MAKE2( ScrPolys[ i ].R, ScrPolys[ i ].G, ScrPolys[ i ].B, 255 );
+							if( Solid )
+								Colour = RGBA_MAKE2( ScrPolys[ i ].R, ScrPolys[ i ].G, ScrPolys[ i ].B, 255 );
+							else
+								Colour = RGBA_MAKE2( ScrPolys[ i ].Col1.R, ScrPolys[ i ].Col1.G, ScrPolys[ i ].Col1.B, 255 );
 
 							ScrPolyVertPnt->sx = x1;
 							ScrPolyVertPnt->sy = y1;
@@ -2443,10 +2452,16 @@ bool ScrPolyDispSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * 
 							ScrPolyVertPnt->tv = v1;
 							ScrPolyVertPnt++;
 
+							if( !Solid )
+								Colour = RGBA_MAKE2( ScrPolys[ i ].Col2.R, ScrPolys[ i ].Col2.G, ScrPolys[ i ].Col2.B, 255 );
+
 							ScrPolyVertPnt->sz = ZValue;
 							ScrPolyVertPnt->color = Colour;
 							ScrPolyVertPnt->rhw = RHWValue;
 							ScrPolyVertPnt++;
+							if( !Solid )
+								Colour = RGBA_MAKE2( ScrPolys[ i ].Col3.R, ScrPolys[ i ].Col3.G, ScrPolys[ i ].Col3.B, 255 );
+
 
 							ScrPolyVertPnt->sx = x3;
 							ScrPolyVertPnt->sy = y3;
@@ -2456,6 +2471,9 @@ bool ScrPolyDispSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * 
 							ScrPolyVertPnt->tu = u2;
 							ScrPolyVertPnt->tv = v2;
 							ScrPolyVertPnt++;
+							if( !Solid )
+								Colour = RGBA_MAKE2( ScrPolys[ i ].Col4.R, ScrPolys[ i ].Col4.G, ScrPolys[ i ].Col4.B, 255 );
+
 
 							ScrPolyVertPnt->sz = ZValue;
 							ScrPolyVertPnt->color = Colour;
@@ -2593,6 +2611,19 @@ bool ScrPolyDispSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * 
 }
 
 /*===================================================================
+	Procedure	:	Display All Solid Screen Polygons
+	Input		:	RENDEROBJECT *			Render object
+				:	int16_t	*					Current TPage List
+				:	u_int16_t	*					Current ScrPoly
+	Output		:	True/False
+===================================================================*/
+bool ScrPolyDispSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * NextScrPoly )
+{
+	return ScrPolyDispFill( true, renderObject, TPage, NextScrPoly );
+}
+
+
+/*===================================================================
 	Procedure	:	Display All NonSolid Screen Polygons
 	Input		:	RENDEROBJECT  *				RenderObject struct pointer
 				:	int16_t	*					Current TPage List
@@ -2601,569 +2632,7 @@ bool ScrPolyDispSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * 
 ===================================================================*/
 bool ScrPolyDispNonSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * NextScrPoly )
 {
-	u_int16_t			i;
-	int16_t			Count;
-	int16_t			BitCount;
-	int16_t			TotalVerts;
-	int16_t			StartVert;
-	int16_t			NumVerts;
-	int16_t			NumTris;
-	float			Xoff;
-	float			Yoff;
-	float			Xsize;
-	float			Ysize;
-	BIT_INFO	*	Bit_Ptr;
-	BOX_INFO	*	Box_Ptr;
-	OFF_INFO	*	Off_Ptr;
-	COLOR		Colour;
-	TLVERTEX	*ScrPolyVertPnt; // pre-transformed vertex type!
-	TRIANGLE	*ScrPolyFacePnt;
-	TLVERTEX	*BufStart;
-	float			u1,v1,u2,v2;
-	float			x1,y1,x3,y3;
-	bool			Textured;
-	WORD			*Indices = nullptr;
-	int				start_index = 0;
-#ifdef __3DS__
-	int				batchVert = 0;
-#endif
-
-	/*===================================================================
-			Pass 1: count verts per texture page
-	===================================================================*/
-	TotalVerts = 0;
-
-	for( Count = *TPage; Count <= MAXTPAGESPERTLOAD; Count++ )
-	{
-		StartVert = TotalVerts;
-		NumVerts = 0;
-		NumTris = 0;
-
-		if( Count == MAXTPAGESPERTLOAD ) Textured = false;
-		else Textured = true;
-
-		if( Count == *TPage ) i = *NextScrPoly;
-		else i = ScrPolyTPages[ Count ].FirstPoly;
-
-		while( ( i != INDEX_NONE ) && ( ( StartVert + NumVerts ) < MAXSCREENPOLYVERTS ) )
-		{
-			if( !scrpoly_skip( i ) && !( ScrPolys[ i ].Flags & SCRFLAG_Solid ) )
-			{
-				if( Textured )
-				{
-					if( ScrPolys[i].Frm_Info && (*ScrPolys[i].Frm_Info ) )
-					{
-						Bit_Ptr = ( (*ScrPolys[ i ].Frm_Info)->Bit_Info + (int16_t) ScrPolys[ i ].Frame );
-						NumTris += ( 2 * Bit_Ptr->numbits );
-						NumVerts += ( 4 * Bit_Ptr->numbits );
-					}
-				}
-				else
-				{
-					NumTris += 2;
-					NumVerts += 4;
-				}
-			}
-
-			i = ScrPolys[ i ].NextInTPage;
-		}
-
-		ScrPolyTPages[ Count ].StartVert = StartVert;
-		ScrPolyTPages[ Count ].NumVerts = NumVerts;
-		ScrPolyTPages[ Count ].NumTris = NumTris;
-
-		TotalVerts = ( StartVert + NumVerts );
-		if( TotalVerts >= MAXSCREENPOLYVERTS ) break;
-	}
-
-	if( !TotalVerts ) return( false );
-
-	renderObject->numTextureGroups = 0;
-
-	ZValue = 1.0F;
-	RHWValue = ( 1.0F / ZValue );
-
-	/*===================================================================
-			Lock the vertex and index buffers
-	===================================================================*/
-
-	if (!(FSLockPretransformedVertexBuffer(renderObject, &BufStart)))
-	{
-		return false;
-	}
-
-	if (!(FSLockIndexBuffer(renderObject, &Indices)))
-	{
-		return false;
-	}
-
-	ScrPolyFacePnt = (TRIANGLE *) Indices;
-
-	ScrPolyVertPnt = (TLVERTEX *) BufStart;
-
-	/*===================================================================
-			Pass 2: fill verts and indices, one texture group per quad
-	===================================================================*/
-	for( Count = *TPage; Count <= MAXTPAGESPERTLOAD; Count++ )
-	{
-		if( Count == MAXTPAGESPERTLOAD ) Textured = false;
-		else Textured = true;
-
-		StartVert = ScrPolyTPages[ Count ].StartVert;
-		NumVerts = ScrPolyTPages[ Count ].NumVerts;
-		NumTris = ScrPolyTPages[ Count ].NumTris;
-
-		if( NumVerts )
-		{
-			if( !Textured )
-			{
-				renderObject->textureGroups[renderObject->numTextureGroups].texture = nullptr;
-				renderObject->textureGroups[renderObject->numTextureGroups].colourkey = false;
-			}
-			else
-			{
-				renderObject->textureGroups[renderObject->numTextureGroups].texture = Tloadheader.TexHandle[Count];
-				renderObject->textureGroups[renderObject->numTextureGroups].colourkey = Tloadheader.ColourKey[Count];
-			}
-
-			if( Count == *TPage ) i = *NextScrPoly;
-			else i = ScrPolyTPages[ Count ].FirstPoly;
-
-			while( ( i != INDEX_NONE ) && ( i < MAXNUMOFSCRPOLYS ) && ( StartVert < MAXSCREENPOLYVERTS ) )
-			{
-				if( !scrpoly_skip( i ) && !( ScrPolys[ i ].Flags & SCRFLAG_Solid ) )
-				{
-					if( Textured && ScrPolys[i].Frm_Info && (*ScrPolys[i].Frm_Info ) )
-					{
-						Bit_Ptr = ( (*ScrPolys[ i ].Frm_Info)->Bit_Info + (int16_t) ScrPolys[ i ].Frame );
-						Off_Ptr = ( (*ScrPolys[ i ].Frm_Info)->Off_Info + Bit_Ptr->startbit );
-
-						for( BitCount = 0; BitCount < Bit_Ptr->numbits; BitCount++ )
-						{
-							int ntris = 0;
-
-							/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
-							Box_Ptr = ( (*ScrPolys[ i ].Frm_Info)->Box_Info + ( Off_Ptr->box & 0x0fff ) );
-
-							if( ( ScrPolys[ i ].Flags & SCRFLAG_UseCoords ) )
-							{
-								u1 = Box_Ptr->u1;
-								v1 = Box_Ptr->v1;
-								u2 = Box_Ptr->u2;
-								v2 = Box_Ptr->v2;
-								x1 = ScrPolys[ i ].x1;
-								y1 = ScrPolys[ i ].y1;
-								x3 = ScrPolys[ i ].x3;
-								y3 = ScrPolys[ i ].y3;
-							}
-							else
-							{
-								Xoff = ( Off_Ptr->xoff * ScrPolys[ i ].Xscale );
-								Yoff = ( Off_Ptr->yoff * ScrPolys[ i ].Yscale );
-								Xsize = ( Box_Ptr->xsize * ScrPolys[ i ].Xscale );
-								Ysize = ( Box_Ptr->ysize * ScrPolys[ i ].Yscale );
-
-								if( ( ScrPolys[ i ].Flags & SCRFLAG_Scale ) )
-								{
-									Ysize = ( Ysize / Xsize );
-									Xsize = ( ( CurrentCamera.Viewport.Width / 320.0F ) * Xsize );
-									Ysize *= ( ( Xsize ) * pixel_aspect_ratio );
-
-									/* @vfp-exempt R3 — division-by-zero guard on a float offset; integerizing changes the drawn position. measured n/a. Verified 2026-11-19. */
-									if( Xoff != 0.0F ) Yoff = ( Yoff / Xoff );
-									else Yoff = 0.0F;
-									Xoff = ( ( CurrentCamera.Viewport.Width / 320.0F ) * Xoff );
-									Yoff *= ( ( Xoff ) * pixel_aspect_ratio );
-								}
-
-								switch( Off_Ptr->box & BOX_BOTHFLIP )
-								{
-								case BOX_XFLIP:							// X Flip
-									x3 = ( ScrPolys[ i ].Pos.x + Xoff );
-									y1 = ( ScrPolys[ i ].Pos.y + Yoff );
-									x1 = ( x3 - Xsize );
-									y3 = ( y1 + Ysize );
-									u1 = Box_Ptr->u2;
-									v1 = Box_Ptr->v1;
-									u2 = Box_Ptr->u1;
-									v2 = Box_Ptr->v2;
-									break;
-
-								case BOX_YFLIP:							// Y Flip
-									x1 = ( ScrPolys[ i ].Pos.x + Xoff );
-									y3 = ( ScrPolys[ i ].Pos.y + Yoff );
-									x3 = ( x1 + Xsize );
-									y1 = ( y3 - Ysize );
-									u1 = Box_Ptr->u1;
-									v1 = Box_Ptr->v2;
-									u2 = Box_Ptr->u2;
-									v2 = Box_Ptr->v1;
-									break;
-
-								case BOX_BOTHFLIP:						// X & Y Flip
-									x3 = ( ScrPolys[ i ].Pos.x + Xoff );
-									y3 = ( ScrPolys[ i ].Pos.y + Yoff );
-									x1 = ( x3 - Xsize );
-									y1 = ( y3 - Ysize );
-									u1 = Box_Ptr->u2;
-									v1 = Box_Ptr->v2;
-									u2 = Box_Ptr->u1;
-									v2 = Box_Ptr->v1;
-									break;
-
-								default:								// No Flip
-									x1 = ( ScrPolys[ i ].Pos.x + Xoff );
-									y1 = ( ScrPolys[ i ].Pos.y + Yoff );
-									x3 = ( x1 + Xsize );
-									y3 = ( y1 + Ysize );
-									u1 = Box_Ptr->u1;
-									v1 = Box_Ptr->v1;
-									u2 = Box_Ptr->u2;
-									v2 = Box_Ptr->v2;
-									break;
-								}
-							}
-
-							/*===================================================================
-									Create Colour Value for polys
-							===================================================================*/
-
-							Colour = RGBA_MAKE2( ScrPolys[ i ].R, ScrPolys[ i ].G, ScrPolys[ i ].B, 255 );
-
-							ScrPolyVertPnt->sx = x1;
-							ScrPolyVertPnt->sy = y1;
-							ScrPolyVertPnt->sz = ZValue;
-							ScrPolyVertPnt->color = Colour;
-							ScrPolyVertPnt->rhw = RHWValue;
-							ScrPolyVertPnt->tu = u1;
-							ScrPolyVertPnt->tv = v1;
-							ScrPolyVertPnt++;
-
-							ScrPolyVertPnt->sz = ZValue;
-							ScrPolyVertPnt->color = Colour;
-							ScrPolyVertPnt->rhw = RHWValue;
-							ScrPolyVertPnt++;
-
-							ScrPolyVertPnt->sx = x3;
-							ScrPolyVertPnt->sy = y3;
-							ScrPolyVertPnt->sz = ZValue;
-							ScrPolyVertPnt->color = Colour;
-							ScrPolyVertPnt->rhw = RHWValue;
-							ScrPolyVertPnt->tu = u2;
-							ScrPolyVertPnt->tv = v2;
-							ScrPolyVertPnt++;
-
-							ScrPolyVertPnt->sz = ZValue;
-							ScrPolyVertPnt->color = Colour;
-							ScrPolyVertPnt->rhw = RHWValue;
-							ScrPolyVertPnt++;
-
-							if( ClipBox( ScrPolyVertPnt-4, ScrPolyVertPnt-2 ) )
-							{
-								( ScrPolyVertPnt - 4 )->sx = 0.0F;
-								( ScrPolyVertPnt - 4 )->sy = 0.0F;
-								( ScrPolyVertPnt - 3 )->sx = 0.0F;
-								( ScrPolyVertPnt - 3 )->sy = 0.0F;
-								( ScrPolyVertPnt - 2 )->sx = 0.0F;
-								( ScrPolyVertPnt - 2 )->sy = 0.0F;
-								( ScrPolyVertPnt - 1 )->sx = 0.0F;
-								( ScrPolyVertPnt - 1 )->sy = 0.0F;
-							}
-
-							( ScrPolyVertPnt - 3 )->sx = ( ScrPolyVertPnt - 2 )->sx;
-							( ScrPolyVertPnt - 3 )->sy = ( ScrPolyVertPnt - 4 )->sy;
-							( ScrPolyVertPnt - 3 )->tu = ( ScrPolyVertPnt - 2 )->tu;
-							( ScrPolyVertPnt - 3 )->tv = ( ScrPolyVertPnt - 4 )->tv;
-
-							( ScrPolyVertPnt - 1 )->sx = ( ScrPolyVertPnt - 4 )->sx;
-							( ScrPolyVertPnt - 1 )->sy = ( ScrPolyVertPnt - 2 )->sy;
-							( ScrPolyVertPnt - 1 )->tu = ( ScrPolyVertPnt - 4 )->tu;
-							( ScrPolyVertPnt - 1 )->tv = ( ScrPolyVertPnt - 2 )->tv;
-
-							if( ( ScrPolys[ i ].Flags & SCRFLAG_Rot90 ) )
-							{
-								u1 = ( ScrPolyVertPnt - 4 )->tu;
-								v1 = ( ScrPolyVertPnt - 4 )->tv;
-								( ScrPolyVertPnt - 4 )->tu = ( ScrPolyVertPnt - 3 )->tu;
-								( ScrPolyVertPnt - 4 )->tv = ( ScrPolyVertPnt - 3 )->tv;
-								( ScrPolyVertPnt - 3 )->tu = ( ScrPolyVertPnt - 2 )->tu;
-								( ScrPolyVertPnt - 3 )->tv = ( ScrPolyVertPnt - 2 )->tv;
-								( ScrPolyVertPnt - 2 )->tu = ( ScrPolyVertPnt - 1 )->tu;
-								( ScrPolyVertPnt - 2 )->tv = ( ScrPolyVertPnt - 1 )->tv;
-								( ScrPolyVertPnt - 1 )->tu = u1;
-								( ScrPolyVertPnt - 1 )->tv = v1;
-							}
-
-							ScrPolyFacePnt->v1 = 0;
-							ScrPolyFacePnt->v2 = 1;
-							ScrPolyFacePnt->v3 = 2;
-							ScrPolyFacePnt++;
-							ntris++;
-
-							ScrPolyFacePnt->v1 = 0;
-							ScrPolyFacePnt->v2 = 2;
-							ScrPolyFacePnt->v3 = 3;
-							ScrPolyFacePnt++;
-							ntris++;
-
-							renderObject->textureGroups[renderObject->numTextureGroups].numTriangles = ntris;
-							renderObject->textureGroups[renderObject->numTextureGroups].numVerts = 4;
-							renderObject->textureGroups[renderObject->numTextureGroups].startIndex = start_index;
-#ifdef __3DS__
-							renderObject->textureGroups[renderObject->numTextureGroups].startVert = batchVert;
-#else
-							renderObject->textureGroups[renderObject->numTextureGroups].startVert = StartVert;
-#endif
-							renderObject->textureGroups[renderObject->numTextureGroups].texture = Tloadheader.TexHandle[Count];
-							renderObject->textureGroups[renderObject->numTextureGroups].colourkey = Tloadheader.ColourKey[Count];
-#ifdef __3DS__
-							renderObject->numTextureGroups++;
-#else
-							INCREASE_TEXTURE_GROUPS(renderObject);
-#endif
-
-							start_index += ntris*3; // each triangle has three indexes...
-							StartVert += 4;
-							/*
-							 * 3DS mid-draw flush — textured quad path (ScrPolyDispNonSolid).
-							 *
-							 * WHY THIS EXISTS:
-							 *   INCREASE_TEXTURE_GROUPS() asserts
-							 *   numTextureGroups < MAX_TEXTURE_GROUPS, which is 64 on
-							 *   3DS (600 on PC).  Loading screens and menus use one
-							 *   TEXTUREGROUP per sprite quad and easily pass 64.  The
-							 *   batch objects' textureGroups point at fixed scratch
-							 *   arrays of that size (RenderBufs' static scratch and
-							 *   stack arrays in oct2.cpp), so 3DS flushes instead.
-							 *
-							 * WHAT THE FIX DOES:
-							 *   After committing each group we check whether the array is
-							 *   full.  If so, we flush the accumulated batch immediately:
-							 *   unlock vertex/index buffers, issue draw_2d_object, then
-							 *   re-lock.  numTextureGroups, start_index, and batchVert are
-							 *   all reset to 0 so the next group fills the array from the
-							 *   beginning.  Each partial batch is a complete draw call.
-							 *
-							 * WHY batchVert INSTEAD OF StartVert FOR startVert:
-							 *   StartVert is a cumulative counter across the entire function
-							 *   call (unchanged on PC).  After a flush the vertex buffer is
-							 *   re-locked from offset 0, so the next group's vertices land
-							 *   at position 0 in the new buffer — not at whatever StartVert
-							 *   has accumulated.  batchVert tracks position within the
-							 *   current batch only; it resets to 0 on every flush so that
-							 *   textureGroup.startVert indices stay correct.
-							 *
-							 * CRITICAL ORDERING:
-							 *   start_index, StartVert, and batchVert are ALL advanced
-							 *   BEFORE this flush check, so a flush leaves start_index
-							 *   and batchVert at 0 for the first group of the next
-							 *   batch.  Advancing after the reset would offset that
-							 *   group by one quad.  StartVert is never reset: it keeps
-							 *   the MAXSCREENPOLYVERTS bound tied to pass 1's count.
-							 */
-#ifdef __3DS__
-							batchVert += 4;
-							if (renderObject->numTextureGroups >= MAX_TEXTURE_GROUPS) {
-								FSUnlockVertexBuffer(renderObject);
-								FSUnlockIndexBuffer(renderObject);
-								disable_zbuff();
-								cull_none();
-								draw_2d_object(renderObject);
-								reset_cull();
-								reset_zbuff();
-								renderObject->numTextureGroups = 0;
-								start_index = 0;
-								batchVert = 0;
-								FSLockPretransformedVertexBuffer(renderObject, &BufStart);
-								FSLockIndexBuffer(renderObject, &Indices);
-								ScrPolyVertPnt = (TLVERTEX *) BufStart;
-								ScrPolyFacePnt = (TRIANGLE *) Indices;
-							}
-#endif
-							Off_Ptr++;
-						}
-					}
-					else
-					{
-						if( !Textured )
-						{
-							int ntris = 0;
-
-							u1 = 0.0F;
-							v1 = 0.0F;
-							u2 = 1.0F;
-							v2 = 1.0F;
-							x1 = ScrPolys[ i ].x1;
-							y1 = ScrPolys[ i ].y1;
-							x3 = ScrPolys[ i ].x3;
-							y3 = ScrPolys[ i ].y3;
-
-
-							Colour = RGBA_MAKE2( ScrPolys[ i ].Col1.R, ScrPolys[ i ].Col1.G, ScrPolys[ i ].Col1.B, 255 );
-
-							ScrPolyVertPnt->sx = x1;
-							ScrPolyVertPnt->sy = y1;
-							ScrPolyVertPnt->sz = ZValue;
-							ScrPolyVertPnt->color = Colour;
-							ScrPolyVertPnt->rhw = RHWValue;
-							ScrPolyVertPnt->tu = u1;
-							ScrPolyVertPnt->tv = v1;
-							ScrPolyVertPnt++;
-
-							Colour = RGBA_MAKE2( ScrPolys[ i ].Col2.R, ScrPolys[ i ].Col2.G, ScrPolys[ i ].Col2.B, 255 );
-
-							ScrPolyVertPnt->sz = ZValue;
-							ScrPolyVertPnt->color = Colour;
-							ScrPolyVertPnt->rhw = RHWValue;
-							ScrPolyVertPnt++;
-
-							Colour = RGBA_MAKE2( ScrPolys[ i ].Col3.R, ScrPolys[ i ].Col3.G, ScrPolys[ i ].Col3.B, 255 );
-
-							ScrPolyVertPnt->sx = x3;
-							ScrPolyVertPnt->sy = y3;
-							ScrPolyVertPnt->sz = ZValue;
-							ScrPolyVertPnt->color = Colour;
-							ScrPolyVertPnt->rhw = RHWValue;
-							ScrPolyVertPnt->tu = u2;
-							ScrPolyVertPnt->tv = v2;
-							ScrPolyVertPnt++;
-
-							Colour = RGBA_MAKE2( ScrPolys[ i ].Col4.R, ScrPolys[ i ].Col4.G, ScrPolys[ i ].Col4.B, 255 );
-
-							ScrPolyVertPnt->sz = ZValue;
-							ScrPolyVertPnt->color = Colour;
-							ScrPolyVertPnt->rhw = RHWValue;
-							ScrPolyVertPnt++;
-
-							if( ClipBox( ScrPolyVertPnt-4, ScrPolyVertPnt-2 ) )
-							{
-								( ScrPolyVertPnt - 4 )->sx = 0.0F;
-								( ScrPolyVertPnt - 4 )->sy = 0.0F;
-								( ScrPolyVertPnt - 3 )->sx = 0.0F;
-								( ScrPolyVertPnt - 3 )->sy = 0.0F;
-								( ScrPolyVertPnt - 2 )->sx = 0.0F;
-								( ScrPolyVertPnt - 2 )->sy = 0.0F;
-								( ScrPolyVertPnt - 1 )->sx = 0.0F;
-								( ScrPolyVertPnt - 1 )->sy = 0.0F;
-							}
-
-							( ScrPolyVertPnt - 3 )->sx = ( ScrPolyVertPnt - 2 )->sx;
-							( ScrPolyVertPnt - 3 )->sy = ( ScrPolyVertPnt - 4 )->sy;
-							( ScrPolyVertPnt - 3 )->tu = ( ScrPolyVertPnt - 2 )->tu;
-							( ScrPolyVertPnt - 3 )->tv = ( ScrPolyVertPnt - 4 )->tv;
-
-							( ScrPolyVertPnt - 1 )->sx = ( ScrPolyVertPnt - 4 )->sx;
-							( ScrPolyVertPnt - 1 )->sy = ( ScrPolyVertPnt - 2 )->sy;
-							( ScrPolyVertPnt - 1 )->tu = ( ScrPolyVertPnt - 4 )->tu;
-							( ScrPolyVertPnt - 1 )->tv = ( ScrPolyVertPnt - 2 )->tv;
-
-							if( ( ScrPolys[ i ].Flags & SCRFLAG_Rot90 ) )
-							{
-								u1 = ( ScrPolyVertPnt - 4 )->tu;
-								v1 = ( ScrPolyVertPnt - 4 )->tv;
-								( ScrPolyVertPnt - 4 )->tu = ( ScrPolyVertPnt - 3 )->tu;
-								( ScrPolyVertPnt - 4 )->tv = ( ScrPolyVertPnt - 3 )->tv;
-								( ScrPolyVertPnt - 3 )->tu = ( ScrPolyVertPnt - 2 )->tu;
-								( ScrPolyVertPnt - 3 )->tv = ( ScrPolyVertPnt - 2 )->tv;
-								( ScrPolyVertPnt - 2 )->tu = ( ScrPolyVertPnt - 1 )->tu;
-								( ScrPolyVertPnt - 2 )->tv = ( ScrPolyVertPnt - 1 )->tv;
-								( ScrPolyVertPnt - 1 )->tu = u1;
-								( ScrPolyVertPnt - 1 )->tv = v1;
-							}
-
-							ScrPolyFacePnt->v1 = 0;
-							ScrPolyFacePnt->v2 = 1;
-							ScrPolyFacePnt->v3 = 2;
-							ScrPolyFacePnt++;
-							ntris++;
-
-							ScrPolyFacePnt->v1 = 0;
-							ScrPolyFacePnt->v2 = 2;
-							ScrPolyFacePnt->v3 = 3;
-							ScrPolyFacePnt++;
-							ntris++;
-
-							renderObject->textureGroups[renderObject->numTextureGroups].numTriangles = ntris;
-							renderObject->textureGroups[renderObject->numTextureGroups].numVerts = 4;
-							renderObject->textureGroups[renderObject->numTextureGroups].startIndex = start_index;
-#ifdef __3DS__
-							renderObject->textureGroups[renderObject->numTextureGroups].startVert = batchVert;
-#else
-							renderObject->textureGroups[renderObject->numTextureGroups].startVert = StartVert;
-#endif
-							renderObject->textureGroups[renderObject->numTextureGroups].texture = nullptr;
-							renderObject->textureGroups[renderObject->numTextureGroups].colourkey = false;
-#ifdef __3DS__
-							renderObject->numTextureGroups++;
-#else
-							INCREASE_TEXTURE_GROUPS(renderObject);
-#endif
-
-							start_index += ntris*3; // each triangle has three indexes...
-							StartVert += 4;
-							/*
-							 * 3DS mid-draw flush — untextured quad path (ScrPolyDispNonSolid).
-							 *
-							 * Same overflow-prevention mechanism as the textured-quad path
-							 * above.  INCREASE_TEXTURE_GROUPS() would assert/abort on overflow;
-							 * instead we flush (unlock → draw → re-lock) and reset the
-							 * group/index/vertex cursors before continuing.
-							 * batchVert is used for startVert rather than StartVert because it
-							 * resets to 0 on each flush, keeping vertex indices correct
-							 * relative to the freshly re-locked buffer.  Advances
-							 * (start_index, StartVert, batchVert) happen BEFORE this check so
-							 * that a flush leaves the cursors at 0 for the next batch.
-							 */
-#ifdef __3DS__
-							batchVert += 4;
-							if (renderObject->numTextureGroups >= MAX_TEXTURE_GROUPS) {
-								FSUnlockVertexBuffer(renderObject);
-								FSUnlockIndexBuffer(renderObject);
-								disable_zbuff();
-								cull_none();
-								draw_2d_object(renderObject);
-								reset_cull();
-								reset_zbuff();
-								renderObject->numTextureGroups = 0;
-								start_index = 0;
-								batchVert = 0;
-								FSLockPretransformedVertexBuffer(renderObject, &BufStart);
-								FSLockIndexBuffer(renderObject, &Indices);
-								ScrPolyVertPnt = (TLVERTEX *) BufStart;
-								ScrPolyFacePnt = (TRIANGLE *) Indices;
-							}
-#endif
-						}
-					}
-				}
-
-				i = ScrPolys[ i ].NextInTPage;
-			}
-
-		}
-
-		if( StartVert >= MAXSCREENPOLYVERTS ) break;
-	}
-
-	/*===================================================================
-			Unlock the buffers and return the resume point
-	===================================================================*/
-
-	if (!FSUnlockVertexBuffer(renderObject))
-	{
-		return false;
-	}
-
-	if (!(FSUnlockIndexBuffer(renderObject)))
-	{
-		Msg( "FSUnlockIndexBuffer failed");
-		return false ;
-	}
-
-	*TPage = Count;
-	*NextScrPoly = i;
-
-	return( true );
+	return ScrPolyDispFill( false, renderObject, TPage, NextScrPoly );
 }
 
 /*===================================================================
