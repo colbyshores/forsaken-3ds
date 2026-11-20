@@ -38,18 +38,37 @@ constexpr int EXTERNALFORCES_VERSION_NUMBER = 2;
 /*===================================================================
 		Globals ...
 ===================================================================*/
-int32_t	NumOfExternalForces = 0;
-
-EXTERNALFORCE * ExternalForcesGroupLink[MAXGROUPS];
-
 EXTERNALFORCE * ExternalForces = nullptr;
+
+namespace {
+
+/* The level's external-force bookkeeping (one instance, g_extforces): how
+ * many entries ExternalForces[] holds and each group's chain through it.
+ * Loaded with the level, walked when ships move and in the zone display,
+ * and saved with the game. ExternalForces[] itself stays global (triggers
+ * index it). */
+class ExternalForceSet {
+	public:
+	bool  load( char * Filename );
+	void  release();
+	bool  area_check( VECTOR * OldPos, VECTOR * NewPos, u_int16_t Group, VECTOR * ExtForce, float * Shield );
+	void  display_in_group( u_int16_t Group );
+	FILE *save( FILE * fp );
+	FILE *restore( FILE * fp );
+
+	private:
+	EXTERNALFORCE * ExternalForcesGroupLink[MAXGROUPS] = {};
+	int32_t         NumOfExternalForces = 0;
+};
+
+} // namespace
 
 /*===================================================================
 	Procedure	:	External Forces load...
 	Input		:	char * filename....
 	Output		:	bool
 ===================================================================*/
-bool ExternalForcesLoad( char * Filename )
+bool ExternalForceSet::load( char * Filename )
 {
 	long			File_Size;
 	long			Read_Size;
@@ -171,7 +190,7 @@ bool ExternalForcesLoad( char * Filename )
 	Input		:	void
 	Output		:	void
 ===================================================================*/
-void ReleaseExternalForces( void )
+void ExternalForceSet::release()
 {
 	int i;
 	EXTERNALFORCE * EFpnt;
@@ -198,7 +217,7 @@ void ReleaseExternalForces( void )
 	Input		:	void
 	Output		:	true/false
 ===================================================================*/
-bool ExternalForcesAreaCheck( VECTOR * OldPos , VECTOR * NewPos , u_int16_t Group , VECTOR * ExtForce , float * Shield )
+bool ExternalForceSet::area_check( VECTOR * OldPos , VECTOR * NewPos , u_int16_t Group , VECTOR * ExtForce , float * Shield )
 {
 	EXTERNALFORCE * EFpnt;
 	float	Distance;
@@ -256,7 +275,7 @@ bool ExternalForcesAreaCheck( VECTOR * OldPos , VECTOR * NewPos , u_int16_t Grou
 	Input		:	u_int16_t	Group
 	Output		:	Nothing
 ===================================================================*/
-void DisplayExternalForcesInGroup( u_int16_t Group )
+void ExternalForceSet::display_in_group( u_int16_t Group )
 {
 	EXTERNALFORCE * EFpnt;
 
@@ -368,7 +387,7 @@ void StopExternalForce( u_int16_t * Data )
 	Input		:	FILE	*	File Pointer
 	Output		:	FILE	*	Updated File Pointer
 ===================================================================*/
-FILE * SaveExternalForces( FILE * fp )
+FILE * ExternalForceSet::save( FILE * fp )
 {
 	int				i;
 	EXTERNALFORCE *	ExtForcesPtr;
@@ -394,7 +413,7 @@ FILE * SaveExternalForces( FILE * fp )
 	Input		:	FILE	*	File Pointer
 	Output		:	FILE	*	Updated File Pointer
 ===================================================================*/
-FILE * LoadExternalForces( FILE * fp )
+FILE * ExternalForceSet::restore( FILE * fp )
 {
 	int				i;
 	EXTERNALFORCE *	ExtForcesPtr;
@@ -422,3 +441,11 @@ FILE * LoadExternalForces( FILE * fp )
 	return( fp );
 }
 
+namespace { ExternalForceSet g_extforces; }
+
+bool ExternalForcesLoad( char * Filename ) { return g_extforces.load( Filename ); }
+void ReleaseExternalForces( void ) { g_extforces.release(); }
+bool ExternalForcesAreaCheck( VECTOR * OldPos , VECTOR * NewPos , u_int16_t Group , VECTOR * ExtForce , float * Shield ) { return g_extforces.area_check( OldPos, NewPos, Group, ExtForce, Shield ); }
+void DisplayExternalForcesInGroup( u_int16_t Group ) { g_extforces.display_in_group( Group ); }
+FILE * SaveExternalForces( FILE * fp ) { return g_extforces.save( fp ); }
+FILE * LoadExternalForces( FILE * fp ) { return g_extforces.restore( fp ); }
