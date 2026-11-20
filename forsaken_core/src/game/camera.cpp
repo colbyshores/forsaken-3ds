@@ -34,9 +34,27 @@ CAMERA	MainCamera;			// the main viewing screen...
 
 
 
-int32_t	NumOfCams = 0;
 REMOTECAMERA * ActiveRemoteCamera = nullptr;
 REMOTECAMERA * RemoteCameras = nullptr;
+
+namespace {
+
+/* The level's remote-camera count (one instance, g_remotecams): how many
+ * entries RemoteCameras[] holds. Set when the level's cameras load, cleared
+ * on release, and walked when a saved game restores which camera is
+ * active. RemoteCameras[] and ActiveRemoteCamera stay global (triggers and
+ * the renderer use them). */
+class RemoteCameraSet {
+	public:
+	bool  load( char * Filename );
+	void  release();
+	FILE *restore( FILE * fp );
+
+	private:
+	int32_t NumOfCams = 0;
+};
+
+} // namespace
 
 
 /*===================================================================
@@ -44,7 +62,7 @@ REMOTECAMERA * RemoteCameras = nullptr;
 	Input		:		char	*	Filename
 	Output		:		Nothing
 ===================================================================*/
-bool Cameraload( char * Filename )
+bool RemoteCameraSet::load( char * Filename )
 {
 	char		*	Buffer;
 	char		*	OrgBuffer;
@@ -124,7 +142,7 @@ bool Cameraload( char * Filename )
 	Input		:		NOTHING
 	Output		:		Nothing
 ===================================================================*/
-void CameraRelease( void)
+void RemoteCameraSet::release()
 {
 	if( RemoteCameras )
 	{
@@ -193,7 +211,7 @@ FILE * SaveRemoteCameras( FILE * fp )
 	Input		:	FILE	*	File Pointer
 	Output		:	FILE	*	Updated File Pointer
 ===================================================================*/
-FILE * LoadRemoteCameras( FILE * fp )
+FILE * RemoteCameraSet::restore( FILE * fp )
 {
 	u_int16_t	i;
 	u_int16_t	TempIndex;
@@ -224,4 +242,8 @@ FILE * LoadRemoteCameras( FILE * fp )
 	return( fp );
 }
 
+namespace { RemoteCameraSet g_remotecams; }
 
+bool Cameraload( char * Filename ) { return g_remotecams.load( Filename ); }
+void CameraRelease( void) { g_remotecams.release(); }
+FILE * LoadRemoteCameras( FILE * fp ) { return g_remotecams.restore( fp ); }
