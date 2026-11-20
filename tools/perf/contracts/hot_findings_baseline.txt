@@ -7,8 +7,6 @@
 # This is tracked debt with a ratchet: it may only SHRINK. Regenerate with:
 #     python3 tools/perf/gates_vfp.py --bless
 # (audit_arm11_math.py --bless writes the TRIG / R4-D lines and preserves these.)
-R2|2dpolys.cpp|FmPolyDispGroupClipped|float-to-int cast in loop body
-R2|2dpolys.cpp|FmPolyDispGroupClipped|float-to-int cast in loop body
 R2|2dpolys.cpp|FmPolyDispGroupUnclipped|float-to-int cast in loop body
 R2|2dpolys.cpp|FmPolyDispGroupUnclipped|float-to-int cast in loop body
 R2|2dpolys.cpp|FmPolyProcess|float-to-int cast in loop body
