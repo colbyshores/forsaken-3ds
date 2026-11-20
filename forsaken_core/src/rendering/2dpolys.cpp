@@ -1855,19 +1855,24 @@ bool DisplayGroupUnclippedFmPolys(RENDEROBJECT *renderObject )
 	return( false );
 }
 
-/*===================================================================
-	Procedure	:	Fill one batch of a group's FmPolys
-	Input		:	u_int16_t						Group
-				:	RENDEROBJECT *			Render object
-				:	int16_t	*					Current TPage List (in/out)
-				:	u_int16_t	*					Current FmPoly (in/out)
-	Output		:	true if a batch was filled and should be drawn
-===================================================================*/
-bool FmPolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * NextFmPoly )
+/* Is FmPoly i in this fill? Clipped: a clippable poly in the given group.
+ * Unclipped: any FM_FLAG_DONTCLIP poly, whatever its group. */
+[[gnu::always_inline]] static inline bool FmPolyInFill( u_int16_t i, bool Clipped, u_int16_t Group )
 {
-	/* opt5b memo epoch: stamp this fill's content identity. */
-	renderObject->memoEpochPass = SMEMO_PASS_FM_CLIPPED;
-	renderObject->memoEpochGroup = Group;
+	if( Clipped )
+		return ( !( FmPolys[i].Flags & FM_FLAG_DONTCLIP ) && ( FmPolys[i].Group == Group ) );
+	return ( ( FmPolys[i].Flags & FM_FLAG_DONTCLIP ) != 0 );
+}
+
+/* Fill one batch of FmPolys: the clippable ones of one group (Clipped) or
+ * every FM_FLAG_DONTCLIP one (unclipped). The two public wrappers pass a
+ * constant Clipped, so each compiles to its own specialised copy. */
+[[gnu::always_inline]] static inline bool FmPolyDispGroupFill( bool Clipped, u_int16_t Group, RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * NextFmPoly )
+{
+	/* opt5b memo epoch: stamp this fill's content identity (one group, or the
+	 * whole scene for the unclipped pass). */
+	renderObject->memoEpochPass = Clipped ? SMEMO_PASS_FM_CLIPPED : SMEMO_PASS_FM_UNCLIPPED;
+	renderObject->memoEpochGroup = Clipped ? Group : SMEMO_WHOLE_GROUP;
 	renderObject->memoEpochResume = smemo_resume(*TPage, *NextFmPoly);
 	u_int16_t			i;
 	int16_t			Count;
@@ -1918,7 +1923,7 @@ bool FmPolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int16_
 
 		while( ( i != INDEX_NONE ) && ( ( StartVert + NumVerts ) < MAXFMPOLYVERTS ) )
 		{
-			if( !( FmPolys[i].Flags & FM_FLAG_DONTCLIP ) && ( FmPolys[i].Group == Group ) )
+			if( FmPolyInFill( i, Clipped, Group ) )
 			{
 				if( FmPolys[i].Frm_Info && (*FmPolys[i].Frm_Info ) )
 				{
@@ -1978,7 +1983,7 @@ bool FmPolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int16_
 
 			while( ( i != INDEX_NONE ) && ( StartVert < MAXFMPOLYVERTS ) )
 			{
-				if( !( FmPolys[i].Flags & FM_FLAG_DONTCLIP ) && ( FmPolys[i].Group == Group ) )
+				if( FmPolyInFill( i, Clipped, Group ) )
 				{
 					if( FmPolys[i].Frm_Info && (*FmPolys[i].Frm_Info ) )
 					{
@@ -2230,6 +2235,19 @@ bool FmPolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int16_
 }
 
 /*===================================================================
+	Procedure	:	Fill one batch of a group's FmPolys
+	Input		:	u_int16_t						Group
+				:	RENDEROBJECT *			Render object
+				:	int16_t	*					Current TPage List (in/out)
+				:	u_int16_t	*					Current FmPoly (in/out)
+	Output		:	true if a batch was filled and should be drawn
+===================================================================*/
+bool FmPolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * NextFmPoly )
+{
+	return FmPolyDispGroupFill( true, Group, renderObject, TPage, NextFmPoly );
+}
+
+/*===================================================================
 	Procedure	:	Fill one batch of FM_FLAG_DONTCLIP FmPolys
 	Input		:	RENDEROBJECT *			Render object
 				:	int16_t	*					Current TPage List (in/out)
@@ -2238,369 +2256,7 @@ bool FmPolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int16_
 ===================================================================*/
 bool FmPolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * NextFmPoly )
 {
-	/* opt5b memo epoch: whole-scene fill (no single group). */
-	renderObject->memoEpochPass = SMEMO_PASS_FM_UNCLIPPED;
-	renderObject->memoEpochGroup = SMEMO_WHOLE_GROUP;
-	renderObject->memoEpochResume = smemo_resume(*TPage, *NextFmPoly);
-	u_int16_t			i;
-	int16_t			Count;
-	int16_t			BitCount;
-	int16_t			TotalVerts;
-	int16_t			StartVert;
-#ifdef __3DS__
-	int				batchVert = 0;	/* write position in the current batch */
-#endif
-	int16_t			NumVerts;
-	int16_t			NumTris;
-	VECTOR			TempVector;
-	VECTOR			XVector;
-	VECTOR			YVector;
-	VECTOR			ZVector;
-	VECTOR			Xoff;
-	VECTOR			Yoff;
-	VECTOR			Xsize; ZERO_STACK_MEM(Xsize);
-	VECTOR			Ysize; ZERO_STACK_MEM(Ysize);
-	VECTOR			NewPos;
-	BIT_INFO	*	Bit_Ptr;
-	BOX_INFO	*	Box_Ptr;
-	OFF_INFO	*	Off_Ptr;
-	float			Distance;
-	MATRIX			MatrixCopy;
-	COLOR		Colour;
-	LVERTEX	*FmPolyVertPnt;
-	TRIANGLE	*FmPolyFacePnt;
-	LVERTEX	*BufStart;
-	MATRIX			TempMatrix;
-	QUAT			TempQuat;
-	WORD			*Indices = nullptr;
-	int				start_index = 0;
-
-	/*===================================================================
-			Pass 1: count verts per texture page
-	===================================================================*/
-	TotalVerts = 0;
-
-	for( Count = *TPage; Count < MAXTPAGESPERTLOAD; Count++ )
-	{
-		StartVert = TotalVerts;
-		NumVerts = 0;
-		NumTris = 0;
-
-		if( Count == *TPage ) i = *NextFmPoly;
-		else i = FmPolyTPages[ Count ].FirstPoly;
-
-		while( ( i != INDEX_NONE ) && ( ( StartVert + NumVerts ) < MAXFMPOLYVERTS ) )
-		{
-			if( ( FmPolys[i].Flags & FM_FLAG_DONTCLIP ) )
-			{
-				if( FmPolys[i].Frm_Info && (*FmPolys[i].Frm_Info ) )
-				{
-					Bit_Ptr = ( (*FmPolys[ i ].Frm_Info)->Bit_Info + (int16_t) FmPolys[ i ].Frame );
-					NumTris += ( 2 * Bit_Ptr->numbits );
-					NumVerts += ( 4 * Bit_Ptr->numbits );
-				}
-			}
-
-			i = FmPolys[ i ].NextInTPage;
-		}
-
-		FmPolyTPages[ Count ].StartVert = StartVert;
-		FmPolyTPages[ Count ].NumVerts = NumVerts;
-		FmPolyTPages[ Count ].NumTris = NumTris;
-
-		TotalVerts = ( StartVert + NumVerts );
-		if( TotalVerts >= MAXFMPOLYVERTS ) break;
-	}
-
-	if( !TotalVerts ) return( false );
-
-	renderObject->numTextureGroups = 0;
-
-	/*===================================================================
-			Lock the vertex and index buffers
-	===================================================================*/
-
-	if (!(FSLockVertexBuffer(renderObject, &BufStart)))
-	{
-		return false;
-	}
-
-	if (!(FSLockIndexBuffer(renderObject, &Indices)))
-	{
-		return false;
-	}
-
-	FmPolyFacePnt = (TRIANGLE *) Indices;
-
-	FmPolyVertPnt = (LVERTEX *) BufStart;
-
-	/*===================================================================
-			Pass 2: fill verts and indices, one texture group per quad
-	===================================================================*/
-	for( Count = *TPage; Count < MAXTPAGESPERTLOAD; Count++ )
-	{
-		StartVert = FmPolyTPages[ Count ].StartVert;
-		NumVerts = FmPolyTPages[ Count ].NumVerts;
-		NumTris = FmPolyTPages[ Count ].NumTris;
-
-		if( NumVerts )
-		{
-
-			if( Count == *TPage ) i = *NextFmPoly;
-			else i = FmPolyTPages[ Count ].FirstPoly;
-
-			while( ( i != INDEX_NONE ) && ( StartVert < MAXFMPOLYVERTS ) )
-			{
-				if( ( FmPolys[i].Flags & FM_FLAG_DONTCLIP ) )
-				{
-					if( FmPolys[i].Frm_Info && (*FmPolys[i].Frm_Info ) )
-					{
-						/*===================================================================
-								Create Colour Value for polys
-						===================================================================*/
-
-						Colour = RGBA_MAKE2( FmPolys[ i ].R, FmPolys[ i ].G, FmPolys[ i ].B, 255 );
-
-						/*===================================================================
-								Set Dir and Up Vectors
-						===================================================================*/
-						if( FmPolys[ i ].Flags & FM_FLAG_DIRCONST )
-						{
-							YVector = FmPolys[ i ].UpVector;					/* Calc Up Vector */
-							ZVector = FmPolys[ i ].DirVector;					/* Calc Forward Vector */
-						}
-						else
-						{
-							fast_sincosf( D2R( FmPolys[ i ].Rot ), &YVector.x, &YVector.y ); /* Calc Up Vector */
-							YVector.z = 0.0F;
-							ZVector = Forward;
-
-							if( FmPolys[ i ].Flags & FM_FLAG_RELATIVE )
-							{
-								TempQuat.FromDirAndUp(&FmPolys[i].DirVector, &FmPolys[i].UpVector);
-								TempQuat.ToMatrix(&TempMatrix);
-								ApplyMatrix( &TempMatrix, &YVector, &YVector );
-								ApplyMatrix( &TempMatrix, &ZVector, &ZVector );
-							}
-
-							MatrixCopy = CurrentCamera.Mat;
-							MatrixCopy._41 = 0.0F;
-							MatrixCopy._42 = 0.0F;
-							MatrixCopy._43 = 0.0F;
-							ApplyMatrix( &MatrixCopy, &YVector, &YVector );		/* Calc Up Vector */
-							ApplyMatrix( &MatrixCopy, &ZVector, &ZVector );		/* Calc Forward Vector */
-						}
-
-						CrossProduct( &YVector, &ZVector, &XVector );			/* Calc Left Vector */
-
-						/*===================================================================
-								Setup FrameInfo description pointers
-						===================================================================*/
-						Bit_Ptr = ( (*FmPolys[ i ].Frm_Info)->Bit_Info + (int16_t) FmPolys[ i ].Frame );
-						Off_Ptr = ( (*FmPolys[ i ].Frm_Info)->Off_Info + Bit_Ptr->startbit );
-
-						for( BitCount = 0; BitCount < Bit_Ptr->numbits; BitCount++ )
-						{
-							int ntris = 0;
-
-							Box_Ptr = ( (*FmPolys[ i ].Frm_Info)->Box_Info + ( Off_Ptr->box & 0x0fff ) );
-
-							Xoff.x = ( ( Off_Ptr->xoff * FmPolys[ i ].xsize ) * XVector.x );
-							Xoff.y = ( ( Off_Ptr->xoff * FmPolys[ i ].xsize ) * XVector.y );
-							Xoff.z = ( ( Off_Ptr->xoff * FmPolys[ i ].xsize ) * XVector.z );
-							Yoff.x = ( ( -Off_Ptr->yoff * FmPolys[ i ].ysize ) * YVector.x );
-							Yoff.y = ( ( -Off_Ptr->yoff * FmPolys[ i ].ysize ) * YVector.y );
-							Yoff.z = ( ( -Off_Ptr->yoff * FmPolys[ i ].ysize ) * YVector.z );
-
-							switch( Off_Ptr->box & BOX_BOTHFLIP )
-							{
-							case BOX_NOFLIP:
-								Xsize.x = ( ( Box_Ptr->xsize * FmPolys[ i ].xsize ) * XVector.x );
-								Xsize.y = ( ( Box_Ptr->xsize * FmPolys[ i ].xsize ) * XVector.y );
-								Xsize.z = ( ( Box_Ptr->xsize * FmPolys[ i ].xsize ) * XVector.z );
-								Ysize.x = ( ( Box_Ptr->ysize * FmPolys[ i ].ysize ) * YVector.x );
-								Ysize.y = ( ( Box_Ptr->ysize * FmPolys[ i ].ysize ) * YVector.y );
-								Ysize.z = ( ( Box_Ptr->ysize * FmPolys[ i ].ysize ) * YVector.z );
-								break;
-
-							case BOX_XFLIP:
-								Xsize.x = -( ( Box_Ptr->xsize * FmPolys[ i ].xsize ) * XVector.x );
-								Xsize.y = -( ( Box_Ptr->xsize * FmPolys[ i ].xsize ) * XVector.y );
-								Xsize.z = -( ( Box_Ptr->xsize * FmPolys[ i ].xsize ) * XVector.z );
-								Ysize.x = ( ( Box_Ptr->ysize * FmPolys[ i ].ysize ) * YVector.x );
-								Ysize.y = ( ( Box_Ptr->ysize * FmPolys[ i ].ysize ) * YVector.y );
-								Ysize.z = ( ( Box_Ptr->ysize * FmPolys[ i ].ysize ) * YVector.z );
-								break;
-
-							case BOX_YFLIP:
-								Xsize.x = ( ( Box_Ptr->xsize * FmPolys[ i ].xsize ) * XVector.x );
-								Xsize.y = ( ( Box_Ptr->xsize * FmPolys[ i ].xsize ) * XVector.y );
-								Xsize.z = ( ( Box_Ptr->xsize * FmPolys[ i ].xsize ) * XVector.z );
-								Ysize.x = -( ( Box_Ptr->ysize * FmPolys[ i ].ysize ) * YVector.x );
-								Ysize.y = -( ( Box_Ptr->ysize * FmPolys[ i ].ysize ) * YVector.y );
-								Ysize.z = -( ( Box_Ptr->ysize * FmPolys[ i ].ysize ) * YVector.z );
-								break;
-
-							case BOX_BOTHFLIP:
-								/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
-								Xsize.x = -( ( Box_Ptr->xsize * FmPolys[ i ].xsize ) * XVector.x );
-								Xsize.y = -( ( Box_Ptr->xsize * FmPolys[ i ].xsize ) * XVector.y );
-								/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
-								Xsize.z = -( ( Box_Ptr->xsize * FmPolys[ i ].xsize ) * XVector.z );
-								Ysize.x = -( ( Box_Ptr->ysize * FmPolys[ i ].ysize ) * YVector.x );
-								Ysize.y = -( ( Box_Ptr->ysize * FmPolys[ i ].ysize ) * YVector.y );
-								Ysize.z = -( ( Box_Ptr->ysize * FmPolys[ i ].ysize ) * YVector.z );
-								break;
-							}
-
-							/*-------------- MOVEOUT: draw pulled toward the camera ---------------*/
-							if( ( FmPolys[ i ].Flags & FM_FLAG_MOVEOUT ) )
-							{
-								renderObject->memoEpochPass = SMEMO_PASS_NO_REUSE;
-								TempVector.x = ( FmPolys[ i ].Pos.x - CurrentCamera.Pos.x );
-								TempVector.y = ( FmPolys[ i ].Pos.y - CurrentCamera.Pos.y );
-								TempVector.z = ( FmPolys[ i ].Pos.z - CurrentCamera.Pos.z );
-								Distance = VectorLength( &TempVector );
-								NormaliseVector( &TempVector );
-
-								/* @vfp-exempt R3 — explosion size from camera distance; integerizing changes the drawn size. measured n/a. Verified 2026-11-19. */
-								if( Distance >= ( EXPLO_DISTANCE + 110.0F ) )
-								{
-									Distance = EXPLO_DISTANCE;
-								}
-								else
-								{
-									Distance -= 110.0F;
-									if( Distance < 32.0F ) Distance = 32.0F;
-								}
-
-								NewPos.x = ( FmPolys[ i ].Pos.x + ( -Distance * TempVector.x ) );
-								NewPos.y = ( FmPolys[ i ].Pos.y + ( -Distance * TempVector.y ) );
-								NewPos.z = ( FmPolys[ i ].Pos.z + ( -Distance * TempVector.z ) );
-							}
-							else
-							{
-								NewPos = FmPolys[i].Pos;
-							}
-							/*-------------------------------------------*/
-
-							NewPos.x += ( Xoff.x + Yoff.x );
-							NewPos.y += ( Xoff.y + Yoff.y );
-							NewPos.z += ( Xoff.z + Yoff.z );
-
-							FmPolyVertPnt->x = NewPos.x;						// v1
-							FmPolyVertPnt->y = NewPos.y;
-							FmPolyVertPnt->z = NewPos.z;
-							FmPolyVertPnt->tu = Box_Ptr->u1;
-							FmPolyVertPnt->tv = Box_Ptr->v1;
-							FmPolyVertPnt->color = Colour;
-							FmPolyVertPnt++;
-
-							FmPolyVertPnt->x = ( NewPos.x + Xsize.x );			// v2
-							FmPolyVertPnt->y = ( NewPos.y + Xsize.y );
-							FmPolyVertPnt->z = ( NewPos.z + Xsize.z );
-							FmPolyVertPnt->tu = Box_Ptr->u2;
-							FmPolyVertPnt->tv = Box_Ptr->v1;
-							FmPolyVertPnt->color = Colour;
-							FmPolyVertPnt++;
-
-							FmPolyVertPnt->x = ( NewPos.x + Xsize.x - Ysize.x ); // v3
-							FmPolyVertPnt->y = ( NewPos.y + Xsize.y - Ysize.y );
-							FmPolyVertPnt->z = ( NewPos.z + Xsize.z - Ysize.z );
-							FmPolyVertPnt->tu = Box_Ptr->u2;
-							FmPolyVertPnt->tv = Box_Ptr->v2;
-							FmPolyVertPnt->color = Colour;
-							FmPolyVertPnt++;
-
-							FmPolyVertPnt->x = ( NewPos.x - Ysize.x );			// v4
-							FmPolyVertPnt->y = ( NewPos.y - Ysize.y );
-							FmPolyVertPnt->z = ( NewPos.z - Ysize.z );
-							FmPolyVertPnt->tu = Box_Ptr->u1;
-							FmPolyVertPnt->tv = Box_Ptr->v2;
-							FmPolyVertPnt->color = Colour;
-							FmPolyVertPnt++;
-
-							FmPolyFacePnt->v1 = 0;
-							FmPolyFacePnt->v2 = 1;
-							FmPolyFacePnt->v3 = 2;
-							FmPolyFacePnt++;
-							ntris++;
-
-							FmPolyFacePnt->v1 = 0;
-							FmPolyFacePnt->v2 = 2;
-							FmPolyFacePnt->v3 = 3;
-							FmPolyFacePnt++;
-							ntris++;
-
-							renderObject->textureGroups[renderObject->numTextureGroups].numTriangles = ntris;
-							renderObject->textureGroups[renderObject->numTextureGroups].numVerts = 4;
-							renderObject->textureGroups[renderObject->numTextureGroups].startIndex = start_index;
-#ifdef __3DS__
-							renderObject->textureGroups[renderObject->numTextureGroups].startVert = batchVert;
-#else
-							renderObject->textureGroups[renderObject->numTextureGroups].startVert = StartVert;
-#endif
-							renderObject->textureGroups[renderObject->numTextureGroups].texture = Tloadheader.TexHandle[Count];
-							renderObject->textureGroups[renderObject->numTextureGroups].colourkey = Tloadheader.ColourKey[Count];
-
-							start_index += ntris*3; // 3 indexes in a triangle
-							StartVert += 4;
-
-#ifdef __3DS__
-							/* Mid-draw flush: textureGroups is full (one group per
-							 * quad), so draw what is filled and refill from the
-							 * start of the buffers. See polys.h. */
-							renderObject->numTextureGroups++;
-							batchVert += 4;
-							if (renderObject->numTextureGroups >= MAX_TEXTURE_GROUPS) {
-								FSUnlockVertexBuffer(renderObject);
-								FSUnlockIndexBuffer(renderObject);
-								draw_billboard_object(renderObject);
-								renderObject->numTextureGroups = 0;
-								renderObject->memoEpochResume += SMEMO_CHUNK_STEP;
-								start_index = 0;
-								batchVert = 0;
-								FSLockVertexBuffer(renderObject, &BufStart);
-								FSLockIndexBuffer(renderObject, &Indices);
-								FmPolyVertPnt = (LVERTEX *) BufStart;
-								FmPolyFacePnt = (TRIANGLE *) Indices;
-							}
-#else
-							INCREASE_TEXTURE_GROUPS(renderObject);
-#endif
-
-							Off_Ptr++;
-						}
-					}
-				}
-
-				i = FmPolys[ i ].NextInTPage;
-			}
-
-		}
-
-		if( StartVert >= MAXFMPOLYVERTS ) break;
-	}
-
-	/*===================================================================
-			Unlock the buffers and return the resume point
-	===================================================================*/
-
-	if (!(FSUnlockVertexBuffer(renderObject)))
-	{
-		return false;
-	}
-
-	if (!(FSUnlockIndexBuffer(renderObject)))
-	{
-		Msg( "FSUnlockIndexBuffer failed");
-		return false ;
-	}
-
-	*TPage = Count;
-	*NextFmPoly = i;
-
-	return( true );
+	return FmPolyDispGroupFill( false, 0, renderObject, TPage, NextFmPoly );
 }
 
 /*===================================================================
