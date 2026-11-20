@@ -2775,6 +2775,239 @@ char NodeName[256];
 	GameStatus[WhoIAm] = MyGameStatus;
 }
 
+/* STATUS_WaitingToStartTeamGame -- false: RenderScene returns false */
+[[gnu::always_inline]] static inline bool RenderStatusWaitingToStartTeamGame( int & WaitFrames )
+{
+	DebugState("STATUS_WaitingToStartTeamGame\n");
+	Browl -= framelag;
+
+	if( Browl <= 0.0F )
+	{
+		Browl = 30.0F;
+		SendGameMessage(MSG_STATUS, 0, 0, 0, 0);
+	}
+	ReceiveGameMessages();
+
+	if( DisplayTitle() != true )
+	{
+		SeriousError = true;
+		return false;
+	}
+
+	if ( VduFinished( nullptr ) )
+		WaitFrames--;
+	if ( !WaitFrames )
+	{
+		WaitFrames = 2;
+		LastMenu = CurrentMenu;
+		VduClear();
+		MenuAbort();
+		MyGameStatus = PreSynchupStatus;
+	}
+
+	if( IMustQuit )
+		SpecialDestroyGame();
+
+	return true;
+}
+
+/* STATUS_Joining */
+[[gnu::always_inline]] static inline void RenderStatusJoining(  )
+{
+	DebugState("STATUS_Joining\n");
+	clear_black();
+
+	ReceiveGameMessages();
+	if( IMustQuit || IsHost || ( OverallGameStatus != STATUS_Normal ) )
+	{
+		SpecialDestroyGame();
+		return;
+	}
+	Browl -= framelag;
+	if( Browl <= 0.0F )
+	{
+		Browl = 30.0F;
+		SendGameMessage(MSG_STATUS, 0, 0, 0, 0);
+	}
+
+	{
+		RENDEROBJECT ro;
+		TEXTUREGROUP ro_groups[MAX_TEXTURE_GROUPS];
+		ZERO_STACK_MEM(ro);
+		ro.textureGroups = ro_groups;
+		FSCreateDynamic2dVertexBuffer(&ro, BATCH_BUFFER_VERTS);
+		FSCreateIndexBuffer(&ro, BATCH_BUFFER_VERTS * 3);
+
+
+		CenterPrint4x5Text( "Pickups Left   " , (render_info.window_size.cy>>1)-(FontHeight<<2), GRAY );
+		Printu_int16_t( (u_int16_t) Ships[WhoIAm].Pickups , (render_info.window_size.cx>>1)+((17*FontWidth>>1)), (render_info.window_size.cy>>1)-(FontHeight<<2), 2 );
+
+		CenterPrint4x5Text( "RegenSlots Left" , (render_info.window_size.cy>>1)-(FontHeight<<1), GRAY );
+		Printu_int16_t( (u_int16_t) Ships[WhoIAm].RegenSlots , (render_info.window_size.cx>>1)+((17*FontWidth>>1)), (render_info.window_size.cy>>1)-(FontHeight<<1), 2 );
+
+		CenterPrint4x5Text( "Mines Left     " , (render_info.window_size.cy>>1), GRAY );
+		Printu_int16_t( (u_int16_t) Ships[WhoIAm].Mines , (render_info.window_size.cx>>1)+((17*FontWidth>>1)), (render_info.window_size.cy>>1), 2 );
+
+		CenterPrint4x5Text( "Triggers Left  " , (render_info.window_size.cy>>1)+(FontHeight<<1), GRAY );
+		Printu_int16_t( (u_int16_t) Ships[WhoIAm].Triggers , (render_info.window_size.cx>>1)+((17*FontWidth>>1)), (render_info.window_size.cy>>1)+(FontHeight<<1), 2 );
+
+		CenterPrint4x5Text( "TrigVars Left  " , (render_info.window_size.cy>>1)+(FontHeight<<2), GRAY );
+		Printu_int16_t( (u_int16_t) Ships[WhoIAm].TrigVars , (render_info.window_size.cx>>1)+((17*FontWidth>>1)), (render_info.window_size.cy>>1)+(FontHeight<<2), 2 );
+
+
+		DisplayNonSolidScrPolys(&ro);
+		DisplaySolidScrPolys(&ro);
+		FSReleaseRenderObject(&ro);
+		// lock rendering to lower fps to stop tearing on loading screen
+		{
+			constexpr auto LOADING_SCREEN_FPS = 1.0f / 10.0f;
+			static float counter = LOADING_SCREEN_FPS;
+			counter += real_framelag;
+			if(counter > LOADING_SCREEN_FPS)
+			{
+				render_flip(&render_info);
+				counter = 0;
+			}
+		}
+		ScreenPolyProcess();
+	}
+
+	// wait for all the pickup and mine stuff to be sent to me.....
+	if( ( Ships[WhoIAm].Pickups == 0 ) && ( Ships[WhoIAm].Mines == 0 ) && ( Ships[WhoIAm].RegenSlots == 0 ) &&
+		( Ships[WhoIAm].Triggers == 0 ) && ( Ships[WhoIAm].TrigVars == 0 ) && OverallGameStatus == STATUS_Normal)
+	{
+		// broadcast "x is joining the game" to all players...
+		if (TeamGame)
+			SendGameMessage(MSG_TEXTMSG, 0, 0, TEXTMSGTYPE_JoiningTeamGame, 0);
+
+		MyGameStatus = OverallGameStatus;
+		input_grab( true );
+
+
+		GameStatus[WhoIAm] = OverallGameStatus;
+		SendGameMessage(MSG_STATUS, 0, 0, 0, 0);
+		SyncMines();
+		InitShipRandomPos( WhoIAm );
+		NextworkOldBikeNum = -1;
+		if( CountDownOn )
+		{
+			CreateCountdownDigits();
+			StartCountDown( (int16_t) TimeLimit.value, 0 );
+			IllegalTime = true;
+		}
+	}
+}
+
+/* STATUS_ChangeLevelPostInitView -- false: RenderScene returns false */
+[[gnu::always_inline]] static inline bool RenderStatusChangeLevelPostInitView(  )
+{
+	DebugState("STATUS_ChangeLevelPostInitView\n");
+	Change_Ext( &LevelNames[ LevelNum ][ 0 ], &NodeName[ 0 ], sizeof( NodeName ), ".NOD" );
+	if( !Nodeload( NodeName ) )
+	{
+		SeriousError = true;
+		return( false );
+	}
+
+	if( !LoadBGOFiles() )
+	{
+		SeriousError = true;
+		return( false );
+	}
+
+	if( !LoadEnemies() )
+	{
+		SeriousError = true;
+		Msg( "LoadEnemies() failed\n" );
+		return( false );
+	}
+
+	if( !LoadSpotFX() )
+	{
+		SeriousError = true;
+		Msg( "LoadSpotFX() failed\n" );
+		return( false );
+	}
+
+	if( !LoadStartPoints() )
+	{
+		SeriousError = true;
+		Msg( "LoadStartPoints() failed\n" );
+		return( false );
+	}
+
+	if ( !InitializeSound( DESTROYSOUND_All ))
+	{
+		Msg("InitializeSound() failed\n");
+		return false;
+	}
+
+	Change_Ext( &LevelNames[ LevelNum ][ 0 ], &NodeName[ 0 ], sizeof( NodeName ), ".CAM" );
+
+	if( !Cameraload( NodeName ) )
+	{
+		SeriousError = true;
+		return( false );
+	}
+
+	// might not be any real-time lights
+	LoadRTLights();
+
+	if ( CaptureTheFlag || CTF )
+		GoalLoad();
+
+	InitThermo();
+
+	if( ( ChangeLevel_MyGameStatus == STATUS_SinglePlayer ) ||
+		( ChangeLevel_MyGameStatus == STATUS_PostStartingSinglePlayer ) ||
+		( ChangeLevel_MyGameStatus == STATUS_TitleLoadGamePostStartingSinglePlayer) )
+	{
+		LoadTimeForLevel();
+	}
+
+	if( !LoadPickupsPositions() )
+	{
+		SeriousError = true;
+		Msg( "LoadPickupsPositions() failed\n" );
+		return( false );
+	}
+
+	// might not be any External Forces...
+	ExternalForcesLoad( (char*) &ExternalForceNames[LevelNum][0] );
+
+	// might not be any Teleports...
+	TeleportsLoad( (char*) &TeleportNames[LevelNum][0] );
+
+	// Can Cope with no Zone file!!!
+	TriggerAreaload( (char*) &ZoneNames[LevelNum][0] );
+
+	InitShipsChangeLevel(&Mloadheader);
+
+	if( ( ChangeLevel_MyGameStatus == STATUS_SinglePlayer ) ||
+		( ChangeLevel_MyGameStatus == STATUS_PostStartingSinglePlayer ) ||
+		( ChangeLevel_MyGameStatus == STATUS_TitleLoadGamePostStartingSinglePlayer) )
+	{
+		if( CountDownOn )
+		{
+			CreateCountdownDigits();
+			StartCountDown( (int16_t) SinglePlayerTimeLimit, 0 );
+		}
+		else
+		{
+			DeleteCountdownDigits();
+		}
+	}
+
+	GodModeOnceOnly = true;
+
+	MyGameStatus = ChangeLevel_MyGameStatus;
+
+	PrintInitViewStatus( MyGameStatus );
+
+
+	return true;
+}
+
 bool RenderScene( void )
 {
 	u_int16_t  i,e;
@@ -2830,36 +3063,8 @@ bool RenderScene( void )
 
 
 	case STATUS_WaitingToStartTeamGame:
-		DebugState("STATUS_WaitingToStartTeamGame\n");
-		Browl -= framelag;
-
-		if( Browl <= 0.0F )
-		{
-			Browl = 30.0F;
-			SendGameMessage(MSG_STATUS, 0, 0, 0, 0);
-		}
-		ReceiveGameMessages();
-
-		if( DisplayTitle() != true )
-		{
-			SeriousError = true;
+		if( !RenderStatusWaitingToStartTeamGame( WaitFrames ) )
 			return false;
-		}
-
-		if ( VduFinished( nullptr ) )
-			WaitFrames--;
-		if ( !WaitFrames )
-		{
-			WaitFrames = 2;
-			LastMenu = CurrentMenu;
-			VduClear();
-			MenuAbort();
-			MyGameStatus = PreSynchupStatus;
-		}
-
-		if( IMustQuit )
-			SpecialDestroyGame();
-
 		break;
 
 		// the main menu screen
@@ -2903,88 +3108,7 @@ bool RenderScene( void )
 
 
 	case STATUS_Joining:
-		DebugState("STATUS_Joining\n");
-		clear_black();
-
-		ReceiveGameMessages();
-		if( IMustQuit || IsHost || ( OverallGameStatus != STATUS_Normal ) )
-		{
-			SpecialDestroyGame();
-			break;
-		}
-		Browl -= framelag;
-		if( Browl <= 0.0F )
-		{
-			Browl = 30.0F;
-			SendGameMessage(MSG_STATUS, 0, 0, 0, 0);
-		}
-
-		{
-			RENDEROBJECT ro;
-			TEXTUREGROUP ro_groups[MAX_TEXTURE_GROUPS];
-			ZERO_STACK_MEM(ro);
-			ro.textureGroups = ro_groups;
-			FSCreateDynamic2dVertexBuffer(&ro, BATCH_BUFFER_VERTS);
-			FSCreateIndexBuffer(&ro, BATCH_BUFFER_VERTS * 3);
-
-
-			CenterPrint4x5Text( "Pickups Left   " , (render_info.window_size.cy>>1)-(FontHeight<<2), GRAY );
-			Printu_int16_t( (u_int16_t) Ships[WhoIAm].Pickups , (render_info.window_size.cx>>1)+((17*FontWidth>>1)), (render_info.window_size.cy>>1)-(FontHeight<<2), 2 );
-
-			CenterPrint4x5Text( "RegenSlots Left" , (render_info.window_size.cy>>1)-(FontHeight<<1), GRAY );
-			Printu_int16_t( (u_int16_t) Ships[WhoIAm].RegenSlots , (render_info.window_size.cx>>1)+((17*FontWidth>>1)), (render_info.window_size.cy>>1)-(FontHeight<<1), 2 );
-
-			CenterPrint4x5Text( "Mines Left     " , (render_info.window_size.cy>>1), GRAY );
-			Printu_int16_t( (u_int16_t) Ships[WhoIAm].Mines , (render_info.window_size.cx>>1)+((17*FontWidth>>1)), (render_info.window_size.cy>>1), 2 );
-
-			CenterPrint4x5Text( "Triggers Left  " , (render_info.window_size.cy>>1)+(FontHeight<<1), GRAY );
-			Printu_int16_t( (u_int16_t) Ships[WhoIAm].Triggers , (render_info.window_size.cx>>1)+((17*FontWidth>>1)), (render_info.window_size.cy>>1)+(FontHeight<<1), 2 );
-
-			CenterPrint4x5Text( "TrigVars Left  " , (render_info.window_size.cy>>1)+(FontHeight<<2), GRAY );
-			Printu_int16_t( (u_int16_t) Ships[WhoIAm].TrigVars , (render_info.window_size.cx>>1)+((17*FontWidth>>1)), (render_info.window_size.cy>>1)+(FontHeight<<2), 2 );
-
-
-			DisplayNonSolidScrPolys(&ro);
-			DisplaySolidScrPolys(&ro);
-			FSReleaseRenderObject(&ro);
-			// lock rendering to lower fps to stop tearing on loading screen
-			{
-				constexpr auto LOADING_SCREEN_FPS = 1.0f / 10.0f;
-				static float counter = LOADING_SCREEN_FPS;
-				counter += real_framelag;
-				if(counter > LOADING_SCREEN_FPS)
-				{
-					render_flip(&render_info);
-					counter = 0;
-				}
-			}
-			ScreenPolyProcess();
-		}
-
-		// wait for all the pickup and mine stuff to be sent to me.....
-		if( ( Ships[WhoIAm].Pickups == 0 ) && ( Ships[WhoIAm].Mines == 0 ) && ( Ships[WhoIAm].RegenSlots == 0 ) &&
-			( Ships[WhoIAm].Triggers == 0 ) && ( Ships[WhoIAm].TrigVars == 0 ) && OverallGameStatus == STATUS_Normal)
-		{
-			// broadcast "x is joining the game" to all players...
-			if (TeamGame)
-				SendGameMessage(MSG_TEXTMSG, 0, 0, TEXTMSGTYPE_JoiningTeamGame, 0);
-
-			MyGameStatus = OverallGameStatus;
-			input_grab( true );
-
-
-			GameStatus[WhoIAm] = OverallGameStatus;
-			SendGameMessage(MSG_STATUS, 0, 0, 0, 0);
-			SyncMines();
-			InitShipRandomPos( WhoIAm );
-			NextworkOldBikeNum = -1;
-			if( CountDownOn )
-			{
-				CreateCountdownDigits();
-				StartCountDown( (int16_t) TimeLimit.value, 0 );
-				IllegalTime = true;
-			}
-		}
+		RenderStatusJoining(  );
 		break;
 
 		// in the multiplayer screen waiting for the game to start
@@ -3020,110 +3144,8 @@ bool RenderScene( void )
 
 
 	case STATUS_ChangeLevelPostInitView:
-		DebugState("STATUS_ChangeLevelPostInitView\n");
-		Change_Ext( &LevelNames[ LevelNum ][ 0 ], &NodeName[ 0 ], sizeof( NodeName ), ".NOD" );
-		if( !Nodeload( NodeName ) )
-		{
-			SeriousError = true;
-			return( false );
-		}
-
-		if( !LoadBGOFiles() )
-		{
-			SeriousError = true;
-			return( false );
-		}
-
-		if( !LoadEnemies() )
-		{
-			SeriousError = true;
-			Msg( "LoadEnemies() failed\n" );
-			return( false );
-		}
-
-		if( !LoadSpotFX() )
-		{
-			SeriousError = true;
-			Msg( "LoadSpotFX() failed\n" );
-			return( false );
-		}
-
-		if( !LoadStartPoints() )
-		{
-			SeriousError = true;
-			Msg( "LoadStartPoints() failed\n" );
-			return( false );
-		}
-
-		if ( !InitializeSound( DESTROYSOUND_All ))
-		{
-			Msg("InitializeSound() failed\n");
+		if( !RenderStatusChangeLevelPostInitView(  ) )
 			return false;
-		}
-
-		Change_Ext( &LevelNames[ LevelNum ][ 0 ], &NodeName[ 0 ], sizeof( NodeName ), ".CAM" );
-
-		if( !Cameraload( NodeName ) )
-		{
-			SeriousError = true;
-			return( false );
-		}
-
-		// might not be any real-time lights
-		LoadRTLights();
-
-		if ( CaptureTheFlag || CTF )
-			GoalLoad();
-
-		InitThermo();
-
-		if( ( ChangeLevel_MyGameStatus == STATUS_SinglePlayer ) ||
-			( ChangeLevel_MyGameStatus == STATUS_PostStartingSinglePlayer ) ||
-			( ChangeLevel_MyGameStatus == STATUS_TitleLoadGamePostStartingSinglePlayer) )
-		{
-			LoadTimeForLevel();
-		}
-
-		if( !LoadPickupsPositions() )
-		{
-			SeriousError = true;
-			Msg( "LoadPickupsPositions() failed\n" );
-			return( false );
-		}
-
-		// might not be any External Forces...
-		ExternalForcesLoad( (char*) &ExternalForceNames[LevelNum][0] );
-
-		// might not be any Teleports...
-		TeleportsLoad( (char*) &TeleportNames[LevelNum][0] );
-
-		// Can Cope with no Zone file!!!
-		TriggerAreaload( (char*) &ZoneNames[LevelNum][0] );
-
-		InitShipsChangeLevel(&Mloadheader);
-
-		if( ( ChangeLevel_MyGameStatus == STATUS_SinglePlayer ) ||
-			( ChangeLevel_MyGameStatus == STATUS_PostStartingSinglePlayer ) ||
-			( ChangeLevel_MyGameStatus == STATUS_TitleLoadGamePostStartingSinglePlayer) )
-		{
-			if( CountDownOn )
-			{
-				CreateCountdownDigits();
-				StartCountDown( (int16_t) SinglePlayerTimeLimit, 0 );
-			}
-			else
-			{
-				DeleteCountdownDigits();
-			}
-		}
-
-		GodModeOnceOnly = true;
-
-		MyGameStatus = ChangeLevel_MyGameStatus;
-
-		PrintInitViewStatus( MyGameStatus );
-
-
 		break;
 
 		//  *********************** Single Player Game Stuff **********************************
