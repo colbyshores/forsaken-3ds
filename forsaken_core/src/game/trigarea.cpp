@@ -71,13 +71,40 @@ void TriggerAreaProcess( VECTOR * OldPos , VECTOR * NewPos , TRIGGER_AREA * Area
 /*===================================================================
 		Globals ...
 ===================================================================*/
-u_int16_t	NumZones;
 TRIGGER_AREA * Zones = nullptr;
 
-TRIGGER_AREA * GroupTriggerArea_player[MAXGROUPS];
-TRIGGER_AREA * GroupTriggerArea_player_shoots[MAXGROUPS];
-TRIGGER_AREA * GroupTriggerArea_enemy[MAXGROUPS];
-TRIGGER_AREA * GroupTriggerArea_enemy_shoots[MAXGROUPS];
+namespace {
+
+/* The level's trigger-area bookkeeping (one instance, g_trigareas): how
+ * many entries Zones[] holds and, per group, the chains of areas that react
+ * to the player, the player's shots, enemies and enemies' shots. Loaded
+ * with the level, checked as ships, enemies and bullets move, ticked each
+ * frame, switched by triggers and saved with the game. Zones[] itself stays
+ * global. */
+class TriggerAreas {
+	public:
+	bool  load( char * Filename );
+	void  release();
+	bool  player_check( VECTOR * OldPos, VECTOR * NewPos, u_int16_t Group );
+	bool  player_shoots_check( VECTOR * OldPos, VECTOR * NewPos, u_int16_t Group, u_int8_t WeaponType, u_int8_t Weapon );
+	bool  enemy_check( VECTOR * OldPos, VECTOR * NewPos, u_int16_t Group );
+	bool  enemy_shoots_check( VECTOR * OldPos, VECTOR * NewPos, u_int16_t Group, u_int8_t WeaponType, u_int8_t Weapon );
+	void  display_group( u_int16_t Group );
+	void  enable( u_int16_t * Data );
+	void  disable( u_int16_t * Data );
+	void  process();
+	FILE *save( FILE * fp );
+	FILE *restore( FILE * fp );
+
+	private:
+	TRIGGER_AREA * GroupTriggerArea_player[MAXGROUPS] = {};
+	TRIGGER_AREA * GroupTriggerArea_player_shoots[MAXGROUPS] = {};
+	TRIGGER_AREA * GroupTriggerArea_enemy[MAXGROUPS] = {};
+	TRIGGER_AREA * GroupTriggerArea_enemy_shoots[MAXGROUPS] = {};
+	u_int16_t      NumZones = 0;
+};
+
+} // namespace
 
 /*===================================================================
 		Defines
@@ -89,7 +116,7 @@ constexpr int ZON_VERSION_NUMBER = 2;
 	Input		:		char	*	Filename
 	Output		:		bool	true/false ( true if there is no file )
 ===================================================================*/
-bool TriggerAreaload( char * Filename )
+bool TriggerAreas::load( char * Filename )
 {
 	long			File_Size;
 	long			Read_Size;
@@ -309,7 +336,7 @@ bool TriggerAreaload( char * Filename )
 	Input		:		void
 	Output		:		void
 ===================================================================*/
-void ReleaseTriggerArea( void )
+void TriggerAreas::release()
 {
 	int			i;
 	TRIGGER_AREA * AreaPnt;
@@ -343,7 +370,7 @@ bool	In;
 				:		u_int16_t		Group
 	Output		:		bool		true
 ===================================================================*/
-bool	TriggerAreaPlayerCheck( VECTOR * OldPos , VECTOR * NewPos , u_int16_t Group )
+bool	TriggerAreas::player_check( VECTOR * OldPos , VECTOR * NewPos , u_int16_t Group )
 {
 	TRIGGER_AREA * Area;
 
@@ -385,7 +412,7 @@ bool	TriggerAreaPlayerCheck( VECTOR * OldPos , VECTOR * NewPos , u_int16_t Group
 				:		u_int8_t		Weapon
 	Output		:		bool		true
 ===================================================================*/
-bool	TriggerAreaPlayerShootsCheck( VECTOR * OldPos , VECTOR * NewPos , u_int16_t Group, u_int8_t WeaponType, u_int8_t Weapon )
+bool	TriggerAreas::player_shoots_check( VECTOR * OldPos , VECTOR * NewPos , u_int16_t Group, u_int8_t WeaponType, u_int8_t Weapon )
 {
 	TRIGGER_AREA * Area;
 	bool	CanActivate;
@@ -445,7 +472,7 @@ bool	TriggerAreaPlayerShootsCheck( VECTOR * OldPos , VECTOR * NewPos , u_int16_t
 				:		u_int16_t		Group
 	Output		:		bool		true
 ===================================================================*/
-bool	TriggerAreaEnemyCheck( VECTOR * OldPos , VECTOR * NewPos , u_int16_t Group )
+bool	TriggerAreas::enemy_check( VECTOR * OldPos , VECTOR * NewPos , u_int16_t Group )
 {
 	TRIGGER_AREA * Area;
 
@@ -487,7 +514,7 @@ bool	TriggerAreaEnemyCheck( VECTOR * OldPos , VECTOR * NewPos , u_int16_t Group 
 				:		u_int8_t		Weapon
 	Output		:		bool		true
 ===================================================================*/
-bool	TriggerAreaEnemyShootsCheck( VECTOR * OldPos , VECTOR * NewPos , u_int16_t Group, u_int8_t WeaponType, u_int8_t Weapon )
+bool	TriggerAreas::enemy_shoots_check( VECTOR * OldPos , VECTOR * NewPos , u_int16_t Group, u_int8_t WeaponType, u_int8_t Weapon )
 {
 	TRIGGER_AREA * Area;
 	bool	CanActivate;
@@ -691,7 +718,7 @@ void TriggerAreaProcess( VECTOR * OldPos , VECTOR * NewPos , TRIGGER_AREA * Area
 	Input		:		u_int16_t	Group
 	Output		:		Nothing
 ===================================================================*/
-void DispGroupTriggerAreas( u_int16_t Group )
+void TriggerAreas::display_group( u_int16_t Group )
 {
 	TRIGGER_AREA * Area;
 
@@ -815,7 +842,7 @@ void DispGroupTriggerAreas( u_int16_t Group )
 	Input		:		u_int16_t	* Data
 	Output		:		Nothing
 ===================================================================*/
-void EnableTriggerArea( u_int16_t * Data )
+void TriggerAreas::enable( u_int16_t * Data )
 {
 	TRIGGER_AREA * AreaPnt;
 	AreaPnt = Zones;
@@ -831,7 +858,7 @@ void EnableTriggerArea( u_int16_t * Data )
 	Input		:		u_int16_t	* Data
 	Output		:		Nothing
 ===================================================================*/
-void DisableTriggerArea( u_int16_t * Data )
+void TriggerAreas::disable( u_int16_t * Data )
 {
 	TRIGGER_AREA * AreaPnt;
 	AreaPnt = Zones;
@@ -845,7 +872,7 @@ void DisableTriggerArea( u_int16_t * Data )
 	Input		:		void
 	Output		:		void
 ===================================================================*/
-void ProcessTriggerAreas( void )
+void TriggerAreas::process()
 {
 	TRIGGER_AREA * Area;
 	int i;
@@ -872,7 +899,7 @@ void ProcessTriggerAreas( void )
 	Input		:	FILE	*	File Pointer
 	Output		:	FILE	*	Updated File Pointer
 ===================================================================*/
-FILE * SaveTriggerAreas( FILE * fp )
+FILE * TriggerAreas::save( FILE * fp )
 {
 	int				i;
 	TRIGGER_AREA *	TrigAreaPtr;
@@ -899,7 +926,7 @@ FILE * SaveTriggerAreas( FILE * fp )
 	Output		:	FILE	*	Updated File Pointer ( closed and NULL
 					if the area count does not match the level )
 ===================================================================*/
-FILE * LoadTriggerAreas( FILE * fp )
+FILE * TriggerAreas::restore( FILE * fp )
 {
 	int				i;
 	TRIGGER_AREA *	TrigAreaPtr;
@@ -927,3 +954,17 @@ FILE * LoadTriggerAreas( FILE * fp )
 	return( fp );
 }
 
+namespace { TriggerAreas g_trigareas; }
+
+bool TriggerAreaload( char * Filename ) { return g_trigareas.load( Filename ); }
+void ReleaseTriggerArea( void ) { g_trigareas.release(); }
+bool TriggerAreaPlayerCheck( VECTOR * OldPos , VECTOR * NewPos , u_int16_t Group ) { return g_trigareas.player_check( OldPos, NewPos, Group ); }
+bool TriggerAreaPlayerShootsCheck( VECTOR * OldPos , VECTOR * NewPos , u_int16_t Group, u_int8_t WeaponType, u_int8_t Weapon ) { return g_trigareas.player_shoots_check( OldPos, NewPos, Group, WeaponType, Weapon ); }
+bool TriggerAreaEnemyCheck( VECTOR * OldPos , VECTOR * NewPos , u_int16_t Group ) { return g_trigareas.enemy_check( OldPos, NewPos, Group ); }
+bool TriggerAreaEnemyShootsCheck( VECTOR * OldPos , VECTOR * NewPos , u_int16_t Group, u_int8_t WeaponType, u_int8_t Weapon ) { return g_trigareas.enemy_shoots_check( OldPos, NewPos, Group, WeaponType, Weapon ); }
+void DispGroupTriggerAreas( u_int16_t Group ) { g_trigareas.display_group( Group ); }
+void EnableTriggerArea( u_int16_t * Data ) { g_trigareas.enable( Data ); }
+void DisableTriggerArea( u_int16_t * Data ) { g_trigareas.disable( Data ); }
+void ProcessTriggerAreas( void ) { g_trigareas.process(); }
+FILE * SaveTriggerAreas( FILE * fp ) { return g_trigareas.save( fp ); }
+FILE * LoadTriggerAreas( FILE * fp ) { return g_trigareas.restore( fp ); }
