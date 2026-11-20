@@ -56,6 +56,72 @@
 	}
 }
 
+/* Flush the current batch. Eye 1 (and memo off): one draw call. Eye 2 in
+ * lookup mode, or a batch holding retained level buffers: one draw per
+ * texgroup range in the batch, in walk order, with the same per-batch state.
+ * Splitting only the submit (never state, order or uniforms) keeps pixels
+ * identical while tolerating per-eye culling differences: a texgroup the
+ * left eye never converted is simply converted live instead. */
+[[gnu::always_inline]] static inline void draw_flush_batch( int & batch_vertCount, int batch_tg0, int group, bool orthographic,
+	int batch_startOffset, bool batch_colourkey, bool batch_hasTexture,
+	const int (&tg_memo_off)[MAX_TEXTURE_GROUPS], const int (&tg_memo_cnt)[MAX_TEXTURE_GROUPS],
+	gpu_vertex_t * const (&tg_persist_buf)[MAX_TEXTURE_GROUPS], const int (&tg_persist_cnt)[MAX_TEXTURE_GROUPS] )
+{
+	if (batch_vertCount > 0) {
+		int has_persist = 0;
+		{ int pi; for (pi = batch_tg0; pi < group; pi++) if (tg_persist_buf[pi]) { has_persist = 1; break; } }
+		if ((has_persist || (s_memoMode == SMEMO_LOOKUP)) && !orthographic) {
+			int si;
+			int consumed = 0;
+			long run_off = 0;
+			int run_cnt = 0;
+			int run_open = 0;
+			for (si = batch_tg0; si < group && consumed < batch_vertCount; si++) {
+				if (tg_persist_buf[si]) {
+					if (run_open) {
+						bind_vertex_buffer(s_scratch + run_off);
+						C3D_DrawArrays(GPU_TRIANGLES, 0, run_cnt);
+						run_open = 0;
+					}
+					bind_vertex_buffer(tg_persist_buf[si]);
+					C3D_DrawArrays(GPU_TRIANGLES, 0, tg_persist_cnt[si]);
+					consumed += tg_persist_cnt[si];
+					continue;
+				}
+				if (tg_memo_cnt[si] <= 0 || (run_open && tg_memo_off[si] != run_off + run_cnt)) {
+					if (run_open) {
+						bind_vertex_buffer(s_scratch + run_off);
+						C3D_DrawArrays(GPU_TRIANGLES, 0, run_cnt);
+						run_open = 0;
+					}
+					if (tg_memo_cnt[si] <= 0)
+						continue;
+				}
+				if (!run_open) {
+					run_off = tg_memo_off[si];
+					run_cnt = 0;
+					run_open = 1;
+				}
+				run_cnt += tg_memo_cnt[si];
+				consumed += tg_memo_cnt[si];
+			}
+			if (run_open) {
+				bind_vertex_buffer(s_scratch + run_off);
+				C3D_DrawArrays(GPU_TRIANGLES, 0, run_cnt);
+			}
+		} else {
+			bind_vertex_buffer(s_scratch + batch_startOffset);
+			C3D_DrawArrays(GPU_TRIANGLES, 0, batch_vertCount);
+		}
+		if (batch_colourkey)
+			C3D_AlphaTest(false, GPU_ALWAYS, 0);
+		if (batch_hasTexture && !_additive_blend_active)
+			C3D_AlphaBlend(GPU_BLEND_ADD, GPU_BLEND_ADD,
+				GPU_ONE, GPU_ZERO, GPU_ONE, GPU_ZERO);
+		batch_vertCount = 0;
+	}
+}
+
 /* After C3D_FrameSplit reset the scratch buffer: stop the stereo memo
  * (scratch reset recycles eye-1 recorded offsets; the pending batch was
  * already flushed with valid ranges, so the rest of the frame runs fully
@@ -176,68 +242,6 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 	int   tg_persist_cnt[MAX_TEXTURE_GROUPS] = {0};
 
 
-	/* Macro: flush the current batch. Eye 1 (and memo off): one draw call,
-	 * exactly as before. Eye 2 in lookup mode: one draw per texgroup range
-	 * in the batch, in walk order, with the same per-batch state. Splitting
-	 * only the submit (never state, order or uniforms) keeps pixels
-	 * identical while tolerating per-eye culling differences: a texgroup
-	 * the left eye never converted is simply converted live instead. */
-#define FLUSH_BATCH() do { \
-	if (batch_vertCount > 0) { \
-		int _has_persist = 0; \
-		{ int _pi; for (_pi = batch_tg0; _pi < group; _pi++) if (tg_persist_buf[_pi]) { _has_persist = 1; break; } } \
-		if ((_has_persist || (s_memoMode == SMEMO_LOOKUP)) && !orthographic) { \
-			int _si; \
-			int _consumed = 0; \
-			long _run_off = 0; \
-			int _run_cnt = 0; \
-			int _run_open = 0; \
-			for (_si = batch_tg0; _si < group && _consumed < batch_vertCount; _si++) { \
-				if (tg_persist_buf[_si]) { \
-					if (_run_open) { \
-						bind_vertex_buffer(s_scratch + _run_off); \
-						C3D_DrawArrays(GPU_TRIANGLES, 0, _run_cnt); \
-						_run_open = 0; \
-					} \
-					bind_vertex_buffer(tg_persist_buf[_si]); \
-					C3D_DrawArrays(GPU_TRIANGLES, 0, tg_persist_cnt[_si]); \
-					_consumed += tg_persist_cnt[_si]; \
-					continue; \
-				} \
-				if (tg_memo_cnt[_si] <= 0 || (_run_open && tg_memo_off[_si] != _run_off + _run_cnt)) { \
-					if (_run_open) { \
-						bind_vertex_buffer(s_scratch + _run_off); \
-						C3D_DrawArrays(GPU_TRIANGLES, 0, _run_cnt); \
-						_run_open = 0; \
-					} \
-					if (tg_memo_cnt[_si] <= 0) \
-						continue; \
-				} \
-				if (!_run_open) { \
-					_run_off = tg_memo_off[_si]; \
-					_run_cnt = 0; \
-					_run_open = 1; \
-				} \
-				_run_cnt += tg_memo_cnt[_si]; \
-				_consumed += tg_memo_cnt[_si]; \
-			} \
-			if (_run_open) { \
-				bind_vertex_buffer(s_scratch + _run_off); \
-				C3D_DrawArrays(GPU_TRIANGLES, 0, _run_cnt); \
-			} \
-		} else { \
-			bind_vertex_buffer(s_scratch + batch_startOffset); \
-			C3D_DrawArrays(GPU_TRIANGLES, 0, batch_vertCount); \
-		} \
-		if (batch_colourkey) \
-			C3D_AlphaTest(false, GPU_ALWAYS, 0); \
-		if (batch_hasTexture && !_additive_blend_active) \
-			C3D_AlphaBlend(GPU_BLEND_ADD, GPU_BLEND_ADD, \
-				GPU_ONE, GPU_ZERO, GPU_ONE, GPU_ZERO); \
-		batch_vertCount = 0; \
-	} \
-} while(0)
-
 	for (group = 0; group < numGroups; group++)
 	{
 		TEXTUREGROUP *tg = &renderObject->textureGroups[sorted_order[group]];
@@ -289,7 +293,7 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 		{
 			if (s_inFrame)
 			{
-				FLUSH_BATCH();
+				draw_flush_batch(batch_vertCount, batch_tg0, group, orthographic, batch_startOffset, batch_colourkey, batch_hasTexture, tg_memo_off, tg_memo_cnt, tg_persist_buf, tg_persist_cnt);
 				C3D_FrameSplit(0);
 				s_scratchUsed = 0;
 				draw_restore_after_frame_split(orthographic);
@@ -405,7 +409,7 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 			 tg->colourkey      != batch_colourkey ||
 			 eff_hasTexture     != batch_hasTexture))
 		{
-			FLUSH_BATCH();
+			draw_flush_batch(batch_vertCount, batch_tg0, group, orthographic, batch_startOffset, batch_colourkey, batch_hasTexture, tg_memo_off, tg_memo_cnt, tg_persist_buf, tg_persist_cnt);
 		}
 
 		/* Start a new batch if needed — set GPU state */
@@ -440,9 +444,7 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 	}
 
 	/* Flush the final pending batch */
-	FLUSH_BATCH();
-
-#undef FLUSH_BATCH
+	draw_flush_batch(batch_vertCount, batch_tg0, group, orthographic, batch_startOffset, batch_colourkey, batch_hasTexture, tg_memo_off, tg_memo_cnt, tg_persist_buf, tg_persist_cnt);
 
 	return true;
 }
