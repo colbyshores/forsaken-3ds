@@ -43,30 +43,74 @@ constexpr int TRG_VERSION_NUMBER = 1;
 /*===================================================================
 		Globals ...
 ===================================================================*/
-TRIGGERVAR * AvatarActivated = nullptr;
-TRIGGERVAR * Level_End = nullptr;
 TRIGGERVAR * DecreaseTemperature = nullptr;
 TRIGGERVAR * TimeLimitTrigger = nullptr;
 int	NumOfTrigMods = 0;
 TRIGGERMOD	*TrigMods = nullptr;
 int	NumOfTrigVars = 0;
-TRIGGERVAR	*TrigVars = nullptr;
 int	NumOfTriggers = 0;
-TRIGGER	*Triggers = nullptr;
-int	NumOfEvents = 0;
-EVENT	*Events = nullptr;
-int	NumOfConditions = 0;
-CONDITION *Conditions = nullptr;
 
-int init_shortcopy = 0;
-SHORTTRIGGER *ShortTriggerCopy[ MAX_PLAYERS ];
-SHORTTRIGVAR *ShortTrigVarCopy[ MAX_PLAYERS ];
+namespace {
 
-int	NumOfActiveConditions = 0;
-CONDITION ** ActiveConditions = nullptr;
+/* The level's trigger script state (one instance, g_triggers): the trigger
+ * var, trigger, event and condition tables read from the .trg file, the
+ * conditions that came true this frame, the delayed trigger mod queue, the
+ * per-player copies sent to joining players, and the LEVEL_END and
+ * AvatarActivated vars. Built by Triggerload and freed by ReleaseTriggers;
+ * the queue and active list are filled as trigger mods apply and drained
+ * each frame by ProcessActiveConditions; saved with the game. TrigMods[],
+ * the counts other files read, DecreaseTemperature and TimeLimitTrigger
+ * stay global. */
+class TriggerState {
+	public:
+	bool  load( char * Filename );
+	void  release();
+	void  apply_mod( TRIGGERMOD * TrigMod );
+	/* Out of line, as AddCondition was: TestAllConditions reaches it only
+	 * when a trigger's conditions all hold. */
+	[[gnu::noinline]] void add_condition( CONDITION * Con );
+	void  process_active_conditions();
+	void  gen_trigger_list( u_int16_t Ship, SHORTTRIGGER * TriggerSlots, BYTE * NumTriggerSlots, BYTE Section );
+	void  regen_trigger_list( SHORTTRIGGER * Slots, BYTE Num );
+	void  copy_triggers( u_int16_t Player );
+	void  gen_trigvar_list( u_int16_t Ship, SHORTTRIGVAR * TrigVarSlots, BYTE * NumTrigVarSlots, BYTE Section );
+	void  regen_trigvar_list( SHORTTRIGVAR * Slots, BYTE Num );
+	void  copy_trigvars( u_int16_t Player );
+	void  how_many_secrets( int * NumOfSecrets , int * SecretsFound );
+	bool  has_level_ended();
+	bool  is_avatar_active();
+	FILE *save( FILE * fp );
+	FILE *restore( FILE * fp );
 
-int NumOfTrigModQues = 0;
-TRIGGERMODQUE *TrigModQue = nullptr;
+	private:
+	/* Out of line, as AddTriggerModQue and ProcessTriggerModQue were:
+	 * inlined, they would double the per-frame apply_mod and
+	 * process_active_conditions. */
+	[[gnu::noinline]] void add_mod_que( TRIGGERMOD * TrigMod );
+	[[gnu::noinline]] void process_mod_que();
+	[[gnu::always_inline]] inline void load_release_previous( int & i );
+	[[gnu::always_inline]] inline bool load_allocate( int & i );
+	[[gnu::always_inline]] inline bool load_records( int & i, int & j, int & k, TRIGGERVAR *& v, TRIGGER *& t, TRIGGERMOD *& m, EVENT *& e, CONDITION *& c, FileReader & in );
+	[[gnu::always_inline]] inline void load_find_special_trigvars( int & i, TRIGGERVAR *& TVpnt );
+
+	CONDITION **   ActiveConditions = nullptr;
+	int            NumOfActiveConditions = 0;
+	TRIGGERMODQUE *TrigModQue = nullptr;
+	int            NumOfTrigModQues = 0;
+	TRIGGERVAR *   Level_End = nullptr;
+	TRIGGERVAR *   AvatarActivated = nullptr;
+	TRIGGERVAR *   TrigVars = nullptr;
+	TRIGGER *      Triggers = nullptr;
+	EVENT *        Events = nullptr;
+	CONDITION *    Conditions = nullptr;
+	int            NumOfEvents = 0;
+	int            NumOfConditions = 0;
+	int            init_shortcopy = 0;
+	SHORTTRIGGER * ShortTriggerCopy[ MAX_PLAYERS ] = {};
+	SHORTTRIGVAR * ShortTrigVarCopy[ MAX_PLAYERS ] = {};
+};
+
+} // namespace
 
 
 /*===================================================================
@@ -74,7 +118,7 @@ TRIGGERMODQUE *TrigModQue = nullptr;
 	Input		:		TRIGGERMOD	* TrigMod
 	Output		:		nothing
 ===================================================================*/
-void AddTriggerModQue( TRIGGERMOD * TrigMod )
+void TriggerState::add_mod_que( TRIGGERMOD * TrigMod )
 {
 	int i;
 
@@ -96,7 +140,7 @@ void AddTriggerModQue( TRIGGERMOD * TrigMod )
 	Input		:		TRIGGERMOD	* TrigMod
 	Output		:		nothing
 ===================================================================*/
-void ProcessTriggerModQue( void )
+void TriggerState::process_mod_que()
 {
 	int i;
 	TRIGGERMOD * TrigMod;
@@ -123,7 +167,7 @@ void ProcessTriggerModQue( void )
 	Input		:		TRIGGERMOD	* TrigMod
 	Output		:		nothing
 ===================================================================*/
-void ApplyTriggerMod( TRIGGERMOD * TrigMod )
+void TriggerState::apply_mod( TRIGGERMOD * TrigMod )
 {
 	// hacky way to stop pausing while inside a trigger zone messing up....
 	if( framelag == 0.0F )
@@ -132,7 +176,7 @@ void ApplyTriggerMod( TRIGGERMOD * TrigMod )
 	{
 		if( TrigMod->Time != 0.0F )
 		{
-			AddTriggerModQue( TrigMod );
+			add_mod_que( TrigMod );
 		}else{
 			ModifyTriggerVar( TrigMod->TrigVar, TrigMod->Op, TrigMod->Val );
 		}
@@ -307,7 +351,7 @@ void TestAllConditions( TRIGGER * Trig )
 	Input		:		CONDITION * Con..
 	Output		:		nothing
 ===================================================================*/
-void AddCondition( CONDITION * Con )
+void TriggerState::add_condition( CONDITION * Con )
 {
 	int i;
 
@@ -334,7 +378,7 @@ void AddCondition( CONDITION * Con )
 	Input		:		nothing
 	Output		:		nothing
 ===================================================================*/
-void ProcessActiveConditions( void )
+void TriggerState::process_active_conditions()
 {
 	int i,f;
 	CONDITION * Con;
@@ -352,7 +396,7 @@ void ProcessActiveConditions( void )
 	}
 	NumOfActiveConditions = 0;
 
-	ProcessTriggerModQue();
+	process_mod_que();
 }
 
 /*===================================================================
@@ -723,7 +767,7 @@ void EVENT_EnemySetNextTargetNode( u_int8_t * Data )
 	Output		:		bool	true/false
 ===================================================================*/
 /* free the previous level's trigger data and reset the per-player trigger state */
-[[gnu::always_inline]] static inline void TriggerloadReleasePrevious( int & i )
+inline void TriggerState::load_release_previous( int & i )
 {
 	if ( TrigVars )
 	{
@@ -791,7 +835,7 @@ void EVENT_EnemySetNextTargetNode( u_int8_t * Data )
 }
 
 /* allocate this level's trigger arrays. True: Triggerload fails. */
-[[gnu::always_inline]] static inline bool TriggerloadAllocate( int & i )
+inline bool TriggerState::load_allocate( int & i )
 {
 	if ( NumOfTrigVars )
 	{
@@ -882,7 +926,7 @@ void EVENT_EnemySetNextTargetNode( u_int8_t * Data )
 }
 
 /* read the trigger variables, triggers, trigger mods, events and conditions. True: Triggerload fails. */
-[[gnu::always_inline]] static inline bool TriggerloadRecords( int & i, int & j, int & k, TRIGGERVAR *& v, TRIGGER *& t, TRIGGERMOD *& m, EVENT *& e, CONDITION *& c, FileReader & in )
+inline bool TriggerState::load_records( int & i, int & j, int & k, TRIGGERVAR *& v, TRIGGER *& t, TRIGGERMOD *& m, EVENT *& e, CONDITION *& c, FileReader & in )
 {
 	for ( i = 0; i < NumOfTrigVars; i++ )
 	{
@@ -1023,7 +1067,7 @@ void EVENT_EnemySetNextTargetNode( u_int8_t * Data )
 }
 
 /* find the trigger variables the engine drives itself (level end, boss activation, temperature) */
-[[gnu::always_inline]] static inline void TriggerloadFindSpecialTrigVars( int & i, TRIGGERVAR *& TVpnt )
+inline void TriggerState::load_find_special_trigvars( int & i, TRIGGERVAR *& TVpnt )
 {
 	TVpnt =	TrigVars;
 	if( TVpnt )
@@ -1106,7 +1150,7 @@ void EVENT_EnemySetNextTargetNode( u_int8_t * Data )
 	}
 }
 
-bool Triggerload( char * Filename )
+bool TriggerState::load( char * Filename )
 {
 	long			File_Size;
 	long			Read_Size;
@@ -1161,7 +1205,7 @@ bool Triggerload( char * Filename )
 		return( false );
 	}
 
-	TriggerloadReleasePrevious( i );
+	load_release_previous( i );
 
 	NumOfTrigVars = in.i32();
 	NumOfTriggers = in.i32();
@@ -1172,14 +1216,14 @@ bool Triggerload( char * Filename )
 	NumOfActiveConditions = 0;
 
 
-	if( TriggerloadAllocate( i ) )
+	if( load_allocate( i ) )
 		return false;
 
 
-	if( TriggerloadRecords( i, j, k, v, t, m, e, c, in ) )
+	if( load_records( i, j, k, v, t, m, e, c, in ) )
 		return false;
 
-	TriggerloadFindSpecialTrigVars( i, TVpnt );
+	load_find_special_trigvars( i, TVpnt );
 
 	for( i = 0 ; i < NumOfTrigModQues ; i++ )
 	{
@@ -1196,7 +1240,7 @@ bool Triggerload( char * Filename )
 	Input		:		none
 	Output		:		none
 ===================================================================*/
-void ReleaseTriggers( void )
+void TriggerState::release()
 {
 	int i;
 
@@ -1280,7 +1324,7 @@ void ReleaseTriggers( void )
 				:	BYTE			Section group of Triggers
 	Output		:	Nothing
 ===================================================================*/
-void GenTriggerList( u_int16_t Ship, SHORTTRIGGER * TriggerSlots, BYTE * NumTriggerSlots, BYTE Section )
+void TriggerState::gen_trigger_list( u_int16_t Ship, SHORTTRIGGER * TriggerSlots, BYTE * NumTriggerSlots, BYTE Section )
 {
 	int16_t	Count;
 	int16_t	i;
@@ -1308,7 +1352,7 @@ void GenTriggerList( u_int16_t Ship, SHORTTRIGGER * TriggerSlots, BYTE * NumTrig
 				:	BYTE			Number of Trigger Slots
 	Output		:	Nothing
 ===================================================================*/
-void RegenTriggerList( SHORTTRIGGER * Slots, BYTE Num )
+void TriggerState::regen_trigger_list( SHORTTRIGGER * Slots, BYTE Num )
 {
 	int16_t		Count;
 	TRIGGER	*	Ptr;
@@ -1328,7 +1372,7 @@ void RegenTriggerList( SHORTTRIGGER * Slots, BYTE Num )
 	Input		:	u_int16_t		Player
 	Output		:	Nothing
 ===================================================================*/
-void CopyTriggers( u_int16_t Player )
+void TriggerState::copy_triggers( u_int16_t Player )
 {
 	int16_t	Count;
 
@@ -1346,7 +1390,7 @@ void CopyTriggers( u_int16_t Player )
 				:	BYTE			Section group of TrigVars
 	Output		:	Nothing
 ===================================================================*/
-void GenTrigVarList( u_int16_t Ship, SHORTTRIGVAR * TrigVarSlots, BYTE * NumTrigVarSlots, BYTE Section )
+void TriggerState::gen_trigvar_list( u_int16_t Ship, SHORTTRIGVAR * TrigVarSlots, BYTE * NumTrigVarSlots, BYTE Section )
 {
 	int16_t	Count;
 	int16_t	i;
@@ -1374,7 +1418,7 @@ void GenTrigVarList( u_int16_t Ship, SHORTTRIGVAR * TrigVarSlots, BYTE * NumTrig
 				:	BYTE			Number of TrigVar Slots
 	Output		:	Nothing
 ===================================================================*/
-void RegenTrigVarList( SHORTTRIGVAR * Slots, BYTE Num )
+void TriggerState::regen_trigvar_list( SHORTTRIGVAR * Slots, BYTE Num )
 {
 	int16_t		Count;
 	TRIGGERVAR	*	Ptr;
@@ -1394,7 +1438,7 @@ void RegenTrigVarList( SHORTTRIGVAR * Slots, BYTE Num )
 	Input		:	u_int16_t		Player
 	Output		:	Nothing
 ===================================================================*/
-void CopyTrigVars( u_int16_t Player )
+void TriggerState::copy_trigvars( u_int16_t Player )
 {
 	int16_t	Count;
 
@@ -1409,7 +1453,7 @@ void CopyTrigVars( u_int16_t Player )
 	Input		:	int * NumOfSecrets , int * SecretsFound
 	Output		:	Nothing
 ===================================================================*/
-void HowManySecrets( int * NumOfSecrets , int * SecretsFound )
+void TriggerState::how_many_secrets( int * NumOfSecrets , int * SecretsFound )
 {
 	int i;
 	TRIGGERVAR	* TVpnt;
@@ -1438,7 +1482,7 @@ void HowManySecrets( int * NumOfSecrets , int * SecretsFound )
 	Input		:	Nothing
 	Output		:	bool yes/no
 ===================================================================*/
-bool HasLevelEnded( void )
+bool TriggerState::has_level_ended()
 {
 	TRIGGERVAR	* TVpnt;
 
@@ -1510,7 +1554,7 @@ void CheckTimeLimit( void )
 	Input		:	Nothing
 	Output		:	bool yes/no
 ===================================================================*/
-bool IsAvatarActive( void )
+bool TriggerState::is_avatar_active()
 {
 	TRIGGERVAR	* TVpnt;
 
@@ -1533,7 +1577,7 @@ bool IsAvatarActive( void )
 	Input		:	FILE	*	File Pointer
 	Output		:	FILE	*	Updated File Pointer
 ===================================================================*/
-FILE * SaveAllTriggers( FILE * fp )
+FILE * TriggerState::save( FILE * fp )
 {
 	int				i;
 	TRIGGERVAR	*	TrigVar;
@@ -1585,7 +1629,7 @@ FILE * SaveAllTriggers( FILE * fp )
 	Input		:	FILE	*	File Pointer
 	Output		:	FILE	*	Updated File Pointer
 ===================================================================*/
-FILE * LoadAllTriggers( FILE * fp )
+FILE * TriggerState::restore( FILE * fp )
 {
 	int				i;
 	TRIGGERVAR	*	TrigVar;
@@ -1660,3 +1704,22 @@ FILE * LoadAllTriggers( FILE * fp )
 
 	return( fp );
 }
+
+namespace { TriggerState g_triggers; }
+
+bool Triggerload( char * Filename ) { return g_triggers.load( Filename ); }
+void ReleaseTriggers( void ) { g_triggers.release(); }
+void ApplyTriggerMod( TRIGGERMOD * TrigMod ) { g_triggers.apply_mod( TrigMod ); }
+void AddCondition( CONDITION * Con ) { g_triggers.add_condition( Con ); }
+void ProcessActiveConditions( void ) { g_triggers.process_active_conditions(); }
+void GenTriggerList( u_int16_t Ship, SHORTTRIGGER * TriggerSlots, BYTE * NumTriggerSlots, BYTE Section ) { g_triggers.gen_trigger_list( Ship, TriggerSlots, NumTriggerSlots, Section ); }
+void RegenTriggerList( SHORTTRIGGER * Slots, BYTE Num ) { g_triggers.regen_trigger_list( Slots, Num ); }
+void CopyTriggers( u_int16_t Player ) { g_triggers.copy_triggers( Player ); }
+void GenTrigVarList( u_int16_t Ship, SHORTTRIGVAR * TrigVarSlots, BYTE * NumTrigVarSlots, BYTE Section ) { g_triggers.gen_trigvar_list( Ship, TrigVarSlots, NumTrigVarSlots, Section ); }
+void RegenTrigVarList( SHORTTRIGVAR * Slots, BYTE Num ) { g_triggers.regen_trigvar_list( Slots, Num ); }
+void CopyTrigVars( u_int16_t Player ) { g_triggers.copy_trigvars( Player ); }
+void HowManySecrets( int * NumOfSecrets , int * SecretsFound ) { g_triggers.how_many_secrets( NumOfSecrets, SecretsFound ); }
+bool HasLevelEnded( void ) { return g_triggers.has_level_ended(); }
+bool IsAvatarActive( void ) { return g_triggers.is_avatar_active(); }
+FILE * SaveAllTriggers( FILE * fp ) { return g_triggers.save( fp ); }
+FILE * LoadAllTriggers( FILE * fp ) { return g_triggers.restore( fp ); }
