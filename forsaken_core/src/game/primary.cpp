@@ -2503,48 +2503,362 @@ static float PyroCount = 0.0F;
 	return false;
 }
 
+/* per-weapon effects each frame: position and fade the laser/lightning beams, drop Transpulse trail segments, grow Pyrolite flames */
+[[gnu::always_inline]] static inline void PrimBullWeaponFX( u_int16_t & i, VECTOR & TempVector, float & NewFramelag )
+{
+	u_int16_t			fmpoly;
+	GUNOBJECT	*	GunPtr;
+	FIREPOS		*	FirePosPnt;
+	PVSPOTFX	*	SpotFXPtr;
+
+	switch( PrimBulls[i].Weapon )
+	{
+	case LASER:
+	case NME_LASER:
+	case NME_LIGHTNING:
+	case NME_POWERLASER:
+		switch( PrimBulls[i].OwnerType )
+		{
+		case OWNER_SHIP:
+			ApplyMatrix( &Ships[ PrimBulls[i].Owner ].Object.FinalMat, &PrimBulls[i].Offset, &TempVector );
+			PrimBulls[i].GroupImIn = MoveGroup( &Mloadheader, &Ships[ PrimBulls[i].Owner ].Object.Pos, Ships[ PrimBulls[i].Owner ].Object.Group, &TempVector );
+			ApplyMatrix( &Ships[ PrimBulls[i].Owner ].Object.FinalMat, &PrimBulls[i].Offset, &TempVector );
+			ApplyMatrix( &Ships[ PrimBulls[i].Owner ].Object.FinalMat, &PrimBulls[i].LocalDir, &PrimBulls[i].Dir );
+			PrimBulls[i].Pos.x = ( Ships[ PrimBulls[i].Owner ].Object.Pos.x + TempVector.x );
+			PrimBulls[i].Pos.y = ( Ships[ PrimBulls[i].Owner ].Object.Pos.y + TempVector.y );
+			PrimBulls[i].Pos.z = ( Ships[ PrimBulls[i].Owner ].Object.Pos.z + TempVector.z );
+			PrimBulls[i].ColFlag = 0;
+			break;
+
+		case OWNER_ENEMY:
+			if( !Enemies[ PrimBulls[i].Owner ].Object.FirstGun )
+			{
+				ApplyMatrix( &Enemies[ PrimBulls[i].Owner ].Object.FinalMat, &PrimBulls[i].Offset, &TempVector );
+				PrimBulls[i].GroupImIn = MoveGroup( &Mloadheader, &Enemies[ PrimBulls[i].Owner ].Object.Pos, Enemies[ PrimBulls[i].Owner ].Object.Group, &TempVector );
+				ApplyMatrix( &Enemies[ PrimBulls[i].Owner ].Object.FinalMat, &PrimBulls[i].Offset, &TempVector );
+				ApplyMatrix( &Enemies[ PrimBulls[i].Owner ].Object.FinalMat, &PrimBulls[i].LocalDir, &PrimBulls[i].Dir );
+				PrimBulls[i].Pos.x = ( Enemies[ PrimBulls[i].Owner ].Object.Pos.x + TempVector.x );
+				PrimBulls[i].Pos.y = ( Enemies[ PrimBulls[i].Owner ].Object.Pos.y + TempVector.y );
+				PrimBulls[i].Pos.z = ( Enemies[ PrimBulls[i].Owner ].Object.Pos.z + TempVector.z );
+				PrimBulls[i].ColFlag = 0;
+			}
+			else
+			{
+				GunPtr = (GUNOBJECT*)PrimBulls[i].EnemyGun;
+				if( GunPtr )
+				{
+					FirePosPnt = EnemyTypes[ Enemies[ PrimBulls[i].Owner ].Type ].GunFirePoints[ GunPtr->GunNum>>1 ];
+					FirePosPnt += PrimBulls[i].FirePoint;
+					ApplyMatrix( &GunPtr->Mat , &FirePosPnt->Points[0] , &TempVector );
+					TempVector.x += GunPtr->FirePos.x;
+					TempVector.y += GunPtr->FirePos.y;
+					TempVector.z += GunPtr->FirePos.z;
+					PrimBulls[i].Pos = TempVector;
+					TempVector.x -= Enemies[ PrimBulls[i].Owner ].Object.Pos.x;
+					TempVector.y -= Enemies[ PrimBulls[i].Owner ].Object.Pos.y;
+					TempVector.z -= Enemies[ PrimBulls[i].Owner ].Object.Pos.z;
+					PrimBulls[i].GroupImIn = MoveGroup( &Mloadheader, &Enemies[ PrimBulls[i].Owner ].Object.Pos, Enemies[ PrimBulls[i].Owner ].Object.Group, &TempVector );
+					ApplyMatrix( &GunPtr->Mat, &PrimBulls[i].LocalDir, &PrimBulls[i].Dir );
+					PrimBulls[i].ColFlag = 0;
+				}
+			}
+			break;
+
+		case OWNER_NOBODY:
+			PrimBulls[i].ColFlag = 0;
+			break;
+
+		case OWNER_MODELSPOTFX:
+			/* Mirror the defensive pattern used by the other
+			 * OWNER_MODELSPOTFX sites in this file (lines
+			 * 5844 / 6026 / 6205 / 6361): fetch the SpotFX
+			 * array base separately and NULL-check before
+			 * the +SpotFX index offset.  Without the check
+			 * a bullet that outlives its owner model (or
+			 * whose owner slot got reused for a model with
+			 * no spotfx data) dereferences NULL+offset and
+			 * crashes deep in ApplyMatrix.  Symptom seen on
+			 * reactor core: FAR=0x58, PC in ApplyMatrix,
+			 * LR in ProcessPrimaryBullets. */
+			if( ModelNames[ Models[ PrimBulls[i].Owner ].ModelNum ].DoIMorph )
+			{
+				SpotFXPtr = MxaModelHeaders[ Models[ PrimBulls[i].Owner ].ModelNum ].SpotFX;
+			}
+			else
+			{
+				SpotFXPtr = ModelHeaders[ Models[ PrimBulls[i].Owner ].ModelNum ].SpotFX;
+			}
+
+			if( SpotFXPtr )
+			{
+				SpotFXPtr += PrimBulls[i].SpotFX;
+
+				ApplyMatrix( &Models[ PrimBulls[i].Owner ].Mat, &SpotFXPtr->Pos, &TempVector );
+				PrimBulls[i].Pos.x = ( Models[ PrimBulls[i].Owner ].Pos.x + TempVector.x );
+				PrimBulls[i].Pos.y = ( Models[ PrimBulls[i].Owner ].Pos.y + TempVector.y );
+				PrimBulls[i].Pos.z = ( Models[ PrimBulls[i].Owner ].Pos.z + TempVector.z );
+				PrimBulls[i].GroupImIn = MoveGroup( &Mloadheader, &Models[ PrimBulls[i].Owner ].Pos, Models[ PrimBulls[i].Owner ].Group, &TempVector );
+				ApplyMatrix( &Models[ PrimBulls[i].Owner ].Mat, &SpotFXPtr->DirVector, &PrimBulls[i].Dir );
+				PrimBulls[i].ColFlag = 0;
+			}
+			else
+			{
+				/* Owner model has no (or no longer has)
+				 * a SpotFX array — kill this orphaned
+				 * bullet rather than crash. */
+				PrimBulls[i].LifeCount = 0.0F;
+			}
+			break;
+
+		default:
+			break;
+
+		}
+		break;
+
+	case TRANSPULSE_CANNON:
+	case NME_TRANSPULSE:
+		if( IsGroupVisible[ PrimBulls[i].GroupImIn ] )
+		{
+			PrimBulls[i].TimeCount += NewFramelag; //framelag;
+
+			if( PrimBulls[i].TimeCount >= PrimBulls[i].TimeInterval )
+			{
+				PrimBulls[i].TimeCount = 0.0F;
+				CreateTransTrail( i );
+			}
+		}
+		else
+		{
+			PrimBulls[i].TimeCount = 0.0F;
+		}
+		break;
+
+	case PYROLITE_RIFLE:
+	case NME_PYROLITE:
+		fmpoly = PrimBulls[i].fmpoly;
+		if( fmpoly != INDEX_NONE )
+		{
+			FmPolys[ fmpoly ].xsize += ( NewFramelag * ( 0.075F * GLOBAL_SCALE ) ); //framelag
+			FmPolys[ fmpoly ].ysize += ( NewFramelag * ( 0.075F * GLOBAL_SCALE ) );	//framelag
+		}
+		break;
+
+	case FLAMES:
+	case PULSAR:
+	case TROJAX:
+	case SUSS_GUN:
+	case ORBITPULSAR:
+	case NME_PULSAR_BLUE:
+	case NME_BULLET1:
+	case NME_PULSAR:
+	case NME_TROJAX:
+	case NME_SUSS_GUN:
+	default:
+		break;
+	}
+}
+
+/* find the nearest thing this frame's move hits: wall or BG object, ship, secondary weapon or enemy (DistToInt is the nearest) */
+[[gnu::always_inline]] static inline void PrimBullFindHits( u_int16_t & i, VECTOR & TempVector, float & Damage, VECTOR & DirVector, VECTOR & Int_Point, u_int16_t & HitTarget, u_int16_t & HitWall, float & DistFromStart, float & Length, u_int16_t & HitSecondary, VECTOR & MInt_Point, float & DistToInt, VECTOR & MoveOffsetVector, ENEMY *& HitEnemy, VECTOR & EInt_Point )
+{
+	VECTOR			Int_Point2;
+	VECTOR			MInt_Point2;
+	BGOBJECT	*	BGObject;
+	VERT			BGPoint;
+	NORMAL			BGNormal;
+	float			BGDamage;
+	VECTOR			EInt_Point2;
+	NORMAL			ENormal;
+	u_int16_t			TempEnemyIndex;
+
+	HitWall = INDEX_NONE;
+	DistToInt = 100000.0F;									/* Distance to Intersection */
+
+	/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
+	if( PrimBulls[i].ColDist < DistFromStart )
+	{
+		HitWall = 0;
+		DistToInt = (float) fabsf( DistanceVert2Vector( (VERT*) &PrimBulls[i].ColPoint, &PrimBulls[i].Pos ) );
+
+		if( OneGroupBGObjectCol( DistToInt, 1, PrimBulls[i].GroupImIn, &PrimBulls[i].Pos, &MoveOffsetVector,
+								 (VECTOR *) &BGPoint, &BGNormal, &TempVector, &BGObject, 0.0F ) )
+		{
+			DistToInt = (float) fabsf( DistanceVert2Vector( &BGPoint, &PrimBulls[i].Pos ) );
+			PrimBulls[i].ColPoint = BGPoint;
+			PrimBulls[i].ColPointNormal = BGNormal;
+			if( BGObject ) PrimBulls[i].ColGroup = BGObject->Group;
+			BGDamage = PrimaryWeaponAttribs[ PrimBulls[i].Weapon ].Damage[ PrimBulls[i].PowerLevel ];
+			if( ( PrimBulls[ i ].Weapon == LASER ) ||
+				( PrimBulls[ i ].Weapon == NME_LASER ) ||
+				( PrimBulls[ i ].Weapon == NME_POWERLASER ) )
+			{
+				BGDamage *= ( framelag / 3.0F );
+			}
+			if( BGObject ) ChangeBGState( BGObject, PrimBulls[i].OwnerType, PrimBulls[i].Owner, SHOT, BGDamage );
+		}
+	}
+	else
+	{
+		if( OneGroupBGObjectCol( 0.0F, 0, PrimBulls[i].GroupImIn, &PrimBulls[i].Pos, &MoveOffsetVector,
+								 (VECTOR *) &BGPoint, &BGNormal, &TempVector, &BGObject, 0.0F ) )
+		{
+			DistToInt = (float) fabsf( DistanceVert2Vector( &BGPoint, &PrimBulls[i].Pos ) );
+			PrimBulls[i].ColPoint = BGPoint;
+			PrimBulls[i].ColPointNormal = BGNormal;
+			if( BGObject ) PrimBulls[i].ColGroup = BGObject->Group;
+			HitWall = 0;
+			BGDamage = PrimaryWeaponAttribs[ PrimBulls[i].Weapon ].Damage[ PrimBulls[i].PowerLevel ];
+			if( ( PrimBulls[ i ].Weapon == LASER ) ||
+				( PrimBulls[ i ].Weapon == NME_LASER ) ||
+				( PrimBulls[ i ].Weapon == NME_POWERLASER ) )
+			{
+				BGDamage *= ( framelag / 3.0F );
+			}
+			if( BGObject ) ChangeBGState( BGObject, PrimBulls[i].OwnerType, PrimBulls[i].Owner, SHOT, BGDamage );
+		}
+	}
+
+	Damage = (int16_t) PrimaryWeaponAttribs[ PrimBulls[i].Weapon ].Damage[ PrimBulls[i].PowerLevel ];
+
+	if ( WaterObjectCollide( PrimBulls[i].GroupImIn,&PrimBulls[i].Pos, &MoveOffsetVector, &Int_Point , Damage) )
+	{
+		CreateSplash( (VECTOR *) &Int_Point, &PrimBulls[i].Dir, PrimBulls[i].GroupImIn );
+	}
+
+	HitTarget = CheckHitShip( PrimBulls[i].OwnerType, PrimBulls[i].Owner, &PrimBulls[i].Pos, PrimBulls[i].GroupImIn, &DirVector, &PrimBulls[i].UpVector, Length, &Int_Point, &Int_Point2, &DistToInt, PrimBulls[i].ColRadius, PrimBulls[i].ColType );
+	if( HitTarget != INDEX_NONE ) HitWall = INDEX_NONE;
+
+	HitSecondary = CheckHitSecondary( &PrimBulls[i].Pos, PrimBulls[i].GroupImIn, &DirVector, &PrimBulls[i].UpVector, Length, &MInt_Point, &MInt_Point2, &DistToInt, PrimBulls[i].ColRadius, PrimBulls[i].ColType );
+	if( HitSecondary != INDEX_NONE )
+	{
+		HitWall = INDEX_NONE;
+		HitTarget = INDEX_NONE;
+	}
+
+	HitEnemy = CheckHitEnemy( PrimBulls[i].OwnerType, PrimBulls[i].Owner, &PrimBulls[i].Pos, PrimBulls[i].GroupImIn, &DirVector, &PrimBulls[i].UpVector, Length, &EInt_Point, &EInt_Point2, &DistToInt, PrimBulls[i].ColRadius, PrimBulls[i].ColType );
+	if( HitEnemy != nullptr )
+	{
+		HitWall = INDEX_NONE;
+		HitTarget = INDEX_NONE;
+		HitSecondary = INDEX_NONE;
+	}
+	else
+	{
+		TempEnemyIndex = GetComEnemyHitInfo( &EInt_Point, &ENormal, &DistToInt );
+
+		if( TempEnemyIndex != INDEX_NONE )
+		{
+			HitEnemy = &Enemies[ TempEnemyIndex ];
+			EInt_Point2 = EInt_Point;
+			HitWall = INDEX_NONE;
+			HitTarget = INDEX_NONE;
+			HitSecondary = INDEX_NONE;
+		}
+	}
+}
+
+/* carry the bullet's light, trail line, FmPolys and polys along to its new position */
+[[gnu::always_inline]] static inline void PrimBullMoveAttachments( u_int16_t & i, VECTOR & MoveOffsetVector )
+{
+	u_int16_t			fmpoly;
+	u_int16_t			Count;
+	u_int16_t			nextfmpoly;
+	u_int16_t			poly;
+	u_int16_t			nextpoly;
+
+	if ( PrimBulls[i].light != INDEX_NONE )
+	{
+		XLights[PrimBulls[i].light].Group = PrimBulls[i].GroupImIn;
+		XLights[PrimBulls[i].light].Pos = PrimBulls[i].Pos;
+	}
+
+	if( PrimBulls[i].line != INDEX_NONE )
+	{
+		Lines[ PrimBulls[i].line ].EndPos = Lines[ PrimBulls[i].line ].StartPos;
+		Lines[ PrimBulls[i].line ].StartPos = PrimBulls[i].Pos;
+		Lines[ PrimBulls[i].line ].Group = PrimBulls[i].GroupImIn;
+	}
+
+	if ( PrimBulls[i].fmpoly != INDEX_NONE )
+	{
+		fmpoly = PrimBulls[i].fmpoly;
+
+		for( Count = 0; Count < PrimBulls[i].numfmpolys; Count++ )
+		{
+			nextfmpoly = FmPolys[ fmpoly ].Prev;
+
+			if ( fmpoly != INDEX_NONE )
+			{
+				FmPolys[ fmpoly ].Pos.x += MoveOffsetVector.x; //(PrimBulls[i].Dir.x * Speed);
+				FmPolys[ fmpoly ].Pos.y += MoveOffsetVector.y; //(PrimBulls[i].Dir.y * Speed);
+				FmPolys[ fmpoly ].Pos.z += MoveOffsetVector.z; //(PrimBulls[i].Dir.z * Speed);
+				FmPolys[ fmpoly ].Group = PrimBulls[i].GroupImIn;
+			}
+
+			fmpoly = nextfmpoly;
+		}
+	}
+
+	if( ( PrimBulls[i].poly != INDEX_NONE ) &&
+		( PrimBulls[i].Weapon != LASER ) &&
+		( PrimBulls[i].Weapon != NME_LASER ) &&
+		( PrimBulls[i].Weapon != NME_POWERLASER ) &&
+		( PrimBulls[i].Weapon != NME_LIGHTNING ) )
+	{
+		poly = PrimBulls[i].poly;
+
+		for( Count = 0; Count < PrimBulls[i].numpolys; Count++ )
+		{
+			nextpoly = Polys[ poly ].Prev;
+
+			if( poly != INDEX_NONE )
+			{
+				Polys[ poly ].Pos1.x += MoveOffsetVector.x;
+				Polys[ poly ].Pos1.y += MoveOffsetVector.y;
+				Polys[ poly ].Pos1.z += MoveOffsetVector.z;
+				Polys[ poly ].Pos2.x += MoveOffsetVector.x;
+				Polys[ poly ].Pos2.y += MoveOffsetVector.y;
+				Polys[ poly ].Pos2.z += MoveOffsetVector.z;
+				Polys[ poly ].Pos3.x += MoveOffsetVector.x;
+				Polys[ poly ].Pos3.y += MoveOffsetVector.y;
+				Polys[ poly ].Pos3.z += MoveOffsetVector.z;
+				Polys[ poly ].Pos4.x += MoveOffsetVector.x;
+				Polys[ poly ].Pos4.y += MoveOffsetVector.y;
+				Polys[ poly ].Pos4.z += MoveOffsetVector.z;
+				Polys[ poly ].Group = PrimBulls[i].GroupImIn;
+			}
+
+			poly = nextpoly;
+		}
+	}
+}
+
 void ProcessPrimaryBullets( void )
 {
 	u_int16_t			i;
-	u_int16_t			Count;
 	u_int16_t			nextprim;
 	VECTOR			TempVector;
 	float			Speed;
 	VECTOR			temp;
 	VECTOR			NewDir;
-	u_int16_t			fmpoly;
-	u_int16_t			nextfmpoly;
-	u_int16_t			poly;
-	u_int16_t			nextpoly;
 	float			Damage;
 	VECTOR			DirVector;
 	VECTOR			NewPos;
 	VECTOR			Int_Point;
-	VECTOR			Int_Point2;
 	u_int16_t			HitTarget;
 	u_int16_t			HitWall;
 	float			DistFromStart;
 	float			Length;
 	u_int16_t			HitSecondary;
 	VECTOR			MInt_Point;
-	VECTOR			MInt_Point2;
 	float			DistToInt;
 	VECTOR			Recoil;
 	VECTOR			MoveOffsetVector;
 	float			DistToCenter;
-	BGOBJECT	*	BGObject;
-	VERT			BGPoint;
-	NORMAL			BGNormal;
-	float			BGDamage;
 	ENEMY		*	HitEnemy;
 	VECTOR			EInt_Point;
-	VECTOR			EInt_Point2;
-	NORMAL			ENormal;
-	u_int16_t			TempEnemyIndex;
-	GUNOBJECT	*	GunPtr;		// the first gun...
-	FIREPOS		*	FirePosPnt;
 	bool			Killed;
-	PVSPOTFX	*	SpotFXPtr;
 	VECTOR			TrigPos;
 	float			NewFramelag = 0.0F;
 
@@ -2569,152 +2883,7 @@ void ProcessPrimaryBullets( void )
 			PrimBulls[i].LifeCount -= NewFramelag; //framelag;
 			if( PrimBulls[i].LifeCount < 0.0F ) PrimBulls[i].LifeCount = 0.0F;
 
-			switch( PrimBulls[i].Weapon )
-			{
-			case LASER:
-			case NME_LASER:
-			case NME_LIGHTNING:
-			case NME_POWERLASER:
-				switch( PrimBulls[i].OwnerType )
-				{
-				case OWNER_SHIP:
-					ApplyMatrix( &Ships[ PrimBulls[i].Owner ].Object.FinalMat, &PrimBulls[i].Offset, &TempVector );
-					PrimBulls[i].GroupImIn = MoveGroup( &Mloadheader, &Ships[ PrimBulls[i].Owner ].Object.Pos, Ships[ PrimBulls[i].Owner ].Object.Group, &TempVector );
-					ApplyMatrix( &Ships[ PrimBulls[i].Owner ].Object.FinalMat, &PrimBulls[i].Offset, &TempVector );
-					ApplyMatrix( &Ships[ PrimBulls[i].Owner ].Object.FinalMat, &PrimBulls[i].LocalDir, &PrimBulls[i].Dir );
-					PrimBulls[i].Pos.x = ( Ships[ PrimBulls[i].Owner ].Object.Pos.x + TempVector.x );
-					PrimBulls[i].Pos.y = ( Ships[ PrimBulls[i].Owner ].Object.Pos.y + TempVector.y );
-					PrimBulls[i].Pos.z = ( Ships[ PrimBulls[i].Owner ].Object.Pos.z + TempVector.z );
-					PrimBulls[i].ColFlag = 0;
-					break;
-
-				case OWNER_ENEMY:
-					if( !Enemies[ PrimBulls[i].Owner ].Object.FirstGun )
-					{
-						ApplyMatrix( &Enemies[ PrimBulls[i].Owner ].Object.FinalMat, &PrimBulls[i].Offset, &TempVector );
-						PrimBulls[i].GroupImIn = MoveGroup( &Mloadheader, &Enemies[ PrimBulls[i].Owner ].Object.Pos, Enemies[ PrimBulls[i].Owner ].Object.Group, &TempVector );
-						ApplyMatrix( &Enemies[ PrimBulls[i].Owner ].Object.FinalMat, &PrimBulls[i].Offset, &TempVector );
-						ApplyMatrix( &Enemies[ PrimBulls[i].Owner ].Object.FinalMat, &PrimBulls[i].LocalDir, &PrimBulls[i].Dir );
-						PrimBulls[i].Pos.x = ( Enemies[ PrimBulls[i].Owner ].Object.Pos.x + TempVector.x );
-						PrimBulls[i].Pos.y = ( Enemies[ PrimBulls[i].Owner ].Object.Pos.y + TempVector.y );
-						PrimBulls[i].Pos.z = ( Enemies[ PrimBulls[i].Owner ].Object.Pos.z + TempVector.z );
-						PrimBulls[i].ColFlag = 0;
-					}
-					else
-					{
-						GunPtr = (GUNOBJECT*)PrimBulls[i].EnemyGun;
-						if( GunPtr )
-						{
-							FirePosPnt = EnemyTypes[ Enemies[ PrimBulls[i].Owner ].Type ].GunFirePoints[ GunPtr->GunNum>>1 ];
-							FirePosPnt += PrimBulls[i].FirePoint;
-							ApplyMatrix( &GunPtr->Mat , &FirePosPnt->Points[0] , &TempVector );
-							TempVector.x += GunPtr->FirePos.x;
-							TempVector.y += GunPtr->FirePos.y;
-							TempVector.z += GunPtr->FirePos.z;
-							PrimBulls[i].Pos = TempVector;
-							TempVector.x -= Enemies[ PrimBulls[i].Owner ].Object.Pos.x;
-							TempVector.y -= Enemies[ PrimBulls[i].Owner ].Object.Pos.y;
-							TempVector.z -= Enemies[ PrimBulls[i].Owner ].Object.Pos.z;
-							PrimBulls[i].GroupImIn = MoveGroup( &Mloadheader, &Enemies[ PrimBulls[i].Owner ].Object.Pos, Enemies[ PrimBulls[i].Owner ].Object.Group, &TempVector );
-							ApplyMatrix( &GunPtr->Mat, &PrimBulls[i].LocalDir, &PrimBulls[i].Dir );
-							PrimBulls[i].ColFlag = 0;
-						}
-					}
-					break;
-
-				case OWNER_NOBODY:
-					PrimBulls[i].ColFlag = 0;
-					break;
-
-				case OWNER_MODELSPOTFX:
-					/* Mirror the defensive pattern used by the other
-					 * OWNER_MODELSPOTFX sites in this file (lines
-					 * 5844 / 6026 / 6205 / 6361): fetch the SpotFX
-					 * array base separately and NULL-check before
-					 * the +SpotFX index offset.  Without the check
-					 * a bullet that outlives its owner model (or
-					 * whose owner slot got reused for a model with
-					 * no spotfx data) dereferences NULL+offset and
-					 * crashes deep in ApplyMatrix.  Symptom seen on
-					 * reactor core: FAR=0x58, PC in ApplyMatrix,
-					 * LR in ProcessPrimaryBullets. */
-					if( ModelNames[ Models[ PrimBulls[i].Owner ].ModelNum ].DoIMorph )
-					{
-						SpotFXPtr = MxaModelHeaders[ Models[ PrimBulls[i].Owner ].ModelNum ].SpotFX;
-					}
-					else
-					{
-						SpotFXPtr = ModelHeaders[ Models[ PrimBulls[i].Owner ].ModelNum ].SpotFX;
-					}
-
-					if( SpotFXPtr )
-					{
-						SpotFXPtr += PrimBulls[i].SpotFX;
-
-						ApplyMatrix( &Models[ PrimBulls[i].Owner ].Mat, &SpotFXPtr->Pos, &TempVector );
-						PrimBulls[i].Pos.x = ( Models[ PrimBulls[i].Owner ].Pos.x + TempVector.x );
-						PrimBulls[i].Pos.y = ( Models[ PrimBulls[i].Owner ].Pos.y + TempVector.y );
-						PrimBulls[i].Pos.z = ( Models[ PrimBulls[i].Owner ].Pos.z + TempVector.z );
-						PrimBulls[i].GroupImIn = MoveGroup( &Mloadheader, &Models[ PrimBulls[i].Owner ].Pos, Models[ PrimBulls[i].Owner ].Group, &TempVector );
-						ApplyMatrix( &Models[ PrimBulls[i].Owner ].Mat, &SpotFXPtr->DirVector, &PrimBulls[i].Dir );
-						PrimBulls[i].ColFlag = 0;
-					}
-					else
-					{
-						/* Owner model has no (or no longer has)
-						 * a SpotFX array — kill this orphaned
-						 * bullet rather than crash. */
-						PrimBulls[i].LifeCount = 0.0F;
-					}
-					break;
-
-				default:
-					break;
-
-				}
-				break;
-
-			case TRANSPULSE_CANNON:
-			case NME_TRANSPULSE:
-				if( IsGroupVisible[ PrimBulls[i].GroupImIn ] )
-				{
-					PrimBulls[i].TimeCount += NewFramelag; //framelag;
-
-					if( PrimBulls[i].TimeCount >= PrimBulls[i].TimeInterval )
-					{
-						PrimBulls[i].TimeCount = 0.0F;
-						CreateTransTrail( i );
-					}
-				}
-				else
-				{
-					PrimBulls[i].TimeCount = 0.0F;
-				}
-				break;
-
-			case PYROLITE_RIFLE:
-			case NME_PYROLITE:
-				fmpoly = PrimBulls[i].fmpoly;
-				if( fmpoly != INDEX_NONE )
-				{
-					FmPolys[ fmpoly ].xsize += ( NewFramelag * ( 0.075F * GLOBAL_SCALE ) ); //framelag
-					FmPolys[ fmpoly ].ysize += ( NewFramelag * ( 0.075F * GLOBAL_SCALE ) );	//framelag
-				}
-				break;
-
-			case FLAMES:
-			case PULSAR:
-			case TROJAX:
-			case SUSS_GUN:
-			case ORBITPULSAR:
-			case NME_PULSAR_BLUE:
-			case NME_BULLET1:
-			case NME_PULSAR:
-			case NME_TROJAX:
-			case NME_SUSS_GUN:
-			default:
-				break;
-			}
+			PrimBullWeaponFX( i, TempVector, NewFramelag );
 
 			if( AmIOutsideGroup( &Mloadheader, &PrimBulls[i].Pos, PrimBulls[i].GroupImIn ) )
 			{
@@ -2780,90 +2949,7 @@ void ProcessPrimaryBullets( void )
 
 			DistFromStart = (float) fabsf( DistanceVert2Vector( (VERT*) &NewPos, &PrimBulls[i].ColStart ) );
 
-			HitWall = INDEX_NONE;
-			DistToInt = 100000.0F;									/* Distance to Intersection */
-
-			/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
-			if( PrimBulls[i].ColDist < DistFromStart )
-			{
-				HitWall = 0;
-				DistToInt = (float) fabsf( DistanceVert2Vector( (VERT*) &PrimBulls[i].ColPoint, &PrimBulls[i].Pos ) );
-
-				if( OneGroupBGObjectCol( DistToInt, 1, PrimBulls[i].GroupImIn, &PrimBulls[i].Pos, &MoveOffsetVector,
-										 (VECTOR *) &BGPoint, &BGNormal, &TempVector, &BGObject, 0.0F ) )
-				{
-					DistToInt = (float) fabsf( DistanceVert2Vector( &BGPoint, &PrimBulls[i].Pos ) );
-					PrimBulls[i].ColPoint = BGPoint;
-					PrimBulls[i].ColPointNormal = BGNormal;
-					if( BGObject ) PrimBulls[i].ColGroup = BGObject->Group;
-					BGDamage = PrimaryWeaponAttribs[ PrimBulls[i].Weapon ].Damage[ PrimBulls[i].PowerLevel ];
-					if( ( PrimBulls[ i ].Weapon == LASER ) ||
-						( PrimBulls[ i ].Weapon == NME_LASER ) ||
-						( PrimBulls[ i ].Weapon == NME_POWERLASER ) )
-					{
-						BGDamage *= ( framelag / 3.0F );
-					}
-					if( BGObject ) ChangeBGState( BGObject, PrimBulls[i].OwnerType, PrimBulls[i].Owner, SHOT, BGDamage );
-				}
-			}
-			else
-			{
-				if( OneGroupBGObjectCol( 0.0F, 0, PrimBulls[i].GroupImIn, &PrimBulls[i].Pos, &MoveOffsetVector,
-										 (VECTOR *) &BGPoint, &BGNormal, &TempVector, &BGObject, 0.0F ) )
-				{
-					DistToInt = (float) fabsf( DistanceVert2Vector( &BGPoint, &PrimBulls[i].Pos ) );
-					PrimBulls[i].ColPoint = BGPoint;
-					PrimBulls[i].ColPointNormal = BGNormal;
-					if( BGObject ) PrimBulls[i].ColGroup = BGObject->Group;
-					HitWall = 0;
-					BGDamage = PrimaryWeaponAttribs[ PrimBulls[i].Weapon ].Damage[ PrimBulls[i].PowerLevel ];
-					if( ( PrimBulls[ i ].Weapon == LASER ) ||
-						( PrimBulls[ i ].Weapon == NME_LASER ) ||
-						( PrimBulls[ i ].Weapon == NME_POWERLASER ) )
-					{
-						BGDamage *= ( framelag / 3.0F );
-					}
-					if( BGObject ) ChangeBGState( BGObject, PrimBulls[i].OwnerType, PrimBulls[i].Owner, SHOT, BGDamage );
-				}
-			}
-
-			Damage = (int16_t) PrimaryWeaponAttribs[ PrimBulls[i].Weapon ].Damage[ PrimBulls[i].PowerLevel ];
-
-			if ( WaterObjectCollide( PrimBulls[i].GroupImIn,&PrimBulls[i].Pos, &MoveOffsetVector, &Int_Point , Damage) )
-			{
-				CreateSplash( (VECTOR *) &Int_Point, &PrimBulls[i].Dir, PrimBulls[i].GroupImIn );
-			}
-
-			HitTarget = CheckHitShip( PrimBulls[i].OwnerType, PrimBulls[i].Owner, &PrimBulls[i].Pos, PrimBulls[i].GroupImIn, &DirVector, &PrimBulls[i].UpVector, Length, &Int_Point, &Int_Point2, &DistToInt, PrimBulls[i].ColRadius, PrimBulls[i].ColType );
-			if( HitTarget != INDEX_NONE ) HitWall = INDEX_NONE;
-
-			HitSecondary = CheckHitSecondary( &PrimBulls[i].Pos, PrimBulls[i].GroupImIn, &DirVector, &PrimBulls[i].UpVector, Length, &MInt_Point, &MInt_Point2, &DistToInt, PrimBulls[i].ColRadius, PrimBulls[i].ColType );
-			if( HitSecondary != INDEX_NONE )
-			{
-				HitWall = INDEX_NONE;
-				HitTarget = INDEX_NONE;
-			}
-
-			HitEnemy = CheckHitEnemy( PrimBulls[i].OwnerType, PrimBulls[i].Owner, &PrimBulls[i].Pos, PrimBulls[i].GroupImIn, &DirVector, &PrimBulls[i].UpVector, Length, &EInt_Point, &EInt_Point2, &DistToInt, PrimBulls[i].ColRadius, PrimBulls[i].ColType );
-			if( HitEnemy != nullptr )
-			{
-				HitWall = INDEX_NONE;
-				HitTarget = INDEX_NONE;
-				HitSecondary = INDEX_NONE;
-			}
-			else
-			{
-				TempEnemyIndex = GetComEnemyHitInfo( &EInt_Point, &ENormal, &DistToInt );
-
-				if( TempEnemyIndex != INDEX_NONE )
-				{
-					HitEnemy = &Enemies[ TempEnemyIndex ];
-					EInt_Point2 = EInt_Point;
-					HitWall = INDEX_NONE;
-					HitTarget = INDEX_NONE;
-					HitSecondary = INDEX_NONE;
-				}
-			}
+			PrimBullFindHits( i, TempVector, Damage, DirVector, Int_Point, HitTarget, HitWall, DistFromStart, Length, HitSecondary, MInt_Point, DistToInt, MoveOffsetVector, HitEnemy, EInt_Point );
 
 			if( ( HitWall != INDEX_NONE ) || ( HitTarget != INDEX_NONE ) || ( HitSecondary != INDEX_NONE ) || ( HitEnemy != nullptr ) )
 			{
@@ -2918,71 +3004,7 @@ void ProcessPrimaryBullets( void )
 
 			PrimBulls[i].Pos = NewPos;
 
-			if ( PrimBulls[i].light != INDEX_NONE )
-			{
-				XLights[PrimBulls[i].light].Group = PrimBulls[i].GroupImIn;
-				XLights[PrimBulls[i].light].Pos = PrimBulls[i].Pos;
-			}
-
-			if( PrimBulls[i].line != INDEX_NONE )
-			{
-				Lines[ PrimBulls[i].line ].EndPos = Lines[ PrimBulls[i].line ].StartPos;
-				Lines[ PrimBulls[i].line ].StartPos = PrimBulls[i].Pos;
-				Lines[ PrimBulls[i].line ].Group = PrimBulls[i].GroupImIn;
-			}
-
-			if ( PrimBulls[i].fmpoly != INDEX_NONE )
-			{
-				fmpoly = PrimBulls[i].fmpoly;
-
-				for( Count = 0; Count < PrimBulls[i].numfmpolys; Count++ )
-				{
-					nextfmpoly = FmPolys[ fmpoly ].Prev;
-
-					if ( fmpoly != INDEX_NONE )
-					{
-						FmPolys[ fmpoly ].Pos.x += MoveOffsetVector.x; //(PrimBulls[i].Dir.x * Speed);
-						FmPolys[ fmpoly ].Pos.y += MoveOffsetVector.y; //(PrimBulls[i].Dir.y * Speed);
-						FmPolys[ fmpoly ].Pos.z += MoveOffsetVector.z; //(PrimBulls[i].Dir.z * Speed);
-						FmPolys[ fmpoly ].Group = PrimBulls[i].GroupImIn;
-					}
-
-					fmpoly = nextfmpoly;
-				}
-			}
-
-			if( ( PrimBulls[i].poly != INDEX_NONE ) &&
-				( PrimBulls[i].Weapon != LASER ) &&
-				( PrimBulls[i].Weapon != NME_LASER ) &&
-				( PrimBulls[i].Weapon != NME_POWERLASER ) &&
-				( PrimBulls[i].Weapon != NME_LIGHTNING ) )
-			{
-				poly = PrimBulls[i].poly;
-
-				for( Count = 0; Count < PrimBulls[i].numpolys; Count++ )
-				{
-					nextpoly = Polys[ poly ].Prev;
-
-					if( poly != INDEX_NONE )
-					{
-						Polys[ poly ].Pos1.x += MoveOffsetVector.x;
-						Polys[ poly ].Pos1.y += MoveOffsetVector.y;
-						Polys[ poly ].Pos1.z += MoveOffsetVector.z;
-						Polys[ poly ].Pos2.x += MoveOffsetVector.x;
-						Polys[ poly ].Pos2.y += MoveOffsetVector.y;
-						Polys[ poly ].Pos2.z += MoveOffsetVector.z;
-						Polys[ poly ].Pos3.x += MoveOffsetVector.x;
-						Polys[ poly ].Pos3.y += MoveOffsetVector.y;
-						Polys[ poly ].Pos3.z += MoveOffsetVector.z;
-						Polys[ poly ].Pos4.x += MoveOffsetVector.x;
-						Polys[ poly ].Pos4.y += MoveOffsetVector.y;
-						Polys[ poly ].Pos4.z += MoveOffsetVector.z;
-						Polys[ poly ].Group = PrimBulls[i].GroupImIn;
-					}
-
-					poly = nextpoly;
-				}
-			}
+			PrimBullMoveAttachments( i, MoveOffsetVector );
 
 		}
 		else
