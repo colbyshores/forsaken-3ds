@@ -3196,12 +3196,11 @@ void KillLines(void)
 
 #define POINT_TO_PLANE( P, N ) ( (P)->x * (N)->Normal.x + (P)->y * (N)->Normal.y + (P)->z * (N)->Normal.z + ( (N)->Offset) )
 
-bool SetUpLines (u_int16_t Model, PLANE plane, VECTOR *rot)
+/* Slice one mesh of the title holo model with the scan plane and add a line poly for each
+   triangle it crosses. True: the poly pool ran out and SetUpLines fails. */
+[[gnu::always_inline]] static inline bool SetUpLinesMesh( u_int16_t Model, PLANE & plane, MATRIX & Mat_R, int font, int num_polys, TRIANGLE * poly_ptr, LVERTEX * vertex_ptr )
 {
-	int num_polys;
 	int poly, edge;
-	TRIANGLE *poly_ptr;
-	LVERTEX *vertex_ptr;
 	VECTOR tempv1, tempv2, tempv3;
 	VECTOR start, end, IntPoint;
 	float point1dist, point2dist, distance2plane;
@@ -3209,14 +3208,170 @@ bool SetUpLines (u_int16_t Model, PLANE plane, VECTOR *rot)
 	VECTOR point[MAXLINES];
 	int i;
 	float thickness = 3.0F;
-	int font;
 	int scanlinenum;
 	bool startset, endset;
+	float scaleout = 1.01F;
+
+	intersection_points = 0;
+	scanlinenum = 0;
+
+	for (poly=0; poly<num_polys; poly++)
+	{
+		tempv1.x = vertex_ptr[poly_ptr->v1].x;
+		tempv1.y = vertex_ptr[poly_ptr->v1].y;
+		tempv1.z = vertex_ptr[poly_ptr->v1].z;
+
+		tempv2.x = vertex_ptr[poly_ptr->v2].x;
+		tempv2.y = vertex_ptr[poly_ptr->v2].y;
+		tempv2.z = vertex_ptr[poly_ptr->v2].z;
+
+		tempv3.x = vertex_ptr[poly_ptr->v3].x;
+		tempv3.y = vertex_ptr[poly_ptr->v3].y;
+		tempv3.z = vertex_ptr[poly_ptr->v3].z;
+
+		ApplyMatrix( &Mat_R, &tempv1, &tempv1 );
+		ApplyMatrix( &Mat_R, &tempv2, &tempv2 );
+		ApplyMatrix( &Mat_R, &tempv3, &tempv3 );
+
+		tempv1.x *= HoloModelScale * scaleout;
+		tempv1.y *= HoloModelScale * scaleout;
+		tempv1.z *= HoloModelScale * scaleout;
+		tempv2.x *= HoloModelScale * scaleout;
+		tempv2.y *= HoloModelScale * scaleout;
+		tempv2.z *= HoloModelScale * scaleout;
+		tempv3.x *= HoloModelScale * scaleout;
+		tempv3.y *= HoloModelScale * scaleout;
+		tempv3.z *= HoloModelScale * scaleout;
+
+		startset = false;
+		endset = false;
+
+		for (edge = 0; edge < 3; edge++)
+		{
+			switch (edge)
+			{
+			case 0:
+				start.x = tempv1.x;
+				start.y = tempv1.y;
+				start.z = tempv1.z;
+				end.x = tempv2.x;
+				end.y = tempv2.y;
+				end.z = tempv2.z;
+				break;
+			case 1:
+				start.x = tempv2.x;
+				start.y = tempv2.y;
+				start.z = tempv2.z;
+				end.x = tempv3.x;
+				end.y = tempv3.y;
+				end.z = tempv3.z;
+				break;
+			case 2:
+				start.x = tempv3.x;
+				start.y = tempv3.y;
+				start.z = tempv3.z;
+				end.x = tempv1.x;
+				end.y = tempv1.y;
+				end.z = tempv1.z;
+				break;
+			}
+
+			point1dist = POINT_TO_PLANE( &start, &plane );
+			point2dist = POINT_TO_PLANE( &end, &plane );
+
+			if (!(((point1dist > 0.0F) && (point2dist > 0.0F)) || ((point1dist < 0.0F) && (point2dist < 0.0F))))
+			{	//store points of intersection here...
+				distance2plane = (point1dist / (point1dist - point2dist));
+
+				IntPoint.x = start.x + ( distance2plane * (end.x - start.x ) );
+				IntPoint.y = start.y + ( distance2plane * (end.y - start.y ) );
+				IntPoint.z = start.z + ( distance2plane * (end.z - start.z ) );
+
+				point[intersection_points++] = IntPoint;
+
+				if (!startset)
+				{	scanline[scanlinenum].start = IntPoint;
+					startset = true;
+				}else
+				{
+					scanline[scanlinenum].end = IntPoint;
+					endset = true;
+				}
+
+			}
+		}
+
+		scanline[scanlinenum].poly = *poly_ptr;
+
+		if ((startset) && (endset))
+			scanlinenum++;
+
+		poly_ptr++;
+	}
+	for (i=0; i<scanlinenum; i++)
+	{
+
+		BikeLine[CurrentLine] = FindFreePoly();
+
+		if( BikeLine[CurrentLine] != INDEX_NONE )
+		{
+			LinesActive = true;
+
+			Polys[ BikeLine[CurrentLine] ].Col1.R = 255;
+			Polys[ BikeLine[CurrentLine] ].Col1.G = 255;
+			Polys[ BikeLine[CurrentLine] ].Col1.B = 255;
+			Polys[ BikeLine[CurrentLine] ].Col2.R = 255;
+			Polys[ BikeLine[CurrentLine] ].Col2.G = 255;
+			Polys[ BikeLine[CurrentLine] ].Col2.B = 255;
+			Polys[ BikeLine[CurrentLine] ].Col3.R = 255;
+			Polys[ BikeLine[CurrentLine] ].Col3.G = 255;
+			Polys[ BikeLine[CurrentLine] ].Col3.B = 255;
+			Polys[ BikeLine[CurrentLine] ].Col4.R = 255;
+			Polys[ BikeLine[CurrentLine] ].Col4.G = 255;
+			Polys[ BikeLine[CurrentLine] ].Col4.B = 255;
+			Polys[ BikeLine[CurrentLine] ].Trans1 = 255;
+			Polys[ BikeLine[CurrentLine] ].Trans2 = 255;
+			Polys[ BikeLine[CurrentLine] ].Trans3 = 255;
+			Polys[ BikeLine[CurrentLine] ].Trans4 = 255;
+			Polys[ BikeLine[CurrentLine] ].Scale = 0.0F;
+			Polys[ BikeLine[CurrentLine] ].Flags = POLY_FLAG_NOTHING;
+			Polys[ BikeLine[CurrentLine] ].Frm_Info = &Title_Fonts_Header;
+			Polys[ BikeLine[CurrentLine] ].Frame = TextLookup[font][1];
+
+			Polys[ BikeLine[CurrentLine] ].Pos1.x = Models[Model].Pos.x + (scanline[i].start.x - plane.Normal.x * (thickness / 2.0F));
+			Polys[ BikeLine[CurrentLine] ].Pos1.y = Models[Model].Pos.y + (scanline[i].start.y - plane.Normal.y * (thickness / 2.0F));
+			Polys[ BikeLine[CurrentLine] ].Pos1.z = Models[Model].Pos.z + (scanline[i].start.z - plane.Normal.z * (thickness / 2.0F));
+			Polys[ BikeLine[CurrentLine] ].Pos4.x = Models[Model].Pos.x + (scanline[i].end.x - plane.Normal.x * (thickness / 2.0F));
+			Polys[ BikeLine[CurrentLine] ].Pos4.y = Models[Model].Pos.y + (scanline[i].end.y - plane.Normal.y * (thickness / 2.0F));
+			Polys[ BikeLine[CurrentLine] ].Pos4.z = Models[Model].Pos.z + (scanline[i].end.z - plane.Normal.z * (thickness / 2.0F));
+			Polys[ BikeLine[CurrentLine] ].Pos3.x = Models[Model].Pos.x + (scanline[i].end.x + plane.Normal.x * (thickness / 2.0F));
+			Polys[ BikeLine[CurrentLine] ].Pos3.y = Models[Model].Pos.y + (scanline[i].end.y + plane.Normal.y * (thickness / 2.0F));
+			Polys[ BikeLine[CurrentLine] ].Pos3.z = Models[Model].Pos.z + (scanline[i].end.z + plane.Normal.z * (thickness / 2.0F));
+			Polys[ BikeLine[CurrentLine] ].Pos2.x = Models[Model].Pos.x + (scanline[i].start.x + plane.Normal.x * (thickness / 2.0F));
+			Polys[ BikeLine[CurrentLine] ].Pos2.y = Models[Model].Pos.y + (scanline[i].start.y + plane.Normal.y * (thickness / 2.0F));
+			Polys[ BikeLine[CurrentLine] ].Pos2.z = Models[Model].Pos.z + (scanline[i].start.z + plane.Normal.z * (thickness / 2.0F));
+
+			AddPolyToTPage( BikeLine[CurrentLine], GetTPage( *Polys[ BikeLine[CurrentLine] ].Frm_Info, (int16_t) Polys[ BikeLine[CurrentLine] ].Frame ) );
+
+			CurrentLine++;
+		}
+		else
+			return true;
+	}
+
+	return false;
+}
+
+bool SetUpLines (u_int16_t Model, PLANE plane, VECTOR *rot)
+{
+	int num_polys;
+	TRIANGLE *poly_ptr;
+	LVERTEX *vertex_ptr;
+	int font;
 	MXALOADHEADER	* mxaheader;
 	MXLOADHEADER	* mxheader;
 	int Group, Mesh;
 	MATRIX Mat_R;
-	float scaleout = 1.01F;
 
 	font = GetScreenFont(FONT_Large);
 
@@ -3235,152 +3390,8 @@ bool SetUpLines (u_int16_t Model, PLANE plane, VECTOR *rot)
 				poly_ptr = mxaheader->Group[Group].poly_ptr[Mesh];
 				vertex_ptr = mxaheader->Group[Group].originalVerts[Mesh];
 
-				intersection_points = 0;
-				scanlinenum = 0;
-
-
-				for (poly=0; poly<num_polys; poly++)
-				{
-					tempv1.x = vertex_ptr[poly_ptr->v1].x;
-					tempv1.y = vertex_ptr[poly_ptr->v1].y;
-					tempv1.z = vertex_ptr[poly_ptr->v1].z;
-
-					tempv2.x = vertex_ptr[poly_ptr->v2].x;
-					tempv2.y = vertex_ptr[poly_ptr->v2].y;
-					tempv2.z = vertex_ptr[poly_ptr->v2].z;
-
-					tempv3.x = vertex_ptr[poly_ptr->v3].x;
-					tempv3.y = vertex_ptr[poly_ptr->v3].y;
-					tempv3.z = vertex_ptr[poly_ptr->v3].z;
-
-					ApplyMatrix( &Mat_R, &tempv1, &tempv1 );
-					ApplyMatrix( &Mat_R, &tempv2, &tempv2 );
-					ApplyMatrix( &Mat_R, &tempv3, &tempv3 );
-					tempv1.x *= HoloModelScale * scaleout;
-					tempv1.y *= HoloModelScale * scaleout;
-					tempv1.z *= HoloModelScale * scaleout;
-					tempv2.x *= HoloModelScale * scaleout;
-					tempv2.y *= HoloModelScale * scaleout;
-					tempv2.z *= HoloModelScale * scaleout;
-					tempv3.x *= HoloModelScale * scaleout;
-					tempv3.y *= HoloModelScale * scaleout;
-					tempv3.z *= HoloModelScale * scaleout;
-
-					startset = false;
-					endset = false;
-
-					for (edge = 0; edge < 3; edge++)
-					{
-						switch (edge)
-						{
-						case 0:
-							start.x = tempv1.x;
-							start.y = tempv1.y;
-							start.z = tempv1.z;
-							end.x = tempv2.x;
-							end.y = tempv2.y;
-							end.z = tempv2.z;
-							break;
-						case 1:
-							start.x = tempv2.x;
-							start.y = tempv2.y;
-							start.z = tempv2.z;
-							end.x = tempv3.x;
-							end.y = tempv3.y;
-							end.z = tempv3.z;
-							break;
-						case 2:
-							start.x = tempv3.x;
-							start.y = tempv3.y;
-							start.z = tempv3.z;
-							end.x = tempv1.x;
-							end.y = tempv1.y;
-							end.z = tempv1.z;
-							break;
-						}
-
-						point1dist = POINT_TO_PLANE( &start, &plane );
-						point2dist = POINT_TO_PLANE( &end, &plane );
-
-						if (!(((point1dist > 0.0F) && (point2dist > 0.0F)) || ((point1dist < 0.0F) && (point2dist < 0.0F))))
-						{	//store points of intersection here...
-							distance2plane = (point1dist / (point1dist - point2dist));
-
-							IntPoint.x = start.x + ( distance2plane * (end.x - start.x ) );
-							IntPoint.y = start.y + ( distance2plane * (end.y - start.y ) );
-							IntPoint.z = start.z + ( distance2plane * (end.z - start.z ) );
-
-							point[intersection_points++] = IntPoint;
-
-							if (!startset)
-							{	scanline[scanlinenum].start = IntPoint;
-								startset = true;
-							}else
-							{
-								scanline[scanlinenum].end = IntPoint;
-								endset = true;
-							}
-
-						}
-					}
-
-					scanline[scanlinenum].poly = *poly_ptr;
-
-					if ((startset) && (endset))
-						scanlinenum++;
-
-					poly_ptr++;
-				}
-				for (i=0; i<scanlinenum; i++)
-				{
-
-					BikeLine[CurrentLine] = FindFreePoly();
-
-					if( BikeLine[CurrentLine] != INDEX_NONE )
-					{
-						LinesActive = true;
-
-						Polys[ BikeLine[CurrentLine] ].Col1.R = 255;
-						Polys[ BikeLine[CurrentLine] ].Col1.G = 255;
-						Polys[ BikeLine[CurrentLine] ].Col1.B = 255;
-						Polys[ BikeLine[CurrentLine] ].Col2.R = 255;
-						Polys[ BikeLine[CurrentLine] ].Col2.G = 255;
-						Polys[ BikeLine[CurrentLine] ].Col2.B = 255;
-						Polys[ BikeLine[CurrentLine] ].Col3.R = 255;
-						Polys[ BikeLine[CurrentLine] ].Col3.G = 255;
-						Polys[ BikeLine[CurrentLine] ].Col3.B = 255;
-						Polys[ BikeLine[CurrentLine] ].Col4.R = 255;
-						Polys[ BikeLine[CurrentLine] ].Col4.G = 255;
-						Polys[ BikeLine[CurrentLine] ].Col4.B = 255;
-						Polys[ BikeLine[CurrentLine] ].Trans1 = 255;
-						Polys[ BikeLine[CurrentLine] ].Trans2 = 255;
-						Polys[ BikeLine[CurrentLine] ].Trans3 = 255;
-						Polys[ BikeLine[CurrentLine] ].Trans4 = 255;
-						Polys[ BikeLine[CurrentLine] ].Scale = 0.0F;
-						Polys[ BikeLine[CurrentLine] ].Flags = POLY_FLAG_NOTHING;
-						Polys[ BikeLine[CurrentLine] ].Frm_Info = &Title_Fonts_Header;
-						Polys[ BikeLine[CurrentLine] ].Frame = TextLookup[font][1];
-
-						Polys[ BikeLine[CurrentLine] ].Pos1.x = Models[Model].Pos.x + (scanline[i].start.x - plane.Normal.x * (thickness / 2.0F));
-						Polys[ BikeLine[CurrentLine] ].Pos1.y = Models[Model].Pos.y + (scanline[i].start.y - plane.Normal.y * (thickness / 2.0F));
-						Polys[ BikeLine[CurrentLine] ].Pos1.z = Models[Model].Pos.z + (scanline[i].start.z - plane.Normal.z * (thickness / 2.0F));
-						Polys[ BikeLine[CurrentLine] ].Pos4.x = Models[Model].Pos.x + (scanline[i].end.x - plane.Normal.x * (thickness / 2.0F));
-						Polys[ BikeLine[CurrentLine] ].Pos4.y = Models[Model].Pos.y + (scanline[i].end.y - plane.Normal.y * (thickness / 2.0F));
-						Polys[ BikeLine[CurrentLine] ].Pos4.z = Models[Model].Pos.z + (scanline[i].end.z - plane.Normal.z * (thickness / 2.0F));
-						Polys[ BikeLine[CurrentLine] ].Pos3.x = Models[Model].Pos.x + (scanline[i].end.x + plane.Normal.x * (thickness / 2.0F));
-						Polys[ BikeLine[CurrentLine] ].Pos3.y = Models[Model].Pos.y + (scanline[i].end.y + plane.Normal.y * (thickness / 2.0F));
-						Polys[ BikeLine[CurrentLine] ].Pos3.z = Models[Model].Pos.z + (scanline[i].end.z + plane.Normal.z * (thickness / 2.0F));
-						Polys[ BikeLine[CurrentLine] ].Pos2.x = Models[Model].Pos.x + (scanline[i].start.x + plane.Normal.x * (thickness / 2.0F));
-						Polys[ BikeLine[CurrentLine] ].Pos2.y = Models[Model].Pos.y + (scanline[i].start.y + plane.Normal.y * (thickness / 2.0F));
-						Polys[ BikeLine[CurrentLine] ].Pos2.z = Models[Model].Pos.z + (scanline[i].start.z + plane.Normal.z * (thickness / 2.0F));
-
-						AddPolyToTPage( BikeLine[CurrentLine], GetTPage( *Polys[ BikeLine[CurrentLine] ].Frm_Info, (int16_t) Polys[ BikeLine[CurrentLine] ].Frame ) );
-
-						CurrentLine++;
-					}
-					else
-						return false;
-				}
+				if( SetUpLinesMesh( Model, plane, Mat_R, font, num_polys, poly_ptr, vertex_ptr ) )
+					return false;
 			}
 
 		}
@@ -3397,153 +3408,8 @@ bool SetUpLines (u_int16_t Model, PLANE plane, VECTOR *rot)
 				poly_ptr = mxheader->Group[Group].poly_ptr[Mesh];
 				vertex_ptr = mxheader->Group[Group].originalVerts[Mesh];
 
-				intersection_points = 0;
-				scanlinenum = 0;
-
-
-				for (poly=0; poly<num_polys; poly++)
-				{
-					tempv1.x = vertex_ptr[poly_ptr->v1].x;
-					tempv1.y = vertex_ptr[poly_ptr->v1].y;
-					tempv1.z = vertex_ptr[poly_ptr->v1].z;
-
-					tempv2.x = vertex_ptr[poly_ptr->v2].x;
-					tempv2.y = vertex_ptr[poly_ptr->v2].y;
-					tempv2.z = vertex_ptr[poly_ptr->v2].z;
-
-					tempv3.x = vertex_ptr[poly_ptr->v3].x;
-					tempv3.y = vertex_ptr[poly_ptr->v3].y;
-					tempv3.z = vertex_ptr[poly_ptr->v3].z;
-
-					ApplyMatrix( &Mat_R, &tempv1, &tempv1 );
-					ApplyMatrix( &Mat_R, &tempv2, &tempv2 );
-					ApplyMatrix( &Mat_R, &tempv3, &tempv3 );
-
-					tempv1.x *= HoloModelScale * scaleout;
-					tempv1.y *= HoloModelScale * scaleout;
-					tempv1.z *= HoloModelScale * scaleout;
-					tempv2.x *= HoloModelScale * scaleout;
-					tempv2.y *= HoloModelScale * scaleout;
-					tempv2.z *= HoloModelScale * scaleout;
-					tempv3.x *= HoloModelScale * scaleout;
-					tempv3.y *= HoloModelScale * scaleout;
-					tempv3.z *= HoloModelScale * scaleout;
-
-					startset = false;
-					endset = false;
-
-					for (edge = 0; edge < 3; edge++)
-					{
-						switch (edge)
-						{
-						case 0:
-							start.x = tempv1.x;
-							start.y = tempv1.y;
-							start.z = tempv1.z;
-							end.x = tempv2.x;
-							end.y = tempv2.y;
-							end.z = tempv2.z;
-							break;
-						case 1:
-							start.x = tempv2.x;
-							start.y = tempv2.y;
-							start.z = tempv2.z;
-							end.x = tempv3.x;
-							end.y = tempv3.y;
-							end.z = tempv3.z;
-							break;
-						case 2:
-							start.x = tempv3.x;
-							start.y = tempv3.y;
-							start.z = tempv3.z;
-							end.x = tempv1.x;
-							end.y = tempv1.y;
-							end.z = tempv1.z;
-							break;
-						}
-
-						point1dist = POINT_TO_PLANE( &start, &plane );
-						point2dist = POINT_TO_PLANE( &end, &plane );
-
-						if (!(((point1dist > 0.0F) && (point2dist > 0.0F)) || ((point1dist < 0.0F) && (point2dist < 0.0F))))
-						{	//store points of intersection here...
-							distance2plane = (point1dist / (point1dist - point2dist));
-
-							IntPoint.x = start.x + ( distance2plane * (end.x - start.x ) );
-							IntPoint.y = start.y + ( distance2plane * (end.y - start.y ) );
-							IntPoint.z = start.z + ( distance2plane * (end.z - start.z ) );
-
-							point[intersection_points++] = IntPoint;
-
-							if (!startset)
-							{	scanline[scanlinenum].start = IntPoint;
-								startset = true;
-							}else
-							{
-								scanline[scanlinenum].end = IntPoint;
-								endset = true;
-							}
-
-						}
-					}
-
-					scanline[scanlinenum].poly = *poly_ptr;
-
-					if ((startset) && (endset))
-						scanlinenum++;
-
-					poly_ptr++;
-				}
-				for (i=0; i<scanlinenum; i++)
-				{
-
-					BikeLine[CurrentLine] = FindFreePoly();
-
-					if( BikeLine[CurrentLine] != INDEX_NONE )
-					{
-						LinesActive = true;
-
-						Polys[ BikeLine[CurrentLine] ].Col1.R = 255;
-						Polys[ BikeLine[CurrentLine] ].Col1.G = 255;
-						Polys[ BikeLine[CurrentLine] ].Col1.B = 255;
-						Polys[ BikeLine[CurrentLine] ].Col2.R = 255;
-						Polys[ BikeLine[CurrentLine] ].Col2.G = 255;
-						Polys[ BikeLine[CurrentLine] ].Col2.B = 255;
-						Polys[ BikeLine[CurrentLine] ].Col3.R = 255;
-						Polys[ BikeLine[CurrentLine] ].Col3.G = 255;
-						Polys[ BikeLine[CurrentLine] ].Col3.B = 255;
-						Polys[ BikeLine[CurrentLine] ].Col4.R = 255;
-						Polys[ BikeLine[CurrentLine] ].Col4.G = 255;
-						Polys[ BikeLine[CurrentLine] ].Col4.B = 255;
-						Polys[ BikeLine[CurrentLine] ].Trans1 = 255;
-						Polys[ BikeLine[CurrentLine] ].Trans2 = 255;
-						Polys[ BikeLine[CurrentLine] ].Trans3 = 255;
-						Polys[ BikeLine[CurrentLine] ].Trans4 = 255;
-						Polys[ BikeLine[CurrentLine] ].Scale = 0.0F;
-						Polys[ BikeLine[CurrentLine] ].Flags = POLY_FLAG_NOTHING;
-						Polys[ BikeLine[CurrentLine] ].Frm_Info = &Title_Fonts_Header;
-						Polys[ BikeLine[CurrentLine] ].Frame = TextLookup[font][1];
-
-						Polys[ BikeLine[CurrentLine] ].Pos1.x = Models[Model].Pos.x + (scanline[i].start.x - plane.Normal.x * (thickness / 2.0F));
-						Polys[ BikeLine[CurrentLine] ].Pos1.y = Models[Model].Pos.y + (scanline[i].start.y - plane.Normal.y * (thickness / 2.0F));
-						Polys[ BikeLine[CurrentLine] ].Pos1.z = Models[Model].Pos.z + (scanline[i].start.z - plane.Normal.z * (thickness / 2.0F));
-						Polys[ BikeLine[CurrentLine] ].Pos4.x = Models[Model].Pos.x + (scanline[i].end.x - plane.Normal.x * (thickness / 2.0F));
-						Polys[ BikeLine[CurrentLine] ].Pos4.y = Models[Model].Pos.y + (scanline[i].end.y - plane.Normal.y * (thickness / 2.0F));
-						Polys[ BikeLine[CurrentLine] ].Pos4.z = Models[Model].Pos.z + (scanline[i].end.z - plane.Normal.z * (thickness / 2.0F));
-						Polys[ BikeLine[CurrentLine] ].Pos3.x = Models[Model].Pos.x + (scanline[i].end.x + plane.Normal.x * (thickness / 2.0F));
-						Polys[ BikeLine[CurrentLine] ].Pos3.y = Models[Model].Pos.y + (scanline[i].end.y + plane.Normal.y * (thickness / 2.0F));
-						Polys[ BikeLine[CurrentLine] ].Pos3.z = Models[Model].Pos.z + (scanline[i].end.z + plane.Normal.z * (thickness / 2.0F));
-						Polys[ BikeLine[CurrentLine] ].Pos2.x = Models[Model].Pos.x + (scanline[i].start.x + plane.Normal.x * (thickness / 2.0F));
-						Polys[ BikeLine[CurrentLine] ].Pos2.y = Models[Model].Pos.y + (scanline[i].start.y + plane.Normal.y * (thickness / 2.0F));
-						Polys[ BikeLine[CurrentLine] ].Pos2.z = Models[Model].Pos.z + (scanline[i].start.z + plane.Normal.z * (thickness / 2.0F));
-
-						AddPolyToTPage( BikeLine[CurrentLine], GetTPage( *Polys[ BikeLine[CurrentLine] ].Frm_Info, (int16_t) Polys[ BikeLine[CurrentLine] ].Frame ) );
-
-						CurrentLine++;
-					}
-					else
-						return false;
-				}
+				if( SetUpLinesMesh( Model, plane, Mat_R, font, num_polys, poly_ptr, vertex_ptr ) )
+					return false;
 			}
 
 		}
