@@ -462,6 +462,290 @@ void SetViewportError( const char *where, render_viewport_t *vp )
 	Msg( msg );
 }
 
+/* the debug-mode keys (DebugInfo): Shift, Shift+Ctrl and Ctrl function-key commands, plus F8 */
+[[gnu::always_inline]] static inline void ProcessGameKeysDebug( int16_t & startpos )
+{
+	// Shift Modifier
+	if ( SDL_GetModState() & KMOD_SHIFT )
+	{
+
+		// Shift + F1
+		if ( input_buffer_find( SDLK_F1 ) )
+		{
+			if ( !CurrentMenu )
+			{
+				MenuRestart( &MENU_DebugHelp );
+			}
+			else if ( CurrentMenu == &MENU_DebugHelp )
+			{
+				MenuExit();
+			}
+		}
+
+		// Shift + Ctrl Modifier
+		if ( SDL_GetModState() & KMOD_CTRL )
+		{
+
+			// Shift + Ctrl + F2
+			if ( input_buffer_find( SDLK_F2 ) )
+				SetFOV( chosen_fov = normal_fov );
+
+			// Shift + Ctrl + F3
+			if ( input_buffer_find( SDLK_F3 ) )
+				SetFOV( chosen_fov = normal_fov );
+
+		} // end shift + ctrl modifier
+		else // shift only modifier
+		{
+
+			// Shift + F2
+			if ( input_buffer_find( SDLK_F2 ) )
+				SetFOV( chosen_fov = FOV_GROW( hfov ) );
+
+			// Shift + F3
+			if ( input_buffer_find( SDLK_F3 ) )
+				SetFOV( chosen_fov = FOV_SHRINK( hfov ) );
+
+		} // end shift only modifier
+
+		// Shift + F4
+		if ( input_buffer_find( SDLK_F4 ) )
+			if ( !CurrentMenu )
+				MenuRestart( &MENU_GotoRoom );
+
+		// Shift + F5
+		if ( input_buffer_find( SDLK_F5 ) )
+		{
+			InitShipStartPos( WhoIAm, ++startpos );
+			AddColourMessageToQue(SystemMessageColour,
+				"You are now in %s\n",
+				Mloadheader.Group[ Ships[ WhoIAm ].Object.Group ].name
+				);
+		}
+
+		// Shift + F6
+		if ( input_buffer_find( SDLK_F6 ) )
+			DoClipping = !DoClipping;
+
+		// Shift + F7
+		if ( input_buffer_find( SDLK_F7 ) )
+			ShowBoundingBoxes = !ShowBoundingBoxes;
+
+		// Shift + F8
+		if ( input_buffer_find( SDLK_F8 ) )
+			ShowEFZones = !ShowEFZones;
+
+		// Shift + F9
+		if ( input_buffer_find( SDLK_F9 ) )
+		{
+			if( ShowPortal == 4 )
+			{
+				ShowPortal = 0;
+			}
+			else
+			{
+				ShowPortal++;
+			}
+		}
+
+		// Shift + F10
+		if ( input_buffer_find( SDLK_F10 ) )
+			ShowColZones = !ShowColZones;
+
+
+		// Shift + F12
+		if( input_buffer_find( SDLK_F12 ) )
+			no_collision = !no_collision;
+
+	} // end shift modifier
+	// CTRL Modifiers
+	else if ( SDL_GetModState() & KMOD_CTRL )
+	{
+
+		// Ctrl + F1
+		if ( input_buffer_find( SDLK_F1 ) )
+			ShowTeleports = !ShowTeleports;
+
+		// Ctrl + F2
+		if ( input_buffer_find( SDLK_F2 ) )
+			ShowTrigZones = !ShowTrigZones;
+
+
+	} // end ctrl modifier
+	else // no modifiers
+	{
+
+		// F8
+		if ( input_buffer_find( SDLK_F8 ) )
+		{
+			// Awesome !!!
+			// We need to make this a standard feature!!!
+			if( TargetComputerOn )
+			{
+				TargetComputerOn = false;
+			}
+			else
+			{
+				TargetComputerOn = true;
+			}
+		}
+	}
+}
+
+/* the keys outside debug mode: function-key screens, single-player keys, multiplayer taunts */
+[[gnu::always_inline]] static inline void ProcessGameKeysNormal( void )
+{
+	// F1
+	if ( input_buffer_find( SDLK_F1 )  )
+	{
+		if ( !CurrentMenu )
+		{
+			MenuRestart( &MENU_Controls );
+		}
+		else if ( CurrentMenu == &MENU_Controls )
+		{
+			MenuExit();
+		}
+	}
+
+	// F2
+	if ( input_buffer_find( SDLK_F2 )  )
+	{
+		if ( !CurrentMenu )
+		{
+			MenuRestart( &MENU_Options );
+		}
+		else if ( CurrentMenu == &MENU_Options )
+		{
+			MenuExit();
+		}
+	}
+
+	// single player
+	if ( MyGameStatus == STATUS_SinglePlayer )
+	{
+
+		// F3
+		if ( input_buffer_find( SDLK_F3 ) )
+		{
+			if ( !CurrentMenu )
+			{
+				MenuRestart( &MENU_LoadSavedGame );
+			}
+			else if ( CurrentMenu == &MENU_LoadSavedGame )
+			{
+				MenuExit();
+			}
+		}
+
+		// F4
+		if ( input_buffer_find( SDLK_F4 ) )
+		{
+			// quick save
+			if ( !CurrentMenu )
+			{
+				MenuRestart( &MENU_SaveGame );
+			}
+			else if ( CurrentMenu == &MENU_SaveGame )
+			{
+				MenuExit();
+			}
+		}
+
+	}
+
+
+	// F5
+	if ( input_buffer_find( SDLK_F5 ) )
+		MissileCameraEnable = !MissileCameraEnable;
+
+	// F6
+	if ( input_buffer_find( SDLK_F6 ) )
+		RearCameraActive = !RearCameraActive;
+
+	// F7
+	if ( input_buffer_find( SDLK_F7 ) )
+		Panel = !Panel;
+
+	// single player mode
+	if( MyGameStatus == STATUS_SinglePlayer )
+	{
+
+		// F9
+		if ( input_buffer_find( SDLK_F9 ) )
+			LastTextMessage();
+
+		// F10
+		if ( input_buffer_find( SDLK_F10 ) )
+			NextTextMessage();
+
+	} // end single player mode
+	else // not single player mode
+	{
+
+		// Shift Modifier
+		if ( SDL_GetModState() & KMOD_SHIFT )
+		{
+
+			// Shift + F9
+			if ( input_buffer_find( SDLK_F9 ) )
+			{
+				if ( !CurrentMenu )
+				{
+					MenuRestart( &MENU_EditMacro1 );
+				}
+				else if ( CurrentMenu == &MENU_EditMacro1 )
+				{
+					MenuExit();
+				}
+			}
+
+			// Shift + F10
+			if ( input_buffer_find( SDLK_F10 ) )
+			{
+				if ( !CurrentMenu )
+				{
+					MenuRestart( &MENU_EditMacro2 );
+				}
+				else if ( CurrentMenu == &MENU_EditMacro2 )
+				{
+					MenuExit();
+				}
+			}
+
+			// Shift + F11
+			if ( input_buffer_find( SDLK_F11 ) )
+			{
+				if ( !CurrentMenu )
+				{
+					MenuRestart( &MENU_EditMacro3 );
+				}
+				else if ( CurrentMenu == &MENU_EditMacro3 )
+				{
+					MenuExit();
+				}
+			}
+
+		} // Shift Modifier
+		else // no modifier
+		{
+
+			// F9
+			if ( input_buffer_find( SDLK_F9 ) )
+				SendGameMessage(MSG_TEXTMSG, 0, 0, TEXTMSGTYPE_Taunt1, 0);
+
+			// F10
+			if ( input_buffer_find( SDLK_F10 ) )
+				SendGameMessage(MSG_TEXTMSG, 0, 0, TEXTMSGTYPE_Taunt2, 0);
+
+			// F11
+			if ( input_buffer_find( SDLK_F11 ) )
+				SendGameMessage(MSG_TEXTMSG, 0, 0, TEXTMSGTYPE_Taunt3, 0);
+
+		} // end (not) shift modifier
+	} // end not single player
+}
+
 // read KEYS.txt and DEUBG_KEYS.txt before changing.
 void ProcessGameKeys( void )
 {
@@ -509,286 +793,11 @@ void ProcessGameKeys( void )
 	// debuggin keys
 	if ( DebugInfo )
 	{
-
-		// Shift Modifier
-		if ( SDL_GetModState() & KMOD_SHIFT )
-		{
-
-			// Shift + F1
-			if ( input_buffer_find( SDLK_F1 ) )
-			{
-				if ( !CurrentMenu )
-				{
-					MenuRestart( &MENU_DebugHelp );
-				}
-				else if ( CurrentMenu == &MENU_DebugHelp )
-				{
-					MenuExit();
-				}
-			}
-
-			// Shift + Ctrl Modifier
-			if ( SDL_GetModState() & KMOD_CTRL )
-			{
-
-				// Shift + Ctrl + F2
-				if ( input_buffer_find( SDLK_F2 ) )
-					SetFOV( chosen_fov = normal_fov );
-
-				// Shift + Ctrl + F3
-				if ( input_buffer_find( SDLK_F3 ) )
-					SetFOV( chosen_fov = normal_fov );
-
-			} // end shift + ctrl modifier
-			else // shift only modifier
-			{
-
-				// Shift + F2
-				if ( input_buffer_find( SDLK_F2 ) )
-					SetFOV( chosen_fov = FOV_GROW( hfov ) );
-
-				// Shift + F3
-				if ( input_buffer_find( SDLK_F3 ) )
-					SetFOV( chosen_fov = FOV_SHRINK( hfov ) );
-
-			} // end shift only modifier
-
-			// Shift + F4
-			if ( input_buffer_find( SDLK_F4 ) )
-				if ( !CurrentMenu )
-					MenuRestart( &MENU_GotoRoom );
-
-			// Shift + F5
-			if ( input_buffer_find( SDLK_F5 ) )
-			{
-				InitShipStartPos( WhoIAm, ++startpos );
-				AddColourMessageToQue(SystemMessageColour,
-					"You are now in %s\n",
-					Mloadheader.Group[ Ships[ WhoIAm ].Object.Group ].name
-					);
-			}
-
-			// Shift + F6
-			if ( input_buffer_find( SDLK_F6 ) )
-				DoClipping = !DoClipping;
-
-			// Shift + F7
-			if ( input_buffer_find( SDLK_F7 ) )
-				ShowBoundingBoxes = !ShowBoundingBoxes;
-
-			// Shift + F8
-			if ( input_buffer_find( SDLK_F8 ) )
-				ShowEFZones = !ShowEFZones;
-
-			// Shift + F9
-			if ( input_buffer_find( SDLK_F9 ) )
-			{
-				if( ShowPortal == 4 )
-				{
-					ShowPortal = 0;
-				}
-				else
-				{
-					ShowPortal++;
-				}
-			}
-
-			// Shift + F10
-			if ( input_buffer_find( SDLK_F10 ) )
-				ShowColZones = !ShowColZones;
-
-
-			// Shift + F12
-			if( input_buffer_find( SDLK_F12 ) )
-				no_collision = !no_collision;
-
-		} // end shift modifier
-		// CTRL Modifiers
-		else if ( SDL_GetModState() & KMOD_CTRL )
-		{
-
-			// Ctrl + F1
-			if ( input_buffer_find( SDLK_F1 ) )
-				ShowTeleports = !ShowTeleports;
-
-			// Ctrl + F2
-			if ( input_buffer_find( SDLK_F2 ) )
-				ShowTrigZones = !ShowTrigZones;
-
-
-		} // end ctrl modifier
-		else // no modifiers
-		{
-
-			// F8
-			if ( input_buffer_find( SDLK_F8 ) )
-			{
-				// Awesome !!!
-				// We need to make this a standard feature!!!
-				if( TargetComputerOn )
-				{
-					TargetComputerOn = false;
-				}
-				else
-				{
-					TargetComputerOn = true;
-				}
-			}
-		}
-
+		ProcessGameKeysDebug( startpos );
 	} // end debug keys
 	else // non debugging mode keys
 	{
-
-		// F1
-		if ( input_buffer_find( SDLK_F1 )  )
-		{
-			if ( !CurrentMenu )
-			{
-				MenuRestart( &MENU_Controls );
-			}
-			else if ( CurrentMenu == &MENU_Controls )
-			{
-				MenuExit();
-			}
-		}
-
-		// F2
-		if ( input_buffer_find( SDLK_F2 )  )
-		{
-			if ( !CurrentMenu )
-			{
-				MenuRestart( &MENU_Options );
-			}
-			else if ( CurrentMenu == &MENU_Options )
-			{
-				MenuExit();
-			}
-		}
-
-		// single player
-		if ( MyGameStatus == STATUS_SinglePlayer )
-		{
-
-			// F3
-			if ( input_buffer_find( SDLK_F3 ) )
-			{
-				if ( !CurrentMenu )
-				{
-					MenuRestart( &MENU_LoadSavedGame );
-				}
-				else if ( CurrentMenu == &MENU_LoadSavedGame )
-				{
-					MenuExit();
-				}
-			}
-
-			// F4
-			if ( input_buffer_find( SDLK_F4 ) )
-			{
-				// quick save
-				if ( !CurrentMenu )
-				{
-					MenuRestart( &MENU_SaveGame );
-				}
-				else if ( CurrentMenu == &MENU_SaveGame )
-				{
-					MenuExit();
-				}
-			}
-
-		}
-
-
-		// F5
-		if ( input_buffer_find( SDLK_F5 ) )
-			MissileCameraEnable = !MissileCameraEnable;
-
-		// F6
-		if ( input_buffer_find( SDLK_F6 ) )
-			RearCameraActive = !RearCameraActive;
-
-		// F7
-		if ( input_buffer_find( SDLK_F7 ) )
-			Panel = !Panel;
-
-		// single player mode
-		if( MyGameStatus == STATUS_SinglePlayer )
-		{
-
-			// F9
-			if ( input_buffer_find( SDLK_F9 ) )
-				LastTextMessage();
-
-			// F10
-			if ( input_buffer_find( SDLK_F10 ) )
-				NextTextMessage();
-
-		} // end single player mode
-		else // not single player mode
-		{
-
-			// Shift Modifier
-			if ( SDL_GetModState() & KMOD_SHIFT )
-			{
-
-				// Shift + F9
-				if ( input_buffer_find( SDLK_F9 ) )
-				{
-					if ( !CurrentMenu )
-					{
-						MenuRestart( &MENU_EditMacro1 );
-					}
-					else if ( CurrentMenu == &MENU_EditMacro1 )
-					{
-						MenuExit();
-					}
-				}
-
-				// Shift + F10
-				if ( input_buffer_find( SDLK_F10 ) )
-				{
-					if ( !CurrentMenu )
-					{
-						MenuRestart( &MENU_EditMacro2 );
-					}
-					else if ( CurrentMenu == &MENU_EditMacro2 )
-					{
-						MenuExit();
-					}
-				}
-
-				// Shift + F11
-				if ( input_buffer_find( SDLK_F11 ) )
-				{
-					if ( !CurrentMenu )
-					{
-						MenuRestart( &MENU_EditMacro3 );
-					}
-					else if ( CurrentMenu == &MENU_EditMacro3 )
-					{
-						MenuExit();
-					}
-				}
-
-			} // Shift Modifier
-			else // no modifier
-			{
-
-				// F9
-				if ( input_buffer_find( SDLK_F9 ) )
-					SendGameMessage(MSG_TEXTMSG, 0, 0, TEXTMSGTYPE_Taunt1, 0);
-
-				// F10
-				if ( input_buffer_find( SDLK_F10 ) )
-					SendGameMessage(MSG_TEXTMSG, 0, 0, TEXTMSGTYPE_Taunt2, 0);
-
-				// F11
-				if ( input_buffer_find( SDLK_F11 ) )
-					SendGameMessage(MSG_TEXTMSG, 0, 0, TEXTMSGTYPE_Taunt3, 0);
-
-			} // end (not) shift modifier
-		} // end not single player
+		ProcessGameKeysNormal();
 	} // end normal keys
 } // ProcessGameKeys
 
