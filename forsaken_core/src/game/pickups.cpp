@@ -3055,6 +3055,203 @@ bool PreLoadPickups( void )
 }
 #endif /* EDITION_REMASTER */
 
+#ifdef EDITION_REMASTER
+/* Populate Remaster N64 pickup slots (100-105) by template-copying
+ * from a similar 1998 pickup (light / glow attribs) once, then point
+ * ModelType at the N64 mesh PreLoadPickups registered. PreLoadPickups
+ * runs on every level change and the slot indices it gets depend on
+ * the level's background and enemy models, so the ModelType overrides
+ * are reapplied on every load, not only the first. */
+[[gnu::always_inline]] static inline void LoadPickupsN64Templates( void )
+{
+	static bool _n64_pickup_init_done = false;
+	if (!_n64_pickup_init_done)
+	{
+		_n64_pickup_init_done = true;
+
+		/* StablizerCrystal (100): glowing crystal pickup → Crystal template. */
+		PickupAttribs[ PICKUP_StablizerCrystal ] = PickupAttribs[ PICKUP_Crystal ];
+
+		/* ComputerCapsule (101): pickup capsule → Computer template
+		 * (no real mesh extracted — not used by any level in the SP
+		 * mission set, kept for completeness). */
+		PickupAttribs[ PICKUP_ComputerCapsule ] = PickupAttribs[ PICKUP_Computer ];
+
+		/* BlackHoleGun parts (102-105): weapon-component pickups → PowerPod
+		 * template for light/glow. */
+		PickupAttribs[ PICKUP_BlackHoleGunPart1 ] = PickupAttribs[ PICKUP_PowerPod ];
+		PickupAttribs[ PICKUP_BlackHoleGunPart2 ] = PickupAttribs[ PICKUP_PowerPod ];
+		PickupAttribs[ PICKUP_BlackHoleGunPart3 ] = PickupAttribs[ PICKUP_PowerPod ];
+		PickupAttribs[ PICKUP_BlackHoleGunPart4 ] = PickupAttribs[ PICKUP_PowerPod ];
+	}
+
+	/* This level's model slots for the real N64 meshes. */
+	if (s_n64_pickup_model_idx[0] >= 0)
+		PickupAttribs[ PICKUP_StablizerCrystal ].ModelType = s_n64_pickup_model_idx[0];
+	if (s_n64_pickup_model_idx[1] >= 0)
+		PickupAttribs[ PICKUP_BlackHoleGunPart1 ].ModelType = s_n64_pickup_model_idx[1];
+	if (s_n64_pickup_model_idx[2] >= 0)
+		PickupAttribs[ PICKUP_BlackHoleGunPart2 ].ModelType = s_n64_pickup_model_idx[2];
+	if (s_n64_pickup_model_idx[3] >= 0)
+		PickupAttribs[ PICKUP_BlackHoleGunPart3 ].ModelType = s_n64_pickup_model_idx[3];
+	if (s_n64_pickup_model_idx[4] >= 0)
+		PickupAttribs[ PICKUP_BlackHoleGunPart4 ].ModelType = s_n64_pickup_model_idx[4];
+}
+#endif /* EDITION_REMASTER */
+
+/* validate each regen point (inside its group, a pickup type this game allows) and set it up by generation type: placed now, after a delay, or on a trigger */
+[[gnu::always_inline]] static inline void LoadPickupsSetupRegenPoints( void )
+{
+	int16_t   Count;
+	VECTOR  Dir = { 0.0F, 0.0F, 0.0F };
+	u_int16_t  i = 0;
+
+	for( Count = 0; Count < NumRegenPoints; Count++ )
+	{
+
+		/* if the regen point is outside of its group
+		   it will be decalred as used and forgetten about
+		   the pickup it holds will be added to the regenerate list */
+
+		if( ! CheckValidRegenSlot( Count ) )
+			continue;
+
+		/* if pickup is NOT valid */
+		if(
+			!FilterPickup( RegenPoints[ Count ].Type ) &&
+				   (!
+					   (( ( RegenPoints[ Count ].Type == PICKUP_Flag) && CaptureTheFlag) ||
+				 ( (RegenPoints[ Count ].Type == PICKUP_Bounty) && BountyHunt ))
+					  )
+			)
+
+			continue;
+
+		/* setup regen point
+		   based on its GenType */
+
+		switch( RegenPoints[ Count ].GenType )
+		{
+
+			/* Initialised Regen Point */
+			/* AKA: Regen Points that have their pickups loaded at start */
+		case PU_GENTYPE_Initialised:
+
+			/* add one to global count for this type of pickup */
+			MaxPickupType[ RegenPoints[ Count ].Type ]++;
+
+			/* try to create the pickup */
+			i = InitOnePickup(
+				  &RegenPoints[ Count ].Pos,
+				  RegenPoints[ Count ].Group,
+				  &Dir,
+				  0.0F,
+				  RegenPoints[ Count ].Type,
+				  INDEX_NONE,
+				  ++Ships[WhoIAm].PickupIdCount,
+				  Count,
+				  false,
+				  RegenPoints[ Count ].Lifespan,
+				  RegenPoints[ Count ].TriggerMod
+				);
+
+			break;
+
+			/* timed regen point */
+			/* AKA: The Regen point will continously generate the pickup ever N seconds */
+		case PU_GENTYPE_Time:
+
+			/* apply the generation delay */
+			RegenPoints[ Count ].GenDelay = ( RegenPoints[ Count ].GenDelay * ANIM_SECOND );
+
+			/* add one to global count for this type of pickup */
+			MaxPickupType[ RegenPoints[ Count ].Type ]++;
+
+			/* ? */
+			RegenPoints[ Count ].PickupID = ++Ships[WhoIAm].PickupIdCount;
+
+			/* set the status of the regen point */
+			RegenPoints[ Count ].Status = PU_REGENSTAT_TimeGen;
+
+			/* set timer to regen event */
+			RegenPoints[ Count ].Wait = RegenPoints[ Count ].GenDelay;
+
+			break;
+
+		case PU_GENTYPE_Trigger:
+
+			/* add one to global count for this type of pickup */
+			MaxPickupType[ RegenPoints[ Count ].Type ]++;
+
+			/* ? */
+			RegenPoints[ Count ].PickupID = ++Ships[WhoIAm].PickupIdCount;
+
+			/* set the status of the regen point */
+			RegenPoints[ Count ].Status = PU_REGENSTAT_TrigGen;
+
+			break;
+		}
+	}
+}
+
+/* outside the bomb/flag modes: the minimum counts of general, pyrolite and suss-gun ammo (and CTF flags per team) that must always exist */
+[[gnu::always_inline]] static inline void LoadPickupsSetMinimums( void )
+{
+	int16_t   Count;
+	u_int16_t  i;
+
+	/* if were not in the blow modes */
+	if(
+		!(
+		( ChangeLevel_MyGameStatus == STATUS_PostStartingSinglePlayer ) ||
+		( ChangeLevel_MyGameStatus == STATUS_SinglePlayer )			  ||
+		( ChangeLevel_MyGameStatus == STATUS_TitleLoadGamePostStartingSinglePlayer)
+		)
+		)
+	{
+		for( Count = 1; Count < MAXPRIMARYWEAPONS; Count++ )
+		{
+			i = PICKUP_Trojax + ( Count - 1 );
+			if( ! FilterPickup( i ) )
+				continue;
+
+			if( MaxPickupType[ i ] < NumPrimaryPickups && ( MaxPickupType[ i ] != 0 ) )
+			{
+				MaxPickupType[ i ] = NumPrimaryPickups;
+
+				if( IsHost )
+					NumPrimWeapons[ Count ] += ( NumPrimaryPickups - NumPickupType [ i ] );
+			}
+		}
+	}
+
+	/* if the minimum ammount of general ammo to allways exist is lower then 3 */
+	if( MaxPickupType[ PICKUP_GeneralAmmo ] < 3 )
+		/* set the minimum of general ammo to to 3 */
+		MaxPickupType[ PICKUP_GeneralAmmo ] = 3;
+
+	/* if the minimum ammount of pryolite ammo to allways exist is 0 */
+	/* and we currently have a pyro on the level */
+	if( ( MaxPickupType[ PICKUP_PyroliteAmmo ] == 0 ) &&
+		( MaxPickupType[ PICKUP_Pyrolite ] != 0 ) )
+		/* set the minimum of pyro ammo that always exists to 2 */
+		MaxPickupType[ PICKUP_PyroliteAmmo ] = 2;
+
+	/* if the minimum ammount of suss gun ammo to allways exist is 0 */
+	/* and we currently have a suss gun on the level */
+	if( ( MaxPickupType[ PICKUP_SussGunAmmo ] == 0 ) &&
+		( MaxPickupType[ PICKUP_SussGun ] != 0 ) )
+		/* set the minimum of suss gun ammot that allways exists to 2 */
+		MaxPickupType[ PICKUP_SussGunAmmo ] = 2;
+
+	/* if we are in ctf mode */
+	if ( CTF )
+		/* for each team */
+		for ( Count = 0; Count < MAX_TEAMS; Count++ )
+			/* set the minimum ammount of flags for this team that allways has to exist to 1 */
+			MaxPickupType[ TeamFlagPickup[ Count ] ] = 1;
+}
+
 /*===================================================================
 	Procedure	:	Load Pickup Positions ( level .PIC regen points )
 	Input		:	Nothing
@@ -3068,8 +3265,6 @@ bool LoadPickupsPositions( void )
 
 	FILE    * fp;
 	int16_t   Count;
-	VECTOR  Dir = { 0.0F, 0.0F, 0.0F };
-	u_int16_t  i = 0;
 	u_int32_t  MagicNumber;
 	u_int32_t  VersionNumber;
 
@@ -3077,48 +3272,9 @@ bool LoadPickupsPositions( void )
 	KillAllPickups();
 
 
-	/* Populate Remaster N64 pickup slots (100-105) by template-copying
-	 * from a similar 1998 pickup (light / glow attribs) once, then point
-	 * ModelType at the N64 mesh PreLoadPickups registered. PreLoadPickups
-	 * runs on every level change and the slot indices it gets depend on
-	 * the level's background and enemy models, so the ModelType overrides
-	 * are reapplied on every load, not only the first. */
 #ifdef EDITION_REMASTER
-	{
-		static bool _n64_pickup_init_done = false;
-		if (!_n64_pickup_init_done)
-		{
-			_n64_pickup_init_done = true;
-
-			/* StablizerCrystal (100): glowing crystal pickup → Crystal template. */
-			PickupAttribs[ PICKUP_StablizerCrystal ] = PickupAttribs[ PICKUP_Crystal ];
-
-			/* ComputerCapsule (101): pickup capsule → Computer template
-			 * (no real mesh extracted — not used by any level in the SP
-			 * mission set, kept for completeness). */
-			PickupAttribs[ PICKUP_ComputerCapsule ] = PickupAttribs[ PICKUP_Computer ];
-
-			/* BlackHoleGun parts (102-105): weapon-component pickups → PowerPod
-			 * template for light/glow. */
-			PickupAttribs[ PICKUP_BlackHoleGunPart1 ] = PickupAttribs[ PICKUP_PowerPod ];
-			PickupAttribs[ PICKUP_BlackHoleGunPart2 ] = PickupAttribs[ PICKUP_PowerPod ];
-			PickupAttribs[ PICKUP_BlackHoleGunPart3 ] = PickupAttribs[ PICKUP_PowerPod ];
-			PickupAttribs[ PICKUP_BlackHoleGunPart4 ] = PickupAttribs[ PICKUP_PowerPod ];
-		}
-
-		/* This level's model slots for the real N64 meshes. */
-		if (s_n64_pickup_model_idx[0] >= 0)
-			PickupAttribs[ PICKUP_StablizerCrystal ].ModelType = s_n64_pickup_model_idx[0];
-		if (s_n64_pickup_model_idx[1] >= 0)
-			PickupAttribs[ PICKUP_BlackHoleGunPart1 ].ModelType = s_n64_pickup_model_idx[1];
-		if (s_n64_pickup_model_idx[2] >= 0)
-			PickupAttribs[ PICKUP_BlackHoleGunPart2 ].ModelType = s_n64_pickup_model_idx[2];
-		if (s_n64_pickup_model_idx[3] >= 0)
-			PickupAttribs[ PICKUP_BlackHoleGunPart3 ].ModelType = s_n64_pickup_model_idx[3];
-		if (s_n64_pickup_model_idx[4] >= 0)
-			PickupAttribs[ PICKUP_BlackHoleGunPart4 ].ModelType = s_n64_pickup_model_idx[4];
-	}
-#endif /* EDITION_REMASTER — N64 pickup template block */
+	LoadPickupsN64Templates();
+#endif
 
 	/* convert the level_name into level_name.pic */
 	Change_Ext( &LevelNames[ LevelNum ][ 0 ], &NewFilename[ 0 ], sizeof( NewFilename ), NewExt );
@@ -3267,92 +3423,7 @@ bool LoadPickupsPositions( void )
 				RandomizePickups();
 
 		/* for each regeneration point */
-		for( Count = 0; Count < NumRegenPoints; Count++ )
-		{
-
-			/* if the regen point is outside of its group
-			   it will be decalred as used and forgetten about
-			   the pickup it holds will be added to the regenerate list */
-
-			if( ! CheckValidRegenSlot( Count ) )
-				continue;
-
-			/* if pickup is NOT valid */
-			if(
-				!FilterPickup( RegenPoints[ Count ].Type ) &&
-					   (!
-						   (( ( RegenPoints[ Count ].Type == PICKUP_Flag) && CaptureTheFlag) ||
-					 ( (RegenPoints[ Count ].Type == PICKUP_Bounty) && BountyHunt ))
-						  )
-				)
-
-				continue;
-
-			/* setup regen point
-			   based on its GenType */
-
-			switch( RegenPoints[ Count ].GenType )
-			{
-
-				/* Initialised Regen Point */
-				/* AKA: Regen Points that have their pickups loaded at start */
-			case PU_GENTYPE_Initialised:
-
-				/* add one to global count for this type of pickup */
-				MaxPickupType[ RegenPoints[ Count ].Type ]++;
-
-				/* try to create the pickup */
-				i = InitOnePickup(
-					  &RegenPoints[ Count ].Pos,
-					  RegenPoints[ Count ].Group,
-					  &Dir,
-					  0.0F,
-					  RegenPoints[ Count ].Type,
-					  INDEX_NONE,
-					  ++Ships[WhoIAm].PickupIdCount,
-					  Count,
-					  false,
-					  RegenPoints[ Count ].Lifespan,
-					  RegenPoints[ Count ].TriggerMod
-					);
-
-				break;
-
-				/* timed regen point */
-				/* AKA: The Regen point will continously generate the pickup ever N seconds */
-			case PU_GENTYPE_Time:
-
-				/* apply the generation delay */
-				RegenPoints[ Count ].GenDelay = ( RegenPoints[ Count ].GenDelay * ANIM_SECOND );
-
-				/* add one to global count for this type of pickup */
-				MaxPickupType[ RegenPoints[ Count ].Type ]++;
-
-				/* ? */
-				RegenPoints[ Count ].PickupID = ++Ships[WhoIAm].PickupIdCount;
-
-				/* set the status of the regen point */
-				RegenPoints[ Count ].Status = PU_REGENSTAT_TimeGen;
-
-				/* set timer to regen event */
-				RegenPoints[ Count ].Wait = RegenPoints[ Count ].GenDelay;
-
-				break;
-
-			case PU_GENTYPE_Trigger:
-
-				/* add one to global count for this type of pickup */
-				MaxPickupType[ RegenPoints[ Count ].Type ]++;
-
-				/* ? */
-				RegenPoints[ Count ].PickupID = ++Ships[WhoIAm].PickupIdCount;
-
-				/* set the status of the regen point */
-				RegenPoints[ Count ].Status = PU_REGENSTAT_TrigGen;
-
-				break;
-			}
-		}
+		LoadPickupsSetupRegenPoints();
 	}
 
 	/* remove the 1000 headroom added above; it kept InitOnePickup's
@@ -3362,56 +3433,7 @@ bool LoadPickupsPositions( void )
 	for( Count = 0; Count < MAXPICKUPTYPES; Count++ )
 		MaxPickupType[ Count ] -= 1000;
 
-	/* if were not in the blow modes */
-	if(
-		!(
-		( ChangeLevel_MyGameStatus == STATUS_PostStartingSinglePlayer ) ||
-		( ChangeLevel_MyGameStatus == STATUS_SinglePlayer )			  ||
-		( ChangeLevel_MyGameStatus == STATUS_TitleLoadGamePostStartingSinglePlayer)
-		)
-		)
-	{
-		for( Count = 1; Count < MAXPRIMARYWEAPONS; Count++ )
-		{
-			i = PICKUP_Trojax + ( Count - 1 );
-			if( ! FilterPickup( i ) )
-				continue;
-
-			if( MaxPickupType[ i ] < NumPrimaryPickups && ( MaxPickupType[ i ] != 0 ) )
-			{
-				MaxPickupType[ i ] = NumPrimaryPickups;
-
-				if( IsHost )
-					NumPrimWeapons[ Count ] += ( NumPrimaryPickups - NumPickupType [ i ] );
-			}
-		}
-	}
-
-	/* if the minimum ammount of general ammo to allways exist is lower then 3 */
-	if( MaxPickupType[ PICKUP_GeneralAmmo ] < 3 )
-		/* set the minimum of general ammo to to 3 */
-		MaxPickupType[ PICKUP_GeneralAmmo ] = 3;
-
-	/* if the minimum ammount of pryolite ammo to allways exist is 0 */
-	/* and we currently have a pyro on the level */
-	if( ( MaxPickupType[ PICKUP_PyroliteAmmo ] == 0 ) &&
-		( MaxPickupType[ PICKUP_Pyrolite ] != 0 ) )
-		/* set the minimum of pyro ammo that always exists to 2 */
-		MaxPickupType[ PICKUP_PyroliteAmmo ] = 2;
-
-	/* if the minimum ammount of suss gun ammo to allways exist is 0 */
-	/* and we currently have a suss gun on the level */
-	if( ( MaxPickupType[ PICKUP_SussGunAmmo ] == 0 ) &&
-		( MaxPickupType[ PICKUP_SussGun ] != 0 ) )
-		/* set the minimum of suss gun ammot that allways exists to 2 */
-		MaxPickupType[ PICKUP_SussGunAmmo ] = 2;
-
-	/* if we are in ctf mode */
-	if ( CTF )
-		/* for each team */
-		for ( Count = 0; Count < MAX_TEAMS; Count++ )
-			/* set the minimum ammount of flags for this team that allways has to exist to 1 */
-			MaxPickupType[ TeamFlagPickup[ Count ] ] = 1;
+	LoadPickupsSetMinimums();
 
 	/* finally done */
 	return( true );
