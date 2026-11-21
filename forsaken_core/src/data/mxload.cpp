@@ -71,18 +71,6 @@
 constexpr int MX_VERSION_NUMBER = 2;
 
 /*===================================================================
-		Globals...
-===================================================================*/
-
-constexpr int NUMOFPOLYSPER3DPANELITEM = 2;
-POLYANIM * Panel3DPolyAnims_Primary[NUMOFPOLYSPER3DPANELITEM];
-POLYANIM * Panel3DPolyAnims_Secondary[NUMOFPOLYSPER3DPANELITEM];
-POLYANIM * Panel3DPolyAnims_Mine[NUMOFPOLYSPER3DPANELITEM];
-POLYANIM * Panel3DPolyAnims_MineNum[NUMOFPOLYSPER3DPANELITEM];
-
-void Check3DPanelPolyAnim(POLYANIM * PolyAnim );
-
-/*===================================================================
 	Procedure	:		Load .Mx File
 	Input		:		char	*	Filename , MXLOADHEADER *
 	Output		:		Nothing
@@ -339,7 +327,7 @@ void Check3DPanelPolyAnim(POLYANIM * PolyAnim );
 }
 
 /* load the model's texture animations. True: Mxload fails. */
-[[gnu::always_inline]] static inline bool MxloadBackgroundAnimations( char *& Filename, MXLOADHEADER *& Mxloadheader, bool & Panel, LVERTEX *& LVert, int & i, int & e, int & o, int & mesh, int & group, u_int16_t & animation, u_int16_t & frames, u_int16_t & vertices, POLYANIM *& PolyAnim, TANIMUV *& TanimUV, int *& intPnt, u_int16_t & num_animations, u_int16_t & animsize, FileReader & in )
+[[gnu::always_inline]] static inline bool MxloadBackgroundAnimations( char *& Filename, MXLOADHEADER *& Mxloadheader, LVERTEX *& LVert, int & i, int & e, int & o, int & mesh, int & group, u_int16_t & animation, u_int16_t & frames, u_int16_t & vertices, POLYANIM *& PolyAnim, TANIMUV *& TanimUV, int *& intPnt, u_int16_t & num_animations, u_int16_t & animsize, FileReader & in )
 {
 	if( num_animations )
 	{
@@ -428,11 +416,6 @@ void Check3DPanelPolyAnim(POLYANIM * PolyAnim );
 						}
 
 						FixUV_Anim( PolyAnim, LVert, Mxloadheader->Group[group].originalVerts[mesh] );
-
-						if( Panel )
-						{
-							Check3DPanelPolyAnim( PolyAnim );
-						}
 
 						PolyAnim++;
 					}
@@ -607,18 +590,6 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 		}
 	}
 
-	if( Panel )
-	{
-		// clear out the 3d Panel PolyAnim Data....
-		for( i = 0 ; i < NUMOFPOLYSPER3DPANELITEM ; i++ )
-		{
-			Panel3DPolyAnims_Primary[i]=nullptr;
-			Panel3DPolyAnims_Secondary[i]=nullptr;
-			Panel3DPolyAnims_Mine[i]=nullptr;
-			Panel3DPolyAnims_MineNum[i]=nullptr;
-		}
-	}
-
 	if( Mxloadheader->Buffer == nullptr)
 	{
 		Msg( "Mxload() Buffer was not allocated in %s\n", Filename );
@@ -655,7 +626,7 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 	num_animations = in.u16();
 	Mxloadheader->AnimData.num_animations = num_animations;
 
-	if( MxloadBackgroundAnimations( Filename, Mxloadheader, Panel, LVert, i, e, o, mesh, group, animation, frames, vertices, PolyAnim, TanimUV, intPnt, num_animations, animsize, in ) )
+	if( MxloadBackgroundAnimations( Filename, Mxloadheader, LVert, i, e, o, mesh, group, animation, frames, vertices, PolyAnim, TanimUV, intPnt, num_animations, animsize, in ) )
 		return false;
 
 	/*===================================================================
@@ -1172,48 +1143,5 @@ bool RestoreColourMxloadHeader( MXLOADHEADER * Mxloadheader1 )
 		}
 	}
 	return true;
-}
-/*===================================================================
-	Procedure	:		CheckFor 3d Panel PolyAnims..
-	Input		;		POLYANIM * PolyAnim
-	Output		:		NOTHING
-===================================================================*/
-void Check3DPanelPolyAnim(POLYANIM * PolyAnim )
-{
-	int j;
-	// Make a note of any polyanims that are to do with the 3D Panel.....
-	if( strcasecmp( "Primary" , (char*) &PolyAnim->Tag[0] ) == 0 )
-	{
-		for( j = 0 ; j < NUMOFPOLYSPER3DPANELITEM ; j++ )
-		{
-			if( Panel3DPolyAnims_Primary[j] == nullptr )
-				Panel3DPolyAnims_Primary[j] = PolyAnim;
-		}
-	}
-	else if( strcasecmp( "Secondary" , (char*) &PolyAnim->Tag[0] ) == 0 )
-	{
-		for( j = 0 ; j < NUMOFPOLYSPER3DPANELITEM ; j++ )
-		{
-			if( Panel3DPolyAnims_Secondary[j] == nullptr )
-				Panel3DPolyAnims_Secondary[j] = PolyAnim;
-		}
-	}
-	else if( strcasecmp( "Mine" , (char*) &PolyAnim->Tag[0] ) == 0 )
-	{
-		for( j = 0 ; j < NUMOFPOLYSPER3DPANELITEM ; j++ )
-		{
-			if( Panel3DPolyAnims_Mine[j] == nullptr )
-				Panel3DPolyAnims_Mine[j] = PolyAnim;
-		}
-
-	}
-	else if( strcasecmp( "MineNum" , (char*) &PolyAnim->Tag[0] ) == 0 )
-	{
-		for( j = 0 ; j < NUMOFPOLYSPER3DPANELITEM ; j++ )
-		{
-			if( Panel3DPolyAnims_MineNum[j] == nullptr )
-				Panel3DPolyAnims_MineNum[j] = PolyAnim;
-		}
-	}
 }
 
