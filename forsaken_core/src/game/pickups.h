@@ -4,8 +4,8 @@
  *
  * PickupAttribs[] (pickups.cpp) gives each PICKUP_* type its model and light.
  * Pickups[MAXPICKUPS] is the live pool, reset by InitPickups at scene init;
- * the used list starts at FirstPickupUsed and is walked through Prev, and each
- * pickup is also on a per-group list (PickupGroups[]). LoadPickupsPositions
+ * the used list (whose head is private to pickups.cpp's PickupPool) is walked
+ * through Prev, and each pickup is also on a per-group list (PickupGroups[]). LoadPickupsPositions
  * reads the level .PIC into RegenPoints[] (malloc'd per level, plus one copy
  * per player in RegenSlotsCopy[]) and seeds the level's pickups.
  *
