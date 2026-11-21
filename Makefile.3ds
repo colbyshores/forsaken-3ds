@@ -135,6 +135,17 @@ ifeq ($(wildcard $(SMDH_ICON)),)
 SMDH_ICON := $(DEVKITPRO)/libctru/default_icon.png
 endif
 
+# What the HOME menu shows: title, description, publisher. The release
+# (EDITION=remaster) is Forsaken Remastered; the 1998-data build keeps the
+# original name.
+ifeq ($(EDITION),remaster)
+SMDH_TITLE     := Forsaken Remastered
+else
+SMDH_TITLE     := Forsaken
+endif
+SMDH_DESC      := $(SMDH_TITLE)
+SMDH_PUBLISHER := killprocess
+
 #---------------------------------------------------------------------------------
 # Targets
 #---------------------------------------------------------------------------------
@@ -336,10 +347,11 @@ $(CIA_ROMFS_STAMP): $(ROMFS_STAMP)
 		$(ROMFS_STAGING)/ $(CIA_ROMFS)/
 	@touch $(CIA_ROMFS_STAMP)
 
-$(OUTPUT_SMDH):
+# Rebuilt when this Makefile (the names above) changes.
+$(OUTPUT_SMDH): Makefile.3ds
 	@echo "Creating SMDH..."
 	@mkdir -p $(OUTDIR)
-	smdhtool --create "Forsaken" "3DS port of ForsakenX" "ForsakenX" $(SMDH_ICON) $@
+	smdhtool --create "$(SMDH_TITLE)" "$(SMDH_DESC)" "$(SMDH_PUBLISHER)" $(SMDH_ICON) $@
 
 $(OUTPUT_CIA_SMDH): $(OUTPUT_SMDH)
 	python3 -c "import sys; d = bytearray(open(sys.argv[1], 'rb').read()); d[0x2028] |= 0x20; open(sys.argv[2], 'wb').write(d)" $< $@
