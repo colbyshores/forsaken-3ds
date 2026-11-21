@@ -6611,6 +6611,11 @@ void SelectText( MENUITEM *Item )
 	t = (TEXT *)(Item->Variable);
 	OriginalText = *t;
 	t->insert_pos = strlen( t->text );
+#ifdef __3DS__
+	/* No keyboard: ask for the system one. MenuProcess finishes the field
+	 * with its result. */
+	platform_text_input_begin( t->text, t->limit_length, t->FuncType == TypeFileName );
+#endif
 }
 
 void SelectFlatMenutext( MENUITEM *Item )
@@ -14648,6 +14653,29 @@ void MenuProcess()
 		Pulse -= (float)floorf((double)Pulse);
 
 	// TODO - need to handle MENU_NEW_Error
+
+#ifdef __3DS__
+	/* The system keyboard SelectText asked for has closed: type its text into
+	 * the field (through TextType, so the field's filter and length limit
+	 * apply) and finish the field as a keyboard's RETURN or ESCAPE would. */
+	if ( ( MenuState == MENUSTATE_Text || MenuState == MENUSTATE_Text2 ) && TextItem )
+	{
+		char typed[ MAXTEXTMSG ];
+		bool accepted;
+		if ( platform_text_input_result( typed, sizeof( typed ), &accepted ) )
+		{
+			TEXT *t = (TEXT *)TextItem->Variable;
+			if ( accepted )
+			{
+				TextClear( t );
+				for ( const char *c = typed; *c; c++ )
+					TextType( t, *c );
+			}
+			input_buffer_reset();
+			input_buffer[ input_buffer_count++ ] = accepted ? SDLK_RETURN : SDLK_ESCAPE;
+		}
+	}
+#endif
 
 	for( i = 0 ; i < input_buffer_count ; i++ )
 	{

@@ -28,6 +28,7 @@
 #include "input/input.h"
 #include "util/util.h"
 #include "platform_3ds/controls_3ds.h"
+#include "platform_3ds/keyboard_3ds.h"
 
 /* ---- globals expected by the engine ---- */
 
@@ -151,6 +152,12 @@ bool HidPoller::poll()
 	circlePosition cstick;
 	u_int32_t kDown, kHeld;
 	int deadzone;
+
+	/* A menu text field asked for the system keyboard: it opens here, before
+	 * this pass draws anything. Afterwards scan twice, so the press that
+	 * closed it is not also a new press for the game. */
+	if (keyboard_3ds_service())
+		hidScanInput();
 
 	/* pump HID */
 	hidScanInput();
