@@ -20,10 +20,10 @@ aiscan	forsaken_core/src/ai/aiscan.cpp	cpp	8ce1580	todo	-	transitive (ramqan ben
 aispline	forsaken_core/src/ai/aispline.cpp	cpp	ced5653	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
 dsp_adpcm	forsaken_core/src/audio/dsp_adpcm.cpp	cpp	4f19b6a	todo	test_modules	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
 music_table	forsaken_core/src/audio/music_table.cpp	cpp	87549bd	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
-sfx	forsaken_core/src/audio/sfx.cpp	cpp	eb79483	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+sfx	forsaken_core/src/audio/sfx.cpp	cpp	eb79483	d69cc9a SfxCatalog+SfxPlayer+Taunts (private part)	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
 config	forsaken_core/src/data/config.cpp	cpp	ba54803	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
 file	forsaken_core/src/data/file.cpp	cpp	6836f6b	30e4acd FileSearch	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
-loadsave	forsaken_core/src/data/loadsave.cpp	cpp	6578ec8	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+loadsave	forsaken_core/src/data/loadsave.cpp	cpp	6578ec8	a3e6860 SavedGames SaveGames (full)	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
 mload	forsaken_core/src/data/mload.cpp	cpp	6c9501b	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
 mxaload	forsaken_core/src/data/mxaload.cpp	cpp	121cc1f	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
 mxload	forsaken_core/src/data/mxload.cpp	cpp	5c56881	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
@@ -35,19 +35,19 @@ compobjects	forsaken_core/src/game/compobjects.cpp	cpp	f151bc2	todo	-	transitive
 demo	forsaken_core/src/game/demo.cpp	cpp	5d340cc	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
 enemies	forsaken_core/src/game/enemies.cpp	cpp	e5af6fc	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
 extforce	forsaken_core/src/game/extforce.cpp	cpp	c321b0d	8c89172 ExternalForceSet (private part)	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	exported ExternalForces[] remains a global
-goal	forsaken_core/src/game/goal.cpp	cpp	61d7466	b79ccc5 Goals (private part)	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	exported TeamFlag[] remains a global
+goal	forsaken_core/src/game/goal.cpp	cpp	61d7466	bf3c5d4 GoalZones (full)	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	exported TeamFlag[] remains a global
 main	forsaken_core/src/game/main.cpp	cpp	3568753	todo	-	A/B REQUIRED (C->C++ front end changes codegen)	was C (platform/backend TU) until the extern "C" removal
 models	forsaken_core/src/game/models.cpp	cpp	222509b	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
 oct2	forsaken_core/src/game/oct2.cpp	cpp	4f65e74	todo	-	PASS fid-ab-20261116 (tier3)	
-pickups	forsaken_core/src/game/pickups.cpp	cpp	5ab8bbd	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
-primary	forsaken_core/src/game/primary.cpp	cpp	60819fb	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	BEHAVIOUR FIX pending A/B: ModelHeaders/MxaModelHeaders extern were arrays over heap pointers since the Q3 refactor (OWNER_MODELSPOTFX bullets read SpotFX from the wrong base)
+pickups	forsaken_core/src/game/pickups.cpp	cpp	5ab8bbd	94844c0 PickupPool (private part)	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+primary	forsaken_core/src/game/primary.cpp	cpp	60819fb	219474c PrimaryWeapons (private part)	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	BEHAVIOUR FIX pending A/B: ModelHeaders/MxaModelHeaders extern were arrays over heap pointers since the Q3 refactor (OWNER_MODELSPOTFX bullets read SpotFX from the wrong base)
 restart	forsaken_core/src/game/restart.cpp	cpp	9d21b80	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
-secondary	forsaken_core/src/game/secondary.cpp	cpp	4eda836	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+secondary	forsaken_core/src/game/secondary.cpp	cpp	4eda836	11a0674 SecondaryWeapons (private part)	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
 ships	forsaken_core/src/game/ships.cpp	cpp	6e3a4c6	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
 singleplayer	forsaken_core/src/game/singleplayer.cpp	cpp	b1a6bc2	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
 skin	forsaken_core/src/game/skin.cpp	cpp	b1c7b01	d958578 SkinViews (private part)	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
 spotfx	forsaken_core/src/game/spotfx.cpp	cpp	57e292f	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
-stats	forsaken_core/src/game/stats.cpp	cpp	e373585	440de15 GameStats (private part)	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	exported KillStats/BonusStats/KillCounter remain globals
+stats	forsaken_core/src/game/stats.cpp	cpp	e373585	bcefa45 GameStats Stats (full: exported state behind inline members)	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	exported KillStats/BonusStats/KillCounter remain globals
 teleport	forsaken_core/src/game/teleport.cpp	cpp	791e88a	352b970 Teleporters (private part)	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	exported Teleports[] remains a global
 trigarea	forsaken_core/src/game/trigarea.cpp	cpp	45b3d6f	c6d2e55 TriggerAreas (private part)	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	exported Zones/Entry/Exit/In remain globals
 triggers	forsaken_core/src/game/triggers.cpp	cpp	d2a89e8	6e9730b TriggerState (private part)	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
@@ -65,11 +65,11 @@ lights	forsaken_core/src/rendering/lights.cpp	cpp	a65ed11	todo	-	transitive (ram
 lines	forsaken_core/src/rendering/lines.cpp	cpp	a55c06e	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
 polys	forsaken_core/src/rendering/polys.cpp	cpp	9634a58	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
 rtlight	forsaken_core/src/rendering/rtlight.cpp	cpp	ce745ae	13a1278 RealTimeLights	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
-screenpolys	forsaken_core/src/rendering/screenpolys.cpp	cpp	75cc934	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+screenpolys	forsaken_core/src/rendering/screenpolys.cpp	cpp	75cc934	ad99661 ScrPolyPool+CountdownClock (private part)	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
 stereomemo	forsaken_core/src/rendering/stereomemo.cpp	cpp	3bd8416	todo	test_stereomemo	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
 text	forsaken_core/src/rendering/text.cpp	cpp	ff84d3d	ee0e529 HudText (private part)	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
 texture_png	forsaken_core/src/rendering/texture_png.cpp	cpp	4bf7fc9	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
-transexe	forsaken_core/src/rendering/transexe.cpp	cpp	ffe2bec	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+transexe	forsaken_core/src/rendering/transexe.cpp	cpp	ffe2bec	3d0ea22 TranslucentQueue Translucents (full)	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
 lua_common	forsaken_core/src/scripting/lua_common.cpp	cpp	3466132	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
 lua_config	forsaken_core/src/scripting/lua_config.cpp	cpp	6742088	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
 lua_games	forsaken_core/src/scripting/lua_games.cpp	cpp	b1f9b78	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
@@ -77,8 +77,8 @@ title	forsaken_core/src/ui/title.cpp	cpp	591d0e4	todo	-	PASS fid-ab-20261116 (ti
 hunk_alloc	forsaken_core/src/util/hunk_alloc.cpp	cpp	4f19b6a	todo	test_modules	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
 timer	forsaken_core/src/util/timer.cpp	cpp	12e46c1	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
 util	forsaken_core/src/util/util.cpp	cpp	6836f6b	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
-xmem	forsaken_core/src/util/xmem.cpp	cpp	12e46c1	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
-bsp	forsaken_core/src/world/bsp.cpp	cpp	697102f	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+xmem	forsaken_core/src/util/xmem.cpp	cpp	12e46c1	b1b83e4 XMemTracker XMem (full)	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+bsp	forsaken_core/src/world/bsp.cpp	cpp	697102f	409ff80 BspRay (private part)	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
 collision	forsaken_core/src/world/collision.cpp	cpp	372c223	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
 node	forsaken_core/src/world/node.cpp	cpp	63f93d5	b1905a5 NodeRoutes (private part)	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
 visi	forsaken_core/src/world/visi.cpp	cpp	386542d	11b4ee0 Visibility (private part)	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
@@ -86,7 +86,7 @@ music_3ds	forsaken_3ds/src/audio/music_3ds.cpp	cpp	3568753	done c58f4b1	-	P2: on
 sound_3ds	forsaken_3ds/src/audio/sound_3ds.cpp	cpp	3568753	3a11065 SoundSystem	-	A/B REQUIRED (C->C++ front end changes codegen)	was C (platform/backend TU) until the extern "C" removal
 net_3ds	forsaken_3ds/src/net/net_3ds.cpp	cpp	e60c503	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
 controls_3ds	forsaken_3ds/src/platform_3ds/controls_3ds.cpp	cpp	3568753	171043b ButtonMap+RemapMenu	-	A/B REQUIRED (C->C++ front end changes codegen)	was C (platform/backend TU) until the extern "C" removal
-input_3ds	forsaken_3ds/src/platform_3ds/input_3ds.cpp	cpp	3568753	todo	-	A/B REQUIRED (C->C++ front end changes codegen)	was C (platform/backend TU) until the extern "C" removal
+input_3ds	forsaken_3ds/src/platform_3ds/input_3ds.cpp	cpp	3568753	06b8c0a HidPoller (private part)	-	A/B REQUIRED (C->C++ front end changes codegen)	was C (platform/backend TU) until the extern "C" removal
 main_3ds	forsaken_3ds/src/platform_3ds/main_3ds.cpp	cpp	3568753	todo	-	A/B REQUIRED (C->C++ front end changes codegen)	was C (platform/backend TU) until the extern "C" removal
 stubs_3ds	forsaken_3ds/src/platform_3ds/stubs_3ds.cpp	cpp	3568753	todo	-	A/B REQUIRED (C->C++ front end changes codegen)	was C (platform/backend TU) until the extern "C" removal
 render_c3d	forsaken_3ds/src/rendering/render_c3d.cpp	cpp	3568753	todo	-	A/B REQUIRED (C->C++ front end changes codegen)	was C (platform/backend TU) until the extern "C" removal
