@@ -104,6 +104,7 @@ MXALOADHEADER *MxaModelHeaders = nullptr;
 			return true;
 		}
 		Mxaloadheader->Group[group].renderObject[mesh].vertOwner = VERT_OWNER_MXA;
+		Mxaloadheader->Group[group].renderObject[mesh].atlasSeed = mesh_atlas_seed( Filename, group, mesh );
 
 		DebugPrintf("created buffer to hold :%d verts\n", num_vertices);
 

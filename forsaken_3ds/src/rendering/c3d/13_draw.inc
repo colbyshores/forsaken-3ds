@@ -179,11 +179,13 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 {
 	int group;
 
-	/* Per-mesh atlas seed — hash of the renderObject pointer.
-	 * Stable for the lifetime of the level, distinct per mesh, so
-	 * walls in different meshes sharing the same base texture each
-	 * land in their own ProcTex phase bucket. */
-	s_atlasSeed   = (u32)((uintptr_t)renderObject) * 0x9E3779B1u;
+	/* Per-mesh atlas seed, set by the loader from the mesh's file, group
+	 * and index (mesh_atlas_seed), so walls in different meshes sharing
+	 * the same base texture each land in their own ProcTex phase bucket.
+	 * It used to hash the renderObject pointer, which made every wall's
+	 * grain depend on the build's memory layout. 10_texenv.inc reads bits
+	 * 8..23. */
+	s_atlasSeed   = (u32)renderObject->atlasSeed << 8;
 	s_isOrthoDraw = orthographic;
 	c255_init();
 

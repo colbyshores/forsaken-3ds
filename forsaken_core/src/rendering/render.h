@@ -257,6 +257,7 @@ struct RENDEROBJECT
 	BUFFER_HANDLE	normalBuffer;
 	BUFFER_HANDLE	indexBuffer;
 	bool			vbLocked;
+	u_int16_t		atlasSeed;	/* per-mesh ProcTex grain phase; see mesh_atlas_seed */
 	int numTextureGroups;
 	TEXTUREGROUP *textureGroups;
 	unsigned int memoEpochPass;
@@ -271,6 +272,7 @@ struct LEVELRENDEROBJECT
 	BUFFER_HANDLE	normalBuffer;
 	BUFFER_HANDLE	indexBuffer;
 	bool			vbLocked;
+	u_int16_t		atlasSeed;	/* per-mesh ProcTex grain phase; see mesh_atlas_seed */
 	int numTextureGroups;
 	TEXTUREGROUP *textureGroups;
 	unsigned int memoEpochPass;
@@ -278,6 +280,21 @@ struct LEVELRENDEROBJECT
 	unsigned int memoEpochResume;
 	unsigned int vertOwner;
 };
+
+/* Per-mesh ProcTex grain phase (draw_render_object, 10_texenv.inc): a
+ * stable identity for the mesh, so walls that share a base texture still
+ * get different grain. Derived from the model/level file and the mesh's
+ * group and index when the loader creates it, never from an address,
+ * so a build's picture does not depend on its memory layout. 0 (the
+ * zeroed default) is fine for HUD, debug and scratch objects. */
+inline u_int16_t mesh_atlas_seed( const char *file, int group, int mesh )
+{
+	u_int32_t h = 2166136261u;
+	for( const char *c = file; c && *c; c++ ) { h ^= (unsigned char)*c; h *= 16777619u; }
+	h ^= (u_int32_t)( group * 4099 + mesh );
+	h *= 0x9E3779B1u;
+	return (u_int16_t)( h >> 8 );
+}
 
 struct RENDERMATRIX {
 	union {
