@@ -23,8 +23,6 @@ constexpr int BSP_PORTAL_VERSION_NUMBER = (1);
 /*===================================================================
 		Globals ...
 ===================================================================*/
-bool FindCollision( BSP_NODE * node_ptr, VECTOR * start_point_ptr, VECTOR * end_point_ptr );
-
 BSP_HEADER Bsp_Header[ MAX_BSP_MODELS ];
 
 BSP_NODE *	BSP_Nodes[256];
@@ -276,15 +274,33 @@ void Bspfree( void )
 
 #define POINT_TO_PLANE( P, N ) ( (P)->x * (N)->Normal.x + (P)->y * (N)->Normal.y + (P)->z * (N)->Normal.z + ( (N)->Offset) )
 
-static VECTOR RayPos;
-static VECTOR RayDir;
-static float RayLength;
-VECTOR CollidePoint;
-BSP_NODE *CollideNode;
 BSP_NODE *OldCollideNode;
 float CollisionRadius = 0.0F;
 
-bool RayCollide( BSP_HEADER *Bsp_Header, VECTOR *StartPos, VECTOR *Dir, VECTOR *ImpactPoint, VECTOR *ImpactNormal, float *ImpactOffset , u_int16_t group)
+namespace {
+
+/* The ray test's working state (one instance, g_bspray): the current ray's
+ * start, direction and length, set by each RayCollide, and the nearest plane
+ * and point it hits, which find_collision records as it walks the group's
+ * BSP tree. Nothing outside the ray test reads them; RayCollide copies the
+ * hit out (and into the global OldCollideNode). */
+class BspRay {
+	public:
+	bool collide( BSP_HEADER *Bsp_Header, VECTOR *StartPos, VECTOR *Dir, VECTOR *ImpactPoint, VECTOR *ImpactNormal, float *ImpactOffset , u_int16_t group );
+
+	private:
+	bool find_collision( BSP_NODE * node_ptr, VECTOR * start_point_ptr, VECTOR * end_point_ptr );
+
+	VECTOR     RayPos = {};
+	VECTOR     RayDir = {};
+	VECTOR     CollidePoint = {};
+	BSP_NODE * CollideNode = nullptr;
+	float      RayLength = 0.0F;
+};
+
+} // namespace
+
+bool BspRay::collide( BSP_HEADER *Bsp_Header, VECTOR *StartPos, VECTOR *Dir, VECTOR *ImpactPoint, VECTOR *ImpactNormal, float *ImpactOffset , u_int16_t group)
 {
 	bool collided;
 	VECTOR EndPos;
@@ -298,7 +314,7 @@ bool RayCollide( BSP_HEADER *Bsp_Header, VECTOR *StartPos, VECTOR *Dir, VECTOR *
 	EndPos.z = StartPos->z + Dir->z;
 	Depth = 0;
 
-	collided = FindCollision( Bsp_Header->Bsp_Tree[ group % Bsp_Header->NumGroups ].Root, StartPos, &EndPos );
+	collided = find_collision( Bsp_Header->Bsp_Tree[ group % Bsp_Header->NumGroups ].Root, StartPos, &EndPos );
 
 	if ( collided && CollideNode )
 	{
@@ -323,7 +339,7 @@ bool RayCollide( BSP_HEADER *Bsp_Header, VECTOR *StartPos, VECTOR *Dir, VECTOR *
 						VECTOR * end Position
 	Output		:		bool
 ===================================================================*/
-bool FindCollision( BSP_NODE * node_ptr, VECTOR * start_point_ptr, VECTOR * end_point_ptr )
+bool BspRay::find_collision( BSP_NODE * node_ptr, VECTOR * start_point_ptr, VECTOR * end_point_ptr )
 {
 	float		d1, d2;
 	VECTOR		intersection_point;
@@ -357,11 +373,11 @@ bool FindCollision( BSP_NODE * node_ptr, VECTOR * start_point_ptr, VECTOR * end_
 
 			if ( node_ptr->Back && node_ptr->Front )
 			{
-				if ( FindCollision( node_ptr->Back, start_point_ptr, end_point_ptr ) )
+				if ( find_collision( node_ptr->Back, start_point_ptr, end_point_ptr ) )
 				{
 					Back_CollideNode = CollideNode;
 					Back_CollidePoint = CollidePoint;
-					if ( FindCollision( node_ptr->Front, start_point_ptr, end_point_ptr ) )
+					if ( find_collision( node_ptr->Front, start_point_ptr, end_point_ptr ) )
 					{
 						VECTOR dv;
 
@@ -388,16 +404,16 @@ bool FindCollision( BSP_NODE * node_ptr, VECTOR * start_point_ptr, VECTOR * end_
 				}
 				else
 				{
-					return FindCollision( node_ptr->Front, start_point_ptr, end_point_ptr );
+					return find_collision( node_ptr->Front, start_point_ptr, end_point_ptr );
 				}
 			}
 			else if ( node_ptr->Back )
 			{
-				return FindCollision( node_ptr->Back, start_point_ptr, end_point_ptr );
+				return find_collision( node_ptr->Back, start_point_ptr, end_point_ptr );
 			}
 			else if ( node_ptr->Front )
 			{
-				return FindCollision( node_ptr->Front, start_point_ptr, end_point_ptr );
+				return find_collision( node_ptr->Front, start_point_ptr, end_point_ptr );
 			}
 			else // oh shit...what do we do now???
 			{
@@ -449,7 +465,7 @@ bool FindCollision( BSP_NODE * node_ptr, VECTOR * start_point_ptr, VECTOR * end_
 	}
 
 	if( ( !near_node_ptr && ( side ) ) ||
-		( near_node_ptr && FindCollision( near_node_ptr, start_point_ptr, &intersection_point ) ) )
+		( near_node_ptr && find_collision( near_node_ptr, start_point_ptr, &intersection_point ) ) )
 	{
 		return true;
 	}
@@ -461,7 +477,7 @@ bool FindCollision( BSP_NODE * node_ptr, VECTOR * start_point_ptr, VECTOR * end_
 			return false;
 		return true;
 	}
-	return FindCollision( far_node_ptr, &intersection_point, end_point_ptr );
+	return find_collision( far_node_ptr, &intersection_point, end_point_ptr );
 }
 
 /*===================================================================
@@ -513,3 +529,7 @@ bool PointInsideSkin( VECTOR *Pos, u_int16_t Group )
 	}
 	return !AmIOutsideGroup( &Mloadheader, Pos, Group );
 }
+
+namespace { BspRay g_bspray; }
+
+bool RayCollide( BSP_HEADER *Bsp_Header, VECTOR *StartPos, VECTOR *Dir, VECTOR *ImpactPoint, VECTOR *ImpactNormal, float *ImpactOffset , u_int16_t group ) { return g_bspray.collide( Bsp_Header, StartPos, Dir, ImpactPoint, ImpactNormal, ImpactOffset, group ); }
