@@ -142,6 +142,9 @@ endif
 OUTPUT_ELF  := $(OUTDIR)/$(TARGET).elf
 OUTPUT_3DSX := $(OUTDIR)/$(TARGET).3dsx
 OUTPUT_SMDH := $(OUTDIR)/$(TARGET).smdh
+# The CIAs' SMDH: the same file with the "extendedbanner" flag (0x20 at
+# 0x2028) set, so the HOME menu plays the 3D banner (banner/SPEC.md).
+OUTPUT_CIA_SMDH := $(OUTDIR)/$(TARGET)_cia.smdh
 
 # Physical romfs directory (no symlinks - 3dsxtool can't follow them)
 ROMFS_STAGING := $(OUTDIR)/romfs
@@ -338,6 +341,9 @@ $(OUTPUT_SMDH):
 	@mkdir -p $(OUTDIR)
 	smdhtool --create "Forsaken" "3DS port of ForsakenX" "ForsakenX" $(SMDH_ICON) $@
 
+$(OUTPUT_CIA_SMDH): $(OUTPUT_SMDH)
+	python3 -c "import sys; d = bytearray(open(sys.argv[1], 'rb').read()); d[0x2028] |= 0x20; open(sys.argv[2], 'wb').write(d)" $< $@
+
 $(OUTPUT_3DSX): $(OUTPUT_ELF) $(OUTPUT_SMDH) $(ROMFS_STAMP)
 	@echo "Creating 3DSX..."
 	3dsxtool $< $@ --smdh=$(OUTPUT_SMDH) --romfs=$(ROMFS_STAGING)
@@ -359,7 +365,7 @@ $(BUILD)/%.o: %.cpp $(STAMP)
 
 clean:
 	@echo "Cleaning 3DS build..."
-	@rm -rf $(BUILD) $(OUTPUT_ELF) $(OUTPUT_3DSX) $(OUTPUT_SMDH) $(OUTDIR)/$(TARGET).map $(OUTPUT_BNR) $(OUTPUT_CIA) $(OUTPUT_CIA_ALT) $(OUTPUT_CIA_HIMEM) $(OUTPUT_CIA_HIMEM_ALT)
+	@rm -rf $(BUILD) $(OUTPUT_ELF) $(OUTPUT_3DSX) $(OUTPUT_SMDH) $(OUTPUT_CIA_SMDH) $(OUTDIR)/$(TARGET).map $(OUTPUT_BNR) $(OUTPUT_CIA) $(OUTPUT_CIA_ALT) $(OUTPUT_CIA_HIMEM) $(OUTPUT_CIA_HIMEM_ALT)
 
 romfs-clean:
 	@echo "Cleaning romfs staging..."
@@ -370,7 +376,11 @@ romfs-clean:
 #   - tools/makerom    (downloaded by `make tools-fetch`)
 #   - tools/bannertool ("                                          ")
 #   - assets/icon.png         (48x48 home-menu icon)
-#   - assets/banner.png       (256x128 home-menu banner)
+#   - assets/banner.cgfx      (animated 3D home-menu banner, built by
+#                              banner/build_banner.py --install; see
+#                              banner/SPEC.md. Without it the still
+#                              assets/banner.png is used.)
+#   - assets/banner.png       (256x128 home-menu banner, fallback)
 #   - assets/banner.wav       (silent or short clip, used as banner audio)
 #   - assets/forsaken.rsf     (makerom config)
 #   - romfs/dspfirm.cdc       (extracted to sdmc:/3ds/ on first boot by
@@ -384,6 +394,7 @@ BANNERTOOL   := $(TOOLS_DIR)/bannertool
 
 ASSETS_DIR   := $(SRCDIR)/assets
 ICON_PNG     := $(ASSETS_DIR)/icon.png
+BANNER_CGFX  := $(ASSETS_DIR)/banner.cgfx
 BANNER_PNG   := $(ASSETS_DIR)/banner.png
 BANNER_WAV   := $(ASSETS_DIR)/banner.wav
 RSF_FILE     := $(ASSETS_DIR)/forsaken.rsf
@@ -412,18 +423,25 @@ tools-fetch:
 	fi
 	@echo "tools ready: $(MAKEROM) + $(BANNERTOOL)"
 
+ifneq ($(wildcard $(BANNER_CGFX)),)
+$(OUTPUT_BNR): $(BANNER_CGFX) $(BANNER_WAV) | tools-fetch
+	@echo "Creating banner (animated 3D: $(BANNER_CGFX))..."
+	@mkdir -p $(OUTDIR)
+	$(BANNERTOOL) makebanner -ci $(BANNER_CGFX) -a $(BANNER_WAV) -o $@
+else
 $(OUTPUT_BNR): $(BANNER_PNG) $(BANNER_WAV) | tools-fetch
 	@echo "Creating banner..."
 	@mkdir -p $(OUTDIR)
 	$(BANNERTOOL) makebanner -i $(BANNER_PNG) -a $(BANNER_WAV) -o $@
+endif
 
-$(OUTPUT_CIA): $(OUTPUT_ELF) $(OUTPUT_SMDH) $(OUTPUT_BNR) $(RSF_FILE) $(CIA_ROMFS_STAMP) | tools-fetch
+$(OUTPUT_CIA): $(OUTPUT_ELF) $(OUTPUT_CIA_SMDH) $(OUTPUT_BNR) $(RSF_FILE) $(CIA_ROMFS_STAMP) | tools-fetch
 	@echo "Building CIA..."
 	$(MAKEROM) -f cia -o $@ \
 		-rsf $(RSF_FILE) \
 		-target t -exefslogo \
 		-elf $(OUTPUT_ELF) \
-		-icon $(OUTPUT_SMDH) \
+		-icon $(OUTPUT_CIA_SMDH) \
 		-banner $(OUTPUT_BNR) \
 		-DAPP_ROMFS=$(CIA_ROMFS)
 	@echo "CIA written: $@"
@@ -498,13 +516,13 @@ $(RSF_FILE_ALT): $(RSF_FILE) | $(BUILD)
 # Alt CIA: same ELF + assets as the primary CIA, just a different
 # UniqueId. Builds standalone — does not depend on the primary CIA
 # rule, so `make release` can build both in parallel.
-$(OUTPUT_CIA_ALT): $(OUTPUT_ELF) $(OUTPUT_SMDH) $(OUTPUT_BNR) $(RSF_FILE_ALT) $(CIA_ROMFS_STAMP) | tools-fetch
+$(OUTPUT_CIA_ALT): $(OUTPUT_ELF) $(OUTPUT_CIA_SMDH) $(OUTPUT_BNR) $(RSF_FILE_ALT) $(CIA_ROMFS_STAMP) | tools-fetch
 	@echo "[release] Building alt CIA (UniqueId 0xff4bb)..."
 	$(MAKEROM) -f cia -o $@ \
 		-rsf $(RSF_FILE_ALT) \
 		-target t -exefslogo \
 		-elf $(OUTPUT_ELF) \
-		-icon $(OUTPUT_SMDH) \
+		-icon $(OUTPUT_CIA_SMDH) \
 		-banner $(OUTPUT_BNR) \
 		-DAPP_ROMFS=$(CIA_ROMFS)
 	@echo "[release] Alt CIA written: $@"
@@ -538,25 +556,25 @@ $(RSF_FILE_HIMEM_ALT): $(RSF_FILE_HIMEM) | $(BUILD)
 # unified CIA_ROMFS staging (both texture packs); the engine picks
 # 512² at runtime because the HIMEM grant lifts region_size into the
 # 96 MB tier.
-$(OUTPUT_CIA_HIMEM): $(OUTPUT_ELF) $(OUTPUT_SMDH) $(OUTPUT_BNR) $(RSF_FILE_HIMEM) $(CIA_ROMFS_STAMP) | tools-fetch
+$(OUTPUT_CIA_HIMEM): $(OUTPUT_ELF) $(OUTPUT_CIA_SMDH) $(OUTPUT_BNR) $(RSF_FILE_HIMEM) $(CIA_ROMFS_STAMP) | tools-fetch
 	@echo "[release] Building HIMEM CIA (UniqueId 0xff4be — opt-in)..."
 	$(MAKEROM) -f cia -o $@ \
 		-rsf $(RSF_FILE_HIMEM) \
 		-target t -exefslogo \
 		-elf $(OUTPUT_ELF) \
-		-icon $(OUTPUT_SMDH) \
+		-icon $(OUTPUT_CIA_SMDH) \
 		-banner $(OUTPUT_BNR) \
 		-DAPP_ROMFS=$(CIA_ROMFS)
 	@echo "[release] HIMEM CIA written: $@"
 
 # HIMEM alt CIA — UniqueId 0xff4bf, same ELF + assets.
-$(OUTPUT_CIA_HIMEM_ALT): $(OUTPUT_ELF) $(OUTPUT_SMDH) $(OUTPUT_BNR) $(RSF_FILE_HIMEM_ALT) $(CIA_ROMFS_STAMP) | tools-fetch
+$(OUTPUT_CIA_HIMEM_ALT): $(OUTPUT_ELF) $(OUTPUT_CIA_SMDH) $(OUTPUT_BNR) $(RSF_FILE_HIMEM_ALT) $(CIA_ROMFS_STAMP) | tools-fetch
 	@echo "[release] Building HIMEM alt CIA (UniqueId 0xff4bf)..."
 	$(MAKEROM) -f cia -o $@ \
 		-rsf $(RSF_FILE_HIMEM_ALT) \
 		-target t -exefslogo \
 		-elf $(OUTPUT_ELF) \
-		-icon $(OUTPUT_SMDH) \
+		-icon $(OUTPUT_CIA_SMDH) \
 		-banner $(OUTPUT_BNR) \
 		-DAPP_ROMFS=$(CIA_ROMFS)
 	@echo "[release] HIMEM alt CIA written: $@"
