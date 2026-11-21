@@ -10,7 +10,10 @@ exemption grammar, standing exemptions, and the report schema:
 python3 tools/perf/gates_vfp.py        # R1–R11 hot-path audit + build flags
 python3 tools/perf/audit_arm11_math.py # trig-LUT coverage + double residue
 python3 tools/perf/audit_r11_idiv.py   # runtime integer div/mod screen
-tools/perf/check.sh                    # all three
+python3 tools/perf/audit_c_with_classes.py  # C-with-classes language screen (§9)
+python3 tools/perf/audit_memo_stamps.py     # stereo-memo fill-epoch coverage (every shared
+                                            # fill must stamp memoEpochPass/Group/TPage)
+tools/perf/check.sh                    # all five
 ```
 
 
@@ -20,12 +23,12 @@ proof that every prohibited construct is always slow on every 3DS workload.
 
 The original 3DS is the performance target: ARM1176JZF-S at 268 MHz, VFP11
 (VFPv2), 16 KB L1I + 16 KB L1D, no L2. This build enables the New 3DS CPU
-boost when present (`main_3ds.c:312-316`), so **every perf claim must state
+boost when present (`platform_init` in `forsaken_3ds/src/platform_3ds/main_3ds.cpp`, `osSetSpeedupEnable`), so **every perf claim must state
 the console, clock, and cache settings it was measured on. A New-clocked run
 is not an OG pass.** Record stereoscopic mode too: stereo doubles the CPU
 scene traversal in this engine (§6).
 
-The engine ticks at 71 Hz (`CalculateFramelag`, `oct2.c:6480`;
+The engine ticks at 71 Hz (`CalculateFramelag` in `forsaken_core/src/game/oct2.cpp`;
 `framelag = real_framelag * 71.0F`). Frame budgets in this file are
 milliseconds per 71 Hz frame.
 
@@ -46,10 +49,14 @@ Floating-point arithmetic is supported in hardware (VFPv2: `vadd`/`vmul`/
 2. **libm calls that cross the boundary per iteration.** This is Forsaken's
    live debt: VFPv2 has **no float-result floor instruction**, so `floorf`
    is a real `bl` into newlib with `vmrs`/`vmsr` flag transfers and a spill
-   frame (`new3d.h:39-61`). The `FMOD`/`FDIV` macros (`new3d.h:105-106`)
-   expand to `floorf` inside per-entity loops (`models.c`, `secondary.c`,
-   `2dpolys.c`, `bgobjects.c`, `spotfx.c`, `rtlight.c`, `pickups.c`), and
-   `mxaload.c:1195-1199` runs four per vertex in `InterpFrames`.
+   frame (rationale in the `fast_sinf` comment, `forsaken_core/src/math/new3d.h`).
+   This debt is retired for the hot paths: the `FMOD`/`FDIV` macros
+   (`new3d.h`) expand to `fast_floorf`, the `(int)`-cast floor with no libm
+   call, and `InterpFrames` (`data/mxaload.cpp`) uses it too. What remains
+   is `floorf((double)...)` / `fabsf((double)...)` in `StatsNamePulse`
+   (`game/oct2.cpp`), `MenuProcess` (`ui/title.cpp`), the VDU scale setup in
+   `rendering/2dtextures.cpp`, and `game/models.cpp` (`fracspeed`), plus plain
+   `floorf` in title/config/text UI code (cold).
 3. **Subnormal handling.** FPSCR FZ/DN are **not set anywhere in this tree**
    (audit 2026-10-25). R1 fixes that as a correctness pin, not a speedup
    claim.
@@ -80,9 +87,8 @@ A function or loop body is HOT PATH if it:
 **THE CORPUS IS DERIVED FROM A PROFILE, NEVER FROM MEMORY.** No hardware
 capture exists for Forsaken yet, so `hotpath_corpus.json` is explicitly
 `"provisional": true`: a static seed derived from the frame loop
-(`main.c:726` → `RenderScene` `oct2.c:2522` → `MainGame` `oct2.c:5285` →
-`MainRoutines` `oct2.c:4551` / `MainGameRender` `oct2.c:5026` →
-`RenderCurrentCamera` `oct2.c:5910`) and the ≥256×/frame criterion. The
+(`main` loop in `main.cpp` → `RenderScene` → `MainGame` → `MainRoutines` /
+`MainGameRender` → `RenderCurrentCamera`, all in `oct2.cpp`) and the ≥256×/frame criterion. The
 gate prints that on every run. The first audit deliverable is a real
 capture, summarised in `docs/OPTIMIZATION-LOG.md`; then set
 `provisional: false`, set `captured`, and re-derive the seed from the
@@ -110,18 +116,20 @@ phase burns the baseline down. Baseline ≠ exemption (§5). A green gate means
 Flush-to-Zero (bit 24) and Default-NaN (bit 25) MUST be established on every
 thread that executes float math, at thread entry, before any hot path runs.
 
-Forsaken today has **zero FPSCR code**. The only created thread is
-`music_thread_fn` (`music_3ds.c:370`, 16 KiB stack), which touches floats in
-its channel-restart path (`ndspChnSetRate` `music_3ds.c:323`,
-`ndspChnSetMix` `music_3ds.c:327-329`). Upstream libctru's
+Both helpers exist: `vfp_set_fz_dn()` (`forsaken_3ds/src/platform_3ds/main_3ds.cpp`,
+called from `main` in `forsaken_core/src/game/main.cpp`) and
+`vfp_thread_fz_dn()` (called first thing in `MusicStream::thread_entry`,
+`forsaken_3ds/src/audio/music_3ds.cpp`). The only created thread is the music
+worker (16 KiB stack), which touches floats in its channel-restart path
+(`ndspChnSetRate` / `ndspChnSetMix` in `music_3ds.cpp`). Upstream libctru's
 `initThreadVars()` sets both bits for main and `threadCreate` threads —
 verify the linked libctru version; do not assume. The contract still
 requires the defensive helpers (T2K precedent):
 
 | Thread | Helper | Call site |
 |---|---|---|
-| main | `vfp_set_fz_dn()` | start of `main` in `main.c`, before `gfxInitDefault`; failure returns immediately |
-| music worker | `vfp_thread_fz_dn()` | first line of `music_thread_fn` in `music_3ds.c` |
+| main | `vfp_set_fz_dn()` | start of `main` in `main.cpp`, before platform init; failure returns immediately |
+| music worker | `vfp_thread_fz_dn()` | first line of `MusicStream::thread_entry` in `music_3ds.cpp` |
 
 Every helper and call site MUST keep a rationale comment: decay can reach
 subnormals; FZ/DN are the chosen numerical mode; FPSCR is per-thread;
@@ -150,23 +158,23 @@ are the protected hit set: pin them with `@vfp-exempt R3`, do not
 ### R4 — No double precision in hot paths
 
 Unexempted `double` arithmetic and promotions are forbidden in hot paths.
-Use `float` and `f` literals. Known residue at adoption (burn-down, each
+Use `float` and `f` literals. Known residue (re-checked 2026-11-21) (burn-down, each
 needs a fidelity check before retyping — this is ported original-engine
-gameplay math): `spline()` `new3d.c:872-881` (per-entity via `aispline.c`),
-`oct2.c:5461` and `models.c:6187` double promotions in effect code,
-`EPS`/`M_PI_2` double literals in `new3d.h:17,23`.
+gameplay math): `spline()` in `math/new3d.cpp` (`m1 *= 0.5`, per-entity via `aispline.cpp`),
+the `floorf((double)...)` / `fabsf((double)...)` promotions listed in §1,
+`EPS`/`M_PI_2` double literals in `math/new3d.h`.
 
 ### R5 — Loop counters and indices MUST be integer
 
 ### R6 — No libm calls in hot paths
 
-Trig goes through `fast_sinf` / `fast_cosf` (`new3d.h:71-84`; 1024-entry
-table `new3d.c:22`, built by `trig_table_init` `new3d.c:24-29`, called from
-`main.c:490`). One path on every target — do not add `#ifdef __3DS__` trig
+Trig goes through `fast_sinf` / `fast_cosf` (`math/new3d.h`; 1024-entry
+table `fast_sin_table` in `new3d.cpp`, built by `trig_table_init`, called
+from `main` in `game/main.cpp`). One path on every target — do not add `#ifdef __3DS__` trig
 forks. `fast_sinf`'s leaf `(int)` truncation and sign fixup are
 load-bearing (no float floor on VFPv2; `floorf` is a `bl` with flag
 transfers). Do not "clean" it. Domain caveat: `|rad| ≳ 1.3e7` is UB
-(`new3d.h:57-61`) — clamp inputs at call sites that can drift.
+(see the `fast_sinf` comment in `new3d.h`) — clamp inputs at call sites that can drift.
 
 **Forsaken extension:** `floorf`/`ceilf`/`fmod` count as libm calls here
 (§1 item 2). The `FMOD`/`FDIV` sites are the audit's primary burn-down.
@@ -174,17 +182,17 @@ transfers). Do not "clean" it. Domain caveat: `|rad| ≳ 1.3e7` is UB
 `sqrtf` is NOT an R6 violation: with `-fno-math-errno` the ~46 `sqrtf`
 them, and do not resurrect the Quake III reciprocal-sqrt bit-hack — it was
 tried here and was a pessimisation (VFPv2 has no `VRSQRTE`);
-`fast_invsqrtf` is `1.0f/sqrtf(x)` by policy (`new3d.h:86-97`).
+`fast_invsqrtf` is `1.0f/sqrtf(x)` by policy (`new3d.h`).
 
 ### R10 — Build flags follow the devkitPro baseline and are verified
 
-`Makefile.3ds` carries (line 89 today):
+`Makefile.3ds` carries:
 
 ```makefile
 ARCH := -march=armv6k -mtune=mpcore -mfloat-abi=hard -mtp=soft
 ```
 
-plus `-O2` and `-fno-math-errno` (lines 91, 97). These MUST reach the
+plus `-O2` and `-fno-math-errno` in the same `CFLAGS` block. These MUST reach the
 compile and link commands; the gate checks the Makefile text and the audit
 phase verifies effective flags against the installed compiler
 (`arm-none-eabi-gcc -Q --target-help`), not from this file.
@@ -244,8 +252,10 @@ that already works.
 - **R11 — INTEGER division or modulo by a RUNTIME value in a hot loop.**
   No integer divide on this core; runtime `%`/`/` are `__aeabi_idivmod`
   calls with a spill barrier. A compile-time-constant divisor is not a
-  finding. First known hit: `Random_Range` `new3d.c:593`
-  `(Seed1 & 32767) % Max`, called pervasively from per-frame game logic.
+  finding. `Random_Range` (`math/new3d.cpp`) used to be the pervasive hit;
+  it now takes the remainder through a float quotient under a pinned
+  exemption. The remaining candidates are frozen in
+  `tools/perf/contracts/r11_candidates_baseline.txt`.
   `((x % n) + n) % n` is two helper calls; where the value is provably
   within one period, `if (v < 0) v += n; else if (v >= n) v -= n;` is an
   exact identity — prove the bound per site. Screen:
@@ -281,13 +291,13 @@ a baseline entry into an exemption without the review.
 
 | Work | Where | Do not undo |
 |---|---|---|
-| `fast_sinf`/`fast_cosf` LUT, floorf-free range reduction, inlined | `new3d.h:28-103`, `new3d.c:10-29` | no `floorf`, no `__builtin_floorf`, no libm restore |
-| Quake III invsqrt removed | `new3d.h:86-97` | VFPv2 has no `VRSQRTE`; the bit-hack was a measured pessimisation |
+| `fast_sinf`/`fast_cosf` LUT, floorf-free range reduction, inlined | `math/new3d.h`, `math/new3d.cpp` | no `floorf`, no `__builtin_floorf`, no libm restore |
+| Quake III invsqrt removed | `math/new3d.h` | VFPv2 has no `VRSQRTE`; the bit-hack was a measured pessimisation |
 | ~46 `sqrtf` sites → bare `vsqrt.f32` | tree-wide via `-fno-math-errno` | do not table or hack sqrt |
-| hunk allocator (two-tag bump, 8 MB) | `hunk_alloc.c` | bulk-free on level change; keep alignment |
-| GPU lighting shader | `Makefile.3ds:107-111`, `shaders/` | replaces CPU `XLight1Group` per-vertex loop |
-| Stereo display-list replay disabled; rear camera off | `render_c3d.c:1472-1489`, `oct2.c:5130-5138` | stereo = full CPU traversal twice/frame; that is the measured tradeoff |
-| Framebuffers in VRAM; RGBA4 textures | `main_3ds.c:424-450`, `render_c3d.c:42-43` | VRAM budget, not laziness |
+| hunk allocator (two-tag bump, 8 MB) | `util/hunk_alloc.cpp` | bulk-free on level change; keep alignment |
+| GPU lighting shader | `-DGPU_LIGHTING` in `Makefile.3ds`, `forsaken_3ds/shaders/` | replaces CPU `XLight1Group` per-vertex loop |
+| Stereo memo instead of display-list replay (right eye resubmits the left eye's converted vertices); rear camera off | `rendering/stereomemo.cpp`, `RenderCurrentCameraInStereo` and the rear-camera guard in `game/oct2.cpp` | stereo still traverses the scene per eye; the memo only saves the vertex conversion |
+| Framebuffers in VRAM; RGBA4 textures | `platform_init_video` in `main_3ds.cpp`, `rendering/c3d/11_textures.inc` | VRAM budget, not laziness |
 
 **Macro blind spots:** Citro3D macros (e.g. angle converters) can hide
 double arithmetic through expansion, and constant folding can remove an
@@ -315,16 +325,12 @@ Do **not**:
 - Measure a New-3DS-boosted run and call it an OG pass.
 - Treat a green `.3dsx` as a perf pass. OG clock, looked-at frame.
 - Add `#ifdef` renderer forks; backends are separate files
-  (`render_c3d.c` vs `render_gl*.c`), chosen by the build.
+  (`render_c3d.cpp` for 3DS, `render_vulkan.cpp` for PC), chosen by the build.
 - Touch `new3d.h`'s LUT as part of a "quick perf pass".
 
 ---
 
 ## 8. Scope
-
-Include: root-tree `*.c` / `*.h` compiled by `Makefile.3ds` — the gate
-derives scope from `EXCLUDE_SRC` so it follows the build — and
-`Makefile.3ds`.
 
 In scope: every C/C++ source under `forsaken_core/src/` and
 `forsaken_3ds/src/` (what `Makefile.3ds` compiles; `gates_vfp.py`
@@ -338,11 +344,11 @@ directories, data/config directories.
 
 Every translation unit is C++ compiled as "C with classes" — the engine since
 Cleanup 5, the platform layers and render backends since 2026-11-17
-(`docs/CPP_LEDGER.tsv` is the per-module record).
+(`docs/CPP_LEDGER.tsv` is the per-module record, including the class
+conversion of module state; see "Class conventions" below).
 Sources live in `forsaken_core/src` + `forsaken_3ds/src` (+ `forsaken_pc/src`
-and `.cpp` in the core and 3DS trees and compiles `.cpp` with the language
-flags below; PC-only sources (`breakpad.cpp`, `render_d3d.cpp`, …) are not in
-those trees at all. The
+every `.cpp` in the core and 3DS trees with the language flags below; the PC
+platform sources (`forsaken_pc/src`) are not in those trees at all. The
 C++ "C with classes" language model — no virtuals, no RTTI, no exceptions,
 no project-defined templates, no `std::function`/`std::bind`,
 preallocate-in-hot-path, worker stack budgets — is **phase 2**.
@@ -363,9 +369,9 @@ preallocate-in-hot-path, worker stack budgets — is **phase 2**.
   R1–R11 by being a `.cpp`. Findings, baselines, the corpus and exemptions are
   keyed by basename (unique across trees, enforced), so moving a file between
   subdirectories never re-keys a gate.
-- The Makefile compiles `.cpp` with the same numeric flags as `.c` plus
+- The Makefile compiles `.cpp` with the numeric flags above plus
   `-std=gnu++17 -fno-exceptions -fno-rtti -fno-threadsafe-statics`, and
-  links with the C++ driver when any C++ object exists. Banned constructs
+  links with the C++ driver. Banned constructs
   do not merely violate the contract — they do not compile.
 
 **Conversion rules (when a module moves from C to C++):**
@@ -420,7 +426,7 @@ them over the C idiom they replace, in new and converted code:
   packets) keep their exact layout — `std::array` preserves it, but
   check `sizeof` and alignment are unchanged.
 
-Only the `diag/` headers are still read by C code; keep them C. Every such
+Every such
 replacement is a cleanup and carries the cleanup proof:
 `tools/verify_identical.sh` shows identical objects (a `constexpr`
 standing in for a `#define`, or an `enum class` with the same underlying
@@ -431,10 +437,66 @@ correct shipped design — level/execbuf arrays grow on load) and worker
 stack discipline stay review checks. A screen that cries wolf on correct
 code is worse than none.
 
-Worker stack budget today: music thread 16 KiB (`music_3ds.c:370`), main
-stack 256 KiB (`main_3ds.c:64`). No recursion in the music thread; size
+Worker stack budget today: music thread 16 KiB (`threadCreate` in
+`MusicStream::init`, `music_3ds.cpp`), main stack 256 KiB (`__stacksize__`
+in `main_3ds.cpp`). No recursion in the music thread; size
 locals against 16 KiB before adding them — overflow there is silent
 corruption in the audio path.
+
+### Class conventions (module state)
+
+Since the 2026-11 class conversion, file-scope globals of a module move into a
+small class. The record is `docs/CPP_LEDGER.tsv` (`phase2_classes`: the commit
+and class name, tagged "(full)" or "(private part)", or `todo`). The shape is
+the same everywhere; keep new code to it:
+
+- **Private data, default member initialisers, no constructors.** State is
+  `private:` with `= value` initialisers, so there is no static-init-order
+  code and no destructor. Example: `CountdownClock` in
+  `rendering/screenpolys.h` (`float Countdown_Float = 3000.0F;`, ...). The
+  tree has no user constructors except `FileReader`, no destructors and no
+  operators.
+- **One shared instance per module.** Either a public, intent-named global
+  handle declared `extern` in the header (`Primaries` in `game/primary.h`,
+  `Countdown` in `rendering/screenpolys.h`, `EnemyState`) or a file-local
+  `g_*` instance when only that file uses it (`g_music` in
+  `forsaken_3ds/src/audio/music_3ds.cpp`, `g_visi` in `world/visi.cpp`).
+- **Intent-named inline members.** Other files get members named for what the
+  caller wants, not for the field: `Primaries.general_ammo()`,
+  `Countdown.switch_off()`, `Countdown.rearm()`. Each is
+  `[[gnu::always_inline]]` (or defined in the class body for one-liners) so a
+  call site compiles to the same load or store as the global access did.
+- **Old free functions stay as one-line forwarders.** `void InitPrimBulls( void )
+  { Primaries.init(); }` (`game/primary.cpp`), `Enemy_Load` forwarding to
+  `EnemyState.restore` (`game/enemies.cpp`). Hot members are declared
+  `[[gnu::always_inline]] inline` and defined in the .cpp, so a forwarder
+  keeps the original body with no `this` pointer and no added call.
+- **Pools stay global arrays; the class owns the state around them.**
+  `PrimBulls[]` and `PrimaryWeaponAttribs[]` remain global next to
+  `PrimaryWeapons`. Do not move a per-frame pool into a container or an
+  allocation (§9 conversion rules).
+- **Settings and debug toggles are plain structs**, public fields, no
+  methods, one global instance: `CheatFlags` (`CheatState`, `game/oct2.h`),
+  `AudioOpts` (`audio/sfx.h`), `VideoOpts` (`rendering/render.h`), `HudOpts`
+  and `MsgColours` (`ui/title.h`), `DebugViews` (`game/debugview.h`), `NetCfg`
+  (`net/networking.h`). Field addresses are taken by the menu and config
+  tables, so the field types do not change.
+- **Module-private state lives in an anonymous namespace** (`world/visi.cpp`,
+  `data/file.cpp`, `util/hunk_alloc.cpp`), not in file-scope `static`
+  globals.
+- **Class header comment block.** The comment above the class lists the state
+  it owns and which functions use it (see `PrimaryWeapons` in
+  `game/primary.h`); update it with the class.
+- **Arrays stay raw.** `std::array` is allowed (§ "Preferred C++ constructs")
+  but nothing in the tree uses it; fixed arrays, including the pools above,
+  keep their C declarations.
+
+Proof is the cleanup proof above: `tools/verify_identical.sh` compares every
+object's instructions and relocations, and where a change deliberately moves
+code (a handler or a member that is not always-inlined) the function's
+instruction count and call targets are compared before and after, as
+green (its gates key on basenames). Device checks happen outside the tree;
+nothing in the repo exists to serve them (§10 P6).
 
 ---
 
@@ -445,22 +507,23 @@ P1–P6. Correctness requirements apply in cold paths too.
 
 ### P1 — Application lifecycle, sleep, and resume
 
-- The main loop services `aptMainLoop()` every iteration (`main.c:726`) and
+- The main loop services `aptMainLoop()` every iteration (`main` loop, `game/main.cpp`) and
   exits when it returns false. Do not replace it with an unconditional loop
   or block it on a worker.
 - No custom `aptHook` exists today; suspend/resume is libctru default. If
   gameplay must not advance by wall-clock time spent suspended, rebase the
   frame timer on resume under the existing pause policy before adding
   anything that makes that matter.
-- Teardown (`main.c:386-410`) releases acquired resources in dependency
-  order: lua → network → music (thread joined, `music_3ds.c:380-396`) →
-  sound → platform (`main_3ds.c:589-600`). Initialization failures release
+- Teardown at the end of `main` (`game/main.cpp`) releases acquired
+  resources in dependency order: lua → network → music (thread joined in
+  `MusicStream::shutdown`, `music_3ds.cpp`) → sound → platform
+  (`platform_shutdown`, `main_3ds.cpp`). Initialization failures release
   only what succeeded. Keep that order.
 
 ### P2 — Citro3D frame and state ownership
 
 - Draw only after a successful `C3D_FrameBegin`; pair each begin with one
-  `C3D_FrameEnd` (`render_c3d.c:426-432`). Preserve both-eye target and
+  `C3D_FrameEnd` (`FSBeginScene` / `render_init`, `rendering/c3d/07_scene.inc`). Preserve both-eye target and
   slider behavior. Gameplay updates once per simulation step, not per eye.
 - Rendering state has one owner: the main thread. The music thread never
   touches GPU state. Do not move GPU calls between threads casually.
@@ -470,26 +533,27 @@ P1–P6. Correctness requirements apply in cold paths too.
 - Keep submitted buffers/textures valid until the GPU is done; put the
   completion boundary **before** CPU reuse. Current path: Citro3D waits
   for its previous queue in `C3D_FrameBegin`, `C3D_FrameEnd(0)` flushes
-  linear memory (`render_c3d.c:430`). Preserve unless an alternative is
+  linear memory (`rendering/c3d/07_scene.inc`). Preserve unless an alternative is
   measured.
 - The main loop is not vsync-capped (`C3D_FrameEnd(0)`, no VBlank wait);
   `CalculateFramelag` busy-waits only on zero-tick frames
-  (`oct2.c:6543-6547`). Do not add redundant VBlank waits or cache flushes
+  (the `timer_run` loop in `CalculateFramelag`, `oct2.cpp`). Do not add redundant VBlank waits or cache flushes
   around the managed path without identifying the need; measure CPU prep,
   GPU work, and waiting separately.
 
 ### P4 — Worker synchronization and shutdown
 
 - The one worker (music) is guarded by a `LightLock`
-  (`music_3ds.c:305,337,368`), joined before teardown, 25 ms poll
-  (`music_3ds.c:338`). `volatile` alone is not synchronization. New workers
+  (the `lock` member of `MusicStream`, `music_3ds.cpp`), joined before teardown, 25 ms poll
+  (`svcSleepThread` in `MusicStream::thread_entry`). `volatile` alone is not synchronization. New workers
   need: R1 helper, documented ownership, joinable lifetime, stack sized
   against its role. Do not add threads as an unmeasured performance fix.
 
 ### P5 — RomFS, SD access, and streaming
 
-- RomFS mount precedence embedded → SD (`main_3ds.c:354-396`), then
-  `chdir("romfs:/")`. Writable saves stay on the writable path. Check
+- Game data is the embedded romfs (`romfsInit`, then `chdir("romfs:/")`,
+  in `platform_init`, `main_3ds.cpp`); there is no SD fallback. Writable
+  saves stay on the SD path (`sdmc:/3ds/forsaken/savegame`). Check
   open/read results; distinguish a complete asset from a short read.
 - **No blocking SD I/O in the frame loop.** Each trace write is 5–10 ms;
   assets; stream large data with a bounded budget.

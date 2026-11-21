@@ -176,4 +176,7 @@ music table and the N64 enemy and pickup entries.
   yet. Boss_Ramqan's jumping AI is ported (`ai/aijump.cpp`).
 - `biolab` is left out of the level rotation: its AI node graph sends ground
   enemies through walls the collision data doesn't contain.
+- `tuben64` is also left out: its boss alternated between tank and Hunter
+  visuals (a model-pointer corruption whose root cause was not isolated), so
+  it was dropped rather than shipped broken.
 - No multiplayer on 3DS.
