@@ -5,8 +5,8 @@
  * Implemented by sound_3ds.cpp (ndsp, SFX capped at 8 voices with the
  * oldest evicted) and sound_openal.cpp. sfx.cpp is the only game-side
  * caller. Units keep the 1998 DirectSound conventions: volume in millibels (0 = full,
- * negative attenuates, sound_minimum_volume is the floor and is owned by
- * sfx.cpp), pan in -10000..10000, pitch as a multiplier with 0 meaning
+ * negative attenuates, sound_minimum_volume is the floor and lives in
+ * AudioOpts, sfx.h), pan in -10000..10000, pitch as a multiplier with 0 meaning
  * as recorded. Sources are 2D: sfx.cpp pans them with sound_pan.
  */
 
@@ -20,7 +20,7 @@
 //
 
 // the game appears to need this probably wont in openAL
-extern int sound_minimum_volume;
+// (AudioOpts.sound_minimum_volume, see sfx.h)
 
 //
 // Generic Functions

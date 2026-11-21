@@ -18,6 +18,7 @@
 #include "game/main.h"
 #include "util/util.h"
 #include "audio/sound.h"
+#include "audio/sfx.h"
 #include "data/file.h"
 #include <SDL.h>
 #include <AL/al.h>
@@ -158,7 +159,7 @@ bool AudioDevice::init()
 	// the game's volume maths use DirectSound units, where silence
 	// (DSBVOLUME_MIN) is -10000 millibels; forsaken's floor is 1/3 of that.
 	// sfx.cpp already initialises it to this value.
-	sound_minimum_volume = -10000 / 3;
+	AudioOpts.sound_minimum_volume = -10000 / 3;
 
 	// global listener sound set to 50% to reduce crackling
 	// TODO - we should probably have a global sound level setting

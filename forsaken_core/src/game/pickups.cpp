@@ -1729,7 +1729,7 @@ bool CollectPickup( u_int16_t i )
 		if( PickupEnable || no_collision )
 		{
 
-			if( ( MessageSFX != -1 ) && ( bSoundEnabled ) && ( BikeCompSpeechSlider.value || !Speech ) )
+			if( ( MessageSFX != -1 ) && ( AudioOpts.bSoundEnabled ) && ( BikeCompSpeechSlider.value || !Speech ) )
 			{
 				if ( ( TriggeredSFX != -1 ) && !Random_Range( 4 ) )
 					PlaySfxWithTrigger( MessageSFX, TriggeredSFX );
@@ -1752,7 +1752,7 @@ bool CollectPickup( u_int16_t i )
 		{
 			if( !Pickups[ i ].CouldNotPickup )
 			{
-				if( ( MessageSFX != -1 ) && ( bSoundEnabled ) && ( BikeCompSpeechSlider.value || !Speech ) )
+				if( ( MessageSFX != -1 ) && ( AudioOpts.bSoundEnabled ) && ( BikeCompSpeechSlider.value || !Speech ) )
 				{
 					if ( ( TriggeredSFX != -1 ) && !Random_Range( 4 ) )
 						PlaySfxWithTrigger( MessageSFX, TriggeredSFX );

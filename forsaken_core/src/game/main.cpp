@@ -141,7 +141,7 @@ static bool ParseCommandLine(char* args)
 	//  Set Global Defaults
 	//
 
-	NoSFX					= false; // turns off sound
+	AudioOpts.NoSFX				= false; // turns off sound
 	Debug					= false; // turns it off now
 
 	NetUpdateIntervalCmdLine	= 0;
@@ -207,7 +207,7 @@ static bool ParseCommandLine(char* args)
 		// turn off sound
 		else if (!strcasecmp(option, "NoSFX"))
 		{
-			NoSFX = true;
+			AudioOpts.NoSFX = true;
 		}
 
 		// jump to the host screen

@@ -1679,7 +1679,7 @@ int16_t ShipUpdate::do_damage( bool OverrideInvul )
 		}
 	}
 
-	if ( bSoundEnabled && BikeCompSpeechSlider.value && ( MessageSFX != -1 ) )
+	if ( AudioOpts.bSoundEnabled && BikeCompSpeechSlider.value && ( MessageSFX != -1 ) )
 	{
 		if ( ( TriggerSFX != -1 ) && !Random_Range( 4 ) )
 			PlaySfxWithTrigger( MessageSFX, TriggerSFX );

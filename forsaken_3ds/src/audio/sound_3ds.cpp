@@ -36,7 +36,7 @@
 constexpr int MAX_CHANNELS = 24;
 constexpr int MAX_PATH_LEN = 500;
 
-/* sound_minimum_volume is defined in sfx.cpp (always-compiled owner). */
+/* The volume floor is AudioOpts.sound_minimum_volume (sfx.cpp). */
 
 
 

@@ -1074,7 +1074,7 @@ void SecondaryWeapons::FireSecondarySelect( int16_t & OnceOnlyFlag )
 			if( !OnceOnlyFlag )
 			{
 				OnceOnlyFlag = 1;
-				if( !bSoundEnabled ) AddColourMessageToQue( PickupMessageColour, YOU_DONT_HAVE_THAT_WEAPON );
+				if( !AudioOpts.bSoundEnabled ) AddColourMessageToQue( PickupMessageColour, YOU_DONT_HAVE_THAT_WEAPON );
 				PlaySfx( SFX_DontHaveThat, 1.0F );
 			}
 		}
@@ -3131,7 +3131,7 @@ bool ProcessMines( u_int16_t i )
 			{
 				if( !( SecBulls[ i ].Flags & SECFLAGS_NoIncoming ) )
 					if( Ship == WhoIAm )
-						if( bSoundEnabled && BikeCompSpeechSlider.value )
+						if( AudioOpts.bSoundEnabled && BikeCompSpeechSlider.value )
 							PlayPannedSfx( SFX_Incoming, Ships[ WhoIAm ].Object.Group , &Ships[ WhoIAm ].Object.Pos, 0.0F );
 
 				SecBulls[ i ].State = MIS_HOMING;
@@ -3177,7 +3177,7 @@ bool ProcessMines( u_int16_t i )
 			{
 				if( !( SecBulls[ i ].Flags & SECFLAGS_NoIncoming ) )
 					if( Ship == WhoIAm )
-						if( bSoundEnabled && BikeCompSpeechSlider.value )
+						if( AudioOpts.bSoundEnabled && BikeCompSpeechSlider.value )
 							PlayPannedSfx( SFX_Incoming, Ships[ WhoIAm ].Object.Group , &Ships[ WhoIAm ].Object.Pos, 0.0F );
 
 				SecBulls[ i ].State = MIS_HOMING;
@@ -3211,7 +3211,7 @@ bool ProcessMines( u_int16_t i )
 			{
 				if( !( SecBulls[ i ].Flags & SECFLAGS_NoIncoming ) )
 					if( Ship == WhoIAm )
-						if( bSoundEnabled && BikeCompSpeechSlider.value )
+						if( AudioOpts.bSoundEnabled && BikeCompSpeechSlider.value )
 							PlayPannedSfx( SFX_Incoming, Ships[ WhoIAm ].Object.Group , &Ships[ WhoIAm ].Object.Pos, 0.0F );
 
 				SecBulls[ i ].State = MIS_HOMING;

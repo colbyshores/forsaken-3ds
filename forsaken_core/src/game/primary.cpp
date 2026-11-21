@@ -1167,7 +1167,7 @@ void PrimaryWeapons::FirePrimarySelect( int16_t & OnceOnlyFlag, float & Ammo )
 				if( !OnceOnlyFlag )
 				{
 					OnceOnlyFlag = 1;
-					if( !bSoundEnabled ) AddColourMessageToQue(PickupMessageColour, YOU_DONT_HAVE_ANY_AMMO );
+					if( !AudioOpts.bSoundEnabled ) AddColourMessageToQue(PickupMessageColour, YOU_DONT_HAVE_ANY_AMMO );
 					PlaySfx( SFX_DontHaveThat, 1.0F );
 				}
 			}
@@ -1177,7 +1177,7 @@ void PrimaryWeapons::FirePrimarySelect( int16_t & OnceOnlyFlag, float & Ammo )
 			if( !OnceOnlyFlag )
 			{
 				OnceOnlyFlag = 1;
-				if( !bSoundEnabled ) AddColourMessageToQue( PickupMessageColour, YOU_DONT_HAVE_THAT_WEAPON );
+				if( !AudioOpts.bSoundEnabled ) AddColourMessageToQue( PickupMessageColour, YOU_DONT_HAVE_THAT_WEAPON );
 				PlaySfx( SFX_DontHaveThat, 1.0F );
 			}
 		}

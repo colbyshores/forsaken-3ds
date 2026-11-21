@@ -20,9 +20,9 @@
 #include "game/ships.h"
 #include "data/config.h"
 #include "util/util.h"
-/* Owner for sound.h's sound_minimum_volume extern (was a tentative
-   definition in the header; illegal as C++ TUs now include sound.h). */
-int sound_minimum_volume = -10000 / 3;
+/* The audio settings; sound_minimum_volume is the floor the sound
+   backends share with sfx.cpp. */
+AudioOptions AudioOpts;
 
 /*************************************
 Biker speech lookup table identifiers
@@ -474,10 +474,6 @@ struct SFX_HOLDER {
 	int SfxBufferIndex;
 	sound_source_t * source;
 };
-
-bool		NoSFX = false;
-
-bool bSoundEnabled = false;
 
 float	LastDistance[MAX_SFX];
 
@@ -1740,7 +1736,7 @@ bool SfxPlayer::initialize( int flags )
 	int i;
 
 	// check sound is not already initialised
-	if ( bSoundEnabled )
+	if ( AudioOpts.bSoundEnabled )
 	{
 		DebugPrintf("Tried to init sound before destroying!\n");
 		return false;
@@ -1749,14 +1745,14 @@ bool SfxPlayer::initialize( int flags )
 	DebugPrintf("Initializing sound.\n");
 
 	// check sound is valid
-	if( NoSFX || !sound_init() )
+	if( AudioOpts.NoSFX || !sound_init() )
 	{
-		bSoundEnabled = false;
+		AudioOpts.bSoundEnabled = false;
 		return true;
 	}
 	else
 	{
-		bSoundEnabled = true;
+		AudioOpts.bSoundEnabled = true;
 	}
 
 	PreInitSfx();
@@ -1803,7 +1799,7 @@ void SfxPlayer::destroy()
 
 	ClearLevelSpecSfx();
 
-	if ( !bSoundEnabled )
+	if ( !AudioOpts.bSoundEnabled )
 		return;
 
 	g_sfx_catalog.free_paths();
@@ -1826,7 +1822,7 @@ void SfxPlayer::destroy()
 
 	g_sfx_catalog.release_buffers();
 
-	bSoundEnabled = false;
+	AudioOpts.bSoundEnabled = false;
 }
 
 /* InitializeSound's and DestroySound's passes over the catalogue. */
@@ -1881,7 +1877,7 @@ bool SfxPlayer::start_panned( int16_t Sfx, u_int16_t *Group , VECTOR * SfxPos, f
 	u_int16_t offset;
 	int flags;
 
-	if( !bSoundEnabled )
+	if( !AudioOpts.bSoundEnabled )
 	{
 		return false;
 	}
@@ -2003,7 +1999,7 @@ bool SfxPlayer::start_panned( int16_t Sfx, u_int16_t *Group , VECTOR * SfxPos, f
 	LastDistance[Sfx] = Distance;
 
 	Volume = ( 0 - (long) ( Distance * 0.6F ) );	// Scale it down by a factor...
-	Volume = sound_minimum_volume - (long)( (float)( sound_minimum_volume - Volume ) * VolModify * GlobalSoundAttenuation );
+	Volume = AudioOpts.sound_minimum_volume - (long)( (float)( AudioOpts.sound_minimum_volume - Volume ) * VolModify * GlobalSoundAttenuation );
 
 	if ( Effects == SPOT_SFX_TYPE_Taunt )
 		SfxHolder[ HolderIndex ].SfxFlags = SFX_HOLDERTYPE_Taunt;
@@ -2100,7 +2096,7 @@ u_int32_t SfxPlayer::play_with_trigger( int16_t Sfx, int16_t TriggeredSfx )
 {
 	int index;
 
-	if ( !GlobalSoundAttenuation || !bSoundEnabled )
+	if ( !GlobalSoundAttenuation || !AudioOpts.bSoundEnabled )
 		return 0;
 
 	index = FindFreeSfxHolder();
@@ -2131,7 +2127,7 @@ u_int32_t SfxPlayer::play( int16_t Sfx, float Vol )
 {
 	int index;
 
-	if ( !GlobalSoundAttenuation || !bSoundEnabled )
+	if ( !GlobalSoundAttenuation || !AudioOpts.bSoundEnabled )
 		return 0;
 
 	index = FindFreeSfxHolder();
@@ -2157,7 +2153,7 @@ u_int32_t SfxPlayer::play_general_panned( int16_t Sfx, u_int16_t Group , VECTOR 
 {
 	int index;
 
-	if ( !GlobalSoundAttenuation || !bSoundEnabled )
+	if ( !GlobalSoundAttenuation || !AudioOpts.bSoundEnabled )
 		return 0;
 
 	index = FindFreeSfxHolder();
@@ -2198,7 +2194,7 @@ u_int32_t SfxPlayer::play_spot( int16_t Sfx, u_int16_t *Group , VECTOR * SfxPos,
 {
 	int index;
 
-	if ( !GlobalSoundAttenuation || !bSoundEnabled )
+	if ( !GlobalSoundAttenuation || !AudioOpts.bSoundEnabled )
 		return 0;
 
 	index = FindFreeSfxHolder();
@@ -2224,7 +2220,7 @@ u_int32_t SfxPlayer::play_fixed_spot( int16_t Sfx, u_int16_t Group , VECTOR * Sf
 {
 	int index;
 
-	if ( !GlobalSoundAttenuation || !bSoundEnabled )
+	if ( !GlobalSoundAttenuation || !AudioOpts.bSoundEnabled )
 		return 0;
 
 	index = FindFreeSfxHolder();
@@ -2262,7 +2258,7 @@ bool SfxPlayer::stop( u_int32_t uid )
 	if ( !uid )
 		return false;
 
-	if ( !bSoundEnabled )
+	if ( !AudioOpts.bSoundEnabled )
 		return false;
 
 	i = GetSfxHolderIndex( uid );
@@ -2409,7 +2405,7 @@ int SfxPlayer::init_looping( int16_t Sfx, int variant, u_int16_t *Group, VECTOR 
 {
 	int index, i;
 
-	if ( !bSoundEnabled )
+	if ( !AudioOpts.bSoundEnabled )
 		return -1;
 
 	index = -1;
@@ -2505,7 +2501,7 @@ void SfxPlayer::process_looping()
 	static unsigned long maint_frame = 0;
 	static unsigned long sfx_try_frame[ MAX_LOOPING_SFX ];
 
-	if(!bSoundEnabled)
+	if(!AudioOpts.bSoundEnabled)
 		return;
 
 	/* Steady-state ndsp maintenance (param pushes + play-state check)
@@ -2613,8 +2609,8 @@ void SfxPlayer::process_looping()
 		// play-state check only on maint ticks (or first start above).
 		if ( SpotSfxList[ i ].source && ( maint_tick || started ) )
 		{
-			Volume = (long)(( GlobalSoundAttenuation * Distance / MaxDistance ) * sound_minimum_volume);
-			Volume = sound_minimum_volume - (long)( (float)( sound_minimum_volume - Volume ) * SpotSfxList[ i ].vol * GlobalSoundAttenuation );
+			Volume = (long)(( GlobalSoundAttenuation * Distance / MaxDistance ) * AudioOpts.sound_minimum_volume);
+			Volume = AudioOpts.sound_minimum_volume - (long)( (float)( AudioOpts.sound_minimum_volume - Volume ) * SpotSfxList[ i ].vol * GlobalSoundAttenuation );
 
 			SetPannedSourceParams(
 				SpotSfxList[ i ].source,
@@ -2772,7 +2768,7 @@ float SfxPlayer::distance_volume( VECTOR *sfxpos, u_int16_t sfxgroup, VECTOR *li
 		if( vol )
 		{
 			*vol = ( 0 - (long) ( dist * 0.6F ) );	// Scale it down by a factor...
-			*vol = sound_minimum_volume - (long)( ((float)( sound_minimum_volume - *vol )) * GlobalSoundAttenuation );
+			*vol = AudioOpts.sound_minimum_volume - (long)( ((float)( AudioOpts.sound_minimum_volume - *vol )) * GlobalSoundAttenuation );
 		}
 		if( sfxvector )
 		{
@@ -2793,7 +2789,7 @@ bool SfxPlayer::update_taunt( u_int32_t uid, u_int16_t Group, VECTOR *SfxPos )
 	if ( !uid )
 		return false;
 
-	if ( !bSoundEnabled )
+	if ( !AudioOpts.bSoundEnabled )
 		return false;
 
 	i = GetSfxHolderIndex( uid );
@@ -2814,7 +2810,7 @@ bool SfxPlayer::update_taunt( u_int32_t uid, u_int16_t Group, VECTOR *SfxPos )
 	{
 		VolModify = ( (float)BikerSpeechSlider.value / (float)BikerSpeechSlider.max ) * SPEECH_AMPLIFY;	// when multiplied with max value for GlobalSoundAttenuation, gives 1.0F;
 		Volume = 0;
-		Volume = sound_minimum_volume - (long)( (float)( sound_minimum_volume - Volume ) * VolModify * GlobalSoundAttenuation );
+		Volume = AudioOpts.sound_minimum_volume - (long)( (float)( AudioOpts.sound_minimum_volume - Volume ) * VolModify * GlobalSoundAttenuation );
 
 		// set source parameters
 		DebugPrintf("UpdateTaunt:\n");

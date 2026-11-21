@@ -1460,7 +1460,7 @@ bool InitView( void )
 			return false;
 		}
 
-		if ( !bSoundEnabled )
+		if ( !AudioOpts.bSoundEnabled )
 		{
 			if (! InitializeSound( DESTROYSOUND_All ))
 			{
@@ -1820,7 +1820,7 @@ char NodeName[256];
 	if( MainGame() != true )
 		return false;
 
-	if ( bSoundEnabled )
+	if ( AudioOpts.bSoundEnabled )
 	{
 		ProcessLoopingSfx();
 	}
@@ -2671,7 +2671,7 @@ char NodeName[256];
 	if( MainGame() != true )
 		return false;
 
-	if ( bSoundEnabled && !CurrentMenu )
+	if ( AudioOpts.bSoundEnabled && !CurrentMenu )
 	{
 		ProcessLoopingSfx();
 		ProcessEnemyBikerTaunt();
@@ -3025,7 +3025,7 @@ bool RenderScene( void )
 	CalculateFramelag();
 	AnimOncePerFrame++;
 
-	if ( bSoundEnabled )
+	if ( AudioOpts.bSoundEnabled )
 	{
 		CheckSBufferList();
 	}
