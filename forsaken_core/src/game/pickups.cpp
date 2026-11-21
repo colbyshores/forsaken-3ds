@@ -1,5 +1,6 @@
 /* pickups.cpp -- pickup pool, collection, regeneration points; see pickups.h. */
 #include <stdio.h>
+#include "game/debugview.h"
 
 #include "game/main.h"
 #include "math/new3d.h"
@@ -1826,7 +1827,7 @@ void CheckPickup( void )
 	PICKUP	*	NextPickup;
 
 	if( Ships[ WhoIAm ].Object.Mode != NORMAL_MODE ) return;
-	if( DebugInfo ) return;
+	if( DebugViews.DebugInfo ) return;
 
 	Dir.x = ( Ships[ WhoIAm ].Move_Off.x * framelag );
 	Dir.y = ( Ships[ WhoIAm ].Move_Off.y * framelag );
@@ -2159,7 +2160,7 @@ u_int16_t PickupPool::init_one( VECTOR * Pos, u_int16_t Group, VECTOR * Dir, flo
 	u_int16_t	fmpoly;
 	u_int16_t	model;
 
-	if( !DebugInfo && ( MyGameStatus != STATUS_SinglePlayer ) )
+	if( !DebugViews.DebugInfo && ( MyGameStatus != STATUS_SinglePlayer ) )
 	{
 		if( NumPickupType[ Type ] >= MaxPickupType[ Type ] )
 		{

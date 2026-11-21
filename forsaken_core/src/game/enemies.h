@@ -456,7 +456,6 @@ extern float DifficlutyTab[ 4 ];
 extern ENEMY Enemies[ MAXENEMIES ];
 extern ENEMY * EnemyGroups[ MAXGROUPS ];
 void UpdateEnemiesClipGroup( CAMERA * Camera );
-extern bool ShowUntriggeredNMEs;
 
 /* The Enemies[] pool's bookkeeping and the level's enemy tallies (one
  * instance, EnemyState):

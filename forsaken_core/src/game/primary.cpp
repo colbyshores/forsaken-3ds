@@ -1,5 +1,6 @@
 /* primary.cpp -- primary weapons: bullet pool, firing, hits; see primary.h. */
 #include <stdio.h>
+#include "game/debugview.h"
 #include "game/main.h"
 #include "data/file.h"
 
@@ -2918,7 +2919,7 @@ void PrimaryWeapons::process()
 										&PrimBulls[i].ColGroup, &PrimBulls[i].ColPointNormal, &TempVector, false, nullptr ) )
 				{
 					DebugPrintf( "Primary weapon %d didn't collide with backgroup in group %d\n", PrimBulls[i].Weapon, PrimBulls[i].GroupImIn );
-					if( DebugInfo ) CreateDebugLine( &PrimBulls[i].Pos, &temp, PrimBulls[i].GroupImIn, 255, 64, 64 );
+					if( DebugViews.DebugInfo ) CreateDebugLine( &PrimBulls[i].Pos, &temp, PrimBulls[i].GroupImIn, 255, 64, 64 );
 					CleanUpPrimBull( i, true );
 					goto loop;
 				}

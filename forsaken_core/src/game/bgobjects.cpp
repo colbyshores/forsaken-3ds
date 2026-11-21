@@ -4,6 +4,7 @@
 	Includes
 ===================================================================*/
 #include <stdio.h>
+#include "game/debugview.h"
 #include <math.h>
 #include "game/main.h"
 #include "math/new3d.h"
@@ -41,7 +42,6 @@
 ===================================================================*/
 BGOBJECT	*	FirstBGObjectUsed = nullptr;
 BGOBJECT		BGObjects[ MAXBGOBJECTS ];
-bool			ShowColZones = false;
 
 namespace {
 
@@ -1999,7 +1999,7 @@ void ShowAllColZones( u_int16_t Group )
 	ENEMY		*	NMEObject;
 	ENEMY		*	NextNMEObject;
 
-	if( ShowColZones )
+	if( DebugViews.ShowColZones )
 	{
 		Object = FirstBGObjectUsed;
 

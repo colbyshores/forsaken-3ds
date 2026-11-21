@@ -4,6 +4,7 @@
 		Include Files...
 ===================================================================*/
 #include <stdio.h>
+#include "game/debugview.h"
 
 #include "game/main.h"
 #include "math/new3d.h"
@@ -279,7 +280,7 @@ void ExternalForceSet::display_in_group( u_int16_t Group )
 {
 	EXTERNALFORCE * EFpnt;
 
-	if( !ShowEFZones ) return;
+	if( !DebugViews.ShowEFZones ) return;
 
 	EFpnt = ExternalForcesGroupLink[Group];
 

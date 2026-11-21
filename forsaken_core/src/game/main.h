@@ -128,8 +128,6 @@ constexpr u_int16_t INDEX_NONE = (u_int16_t) -1;
 
 /* Defined in main.cpp; shared with the modules that use it. */
 extern bool Debug;
-extern bool ShowFrameRate;
-extern bool ShowInfo;
 void CleanUpAndPostQuit(void);
 
 /* Set when the player or the system asks to quit; the main loop exits. */

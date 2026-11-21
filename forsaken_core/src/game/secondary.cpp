@@ -1,5 +1,6 @@
 /* secondary.cpp -- secondary weapons: missiles, mines, targeting; see secondary.h. */
 #include <stdio.h>
+#include "game/debugview.h"
 #include "game/main.h"
 #include "data/file.h"
 #include "math/new3d.h"
@@ -3705,7 +3706,7 @@ bool SecondaryWeapons::process_missile( u_int16_t i, u_int16_t * NextMissile )
 									&SecBulls[i].ColGroup, &SecBulls[i].ColPointNormal, &TempVector, false, nullptr ) )
 				{
 					DebugPrintf( "Secondary weapon %d didn't collide with backgroup in group %d\n", SecBulls[i].Weapon, SecBulls[i].GroupImIn );
-					if( DebugInfo ) CreateDebugLine( &SecBulls[i].Pos, &temp, SecBulls[i].GroupImIn, 255, 64, 64 );
+					if( DebugViews.DebugInfo ) CreateDebugLine( &SecBulls[i].Pos, &temp, SecBulls[i].GroupImIn, 255, 64, 64 );
 					CleanUpSecBull( i );
 					return( false );
 				}

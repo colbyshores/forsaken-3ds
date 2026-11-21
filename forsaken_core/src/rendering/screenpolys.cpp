@@ -1,5 +1,6 @@
 /* screenpolys.cpp -- ScrPoly HUD quads, countdown, lens flare; see screenpolys.h. */
 #include <stdio.h>
+#include "game/debugview.h"
 
 #include "math/new3d.h"
 #include "math/quat.h"
@@ -1141,7 +1142,7 @@ inline void CountdownClock::update()
 
 	if( MyGameStatus == STATUS_SinglePlayer )
 	{
-		if( ( framelag == 0.0F ) || ( DebugInfo ) )
+		if( ( framelag == 0.0F ) || ( DebugViews.DebugInfo ) )
 		{
 			Time_Diff = 0.0F;
 		}

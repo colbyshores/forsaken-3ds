@@ -6,6 +6,7 @@
  */
 
 #include <stdio.h>
+#include "game/debugview.h"
 #include <math.h>
 
 #include "game/main.h"
@@ -158,7 +159,7 @@ void AI_AIR_MOVETOTARGET( ENEMY * Enemy )
 
 
 	TNode = (NODE*)Enemy->Object.NearestNode;
-	if( ShowNode && TNode )
+	if( DebugViews.ShowNode && TNode )
 		CreateSparks( &TNode->Pos, &SlideUp, TNode->Group );
 
 

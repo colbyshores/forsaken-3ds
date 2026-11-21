@@ -1,5 +1,6 @@
 
 #include <stdio.h>
+#include "game/debugview.h"
 #include "game/main.h"
 #include "math/new3d.h"
 #include "math/quat.h"
@@ -456,7 +457,7 @@ int GoalZones::check_team( VECTOR * OldPos , VECTOR * NewPos, u_int16_t Group, i
 
 	for ( j = 0; j < NumGoals; j++ )
 	{
-		if( ( Goal[ j ].state == GOALSTATE_On || DebugInfo )
+		if( ( Goal[ j ].state == GOALSTATE_On || DebugViews.DebugInfo )
 			&& ( Goal[ j ].group == Group || GroupsAreConnected( Goal[ j ].group, Group ) ) )
 		{
 			GoalCheck( OldPos , NewPos , &Goal[ j ] );
@@ -491,7 +492,7 @@ int GoalZones::display( u_int16_t group )
 	for ( j = 0; j < NumGoals; j++ )
 	{
 		if ( Goal[ j ].group == group
-			&& ( ( Goal[ j ].state == GOALSTATE_On ) || DebugInfo ) )
+			&& ( ( Goal[ j ].state == GOALSTATE_On ) || DebugViews.DebugInfo ) )
 		{
 			for ( k = 0; k < 3; k++ )
 			{

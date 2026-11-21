@@ -42,6 +42,7 @@ num_zones : u_int16_t
 ===================================================================*/
 
 #include <stdio.h>
+#include "game/debugview.h"
 #include "game/main.h"
 #include "math/new3d.h"
 #include "math/quat.h"
@@ -722,7 +723,7 @@ void TriggerAreas::display_group( u_int16_t Group )
 {
 	TRIGGER_AREA * Area;
 
-	if( !ShowTrigZones ) return;
+	if( !DebugViews.ShowTrigZones ) return;
 
 	Area = GroupTriggerArea_player[Group];
 	while( Area )

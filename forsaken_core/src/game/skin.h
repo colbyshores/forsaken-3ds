@@ -73,10 +73,6 @@ void DisplaySphereZone( VECTOR * Pos, float Radius, u_int16_t Group,
 void KillAllSphereZones( void );
 void DisplayZoneDirection( VECTOR * Pos, VECTOR * Dir, u_int16_t Group );
 /* Defined in skin.cpp; shared with the modules that use it. */
-extern bool ShowEFZones;
 extern RENDEROBJECT Portal_Execs[ MAXPORTALEXECS ];
 extern RENDEROBJECT Skin_Execs[ MAXSKINEXECS ];
-extern bool ShowTeleports;
-extern bool ShowTrigZones;
-extern int16_t ShowPortal;
 void DisplayDirAndUp( VECTOR * Pos, VECTOR * Dir, VECTOR *Up, u_int16_t Group );

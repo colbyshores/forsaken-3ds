@@ -1,5 +1,6 @@
 /* ships.cpp -- player ship movement, modes, collision and damage; see ships.h. */
 #include <stdio.h>
+#include "game/debugview.h"
 #include "game/main.h"
 #include "data/file.h"
 
@@ -800,7 +801,7 @@ void (* ShipUpdate::RemoteCameraModeControl[ ])( GLOBALSHIP * ShipPnt , BYTE i )
 			outside_map = !PointInsideSkin( &ShipObjPnt->Pos, ShipObjPnt->Group );
 			if ( outside_map )
 			{
-				if ( !DebugInfo )
+				if ( !DebugViews.DebugInfo )
 				{
 					// player has somehow managed to get outside the map
 					// so we "teleport" him back to his last start position
@@ -1190,7 +1191,7 @@ bool ShipUpdate::process()
 				}
 				/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 				NodePnt = (NODE*)ShipObjPnt->NearestNode;
-				if( NodePnt && ShowNode)
+				if( NodePnt && DebugViews.ShowNode)
 				{
 					SteamTime -= framelag;
 					/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
@@ -1454,7 +1455,7 @@ void BobShip( u_int16_t ship, VECTOR *bob )
 
 	move = Ships[ ship ].Object.Speed;
 	move_len = (float) sqrtf( move.x * move.x + move.y * move.y + move.z * move.z );
-	if ( move_len < MOVE_TOLERANCE && !DebugInfo )
+	if ( move_len < MOVE_TOLERANCE && !DebugViews.DebugInfo )
 	{
 		move.x = BOB_XSIZE * (float) fast_sinf( Ships[ ship ].Object.BobCount * BOB_XFREQ );
 		move.y = BOB_YSIZE * (float) fast_sinf( Ships[ ship ].Object.BobCount * BOB_YFREQ );
@@ -2282,7 +2283,7 @@ void ShipUpdate::remote_camera_mode0( GLOBALSHIP * ShipPnt , BYTE i )
 	u_int16_t	ImpactGroup;
 	NORMAL	FaceNormal;
 
-	if( !DebugInfo )
+	if( !DebugViews.DebugInfo )
 	{
 		temp.x = ShipPnt->Object.Pos.x - Ships[WhoIAm].Object.Pos.x;
 		temp.y = ShipPnt->Object.Pos.y - Ships[WhoIAm].Object.Pos.y;

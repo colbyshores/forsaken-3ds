@@ -4,6 +4,7 @@
 ===================================================================*/
 
 #include "game/main.h"
+#include "game/debugview.h"
 #include "util/platform.h"
 #include "audio/music.h"
 
@@ -609,17 +610,12 @@ SLIDER TextScaleSlider				= { 0, 5, 1, 1, 0, 0.0F, 0.0F, 0, false, nullptr, null
 bool ShowTeamInfo;
 bool NoTeamSelect				= false;
 bool Autoleveling				= true;
-bool DebugInfo					= false;
 bool GodMode					= false;
-bool ShowPlaneRGB				= false;
+DebugView DebugViews;
 bool BrightShips;
 bool MyBrightShips;
 bool BikeExhausts;
 bool ScreenSaving				= true;
-bool ShowNode					= false;
-bool NodeCube					= false;
-bool OldNodeCube				= false;
-bool NodeCubeType				= false;
 bool TeamGame					= false;
 bool BountyBonus;
 bool BikeEnginesOn;
@@ -1304,7 +1300,7 @@ MENU	MENU_NEW_DetailLevels = {
 		{ 10, 40, 150, 40, 0, (u_int8_t*)"MATURE CONTENT", FONT_Small, TEXTFLAG_CentreY,  &MatureContent,	nullptr,	SelectMultiToggle,	DrawFlatMenuToggle, nullptr, 0 },
 		{ 10, 56, 150, 56, 0, (u_int8_t*)LT_MENU_NEW_DetailLevels4/*"Team Info"*/, FONT_Small, TEXTFLAG_CentreY,		&ShowTeamInfo,			nullptr,	SelectFlatMenuToggle,	DrawFlatMenuToggle, nullptr, 0 },
 		{ 10, 72, 95, 72, 0, (u_int8_t*)LT_MENU_NEW_DetailLevels8/*"Water Detail"*/, FONT_Small, TEXTFLAG_AutoSelect | TEXTFLAG_CentreY,		&WaterDetailSlider,		nullptr,	SelectSlider,	DrawFlatMenuSlider, nullptr, 0 },
-		{ 10, 86, 150, 86, 0, (u_int8_t*)LT_MENU_NEW_DetailLevels14/*"Show Extra Info "*/, FONT_Small, TEXTFLAG_CentreY, &ShowInfo, nullptr, SelectFlatMenuToggle, DrawFlatMenuToggle, nullptr, 0 },
+		{ 10, 86, 150, 86, 0, (u_int8_t*)LT_MENU_NEW_DetailLevels14/*"Show Extra Info "*/, FONT_Small, TEXTFLAG_CentreY, &DebugViews.ShowInfo, nullptr, SelectFlatMenuToggle, DrawFlatMenuToggle, nullptr, 0 },
 		{ 10, 102, 150, 102, 0, (u_int8_t*)LT_MENU_NEW_DetailLevels15/*"Show Weapon Kills"*/, FONT_Small, TEXTFLAG_CentreY, &ShowWeaponKills, nullptr, SelectFlatMenuToggle, DrawFlatMenuToggle, nullptr, 0 },
 		{ 10, 150, 150, 150, 0, (u_int8_t*)LT_MENU_NEW_DetailLevels16/*"Back"*/, FONT_Small, TEXTFLAG_CentreY,		nullptr,		nullptr,	MenuItemBack, DrawFlatMenuItem, nullptr, 0 },
 		{ -1, -1, 0, 0, 0, (u_int8_t*)"", 0, 0,  nullptr, nullptr, nullptr, nullptr, nullptr, 0 }
@@ -2211,22 +2207,22 @@ MENU	MENU_DebugMode = {
 	(u_int8_t*)"Select Debug Mode" , InitDebugMode , nullptr , nullptr, 0,
 	{
 
-		{ 200, 96, 0, 0, 0, (u_int8_t*)"Show Plane RGB", 0, 0, &ShowPlaneRGB, nullptr, SelectToggle, DrawToggle, nullptr, 0 },
+		{ 200, 96, 0, 0, 0, (u_int8_t*)"Show Plane RGB", 0, 0, &DebugViews.ShowPlaneRGB, nullptr, SelectToggle, DrawToggle, nullptr, 0 },
 
-		{ 200, 144, 0, 0, 0, (u_int8_t*)"external forces", 0, 0, &ShowEFZones, nullptr, SelectToggle, DrawToggle, nullptr, 0 },
-		{ 200, 160, 0, 0, 0, (u_int8_t*)"show teleports", 0, 0, &ShowTeleports, nullptr, SelectToggle, DrawToggle, nullptr, 0 },
-		{ 200, 176, 0, 0, 0, (u_int8_t*)"trigger zones", 0, 0, &ShowTrigZones, nullptr, SelectToggle, DrawToggle, nullptr, 0 },
-		{ 200, 192, 0, 0, 0, (u_int8_t*)"bounding boxes", 0, 0, &ShowBoundingBoxes, nullptr, SelectToggle, DrawToggle, nullptr, 0 },
-		{ 200, 208, 0, 0, 0, (u_int8_t*)"collision zones", 0, 0, &ShowColZones, nullptr, SelectToggle, DrawToggle, nullptr, 0 },
-		{ 200, 224, 0, 0, 0, (u_int8_t*)"Untriggered Enemies", 0, 0, &ShowUntriggeredNMEs, nullptr, SelectToggle, DrawToggle, nullptr, 0 },
+		{ 200, 144, 0, 0, 0, (u_int8_t*)"external forces", 0, 0, &DebugViews.ShowEFZones, nullptr, SelectToggle, DrawToggle, nullptr, 0 },
+		{ 200, 160, 0, 0, 0, (u_int8_t*)"show teleports", 0, 0, &DebugViews.ShowTeleports, nullptr, SelectToggle, DrawToggle, nullptr, 0 },
+		{ 200, 176, 0, 0, 0, (u_int8_t*)"trigger zones", 0, 0, &DebugViews.ShowTrigZones, nullptr, SelectToggle, DrawToggle, nullptr, 0 },
+		{ 200, 192, 0, 0, 0, (u_int8_t*)"bounding boxes", 0, 0, &DebugViews.ShowBoundingBoxes, nullptr, SelectToggle, DrawToggle, nullptr, 0 },
+		{ 200, 208, 0, 0, 0, (u_int8_t*)"collision zones", 0, 0, &DebugViews.ShowColZones, nullptr, SelectToggle, DrawToggle, nullptr, 0 },
+		{ 200, 224, 0, 0, 0, (u_int8_t*)"Untriggered Enemies", 0, 0, &DebugViews.ShowUntriggeredNMEs, nullptr, SelectToggle, DrawToggle, nullptr, 0 },
 
 		{ 200, 256, 0, 0, 0, (u_int8_t*)"Screen Capture Mode ...on F8 key", 0, 0,		&ScreenSaving,		nullptr,	SelectToggle,	DrawToggle, nullptr, 0 },
-		{ 200, 272, 0, 0, 0, (u_int8_t*)"Old BSP Cube", 0, 0, &OldNodeCube, nullptr, SelectToggle, DrawToggle, nullptr, 0 },
-		{ 200, 288, 0, 0, 0, (u_int8_t*)"BSP Node Cube", 0, 0, &NodeCube, nullptr, SelectToggle, DrawToggle, nullptr, 0 },
-		{ 200, 304, 0, 0, 0, (u_int8_t*)"BSP Nodes tested", 0, 0, &NodeCubeType, nullptr, SelectToggle, DrawToggle, nullptr, 0 },
+		{ 200, 272, 0, 0, 0, (u_int8_t*)"Old BSP Cube", 0, 0, &DebugViews.OldNodeCube, nullptr, SelectToggle, DrawToggle, nullptr, 0 },
+		{ 200, 288, 0, 0, 0, (u_int8_t*)"BSP Node Cube", 0, 0, &DebugViews.NodeCube, nullptr, SelectToggle, DrawToggle, nullptr, 0 },
+		{ 200, 304, 0, 0, 0, (u_int8_t*)"BSP Nodes tested", 0, 0, &DebugViews.NodeCubeType, nullptr, SelectToggle, DrawToggle, nullptr, 0 },
 
-		{ 200, 336, 0, 0, 0, (u_int8_t*)"Show Nodes", 0, 0, &ShowNode, (void*)ShowNodeToggle, SelectToggle, DrawToggle, nullptr, 0 },
-		{ 200, 352, 0, 0, 0, (u_int8_t*)"Show Startpoints", 0, 0, &ShowStartPoints, (void*)ShowStartPointsToggle, SelectToggle, DrawToggle, nullptr, 0 },
+		{ 200, 336, 0, 0, 0, (u_int8_t*)"Show Nodes", 0, 0, &DebugViews.ShowNode, (void*)ShowNodeToggle, SelectToggle, DrawToggle, nullptr, 0 },
+		{ 200, 352, 0, 0, 0, (u_int8_t*)"Show Startpoints", 0, 0, &DebugViews.ShowStartPoints, (void*)ShowStartPointsToggle, SelectToggle, DrawToggle, nullptr, 0 },
 
 		{ -1 , -1, 0, 0, 0, (u_int8_t*)"" , 0, 0, nullptr, nullptr , nullptr , nullptr, nullptr, 0 }
 	}
@@ -2310,8 +2306,8 @@ MENU	MENU_Options = {
 #endif
 		{ 200, 144, 0, 0, 0, (u_int8_t*)LT_MENU_Options2	/*"Sound FX and Music"*/,	0, 0, nullptr,						&MENU_NEW_InGameSound,	MenuChange,		MenuItemDrawName,	nullptr, 0 },
 		{ 200, 160, 0, 0, 0, (u_int8_t*)LT_MENU_Options3	/*"Detail Levels"*/,		0, 0, nullptr,						&MENU_Detail,			MenuChange,		MenuItemDrawName,	nullptr, 0 },
-		{ 200, 176, 0, 0, 0, (u_int8_t*)LT_MENU_Options4	/*"Show Frame Rate "*/,		0, 0, &ShowFrameRate,	nullptr,					SelectToggle,	DrawToggle,			nullptr, 0 },
-		{ 200, 192, 0, 0, 0, (u_int8_t*)LT_MENU_Options8	/*"Show Extra Info "*/,		0, 0, &ShowInfo,		nullptr,					SelectToggle,	DrawToggle,			nullptr, 0 },
+		{ 200, 176, 0, 0, 0, (u_int8_t*)LT_MENU_Options4	/*"Show Frame Rate "*/,		0, 0, &DebugViews.ShowFrameRate,	nullptr,					SelectToggle,	DrawToggle,			nullptr, 0 },
+		{ 200, 192, 0, 0, 0, (u_int8_t*)LT_MENU_Options8	/*"Show Extra Info "*/,		0, 0, &DebugViews.ShowInfo,		nullptr,					SelectToggle,	DrawToggle,			nullptr, 0 },
 		{ 200, 208, 0, 0, 0, (u_int8_t*)LT_MENU_Options9	/*"Show Weapon Kills"*/,	0, 0, &ShowWeaponKills,			nullptr,					SelectToggle,	DrawToggle,			nullptr, 0 },
 		{ 200, 224, 0, 0, 0, (u_int8_t*)LT_MENU_Options13	/*"Show Players on HUD"*/,	0, 0, &ShowPlayersOnHUD,		nullptr,					SelectToggle,	DrawToggle,			nullptr, 0 },
 		{ 200, 240, 0, 0, 0, (u_int8_t*)"HUD Show Kills Only",	0, 0, &ShowPlayersOnHUDbyKills,nullptr,SelectToggle,DrawToggle,nullptr, 0 },
@@ -2390,7 +2386,7 @@ MENU	MENU_InGame = { (u_int8_t*)LT_MENU_InGame0 /*"Forsaken"*/ , InitInGameMenu 
 
 					  OLDMENUITEM( 200, 256, (u_int8_t*)LT_MENU_InGame24 /*"Watch Player"*/, nullptr, &MENU_Watch_Options, MenuChange, MenuItemDrawName),
 #ifdef DEBUG_ON
-					  OLDMENUITEM( 200, 272, (u_int8_t*)LT_MENU_InGame11 /*"Debugging"					*/,	&DebugInfo,					(void*)DebugModeChanged,		SelectToggle,			DrawToggle),
+					  OLDMENUITEM( 200, 272, (u_int8_t*)LT_MENU_InGame11 /*"Debugging"					*/,	&DebugViews.DebugInfo,					(void*)DebugModeChanged,		SelectToggle,			DrawToggle),
 #endif
 					  OLDMENUITEM( 200, 304, (u_int8_t*)LT_MENU_InGame14 /*"Save Menu"					*/,	nullptr,						&MENU_Save,				MenuChange,				MenuItemDrawName),
 					  OLDMENUITEM( 200, 320, (u_int8_t*)LT_MENU_InGame15 /*"Debug Menu"				*/,	nullptr,						&MENU_DebugMode,		MenuChange,				MenuItemDrawName),
@@ -2421,7 +2417,7 @@ MENU	MENU_InGameSingle = { (u_int8_t*)LT_MENU_InGame0 /*"Forsaken"*/ , InitInGam
 					  OLDMENUITEM( 200, 240, (u_int8_t*)LT_MENU_InGame25 /*"Quit to desktop"			*/,	nullptr,						nullptr,					SelectQuit,				MenuItemDrawName),
 #endif
 #ifdef DEBUG_ON
-					  OLDMENUITEM( 200, 272, (u_int8_t*)LT_MENU_InGame11 /*"Debugging"					*/,	&DebugInfo,					(void*)DebugModeChanged,		SelectToggle,			DrawToggle),
+					  OLDMENUITEM( 200, 272, (u_int8_t*)LT_MENU_InGame11 /*"Debugging"					*/,	&DebugViews.DebugInfo,					(void*)DebugModeChanged,		SelectToggle,			DrawToggle),
 #endif
 					  OLDMENUITEM( 200, 304, (u_int8_t*)LT_MENU_InGame14 /*"Save Menu"					*/,	nullptr,						&MENU_Save,				MenuChange,				MenuItemDrawName),
 					  OLDMENUITEM( 200, 320, (u_int8_t*)LT_MENU_InGame15 /*"Debug Menu"				*/,	nullptr,						&MENU_DebugMode,		MenuChange,				MenuItemDrawName),
@@ -6954,7 +6950,7 @@ void InitInGameMenu( MENU *Menu )
 
 		else if ( item->Value == &MENU_Save || item->Value == &MENU_DebugMode )
 		{
-			if ( DebugInfo )
+			if ( DebugViews.DebugInfo )
 			{
 				item->FuncSelect = MenuChange;
 				item->FuncDraw = MenuItemDrawName;
@@ -7006,12 +7002,12 @@ void InitDebugMode( MENU *Menu )
 	{
 		if (
 			item->Value == &ScreenSaving ||
-			item->Value == &OldNodeCube ||
-			item->Value == &NodeCube ||
-			item->Value == &NodeCubeType
+			item->Value == &DebugViews.OldNodeCube ||
+			item->Value == &DebugViews.NodeCube ||
+			item->Value == &DebugViews.NodeCubeType
 			)
 		{
-			if ( DebugInfo )
+			if ( DebugViews.DebugInfo )
 			{
 				item->FuncSelect = SelectToggle;
 				item->FuncDraw = DrawToggle;
@@ -7589,7 +7585,7 @@ int8_t	NotDebuggingString[] = "No Longer Cheating";
 
 void DebugModeChanged( MENUITEM * /*item*/ )
 {
-	if( DebugInfo )
+	if( DebugViews.DebugInfo )
 	{
 		copy_string( (char*)&MacroText4.text[0], sizeof( MacroText4.text ), (char*)&DebuggingString[0] );
 		SendGameMessage(MSG_TEXTMSG, 0, 0, TEXTMSGTYPE_Taunt1, 0);
@@ -7611,12 +7607,12 @@ void SavePickups( MENUITEM * /*item*/ )
 
 void ShowNodeToggle( MENUITEM * /*item*/ )
 {
-	ShowNodeNetwork( ( ShowNode ) ? 1 : 0 );
+	ShowNodeNetwork( ( DebugViews.ShowNode ) ? 1 : 0 );
 }
 
 void ShowStartPointsToggle( MENUITEM * /*item*/ )
 {
-	if( ShowStartPoints )
+	if( DebugViews.ShowStartPoints )
 	{
 		DisplayStartPoints();
 	}

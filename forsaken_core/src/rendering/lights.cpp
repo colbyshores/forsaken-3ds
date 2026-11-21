@@ -1,5 +1,6 @@
 /* lights.cpp -- dynamic XLights and vertex relighting; see lights.h. */
 #include <stdio.h>
+#include "game/debugview.h"
 #include <string.h>
 
 #include "math/new3d.h"
@@ -584,7 +585,7 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 		 * frame to frame) unless white-out or water rewrite them every
 		 * frame; tell the backend's caches which (render.h SMEMO_PASS). */
 		Mloadheader->Group[group].renderObject[mesh].memoEpochPass =
-			( ( Water.dry( group ) || ShowPlaneRGB ) && WhiteOut == 0.0F ) ?
+			( ( Water.dry( group ) || DebugViews.ShowPlaneRGB ) && WhiteOut == 0.0F ) ?
 				SMEMO_PASS_UNSET : SMEMO_PASS_PER_FRAME;
 
 
@@ -629,14 +630,14 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 			/* Skip the colour pass when the previous call left the baked
 			 * colours in place and this one would only copy them again, as
 			 * for the second stereo eye of a frame. */
-			if( !( color_already_clean && !ShowPlaneRGB && WhiteOut == 0.0F &&
+			if( !( color_already_clean && !DebugViews.ShowPlaneRGB && WhiteOut == 0.0F &&
 				   Water.dry( group ) ) )
 			{
-				if( Water.dry( group ) || ShowPlaneRGB )
+				if( Water.dry( group ) || DebugViews.ShowPlaneRGB )
 				{
 					if( WhiteOut == 0.0F )
 					{
-						if ( ShowPlaneRGB )
+						if ( DebugViews.ShowPlaneRGB )
 						{
 							while( vert --)
 							{

@@ -1,5 +1,6 @@
 /* lines.cpp -- debug line pool and per-group line batches; see lines.h. */
 #include "game/main.h"
+#include "game/debugview.h"
 #include <stdio.h>
 #include "math/new3d.h"
 #include "math/quat.h"
@@ -137,7 +138,7 @@ bool LinesDispGroup( u_int16_t Group, RENDEROBJECT *renderObject, u_int16_t * St
 	int16_t			Num_Lines;
 	u_int16_t			i;
 
-	if ( !DebugInfo )
+	if ( !DebugViews.DebugInfo )
 	{
 		*StartLine = INDEX_NONE;
 		return false; // don't display lines if not debugging

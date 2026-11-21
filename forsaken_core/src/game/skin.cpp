@@ -1,5 +1,6 @@
 /* skin.cpp -- debug views of collision skin, portals, BSP nodes and zones; see skin.h. */
 #include <stdio.h>
+#include "game/debugview.h"
 #include "game/main.h"
 #include "math/new3d.h"
 #include "math/quat.h"
@@ -29,14 +30,10 @@ constexpr auto NODECUBE_Array = true;
 static	LVERTEX		PortalVerts[ 310 * 3 ];
 static	TRIANGLE		PortalTris[ 310 ];
 RENDEROBJECT			Portal_Execs[ MAXPORTALEXECS ];
-int16_t					ShowPortal = 0;
 
 static	LVERTEX		SkinVerts[ 310 * 3 ];
 static	TRIANGLE		SkinTris[ 310 ];
 RENDEROBJECT			Skin_Execs[ MAXSKINEXECS ];
-bool					ShowTrigZones = false;
-bool					ShowEFZones = false;
-bool					ShowTeleports = false;
 
 VECTOR					TempVerts[ 64 ];
 
@@ -147,12 +144,12 @@ void SkinViews::display_bsp_node( BSP_NODE * Node )
 	KillBoxLines();
 	KillAllSphereZones();
 
-	if( NodeCube ) DisplayNewBSPNode( Node );
-	if( !OldNodeCube ) return;
+	if( DebugViews.NodeCube ) DisplayNewBSPNode( Node );
+	if( !DebugViews.OldNodeCube ) return;
 
 	CreateLineBox();
 
-	switch( NodeCubeType )
+	switch( DebugViews.NodeCubeType )
 	{
 	case NODECUBE_Branch:
 		TempNode = Node;
@@ -642,7 +639,7 @@ void SkinViews::display_col_zone( ZONESIDE * Sides, int16_t NumSides, u_int16_t 
 	u_int16_t			line;
 	int16_t			SideCount;
 
-	if( !ShowColZones || !NumSides || !Sides ) return;
+	if( !DebugViews.ShowColZones || !NumSides || !Sides ) return;
 
 	Side = -1;
 	StartSide = Sides;
@@ -834,7 +831,7 @@ bool SkinViews::create_portal_exec_list( MLOADHEADER * Mloadheader, int16_t NumV
 	PortalTriCount = 0;
 	ReleasePortalExecs();
 
-	switch( ShowPortal )
+	switch( DebugViews.ShowPortal )
 	{
 	case 0:
 		return true;

@@ -1,5 +1,6 @@
 
 #include "game/main.h"
+#include "game/debugview.h"
 #include "util/platform.h"
 #include "math/new3d.h"
 #include "math/quat.h"
@@ -529,28 +530,28 @@ void SetViewportError( const char *where, render_viewport_t *vp )
 
 		// Shift + F7
 		if ( input_buffer_find( SDLK_F7 ) )
-			ShowBoundingBoxes = !ShowBoundingBoxes;
+			DebugViews.ShowBoundingBoxes = !DebugViews.ShowBoundingBoxes;
 
 		// Shift + F8
 		if ( input_buffer_find( SDLK_F8 ) )
-			ShowEFZones = !ShowEFZones;
+			DebugViews.ShowEFZones = !DebugViews.ShowEFZones;
 
 		// Shift + F9
 		if ( input_buffer_find( SDLK_F9 ) )
 		{
-			if( ShowPortal == 4 )
+			if( DebugViews.ShowPortal == 4 )
 			{
-				ShowPortal = 0;
+				DebugViews.ShowPortal = 0;
 			}
 			else
 			{
-				ShowPortal++;
+				DebugViews.ShowPortal++;
 			}
 		}
 
 		// Shift + F10
 		if ( input_buffer_find( SDLK_F10 ) )
-			ShowColZones = !ShowColZones;
+			DebugViews.ShowColZones = !DebugViews.ShowColZones;
 
 
 		// Shift + F12
@@ -564,11 +565,11 @@ void SetViewportError( const char *where, render_viewport_t *vp )
 
 		// Ctrl + F1
 		if ( input_buffer_find( SDLK_F1 ) )
-			ShowTeleports = !ShowTeleports;
+			DebugViews.ShowTeleports = !DebugViews.ShowTeleports;
 
 		// Ctrl + F2
 		if ( input_buffer_find( SDLK_F2 ) )
-			ShowTrigZones = !ShowTrigZones;
+			DebugViews.ShowTrigZones = !DebugViews.ShowTrigZones;
 
 
 	} // end ctrl modifier
@@ -791,7 +792,7 @@ void ProcessGameKeys( void )
 	}
 
 	// debuggin keys
-	if ( DebugInfo )
+	if ( DebugViews.DebugInfo )
 	{
 		ProcessGameKeysDebug( startpos );
 	} // end debug keys
@@ -4495,9 +4496,9 @@ bool RenderCurrentCamera( void )
 	/*===================================================================
 	  Display Skin & BSP Node Info
 	===================================================================*/
-	if( OldNodeCube || NodeCube || ShowTrigZones || ShowColZones || ShowEFZones || ShowTeleports )
+	if( DebugViews.OldNodeCube || DebugViews.NodeCube || DebugViews.ShowTrigZones || DebugViews.ShowColZones || DebugViews.ShowEFZones || DebugViews.ShowTeleports )
 	{
-		if( OldNodeCube || NodeCube )
+		if( DebugViews.OldNodeCube || DebugViews.NodeCube )
 			ClearZBuffer();
 
 		for( Count = 0; Count < MAXGROUPS; Count++ )
@@ -4568,7 +4569,7 @@ bool RenderCurrentCamera( void )
 	/*===================================================================
 	  Display Portals
 	===================================================================*/
-	if( ShowPortal )
+	if( DebugViews.ShowPortal )
 	{
 		for( Count = 0; Count < MAXGROUPS; Count++ )
 		{
@@ -4631,13 +4632,13 @@ bool Our_CalculateFrameRate(void)
 	}
 
 	// display the framerate
-	if( ShowFrameRate )
+	if( DebugViews.ShowFrameRate )
 	{
 		snprintf(&buf[0], sizeof( buf ), "FPS %d - AVG F %d MS", (int) FPS, avg_time_per_frame );
 		CenterPrint4x5Text( (char *) &buf[0] , FontHeight, 2 );
 	}
 
-	if( ShowInfo )
+	if( DebugViews.ShowInfo )
 	{
 
 		// group information

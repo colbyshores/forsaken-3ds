@@ -4,6 +4,7 @@
 		Include Files...
 ===================================================================*/
 #include <stdio.h>
+#include "game/debugview.h"
 
 #include "game/main.h"
 #include "math/new3d.h"
@@ -265,7 +266,7 @@ void Teleporters::display_in_group( u_int16_t Group )
 {
 	TELEPORT * TPpnt;
 
-	if( !ShowTeleports ) return;
+	if( !DebugViews.ShowTeleports ) return;
 
 	TPpnt = TeleportsGroupLink[Group];
 

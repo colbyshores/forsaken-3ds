@@ -269,7 +269,6 @@ void ReleaseFlyGirl( void );
 
 /* Defined in bgobjects.cpp; shared with the modules that use it. */
 extern BIKEINFO BikeCompFiles[ MAXBIKETYPES ];
-extern bool ShowColZones;
 void UpdateBGObjectsClipGroup( CAMERA * Camera );
 extern BGOBJECT * FirstBGObjectUsed;
 extern BGOBJECT BGObjects[ MAXBGOBJECTS ];

@@ -642,7 +642,6 @@ extern int16_t NextNewModel;
 extern MXLOADHEADER * ModelHeaders;
 extern MODELNAME * TitleModelSet;
 void InitShipSpeeds( void );
-extern bool ShowBoundingBoxes;
 char *GetName(int Player);
 extern MODELNAME InterLevelModelNames[ NUM_INTERLEVEL_MODELS+1 ];
 

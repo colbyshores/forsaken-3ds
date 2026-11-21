@@ -1,6 +1,7 @@
 /* handle keyboard and mouse control */
 
 #include <math.h>
+#include "game/debugview.h"
 
 #include "input/input.h"
 #include "game/oct2.h"
@@ -440,7 +441,7 @@ short InputBuffers::held( USERKEY *k )
 void Cheats::disable()
 {
 	CheatsEnabled = false;
-	DebugInfo = false;
+	DebugViews.DebugInfo = false;
 
 	// used to indicate cheats disabled for multiplayer game...
 	CheatsDisabled = true;

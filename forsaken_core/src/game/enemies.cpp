@@ -1,5 +1,6 @@
 /* enemies.cpp -- enemy types, spawning, AI dispatch and movement; see enemies.h. */
 #include <stdio.h>
+#include "game/debugview.h"
 #include <math.h>
 
 #include "game/main.h"
@@ -52,7 +53,6 @@ constexpr int SPECIALENEMYNODENUM = 16384;
 /*===================================================================
 	Global Variables
 ===================================================================*/
-bool	ShowUntriggeredNMEs = false;
 
 ENEMY * BigGeek = nullptr;
 float	Difficulty = 1.0F;
@@ -6106,7 +6106,7 @@ void DispUntriggeredNMEs( void )
 	ENEMY		*	Enemy;
 	ENEMY		*	NextEnemy;
 
-	if( !ShowUntriggeredNMEs ) return;
+	if( !DebugViews.ShowUntriggeredNMEs ) return;
 
 	Enemy = FirstEnemyUsed;
 

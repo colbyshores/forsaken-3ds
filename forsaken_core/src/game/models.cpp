@@ -1,4 +1,5 @@
 #include "util/platform.h"
+#include "game/debugview.h"
 
 
 
@@ -52,7 +53,6 @@ void CheckModelLinkList( void );
 MODEL	Models[MAXNUMOFMODELS];
 
 int16_t	NextNewModel = -1;
-bool	ShowBoundingBoxes = false;
 
 
 /* calloc'd by PreInitModel, sized to cover the highest populated
@@ -4699,7 +4699,7 @@ bool CreateMXBoundingBox( MXLOADHEADER * DstMloadheader, MATRIX * Matrix, VECTOR
 		}
 
 	}
-	if( !ShowBoundingBoxes ) return true;
+	if( !DebugViews.ShowBoundingBoxes ) return true;
 
 	Group = 0;
 	Mesh = 0;
@@ -4769,7 +4769,7 @@ bool CreateMXABoundingBox( MXALOADHEADER * DstMloadheader, MATRIX * Matrix, VECT
 		}
 
 	}
-	if( !ShowBoundingBoxes ) return true;
+	if( !DebugViews.ShowBoundingBoxes ) return true;
 
 	Group = 0;
 	Mesh = 0;

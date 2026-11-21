@@ -37,8 +37,6 @@
 //
 
 bool Debug = true;
-bool ShowFrameRate = false;
-bool ShowInfo = false;
 
 int cliSleep = 0;
 
