@@ -20,6 +20,8 @@
 #include "game/ships.h"
 #include "data/config.h"
 #include "util/util.h"
+#include "game/spotfx.h"
+#include "game/models.h"
 /* The audio settings; sound_minimum_volume is the floor the sound
    backends share with sfx.cpp. */
 AudioOptions AudioOpts;
@@ -2628,6 +2630,59 @@ void SfxPlayer::process_looping()
 	}
 }
 
+/* A variable-group looping sfx follows its emitter through pos and group
+ * pointers into SpotFX[] or Models[]. Those addresses differ between builds,
+ * and between runs of a position-independent PC build, so a save stores an
+ * owner reference in pos instead: kind << 16 | index (SFX_OWNER_*). A sfx
+ * following anything else is saved as a fixed-group sfx at the emitter's
+ * current place. source is the running process's audio handle and is never
+ * saved or restored. */
+namespace {
+constexpr uintptr_t SFX_OWNER_SPOTFX = 1;
+constexpr uintptr_t SFX_OWNER_MODEL  = 2;
+
+/* The owner reference for pos/group, or 0 if they are not one SpotFX's or
+ * one model's Pos and Group. */
+uintptr_t sfx_owner_code( const VECTOR *pos, const u_int16_t *group )
+{
+	uintptr_t p = (uintptr_t)pos;
+	uintptr_t base = (uintptr_t)&SpotFX[ 0 ];
+	if( p >= base && p < base + sizeof( SpotFX ) )
+	{
+		size_t i = ( p - base ) / sizeof( SPOTFX );
+		if( pos == &SpotFX[ i ].Pos && group == &SpotFX[ i ].Group )
+			return ( SFX_OWNER_SPOTFX << 16 ) | i;
+	}
+	base = (uintptr_t)&Models[ 0 ];
+	if( p >= base && p < base + sizeof( Models ) )
+	{
+		size_t i = ( p - base ) / sizeof( MODEL );
+		if( pos == &Models[ i ].Pos && group == &Models[ i ].Group )
+			return ( SFX_OWNER_MODEL << 16 ) | i;
+	}
+	return 0;
+}
+
+/* pos/group for an owner reference; false if code is not one. */
+bool sfx_owner_pointers( uintptr_t code, VECTOR **pos, u_int16_t **group )
+{
+	uintptr_t i = code & 0xFFFF;
+	switch( code >> 16 )
+	{
+	case SFX_OWNER_SPOTFX:
+		if( i >= MAXSPOTFX ) return false;
+		*pos = &SpotFX[ i ].Pos; *group = &SpotFX[ i ].Group;
+		return true;
+	case SFX_OWNER_MODEL:
+		if( i >= MAXNUMOFMODELS ) return false;
+		*pos = &Models[ i ].Pos; *group = &Models[ i ].Group;
+		return true;
+	default:
+		return false;
+	}
+}
+}
+
 FILE *SfxPlayer::save( FILE *fp )
 {
 	u_int16_t num_active_sfx = 0;
@@ -2645,8 +2700,25 @@ FILE *SfxPlayer::save( FILE *fp )
 
 		// write out sfx data...
 		for ( i = 0; i < MAX_LOOPING_SFX; i++ )
-			if ( SpotSfxList[ i ].used )
-				fwrite( &SpotSfxList[ i ], sizeof( SPOT_SFX_LIST ), 1, fp );
+		{
+			if ( !SpotSfxList[ i ].used )
+				continue;
+			SPOT_SFX_LIST rec = SpotSfxList[ i ];
+			if ( rec.type == LOOPING_SFX_VariableGroup )
+			{
+				uintptr_t owner = sfx_owner_code( rec.pos, rec.group );
+				if ( !owner )
+				{
+					rec.type = LOOPING_SFX_FixedGroup;
+					rec.fixedpos = *rec.pos;
+					rec.fixedgroup = *rec.group;
+				}
+				rec.pos = (VECTOR *)owner;
+				rec.group = nullptr;
+			}
+			rec.source = nullptr;
+			fwrite( &rec, sizeof( SPOT_SFX_LIST ), 1, fp );
+		}
 
 		fwrite( &SfxUniqueID, sizeof( u_int32_t ), 1, fp );
 	}
@@ -2654,8 +2726,10 @@ FILE *SfxPlayer::save( FILE *fp )
 	return( fp );
 }
 
-// TODO: this code loads pointers !!!!!!!!!!
-// apparrently this is somehow possible if you save/load from same binary
+/* A save written before owner references holds the raw pointers; they are
+ * kept only when they are still one SpotFX's or model's Pos and Group in
+ * this build (the same build wrote it). Any other sfx is dropped rather than
+ * followed through a stale address. */
 FILE *SfxPlayer::restore( FILE *fp )
 {
 	u_int16_t num_active_sfx = 0;
@@ -2676,7 +2750,15 @@ FILE *SfxPlayer::restore( FILE *fp )
 
 		// read in sfx data...
 		for ( i = 0; i < num_active_sfx; i++ )
-			file_read( &SpotSfxList[ i ], sizeof( SPOT_SFX_LIST ), 1, fp );
+		{
+			SPOT_SFX_LIST &rec = SpotSfxList[ i ];
+			file_read( &rec, sizeof( SPOT_SFX_LIST ), 1, fp );
+			rec.source = nullptr;
+			if ( rec.used && rec.type == LOOPING_SFX_VariableGroup
+				&& !sfx_owner_pointers( (uintptr_t)rec.pos, &rec.pos, &rec.group )
+				&& !sfx_owner_code( rec.pos, rec.group ) )
+				rec.used = false;
+		}
 
 		file_read( &SfxUniqueID, sizeof( u_int32_t ), 1, fp );
 
