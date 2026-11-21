@@ -224,6 +224,14 @@ bool platform_init(void)
 	mkdir("sdmc:/3ds/forsaken", 0777);
 	mkdir("sdmc:/3ds/forsaken/savegame", 0777);
 
+	/* Bring up IRRST so the New 3DS C-stick / OG Circle Pad Pro read works.
+	 * hidCstickRead is a macro for irrstCstickRead, but libctru does NOT
+	 * start IRRST in its default init — without this the read compiles,
+	 * links and silently returns zero (the C-stick feature looks present and
+	 * does nothing). The same ir:rst path serves the New 3DS nub and the OG
+	 * Circle Pad Pro, so one init covers both. Harmless on OG with no CPP. */
+	irrstInit();
+
 	return true;
 }
 
@@ -360,6 +368,9 @@ void platform_render_present(render_info_t *info)
 
 void platform_shutdown(void)
 {
+	/* Tear IRRST down before graphics (mirrors the init pairing). */
+	irrstExit();
+
 	if (_video_initialized)
 	{
 		c3d_context_exit();

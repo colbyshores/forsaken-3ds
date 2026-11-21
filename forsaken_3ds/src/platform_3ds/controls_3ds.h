@@ -10,7 +10,8 @@
  * binds; the two must stay in lockstep. The remap menu is not modal: the
  * pause menu opens it, oct2.cpp draws it each frame on the bottom screen,
  * and controls_3ds_handle_input swallows HID input while it is open.
- * C-stick fields are saved but not routed through the engine's mapping.
+ * C-stick / Circle Pad Pro fields (axis routing, inversion, sensitivity,
+ * stick swap) are routed by input_3ds.cpp and edited in the same overlay.
  */
 
 #include "util/platform.h"
@@ -54,13 +55,23 @@ struct controls_3ds_t {
 	u32 button[CTRL_NUM_ACTIONS];
 
 	/* C-stick mapping. The engine sees axis 0=yaw, 1=pitch from the
-	 * circle pad; axis 2/3 from the C-stick. cstick_axis_x/y let the
-	 * user remap which engine axis the C-stick drives, and inversion
-	 * lets them flip pitch/yaw direction. */
+	 * circle pad; the C-stick (New 3DS nub or OG Circle Pad Pro — same
+	 * ir:rst path) is routed into the engine axes chosen here, and
+	 * inversion flips pitch/yaw direction. Defaults put the C-stick on
+	 * the look axes (0/1) so it works out of the box. */
 	int cstick_axis_x;       /* 0..3 = engine axis index for stick X */
 	int cstick_axis_y;       /* 0..3 = engine axis index for stick Y */
 	int cstick_invert_x;     /* 0 or 1 */
 	int cstick_invert_y;     /* 0 or 1 */
+
+	/* Per-stick sensitivity multipliers applied to the raw +-100 axis
+	 * output before the engine's own per-axis sensitivity. 1.0 = neutral. */
+	float cstick_sensitivity;
+	float cpad_sensitivity;
+
+	/* 1 = the circle pad and the C-stick exchange axis roles (the circle
+	 * pad drives the C-stick's axes and vice versa). */
+	int swap_sticks;
 };
 
 /* Initialize bindings: load defaults (platform-aware), then overlay
@@ -84,6 +95,9 @@ int  controls_3ds_cstick_axis_x(void);
 int  controls_3ds_cstick_axis_y(void);
 int  controls_3ds_cstick_invert_x(void);
 int  controls_3ds_cstick_invert_y(void);
+float controls_3ds_cstick_sensitivity(void);
+float controls_3ds_cpad_sensitivity(void);
+int  controls_3ds_swap_sticks(void);
 
 /* Modal bottom-screen rebind menu. Takes over the bottom screen
  * with consoleInit, runs a navigation loop (D-pad to select action,
