@@ -18,13 +18,8 @@
 #include "util/util.h"
 
 /* definitions for the globals networking.h declares */
-int local_port;
-int host_port;
-char host_address[256];
+NetConfig NetCfg{};
 bool PlayerReady[MAX_PLAYERS];
-char tracker_server[256];
-int tracker_port;
-bool tracker_enabled;
 
 #include "rendering/2dtextures.h"
 #include "data/mload.h"
@@ -736,11 +731,11 @@ void reset_tracker()
 }
 void update_tracker()
 {
-	if(!IsHost || !tracker_enabled)
+	if(!IsHost || !NetCfg.tracker_enabled)
 		return;
 	if( tracker_timer <= 0 )
 	{
-		send_tracker_update( tracker_server, tracker_port );
+		send_tracker_update( NetCfg.tracker_server, NetCfg.tracker_port );
 		tracker_timer = 20; // 3 times a minute, timeout is 1 minute
 	}
 	tracker_timer -= real_framelag; // minus elapsed time

@@ -34,25 +34,30 @@ typedef int net_bool_t; // backwards compatibility need bool's in pkt structures
 #include "game/constants.h"
 #include "util/timer.h"
 
-// game tracker
-extern char tracker_server[256];
-extern int tracker_port;
-extern bool tracker_enabled;
 
 // my ship number
 constexpr auto UNASSIGNED_SHIP = 0xff; // WhoIAm before host gives me number
 extern BYTE	WhoIAm;  // which ship number i am
 extern network_player_t * host_network_player; // the host .. NULL if I am host
 
-// don't change these directly...
+// Network settings. Plain fields, no methods.
+// Don't change local_port/host_port/host_address directly...
 // instead use:
 //   local_port_str.text = "2300"
 //   host_port_str.text = "2300"
 //   TCPAddress.text = "192.168.0.30"
 // the values are parsed before calling network_join and network_setup
-extern int local_port;
-extern int host_port;
-extern char host_address[256];
+struct NetConfig {
+	// game tracker
+	char tracker_server[256];
+	int tracker_port;
+	bool tracker_enabled;
+	int local_port;
+	int host_port;
+	char host_address[256];
+	bool IpOnCLI = false;
+};
+extern NetConfig NetCfg;
 
 /*
 * defines

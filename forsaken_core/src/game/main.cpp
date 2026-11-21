@@ -226,7 +226,7 @@ static bool ParseCommandLine(char* args)
 			char * port;
 			char address[255];
 
-			IpOnCLI = true;
+			NetCfg.IpOnCLI = true;
 
 			// extract the address
 			option = strtok(nullptr, " ");

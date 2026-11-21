@@ -41,7 +41,6 @@
 
 bool ResetKillsPerLevel;
 bool MyResetKillsPerLevel;
-bool IpOnCLI = false;
 
 
 /*
@@ -181,10 +180,10 @@ void StartAHostSession ( MENUITEM * Item )
 
 	RandomStartPosModify = (u_int16_t) ( ms * 71.42857143 );
 
-	local_port = atoi(local_port_str.text);
+	NetCfg.local_port = atoi(local_port_str.text);
 	SetGamePrefs();
 
-	rv = network_setup( &biker_name[0], local_port );
+	rv = network_setup( &biker_name[0], NetCfg.local_port );
 
 	if( rv != NETWORK_OK )
 	{
@@ -196,7 +195,7 @@ void StartAHostSession ( MENUITEM * Item )
 		case NETWORK_ERROR_BIND:
 			{
 				const char * str = "";
-				if( local_port < 1024 )
+				if( NetCfg.local_port < 1024 )
 					str = "Ports bellow 1024 are normally restricted.";
 				snprintf(error_str, sizeof( error_str ), "%s %s %s %s",
 						"The selected port is in use or invalid.",
@@ -348,7 +347,7 @@ void BailMultiplayer( MENU * /*Menu*/ )
 	if ( WhoIAm < MAX_PLAYERS )
 		SendGameMessage(MSG_STATUS, 0, 0, 0, 0);
 	if(IsHost)
-		send_tracker_finished( tracker_server, tracker_port );
+		send_tracker_finished( NetCfg.tracker_server, NetCfg.tracker_port );
 	network_cleanup();
 	MenuRestart( &MENU_Start );
 	MyGameStatus = STATUS_Title;

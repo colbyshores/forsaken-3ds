@@ -1016,7 +1016,7 @@ MENU MENU_NEW_NetworkOptions = {
 		{ 10, 56,  85, 56, 0,			(u_int8_t*)LT_MENU_NEW_MoreMultiplayerOptions1a /*target collision perspective"*/,		FONT_Small, TEXTFLAG_CentreY,							&MyColPerspective,			(void *)COLPERS_Descent,	SelectFlatRadioButton,	DrawFlatRadioButton,	nullptr, 0 } ,
 		{ 10, 64,  85, 64, 0,			(u_int8_t*)LT_MENU_NEW_MoreMultiplayerOptions2a /*"shooter collision perspective"*/,	FONT_Small, TEXTFLAG_CentreY,							&MyColPerspective,			(void *)COLPERS_Forsaken,	SelectFlatRadioButton,	DrawFlatRadioButton,	nullptr, 0 } ,
 
-		{ 10, 78,  85, 78, 0,			(u_int8_t*)"enable tracker",															FONT_Small, TEXTFLAG_CentreY,							&tracker_enabled,			nullptr,						SelectFlatMenuToggle,	DrawFlatMenuToggle,		nullptr, 0 } ,
+		{ 10, 78,  85, 78, 0,			(u_int8_t*)"enable tracker",															FONT_Small, TEXTFLAG_CentreY,							&NetCfg.tracker_enabled,			nullptr,						SelectFlatMenuToggle,	DrawFlatMenuToggle,		nullptr, 0 } ,
 
 		{ 10, 88,  85, 88, 0,			(u_int8_t*)"local port",																FONT_Small,	TEXTFLAG_ForceFit | TEXTFLAG_CentreY,		&local_port_str,			nullptr,						SelectFlatMenutext,		DrawFlatMenuText,		nullptr, 0 } ,
 
@@ -1476,11 +1476,11 @@ void JoiningEnter(MENU * /*Menu*/)
 	PlayersList.selected_item = -1;
 
 	// convert ports
-	local_port = atoi(local_port_str.text);
-	host_port = atoi(host_port_str.text);
+	NetCfg.local_port = atoi(local_port_str.text);
+	NetCfg.host_port = atoi(host_port_str.text);
 
 	// setup
-	rv = network_setup( &biker_name[0], local_port );
+	rv = network_setup( &biker_name[0], NetCfg.local_port );
 
 	if( rv != NETWORK_OK )
 	{
@@ -1492,7 +1492,7 @@ void JoiningEnter(MENU * /*Menu*/)
 		case NETWORK_ERROR_BIND:
 			{
 				const char * str = "";
-				if( local_port < 1024 )
+				if( NetCfg.local_port < 1024 )
 					str = "Ports bellow 1024 are normally restricted.";
 				snprintf(error_str, sizeof( error_str ), "%s %s %s %s",
 						"The selected port is in use or invalid.",
@@ -1509,9 +1509,9 @@ void JoiningEnter(MENU * /*Menu*/)
 	}
 
 	// convert host
-	copy_string( host_address, sizeof( host_address ), TCPAddress.text );
+	copy_string( NetCfg.host_address, sizeof( NetCfg.host_address ), TCPAddress.text );
 
-	network_join( host_address, host_port );
+	network_join( NetCfg.host_address, NetCfg.host_port );
 }
 
 char join_status_msg[255] = "";
@@ -1525,7 +1525,7 @@ void CheckJoinStatus( int * /*i*/ )
 {
 	// disconnect and reconnect if f1 is pressed
 	if ( input_buffer_find( SDLK_F1 ) )
-		network_join( host_address, host_port );
+		network_join( NetCfg.host_address, NetCfg.host_port );
 
 	// process network routines
 	ReceiveGameMessages();
@@ -4051,7 +4051,7 @@ bool DisplayTitle(void)
 			StackMode = DISC_MODE_NONE;
 			StackStatus = DISC_NOTHING;
 
-			if(IpOnCLI)
+			if(NetCfg.IpOnCLI)
 				SelectConnectionToJoin( nullptr );
 			break;
 
@@ -7030,8 +7030,8 @@ char *SearchKey( char c )
 
 void SelectQuit( MENUITEM * /*Item*/ )
 {
-	if(IsHost && tracker_enabled)
-		send_tracker_finished( tracker_server, tracker_port );
+	if(IsHost && NetCfg.tracker_enabled)
+		send_tracker_finished( NetCfg.tracker_server, NetCfg.tracker_port );
 	SetGamePrefs();
 	MyGameStatus = STATUS_QuittingFromTitles;
 	MenuAbort();
@@ -7289,8 +7289,8 @@ void SelectQuitCurrentGame( MENUITEM * /*Item*/ )
 			return;
 		}
 	}
-	if(IsHost && tracker_enabled)
-		send_tracker_finished( tracker_server, tracker_port );
+	if(IsHost && NetCfg.tracker_enabled)
+		send_tracker_finished( NetCfg.tracker_server, NetCfg.tracker_port );
 	MyGameStatus = STATUS_QuitCurrentGame;
 }
 
@@ -7697,9 +7697,9 @@ void GetGamePrefs( void )
 
 	// tracker
 
-	config_get_strncpy( tracker_server, sizeof(tracker_server), "TrackerServer", "fly.thruhere.net" );
-	tracker_port = config_get_int( "TrackerPort", 47624 );
-	tracker_enabled = config_get_bool( "TrackerEnabled", true );
+	config_get_strncpy( NetCfg.tracker_server, sizeof(NetCfg.tracker_server), "TrackerServer", "fly.thruhere.net" );
+	NetCfg.tracker_port = config_get_int( "TrackerPort", 47624 );
+	NetCfg.tracker_enabled = config_get_bool( "TrackerEnabled", true );
 
 	// booleans
 
@@ -7869,9 +7869,9 @@ void SetGamePrefs( void )
 
 	// tracker
 
-	config_set_str( "TrackerServer",		tracker_server );
-	config_set_int( "TrackerPort",			tracker_port );
-	config_set_bool( "TrackerEnabled",		tracker_enabled );
+	config_set_str( "TrackerServer",		NetCfg.tracker_server );
+	config_set_int( "TrackerPort",			NetCfg.tracker_port );
+	config_set_bool( "TrackerEnabled",		NetCfg.tracker_enabled );
 
 	// booleans
 
