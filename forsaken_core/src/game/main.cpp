@@ -30,13 +30,12 @@
 #include "game/skin.h"
 #include "net/multiplayer.h"
 #include "net/networking.h"
+#include "game/debugview.h"
 
 
 //
 // GLOBAL VARIABLES
 //
-
-bool Debug = true;
 
 int cliSleep = 0;
 
@@ -140,7 +139,7 @@ static bool ParseCommandLine(char* args)
 	//
 
 	AudioOpts.NoSFX				= false; // turns off sound
-	Debug					= false; // turns it off now
+	DebugViews.Debug			= false; // turns it off now
 
 	NetUpdateIntervalCmdLine	= 0;
 
@@ -181,13 +180,13 @@ static bool ParseCommandLine(char* args)
 		// debugging information send to Log...
 		else if (!strcasecmp(option, "log"))
 		{
-			DebugLog = true;
+			DebugViews.DebugLog = true;
 		}
 
 		// debugging information
 		else if (!strcasecmp(option, "Debug"))
 		{
-			Debug = true;
+			DebugViews.Debug = true;
 		}
 
 		// start in fullscreen mode

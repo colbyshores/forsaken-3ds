@@ -7,7 +7,9 @@
  * Plain struct, public fields, no methods; one global instance, DebugViews,
  * defined in ui/title.cpp. The debug menus (title.cpp) keep raw pointers to
  * the fields (&DebugViews.ShowTrigZones and so on), so the field types must
- * stay as they are. Debug and DebugLog are not part of this group.
+ * stay as they are. Debug (the debug-output switch, on until the command line
+ * or the 3DS startup clears it) and DebugLog (command-line log-file switch)
+ * are the last two fields, so the older field offsets did not move.
  */
 struct DebugView
 {
@@ -27,6 +29,8 @@ struct DebugView
 	bool	NodeCubeType = false;
 	bool	ShowFrameRate = false;
 	bool	ShowInfo = false;
+	bool	Debug = true;
+	bool	DebugLog = false;
 };
 
 extern DebugView DebugViews;

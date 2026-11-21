@@ -9,8 +9,7 @@
 #include "string.h"
 #include "ui/title.h"
 #include "input/input.h"
-
-bool DebugLog = false;
+#include "game/debugview.h"
 
 char * convert_char( char from, char to, char* in )
 {
@@ -106,7 +105,7 @@ void DebugPrintf( const char * format, ... ) // timestamp prefix
 	int buf_length;
 	va_list args;
 
-	if(!Debug)
+	if(!DebugViews.Debug)
 		return;
 
 	struct timeval now;
@@ -131,7 +130,7 @@ void DebugPrintf_( const char * format, ... ) // no timestamp prefix
 	static char buf[0x4000];
 	va_list args;
 
-	if(!Debug)
+	if(!DebugViews.Debug)
 		return;
 
 	va_start( args, format );
@@ -147,12 +146,12 @@ void DebugPuts( char * buf )
 {
 	static FILE * logfile_fp;
 
-	if(!Debug)
+	if(!DebugViews.Debug)
 		return;
 
 	fputs( buf, stderr );
 
-	if( !DebugLog )
+	if( !DebugViews.DebugLog )
 		return;
 
 	if(!logfile_fp)
@@ -185,7 +184,7 @@ void DebugPuts( char * buf )
 void DebugState( const char * str )
 {
 	static const char * last;
-	if ( !Debug )
+	if ( !DebugViews.Debug )
 		return;
 	if ( last && strcmp( str, last ) == 0 )
 		return;

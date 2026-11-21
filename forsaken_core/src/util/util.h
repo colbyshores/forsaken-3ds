@@ -3,8 +3,8 @@
 /* util.h -- logging and file-name helpers
  *
  * Msg() only logs (no dialog) and always reports OK. DebugPrintf writes to
- * stderr only when Debug is set, and also to a timestamped file under Logs/
- * when DebugLog is set. convert_path() lower-cases and converts backslashes
+ * stderr only when DebugViews.Debug is set, and also to a timestamped file under Logs/
+ * when DebugViews.DebugLog is set. convert_path() lower-cases and converts backslashes
  * into a static buffer that the next call overwrites.
  *
  * copy_string and append_string are the bounded strcpy and strcat: dst
@@ -41,5 +41,3 @@ bool append_string( char * dst, size_t size, const char * src );
 bool copy_field( char * dst, size_t size, const char * src );
 [[gnu::format( printf, 3, 4 )]] void format_display_text( char * dst, size_t size, const char * fmt, ... );
 
-/* Defined in util.cpp; shared with the modules that use it. */
-extern bool DebugLog;

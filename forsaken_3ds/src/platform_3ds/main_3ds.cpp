@@ -20,6 +20,7 @@
 #include "rendering/render.h"
 #include "util/hunk_alloc.h"
 #include "audio/sound_3ds.h"
+#include "game/debugview.h"
 
 
 /* ---- 3DS heap configuration ---- */
@@ -165,13 +166,13 @@ bool platform_init(void)
 {
 	_ticks_base = svcGetSystemTick();
 
-	/* Debug starts true (main.cpp); ParseCommandLine clears it, but only
+	/* DebugViews.Debug starts true (debugview.h); ParseCommandLine clears it, but only
 	 * after platform_init and the Lua config load have run (AppInit).
 	 * Clear it here first so DebugPrintf is a no-op from the start: with
 	 * Debug set, DebugPrintf("...%f...") calls go through vsnprintf ->
 	 * _dtoa_r, which is slow and has been seen to crash inside _dtoa_r
 	 * on hardware. */
-	Debug = false;
+	DebugViews.Debug = false;
 
 	/* Verify __system_allocateHeaps set up mappableInit correctly.  Our
 	 * override mirrors libctru's default init sequence (svcControlMemory

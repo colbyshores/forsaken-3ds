@@ -29,6 +29,7 @@
 #include "util/timer.h"
 #include "game/goal.h"
 #include "game/oct2.h"
+#include "game/debugview.h"
 #include "util/file_reader.h"
 
 constexpr int MSG_VERSION_NUMBER = 1;
@@ -783,7 +784,7 @@ bool HudText::read_txt( char *Filename )
 	long			Read_Size;
 	char		*	Buffer;
 
-	if ( Debug )
+	if ( DebugViews.Debug )
 	{
 		int i;
 		for( i = 0 ; i < MAXTEXTMESSAGES ; i ++ )
@@ -995,7 +996,7 @@ void HudText::display_old()
 	if( !Tmi )
 		return;
 
-	for( i = 0 ; i < ((Debug)?MAXTEXTMESSAGES:NumOfTextMessages) ; i++ )
+	for( i = 0 ; i < ((DebugViews.Debug)?MAXTEXTMESSAGES:NumOfTextMessages) ; i++ )
 	{
 		if( Tmi->ActivatedOrder == CurrentTextActivated )
 		{

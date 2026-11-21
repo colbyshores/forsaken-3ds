@@ -45,6 +45,7 @@ bool PlayerReady[MAX_PLAYERS];
 #include "net/net_tracker.h"
 #include "util/timer.h"
 #include "game/oct2.h"
+#include "game/debugview.h"
 
 BYTE WhoIAm = UNASSIGNED_SHIP;
 
@@ -792,7 +793,7 @@ void SetupNetworkGame()
 		DebugPrintf("Packet Size: %s \t\t= %d\n",msg_to_str(i),RealPacketSize[i]);
 	}
 
-	if ( Debug )
+	if ( DebugViews.Debug )
 		for( i = 0 ; i < 256 ; i++ )
 		{
 			PacketGot[i] = 0;
@@ -932,7 +933,7 @@ void DestroyGame( void )
 
 	network_cleanup();
 
-	if( Debug )
+	if( DebugViews.Debug )
 		for( i = 0 ; i < 256 ; i++ )
 			if( PacketGot[i] )
 				DebugPrintf("num %3d quantity %12d size %12d\n", i, PacketGot[i] , PacketSize[i] );
@@ -2983,7 +2984,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 	{
 		timer_run( &LastPacketTime[*(MsgPnt+1)] );
 
-		if ( Debug )
+		if ( DebugViews.Debug )
 		{
 			PacketGot[*MsgPnt]++;
 			PacketSize[*MsgPnt]+=len;
