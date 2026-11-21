@@ -56,22 +56,92 @@ int input_buffer_count;
 #define JOYSTICK_POV_PRESSED( J, P, D )   ( !( js_pov[ old_input ][ J ][ P ][ D ] ) && ( js_pov[ new_input ][ J ][ P ][ D ] ) )
 
 
-bool CheatsEnabled = false;
-
-
-int js_buttons[ INPUT_BUFFERS ][ MAX_JOYSTICKS ][ MAX_JOYSTICK_BUTTONS ];
-
 int old_input = 0;
 int new_input = 1;
 
+short key_pressed( USERKEY *k );
+short key_held( USERKEY *k );
 bool joystick_poll( int joysticknum );
-
-u_int8_t
-js_pov[ INPUT_BUFFERS ][ MAX_JOYSTICKS ][ MAX_JOYSTICK_POVS ][ MAX_POV_DIRECTIONS ];
+static void ReadKeyboard( void );
+int EnableCheats( char * cheat );
+int JimBeam( char * cheat );
+int Lumberjack( char * cheat );
 
 bool flush_input = true;
 
-u_int8_t key_state[ INPUT_BUFFERS ][ SDLK_LAST ];
+namespace {
+
+/* The keyboard and joystick read buffers (one instance, g_input), double
+ * buffered by old_input / new_input. ReadInput fills the new half each frame
+ * (read_keyboard, poll_joystick); the per-frame ship controls test bindings
+ * against both halves (pressed / held), and AnyKeyReleased looks for a
+ * release. The mouse buffers and old_input / new_input stay global: the
+ * input.h macros and the platform input layers use them.
+ * Every access indexes by new_input or old_input, and GCC folds a member's
+ * offset into that index (one more add per access), so only key_state is an
+ * instance member, at offset 0. js_buttons and js_pov are static data
+ * members, each its own symbol as the globals were. */
+class InputBuffers {
+	public:
+	short pressed( USERKEY *k );                    // was key_pressed
+	short held( USERKEY *k );                       // was key_held
+	void  read_keyboard();                          // was ReadKeyboard
+	bool  poll_joystick( int joysticknum );         // was joystick_poll
+	bool  button_released( int joysticknum );       // was IsJoystickButtonReleased
+	int   any_released();                           // was AnyKeyReleased
+
+	private:
+	u_int8_t key_state[ INPUT_BUFFERS ][ SDLK_LAST ] = {};
+	static int js_buttons[ INPUT_BUFFERS ][ MAX_JOYSTICKS ][ MAX_JOYSTICK_BUTTONS ];
+	static u_int8_t js_pov[ INPUT_BUFFERS ][ MAX_JOYSTICKS ][ MAX_JOYSTICK_POVS ][ MAX_POV_DIRECTIONS ];
+};
+
+int InputBuffers::js_buttons[ INPUT_BUFFERS ][ MAX_JOYSTICKS ][ MAX_JOYSTICK_BUTTONS ] = {};
+u_int8_t InputBuffers::js_pov[ INPUT_BUFFERS ][ MAX_JOYSTICKS ][ MAX_JOYSTICK_POVS ][ MAX_POV_DIRECTIONS ] = {};
+
+/* The cheat codes (one instance, g_cheats): each code, its handler and how
+ * far the keys typed in the menus have matched it (CheckCheats), and whether
+ * the first code has turned cheats on. DisableCheats turns everything off
+ * for a multiplayer game. */
+class Cheats {
+	public:
+	int  enable();                                  // was EnableCheats
+	void disable();                                 // was DisableCheats
+	void check( int key );                          // was CheckCheats
+
+	private:
+	struct Cheat
+	{
+		unsigned char cheatcode[ 16 ];
+		int (*cheatfunc)( char * );
+		bool allowmultiplayer;
+		int next;
+	};
+	Cheat CheatTable[ 4 ] =
+	{
+	{ { SDLK_b, SDLK_u, SDLK_b, SDLK_b, SDLK_l, SDLK_e, SDLK_s, 0 }, EnableCheats, true, 0 },
+	{ { SDLK_j, SDLK_i, SDLK_m, SDLK_b, SDLK_e, SDLK_a, SDLK_m, 0 }, JimBeam, false, 0 },
+	{ { SDLK_l, SDLK_u, SDLK_m, SDLK_b, SDLK_e, SDLK_r, SDLK_j, SDLK_a, SDLK_c, SDLK_k, 0 }, Lumberjack, false, 0 },
+	{ { SDLK_i, SDLK_a, SDLK_m, SDLK_z, SDLK_e, SDLK_u, SDLK_s, 0 }, ToggleGodMode, false, 0 },
+	};
+	// NOTE: add any new cheats to DisableCheats function to ensure they are not active in multiplayer game
+	bool CheatsEnabled = false;
+};
+
+/* The menu flash message's text (one instance, g_flash): set by
+ * FlashMenuText when a cheat toggles, drawn each frame by
+ * ProcessMenuFlashText while FlashTextActive counts down. FlashTextActive
+ * stays global: title.cpp clears it. */
+class MenuFlash {
+	public:
+	void flash( const char * text, float activetime, u_int16_t sfx );  // was FlashMenuText
+	void process();                                 // was ProcessMenuFlashText
+
+	private:
+	char FlashText[ 128 ] = {};
+};
+
+} // namespace
 
 const char *ShipActionText[NUM_SHIP_ACTIONS] = {
 	"No Action",
@@ -132,7 +202,6 @@ const char *ShipAxisSeperateText[NUM_SHIP_AXIS_ACTIONS * 2] = {
 	"Move Back",
 };
 
-char FlashText[ 128 ];
 float FlashTextActive = 0.0F;
 
 bool FullRearView = false;
@@ -141,7 +210,7 @@ bool ShowMessages = false;	// display long list of chat messages
 bool ShowStatistics = false;	// display statistics in game
 bool ShowNetworkInfo = false;	// display enet info in game
 
-void FlashMenuText( const char * text, float activetime, u_int16_t sfx )
+void MenuFlash::flash( const char * text, float activetime, u_int16_t sfx )
 {
 	if( text )
 	{
@@ -154,7 +223,7 @@ void FlashMenuText( const char * text, float activetime, u_int16_t sfx )
 	}
 }
 
-void ProcessMenuFlashText( void )
+void MenuFlash::process()
 {
 	if ( FlashTextActive > 0.0F )
 	{
@@ -166,7 +235,7 @@ void ProcessMenuFlashText( void )
 	}
 }
 
-int EnableCheats( char * /*cheat*/ )
+int Cheats::enable()
 {
 	CheatsEnabled = true;
 	FlashMenuText( "cheat mode enabled", 120.0F, SFX_Secret );
@@ -239,28 +308,13 @@ int ToggleGodMode( char * /*cheat*/ )
 	return 1;
 }
 
-static struct
-{
-	unsigned char cheatcode[ 16 ];
-	int (*cheatfunc)( char * );
-	bool allowmultiplayer;
-	int next;
-} CheatTable[] =
-{
-{ { SDLK_b, SDLK_u, SDLK_b, SDLK_b, SDLK_l, SDLK_e, SDLK_s, 0 }, EnableCheats, true, 0 },
-{ { SDLK_j, SDLK_i, SDLK_m, SDLK_b, SDLK_e, SDLK_a, SDLK_m, 0 }, JimBeam, false, 0 },
-{ { SDLK_l, SDLK_u, SDLK_m, SDLK_b, SDLK_e, SDLK_r, SDLK_j, SDLK_a, SDLK_c, SDLK_k, 0 }, Lumberjack, false, 0 },
-{ { SDLK_i, SDLK_a, SDLK_m, SDLK_z, SDLK_e, SDLK_u, SDLK_s, 0 }, ToggleGodMode, false, 0 },
-};
-// NOTE: add any new cheats to DisableCheats function to ensure they are not active in multiplayer game
-
 int ShipAxisLookup[NUM_SHIP_AXIS_ACTIONS] = { SHIPACTION_Nothing, SHIPACTION_RotateUp, SHIPACTION_RotateLeft, SHIPACTION_RollLeft,
 	SHIPACTION_SlideUp, SHIPACTION_SlideLeft, SHIPACTION_MoveForward };
 
 
 // this function receives higher level encoded bits
 
-short key_pressed( USERKEY *k )
+short InputBuffers::pressed( USERKEY *k )
 {
 	int j;
 	VirtualKeycode c;
@@ -322,7 +376,7 @@ short key_pressed( USERKEY *k )
 
 // this function receives higher level encoded bits
 
-short key_held( USERKEY *k )
+short InputBuffers::held( USERKEY *k )
 {
 	int j;
 	VirtualKeycode c;
@@ -383,7 +437,7 @@ short key_held( USERKEY *k )
 	return 0;
 }
 
-void DisableCheats( void )
+void Cheats::disable()
 {
 	CheatsEnabled = false;
 	DebugInfo = false;
@@ -399,7 +453,7 @@ void DisableCheats( void )
 		ToggleGodMode( nullptr );
 }
 
-void CheckCheats( int key )
+void Cheats::check( int key )
 {
 	int j, i;
 	int cheats;
@@ -441,7 +495,7 @@ void CheckCheats( int key )
 	}
 }
 
-static void ReadKeyboard( void )
+void InputBuffers::read_keyboard()
 {
 	int i, nkeys;
 	u_int8_t * keys;
@@ -805,7 +859,7 @@ void control_ship( USERCONFIG *conf, SHIPCONTROL *ctrl )
 	}
 }
 
-int AnyKeyReleased( void )
+int InputBuffers::any_released()
 {
 	int k;
 
@@ -882,7 +936,7 @@ void SetUpJoystickAxis(int /*joystick*/)
 {
 }
 
-bool joystick_poll( int joysticknum )
+bool InputBuffers::poll_joystick( int joysticknum )
 {
 	int i;
 
@@ -963,7 +1017,7 @@ void ReadJoystickInput(SHIPCONTROL *ctrl, int joysticknum)
   Input   : int     Joystick Number
   Output    : bool    true/false
 ===================================================================*/
-bool IsJoystickButtonReleased( int joysticknum )
+bool InputBuffers::button_released( int joysticknum )
 {
 	int i;
 
@@ -1000,3 +1054,21 @@ bool IsAnyJoystickButtonReleased( void )
 	}
 	return( false );
 }
+
+namespace {
+InputBuffers g_input;
+Cheats g_cheats;
+MenuFlash g_flash;
+} // namespace
+
+short key_pressed( USERKEY *k ) { return g_input.pressed( k ); }
+short key_held( USERKEY *k ) { return g_input.held( k ); }
+static void ReadKeyboard( void ) { g_input.read_keyboard(); }
+bool joystick_poll( int joysticknum ) { return g_input.poll_joystick( joysticknum ); }
+bool IsJoystickButtonReleased( int joysticknum ) { return g_input.button_released( joysticknum ); }
+int AnyKeyReleased( void ) { return g_input.any_released(); }
+int EnableCheats( char * /*cheat*/ ) { return g_cheats.enable(); }
+void DisableCheats( void ) { g_cheats.disable(); }
+void CheckCheats( int key ) { g_cheats.check( key ); }
+void FlashMenuText( const char * text, float activetime, u_int16_t sfx ) { g_flash.flash( text, activetime, sfx ); }
+void ProcessMenuFlashText( void ) { g_flash.process(); }
