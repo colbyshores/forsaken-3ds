@@ -177,3 +177,15 @@ tests/*
 !tests/Makefile
 !tests/*.cpp
 !tests/*.c
+
+# Animated banner pipeline (banner/SPEC.md): tools and build output
+/banner/.tools/
+/banner/build/
+/banner/test_app/build/
+/banner/test_app/build_cia/
+/banner/test_app/romfs/
+# ...but the banner's own sources are tracked: its art (.png), scripts (.sh)
+# and the approved packed banner (.bnr) would otherwise be caught above.
+!/banner/**/*.png
+!/banner/**/*.sh
+!/banner/*.bnr
