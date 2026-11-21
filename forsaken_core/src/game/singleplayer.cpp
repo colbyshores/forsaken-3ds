@@ -63,7 +63,7 @@ bool LoadASinglePlayerGame( MENUITEM * Item )
 	if( NewLevelNum == -1 )
 		return false;
 
-	CountDownOn = false;
+	Countdown.switch_off();
 
 	MyGameStatus = STATUS_TitleLoadGameStartingSinglePlayer;
 
@@ -107,7 +107,7 @@ bool StartASinglePlayerGame( MENUITEM * /*Item*/ )
 	set_my_player_name();
 	Ships[ WhoIAm ].BikeNum = ( SelectedBike % MAXBIKETYPES );
 
-	CountDownOn = false;
+	Countdown.switch_off();
 
 	MyGameStatus = STATUS_StartingSinglePlayer;
 

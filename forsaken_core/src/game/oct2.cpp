@@ -1265,7 +1265,7 @@ void ReleaseLevel(void)
 		ReleaseRTLights();
 		ReleaseGoal();
 
-		if( CountDownOn )
+		if( Countdown.on() )
 		{
 			DeleteCountdownDigits();
 		}
@@ -2074,7 +2074,7 @@ char NodeName[256];
 				return;  // not yet..
 		}
 		// tell them all they can now restart a new level...
-		if( CountDownOn )
+		if( Countdown.on() )
 		{
 			CreateCountdownDigits();
 			StartCountDown( (int16_t) TimeLimit.value, 0 );
@@ -2087,7 +2087,7 @@ char NodeName[256];
 	}else{
 		if( OverallGameStatus == STATUS_Normal )
 		{
-			if( CountDownOn )
+			if( Countdown.on() )
 			{
 				CreateCountdownDigits();
 				StartCountDown( (int16_t) TimeLimit.value, 0 );
@@ -2231,11 +2231,11 @@ char NodeName[256];
 		SendGameMessage(MSG_STATUS, 0, 0, 0, 0);
 	}
 
-	if( CountDownOn )
+	if( Countdown.on() )
 	{
 		CreateCountdownDigits();
 		StartCountDown( (int16_t) TimeLimit.value, 0 );
-		IllegalTime = false;
+		Countdown.trust_own_time();
 	}
 
 	if( IsHost )
@@ -2889,11 +2889,11 @@ char NodeName[256];
 		SyncMines();
 		InitShipRandomPos( WhoIAm );
 		NextworkOldBikeNum = -1;
-		if( CountDownOn )
+		if( Countdown.on() )
 		{
 			CreateCountdownDigits();
 			StartCountDown( (int16_t) TimeLimit.value, 0 );
-			IllegalTime = true;
+			Countdown.await_host_time();
 		}
 	}
 }
@@ -2987,10 +2987,10 @@ char NodeName[256];
 		( ChangeLevel_MyGameStatus == STATUS_PostStartingSinglePlayer ) ||
 		( ChangeLevel_MyGameStatus == STATUS_TitleLoadGamePostStartingSinglePlayer) )
 	{
-		if( CountDownOn )
+		if( Countdown.on() )
 		{
 			CreateCountdownDigits();
-			StartCountDown( (int16_t) SinglePlayerTimeLimit, 0 );
+			StartCountDown( (int16_t) Countdown.level_time_limit(), 0 );
 		}
 		else
 		{
@@ -3228,7 +3228,7 @@ void MainRoutines( void )
 	DoAfterBurnerEffects();
 	FmPolyProcess();
 	CheckTimeLimit();
-	if( CountDownOn ) UpdateCountdownDigits();
+	if( Countdown.on() ) UpdateCountdownDigits();
 	if(!CurrentMenu)
 		ShowScreenMultiples();
 	ProcessActiveConditions();

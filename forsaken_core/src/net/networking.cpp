@@ -1767,8 +1767,8 @@ void ReceiveGameMessages( void )
 	if ( TeamGame )	GetPlayerNumMenu = &MENU_NEW_WatchTeamSelect;
 	else			GetPlayerNumMenu = (MENU*) NewJoinItem.Value;
 
-	if( TimeLimit.value )	CountDownOn = true;
-	else					CountDownOn	= false;
+	if( TimeLimit.value )	Countdown.switch_on();
+	else					Countdown.switch_off();
 
 	if ( CaptureTheFlag || CTF )
 		GoalScore = InitMsg->GoalScore;
@@ -2663,17 +2663,13 @@ void ReceiveGameMessages( void )
 	SETTIMEMSG	*SetTimeMsg;
 
 	SetTimeMsg = (SETTIMEMSG *)MsgPnt;
-	if( IllegalTime )
-	{
-		Countdown_Float = SetTimeMsg->TimeInfo.Time;
-		IllegalTime = false;
-	}
+	Countdown.take_host_time( SetTimeMsg->TimeInfo.Time );
 }
 
 /* MSG_REQTIME */
 [[gnu::always_inline]] static inline void EvaluateReqTimeMsg( void )
 {
-	if( IsHost ) SetTime( Countdown_Float );
+	if( IsHost ) SetTime( Countdown.time_left() );
 }
 
 /* MSG_BIKENUM */

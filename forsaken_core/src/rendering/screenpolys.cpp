@@ -41,21 +41,15 @@ constexpr auto CUTOFF = ( 5.0F * BLOCKSIZE );
 /*===================================================================
 	Globals
 ===================================================================*/
-bool		CountDownOn = false;
-
-int		SinglePlayerTimeLimit = 0;
 u_int16_t	FlashScreenPoly	= INDEX_NONE;
 
 u_int32_t	TotalScrPolysInUse = 0;
 SCRPOLY	ScrPolys[ MAXNUMOFSCRPOLYS ];
 
 u_int16_t	FirstScrPolyUsed;
-float	Countdown_Float = 3000.0F;	// 30 Seconds
 
 FRAME_INFO	**	CountDownFontGraphics[ 2 ] = { &Numbers2_Header, &Numbers_Header };
 float	CountDownFontWidth[ 2 ] = { 16.0F, 23.0F };
-bool		KilledPlayer = false;
-bool		IllegalTime = false;
 
 int16_t	NumberSegments[ 11 ][ 7 ] = {
 //		  0   1   2   3   4   5   6
@@ -138,48 +132,6 @@ class ScrPolyPool {
 	float     ThermalTemp = 0.0F;
 	float     WantedThermalTemp = 0.0F;
 	float     ThermalMinimum = 0.0F;
-};
-
-/* The countdown clock's digits and their animation (one instance,
- * g_countdown): the ScrPolys each digit's segments use, the font, and the
- * position, scale and fade as the clock slides from the corner to the
- * centre in the last ten seconds. Reset by StartCountDown and
- * ResetCountDownBombTag, moved each frame by UpdateCountdownDigits while
- * CountDownOn, and its digits made and freed with the scene. The time left
- * (Countdown_Float), CountDownOn and countdown_timer stay global (triggers,
- * networking, the game loop and the saved game use them). */
-class CountdownClock {
-	public:
-	void update();
-	void create_digits();
-	void delete_digits();
-	void clear_buffers();
-	void start( int16_t Minutes, int16_t Seconds );
-	void reset_bomb_tag( float Amount );
-
-	private:
-	int16_t   CurrentCountDownFont = 1;
-	bool      Toggle = false;
-	float     ScaleInc = 0.0F;
-	float     Interp_Time = 0.0F;
-	float     CountDown_X = TIMERSTARTSCREENX;
-	float     CountDown_Y = TIMERSTARTSCREENY;
-	float     CountDown_Xoff = 0.0F;
-	float     CountDown_Yoff = 0.0F;
-	float     CountDown_Wanted_X = TIMERSTARTSCREENX;
-	float     CountDown_Wanted_Y = TIMERSTARTSCREENY;
-	float     CountDown_Scale = TIMERSTARTSCALE;
-	float     CountDown_Wanted_Scale = TIMERSTARTSCALE;
-	float     CountDown_Col = 1.0F;
-	float     Time_Diff = 0.0F;
-	u_int16_t Min1Digit[ 7 ] = { 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff };
-	u_int16_t Min0Digit[ 7 ] = { 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff };
-	u_int16_t Bit0Digit[ 1 ] = { 0xffff };
-	u_int16_t Sec1Digit[ 7 ] = { 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff };
-	u_int16_t Sec0Digit[ 7 ] = { 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff };
-	u_int16_t Bit1Digit[ 1 ] = { 0xffff };
-	u_int16_t Hun1Digit[ 7 ] = { 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff };
-	u_int16_t Hun0Digit[ 7 ] = { 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff };
 };
 
 TPAGEINFO ScrPolyPool::ScrPolyTPages[ MAXTPAGESPERTLOAD + 1 ];
@@ -277,7 +229,7 @@ void ScrPolyPool::init()
 
 	InitScrPolyTPages();
 
-	if( CountDownOn ) CreateCountdownDigits();
+	if( Countdown.on() ) CreateCountdownDigits();
 }
 
 /*===================================================================
@@ -498,7 +450,7 @@ void ScrPolyPool::process()
 
 								if( WantedThermalTemp > 99.9F )
 								{
-									if( !KilledPlayer )
+									if( !Countdown.player_killed() )
 									{
 										Ships[WhoIAm].Damage = 512.0F;
 										Lives = 0;
@@ -516,7 +468,7 @@ void ScrPolyPool::process()
 										AddColourMessageToQue(SystemMessageColour, GET_OUT_OF_THE_KITCHEN );
 										Ships[WhoIAm].Timer = 0.0F;
 
-										KilledPlayer = true;
+										Countdown.note_player_killed();
 									}
 									/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 								}
@@ -1172,8 +1124,7 @@ void SecBullLensflare( u_int16_t i )
 				:	LONGLONG	Number
 	Output		:	Nothing
 ===================================================================*/
-px_timer_t countdown_timer;
-void CountdownClock::update()
+inline void CountdownClock::update()
 {
 	float		XPos, YPos;
 	int			DigitNumber;
@@ -2699,12 +2650,26 @@ bool ScrPolyPool::display_non_solid( RENDEROBJECT *renderObject )
 	Input		:	Nothing
 	Output		:	Nothing
 ===================================================================*/
-void LoadTimeForLevel( void )
+void CountdownClock::load_for_level()
 {
 
 	CountDownOn = false;
 	SinglePlayerTimeLimit = 0;
 
+}
+
+/* The countdown's part of the saved game, in the order SaveScreenPolys /
+ * LoadScreenPolys always stored it: whether it runs, then the time left. */
+void CountdownClock::save( FILE * fp )
+{
+	fwrite( &CountDownOn, sizeof( CountDownOn ), 1, fp );
+	fwrite( &Countdown_Float, sizeof( Countdown_Float ), 1, fp );
+}
+
+void CountdownClock::restore( FILE * fp )
+{
+	file_read( &CountDownOn, sizeof( CountDownOn ), 1, fp );
+	file_read( &Countdown_Float, sizeof( Countdown_Float ), 1, fp );
 }
 
 /*===================================================================
@@ -2716,8 +2681,7 @@ FILE * ScrPolyPool::save( FILE * fp )
 {
 	if( fp )
 	{
-		fwrite( &CountDownOn, sizeof( CountDownOn ), 1, fp );
-		fwrite( &Countdown_Float, sizeof( Countdown_Float ), 1, fp );
+		Countdown.save( fp );
 		fwrite( &ThermalTemp, sizeof( ThermalTemp ), 1, fp );
 		fwrite( &WantedThermalTemp, sizeof( WantedThermalTemp ), 1, fp );
 		fwrite( &ThermalMinimum, sizeof( ThermalMinimum ), 1, fp );
@@ -2738,19 +2702,17 @@ FILE * ScrPolyPool::restore( FILE * fp )
 
 	if( fp )
 	{
-		file_read( &CountDownOn, sizeof( CountDownOn ), 1, fp );
-		file_read( &Countdown_Float, sizeof( Countdown_Float ), 1, fp );
+		Countdown.restore( fp );
 		file_read( &ThermalTemp, sizeof( ThermalTemp ), 1, fp );
 		file_read( &WantedThermalTemp, sizeof( WantedThermalTemp ), 1, fp );
 		file_read( &ThermalMinimum, sizeof( ThermalMinimum ), 1, fp );
 
-		if( CountDownOn )
+		if( Countdown.on() )
 		{
-			CountDownOn = true;
-			KilledPlayer = false;
+			Countdown.rearm();
 			CreateCountdownDigits();
-			minutes = Countdown_Float / 6000.0F;
-			seconds = ( Countdown_Float - (minutes * 6000.0F) ) / 100.0F;
+			minutes = Countdown.time_left() / 6000.0F;
+			seconds = ( Countdown.time_left() - (minutes * 6000.0F) ) / 100.0F;
 			StartCountDown( minutes, seconds );
 			TimeLimitTrigger = nullptr;
 		}
@@ -3185,8 +3147,8 @@ void ShowCTFFlags( u_int16_t Ship )
 
 namespace {
 ScrPolyPool    g_scrpolys;
-CountdownClock g_countdown;
 }
+CountdownClock Countdown;
 
 void InitScrPolys( void ) { g_scrpolys.init(); }
 /* Out of line, as they were before the class: the HUD text, lens flares,
@@ -3214,9 +3176,10 @@ bool ScrPolyDispNonSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t
 FILE * SaveScreenPolys( FILE * fp ) { return g_scrpolys.save( fp ); }
 FILE * LoadScreenPolys( FILE * fp ) { return g_scrpolys.restore( fp ); }
 
-void UpdateCountdownDigits( void ) { g_countdown.update(); }
-void CreateCountdownDigits( void ) { g_countdown.create_digits(); }
-void DeleteCountdownDigits( void ) { g_countdown.delete_digits(); }
-void ClearCountdownBuffers( void ) { g_countdown.clear_buffers(); }
-void StartCountDown( int16_t Minutes, int16_t Seconds ) { g_countdown.start( Minutes, Seconds ); }
-void ResetCountDownBombTag( float Amount ) { g_countdown.reset_bomb_tag( Amount ); }
+void UpdateCountdownDigits( void ) { Countdown.update(); }
+void CreateCountdownDigits( void ) { Countdown.create_digits(); }
+void DeleteCountdownDigits( void ) { Countdown.delete_digits(); }
+void ClearCountdownBuffers( void ) { Countdown.clear_buffers(); }
+void StartCountDown( int16_t Minutes, int16_t Seconds ) { Countdown.start( Minutes, Seconds ); }
+void ResetCountDownBombTag( float Amount ) { Countdown.reset_bomb_tag( Amount ); }
+void LoadTimeForLevel( void ) { Countdown.load_for_level(); }

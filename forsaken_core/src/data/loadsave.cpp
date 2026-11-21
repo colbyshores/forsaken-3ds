@@ -321,7 +321,7 @@ bool InGameLoad( MENUITEM * /*MenuItem*/ )
 		DebugPrintf( "Loaded OK\n" );
 		fclose( fp );
 
-		timer_clear( &countdown_timer );
+		Countdown.restart_timer();
 		return true;
 	}
 	return false;

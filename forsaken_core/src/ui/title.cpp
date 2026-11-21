@@ -1790,7 +1790,7 @@ bool InGameLoadASinglePlayerGame( MENUITEM * Item )
 	InGameLoadGameLevelNum = NewLevelNum;
 	NewLevelNum = OldNewLevelNum;
 
-	CountDownOn = false;
+	Countdown.switch_off();
 	MyGameStatus = STATUS_InGameLoadGameStartingSinglePlayer;
 	return true;
 }

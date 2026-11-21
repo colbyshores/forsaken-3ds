@@ -195,13 +195,89 @@ void ShowCTFFlagsOnShip( u_int16_t Ship );
 void ShowCTFFlags( u_int16_t Ship );
 
 /* Defined in screenpolys.cpp; shared with the modules that use it. */
-extern px_timer_t countdown_timer;
-extern bool CountDownOn;
-extern bool IllegalTime;
-extern int SinglePlayerTimeLimit;
 extern u_int32_t TotalScrPolysInUse;
 extern u_int16_t FirstScrPolyUsed;
 extern SCRPOLY ScrPolys[ MAXNUMOFSCRPOLYS ];
 extern u_int16_t FlashScreenPoly;
-extern bool KilledPlayer;
-extern float Countdown_Float;
+
+/* The countdown clock (one instance, Countdown, defined in screenpolys.cpp):
+ * whether this game runs against it, the time left (in hundredths of a
+ * second) and the timer that measures each frame's share of it, whether a
+ * player who joined mid-game still waits for the host's time, and whether
+ * running out of time (or the thermometer) has already killed the local
+ * player; then its digits and their animation: the ScrPolys each digit's
+ * segments use, the font, and the position, scale and fade as the clock
+ * slides from the corner to the centre in the last ten seconds. Switched on
+ * and off by the game set-up and the time-limit trigger, reset by
+ * StartCountDown and ResetCountDownBombTag, moved each frame by
+ * UpdateCountdownDigits while on, its digits made and freed with the scene,
+ * and stored by the saved game. */
+class CountdownClock {
+	public:
+	/* Always inlined and defined in screenpolys.cpp, so the per-frame
+	 * UpdateCountdownDigits keeps its body rather than becoming a tail call.
+	 * Other files call UpdateCountdownDigits. */
+	[[gnu::always_inline]] inline void update();
+	void create_digits();
+	void delete_digits();
+	void clear_buffers();
+	void start( int16_t Minutes, int16_t Seconds );
+	void reset_bomb_tag( float Amount );
+	void load_for_level();
+	void save( FILE * fp );
+	void restore( FILE * fp );
+
+	// the game loop and level set-up: does this game run against the clock?
+	bool on() const { return CountDownOn; }
+	// game set-up: this game is, or is not, played against the clock
+	void switch_on() { CountDownOn = true; }
+	void switch_off() { CountDownOn = false; }
+	// the time-limit trigger and a restored game: the clock runs, and running out may kill the player again
+	void rearm() { CountDownOn = true; KilledPlayer = false; }
+	// the level's single-player time limit, in minutes
+	int level_time_limit() const { return SinglePlayerTimeLimit; }
+	// a player who joined mid-game waits for the host's time; the others keep their own
+	void await_host_time() { IllegalTime = true; }
+	void trust_own_time() { IllegalTime = false; }
+	// MSG_SETTIME: take the host's time if still waiting for it
+	void take_host_time( float Time ) { if( IllegalTime ) { Countdown_Float = Time; IllegalTime = false; } }
+	// MSG_REQTIME: the time left, for the host to send
+	float time_left() const { return Countdown_Float; }
+	// after a saved game loads: the load's time does not count against the clock
+	void restart_timer() { timer_clear( &countdown_timer ); }
+	// the thermometer: has the player already been killed by heat or time?
+	bool player_killed() const { return KilledPlayer; }
+	void note_player_killed() { KilledPlayer = true; }
+
+	private:
+	float     Countdown_Float = 3000.0F;	// 30 Seconds
+	px_timer_t countdown_timer = {};
+	bool      CountDownOn = false;
+	bool      IllegalTime = false;
+	bool      KilledPlayer = false;
+	int       SinglePlayerTimeLimit = 0;
+	int16_t   CurrentCountDownFont = 1;
+	bool      Toggle = false;
+	float     ScaleInc = 0.0F;
+	float     Interp_Time = 0.0F;
+	float     CountDown_X = TIMERSTARTSCREENX;
+	float     CountDown_Y = TIMERSTARTSCREENY;
+	float     CountDown_Xoff = 0.0F;
+	float     CountDown_Yoff = 0.0F;
+	float     CountDown_Wanted_X = TIMERSTARTSCREENX;
+	float     CountDown_Wanted_Y = TIMERSTARTSCREENY;
+	float     CountDown_Scale = TIMERSTARTSCALE;
+	float     CountDown_Wanted_Scale = TIMERSTARTSCALE;
+	float     CountDown_Col = 1.0F;
+	float     Time_Diff = 0.0F;
+	u_int16_t Min1Digit[ 7 ] = { 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff };
+	u_int16_t Min0Digit[ 7 ] = { 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff };
+	u_int16_t Bit0Digit[ 1 ] = { 0xffff };
+	u_int16_t Sec1Digit[ 7 ] = { 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff };
+	u_int16_t Sec0Digit[ 7 ] = { 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff };
+	u_int16_t Bit1Digit[ 1 ] = { 0xffff };
+	u_int16_t Hun1Digit[ 7 ] = { 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff };
+	u_int16_t Hun0Digit[ 7 ] = { 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff };
+};
+
+extern CountdownClock Countdown;

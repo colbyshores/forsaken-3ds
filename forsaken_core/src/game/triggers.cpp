@@ -1538,8 +1538,7 @@ void CheckTimeLimit( void )
 	{
 		if( TVpnt->State )
 		{
-			CountDownOn = true;
-			KilledPlayer = false;
+			Countdown.rearm();
 
 			CreateCountdownDigits();
 			StartCountDown( 1, 0 );

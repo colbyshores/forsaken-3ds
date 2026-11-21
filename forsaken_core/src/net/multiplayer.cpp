@@ -252,11 +252,11 @@ void StartAHostSession ( MENUITEM * Item )
 
 	if( TimeLimit.value )
 	{
-		CountDownOn = true;
+		Countdown.switch_on();
 	}
 	else
 	{
-		CountDownOn = false;
+		Countdown.switch_off();
 	}
 
 
