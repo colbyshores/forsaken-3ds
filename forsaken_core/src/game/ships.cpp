@@ -611,9 +611,9 @@ void (* ShipUpdate::RemoteCameraModeControl[ ])( GLOBALSHIP * ShipPnt , BYTE i )
 		goalcheck = GoalCheckTeam( &StartPos, &ShipObjPnt->Pos, ShipObjPnt->Group, TeamNumber[ i ] );
 		if ( goalcheck == GOAL_SCORED )
 		{
-			PickupsGot[ PICKUP_Flag ] = 0;
+			PickupState.lose( PICKUP_Flag );
 			Ships[ i ].Object.Flags &= ~SHIP_CarryingFlag;
-			FlagsToGenerate++;
+			PickupState.owe_flag();
 			// update bonus 2 (stats.cpp) -- flag chase scored
 			UpdateBonusStats(i,GoalScore);
 			AddColourMessageToQue(FlagMessageColour, TEAM_SCORED,
@@ -651,7 +651,7 @@ void (* ShipUpdate::RemoteCameraModeControl[ ])( GLOBALSHIP * ShipPnt , BYTE i )
 				{
 					if ( ShipObjPnt->Flags & TeamFlagMask[ team ] )
 					{
-						PickupsGot[ TeamFlagPickup[ team ] ] = 0;
+						PickupState.lose( TeamFlagPickup[ team ] );
 						Ships[ i ].Object.Flags &= ~TeamFlagMask[ team ];
 						if ( team != TeamNumber[ i ] )
 						{
@@ -849,7 +849,7 @@ void (* ShipUpdate::RemoteCameraModeControl[ ])( GLOBALSHIP * ShipPnt , BYTE i )
 				PlaySfx( SFX_DeCloaking, 1.0F );
 				ShipPnt->StealthTime = 0.0F;
 				ShipObjPnt->Flags &= ~SHIP_Stealth;
-				NumStealths++;
+				PickupState.owe_stealth();
 			}
 		}
 
@@ -1219,10 +1219,10 @@ bool ShipUpdate::process()
 					else
 					{
 						ShipPnt->Invul = false;
-						if( PickupInvulnerability )
+						if( PickupState.invul_from_pickup() )
 						{
-							NumInvuls++;
-							PickupInvulnerability = false;
+							PickupState.owe_invul();
+							PickupState.end_pickup_invul();
 						}
 					}
 					if ( BountyHunt && ShipObjPnt->Flags & SHIP_CarryingBounty )
@@ -2213,7 +2213,7 @@ void ShipMode4( GLOBALSHIP * ShipPnt , BYTE /*i*/ )
 		// All Lives have been lost.......
 		SpecialDestroyGame();
 
-		NumGoldBars = 0;
+		PickupState.reset_gold_bars();
 		CrystalsFound = 0;
 	}
 }

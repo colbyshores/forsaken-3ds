@@ -932,12 +932,12 @@ void ChangeBGState( BGOBJECT * Object, u_int16_t OwnerType, u_int16_t Owner, int
 				{
 					if( Object->PickupNeeded != -1 )
 					{
-						if( PickupsGot[ Object->PickupNeeded ] )
+						if( PickupState.carrying( Object->PickupNeeded ) )
 						{
 							Object->Locked = false;
 							Activate = true;
-							if( Object->PickupNeeded == PICKUP_SkeletonKey ) PickupsGot[ Object->PickupNeeded ]--;
-							if( Object->PickupNeeded == PICKUP_GoldFigure ) PickupsGot[ Object->PickupNeeded ]--;
+							if( Object->PickupNeeded == PICKUP_SkeletonKey ) PickupState.use_up( Object->PickupNeeded );
+							if( Object->PickupNeeded == PICKUP_GoldFigure ) PickupState.use_up( Object->PickupNeeded );
 						}
 					}
 				}
@@ -961,12 +961,12 @@ void ChangeBGState( BGOBJECT * Object, u_int16_t OwnerType, u_int16_t Owner, int
 				{
 					if( Object->PickupNeeded != -1 )
 					{
-						if( PickupsGot[ Object->PickupNeeded ] )
+						if( PickupState.carrying( Object->PickupNeeded ) )
 						{
 							Object->Locked = false;
 							Activate = true;
-							if( Object->PickupNeeded == PICKUP_SkeletonKey ) PickupsGot[ Object->PickupNeeded ]--;
-							if( Object->PickupNeeded == PICKUP_GoldFigure ) PickupsGot[ Object->PickupNeeded ]--;
+							if( Object->PickupNeeded == PICKUP_SkeletonKey ) PickupState.use_up( Object->PickupNeeded );
+							if( Object->PickupNeeded == PICKUP_GoldFigure ) PickupState.use_up( Object->PickupNeeded );
 						}
 					}
 				}

@@ -12575,13 +12575,13 @@ void InitCrystalsFoundText( MENU * /*Menu*/ )
 		snprintf( CrystalsFoundText, sizeof( CrystalsFoundText ), LT_CrystalsFound, CrystalsFound );
 	}
 
-	if ( NumGoldBars == 1 )
+	if ( PickupState.gold_bars() == 1 )
 	{
-		snprintf( GoldBarsFoundText, sizeof( GoldBarsFoundText ), LT_OneGoldBarFound, (int)NumGoldBars );
+		snprintf( GoldBarsFoundText, sizeof( GoldBarsFoundText ), LT_OneGoldBarFound, (int)PickupState.gold_bars() );
 	}
 	else
 	{
-		snprintf( GoldBarsFoundText, sizeof( GoldBarsFoundText ), LT_GoldBarsFound, (int)NumGoldBars );
+		snprintf( GoldBarsFoundText, sizeof( GoldBarsFoundText ), LT_GoldBarsFound, (int)PickupState.gold_bars() );
 	}
 
 	if( Secrets == 1 )

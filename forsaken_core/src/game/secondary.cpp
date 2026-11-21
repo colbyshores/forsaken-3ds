@@ -4584,7 +4584,7 @@ void KillOwnersSecBulls( u_int16_t Owner )
 				{
 					DropPickupSend( &Ships[ WhoIAm ].Object.Pos, Ships[ WhoIAm ].Object.Group ,&DirVector, Speed, PickupNum, Ships[ WhoIAm ].PickupIdCount, -1, false, LifeCount, INDEX_NONE );
 					TotalPickups++;
-					PickupsGot[ TeamFlagPickup[ team ] ] = 0;
+					PickupState.lose( TeamFlagPickup[ team ] );
 					Ships[ WhoIAm ].Object.Flags &= ~TeamFlagMask[ team ];
 				}
 				else
@@ -4713,7 +4713,7 @@ void KillOwnersSecBulls( u_int16_t Owner )
 		}
 		else
 		{
-			NumStealths++;
+			PickupState.owe_stealth();
 		}
 	}
 }
@@ -4744,7 +4744,7 @@ void KillOwnersSecBulls( u_int16_t Owner )
 			}
 			else
 			{
-				NumOrbs++;
+				PickupState.owe_orb();
 			}
 
 			if( Ships[ WhoIAm ].OrbModels[ Count ] != INDEX_NONE )
@@ -4770,7 +4770,7 @@ void SecondaryWeapons::scatter_weapons( VECTOR * Dir, int16_t MaxPickupsAllowed 
 	u_int16_t	i;
 	int		team;
 
-	RegenDelay = ( 5.0F * ANIM_SECOND );
+	PickupState.delay_regen( 5.0F * ANIM_SECOND );
 
 	if( MyGameStatus == STATUS_SinglePlayer ) MaxPickupsAllowed = MAXPICKUPS;
 
@@ -4806,7 +4806,7 @@ void SecondaryWeapons::scatter_weapons( VECTOR * Dir, int16_t MaxPickupsAllowed 
 			DropPickupSend( &Ships[ WhoIAm ].Object.Pos, Ships[ WhoIAm ].Object.Group ,&DirVector, Speed, PickupNum, Ships[ WhoIAm ].PickupIdCount, -1, false, LifeCount, INDEX_NONE );
 			TotalPickups++;
 		}
-		PickupsGot[ PICKUP_Bounty ] = 0;
+		PickupState.lose( PICKUP_Bounty );
 		Ships[ WhoIAm ].Object.Flags &= ~SHIP_CarryingBounty;
 	}
 
@@ -4825,7 +4825,7 @@ void SecondaryWeapons::scatter_weapons( VECTOR * Dir, int16_t MaxPickupsAllowed 
 			DropPickupSend( &Ships[ WhoIAm ].Object.Pos, Ships[ WhoIAm ].Object.Group ,&DirVector, Speed, PickupNum, Ships[ WhoIAm ].PickupIdCount, -1, false, LifeCount, INDEX_NONE );
 			TotalPickups++;
 		}
-		PickupsGot[ PICKUP_Flag ] = 0;
+		PickupState.lose( PICKUP_Flag );
 		Ships[ WhoIAm ].Object.Flags &= ~SHIP_CarryingFlag;
 	}
 
@@ -4899,12 +4899,12 @@ void SecondaryWeapons::scatter_weapons( VECTOR * Dir, int16_t MaxPickupsAllowed 
 
 	ScatterStealthMantle( Dir, MaxPickupsAllowed, PickupNum, DirVector, TotalPickups, LifeCount, Speed, i );
 
-	if(	Ships[ WhoIAm ].Invul && PickupInvulnerability )
+	if(	Ships[ WhoIAm ].Invul && PickupState.invul_from_pickup() )
 	{
 		Ships[ WhoIAm ].Invul = false;
 		Ships[ WhoIAm ].InvulTimer = 0.0F;
-		NumInvuls++;
-		PickupInvulnerability = false;
+		PickupState.owe_invul();
+		PickupState.end_pickup_invul();
 	}
 
 	ScatterOrbitPulsars( Dir, MaxPickupsAllowed, Count, PickupNum, DirVector, TotalPickups, LifeCount, Speed, i );

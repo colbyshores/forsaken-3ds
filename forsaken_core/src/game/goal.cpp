@@ -442,7 +442,7 @@ void GoalZones::process()
 				// and old team has disappeared -> kill all their flags
 				KillAllPickupsOfType( TeamFlagPickup[ j ], PICKUPKILL_Immediate );
 				Ships[ WhoIAm ].Object.Flags &= ~TeamFlagMask[ j ];
-				PickupsGot[ TeamFlagPickup[ j ] ] = 0;
+				PickupState.lose( TeamFlagPickup[ j ] );
 				TeamFlagAtHome[ j ] = false;
 			}
 		}

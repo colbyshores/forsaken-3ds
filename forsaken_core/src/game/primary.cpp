@@ -1356,7 +1356,7 @@ void PrimaryWeapons::FirePrimaryOrbitPulsars( VECTOR & Pos, VECTOR & UpVector, V
 
 								Ships[ WhoIAm ].OrbAmmo[ Count ] = Ships[ WhoIAm ].OrbAmmo[ Ships[ WhoIAm ].NumMultiples - 1 ];
 
-								NumOrbs++;
+								PickupState.owe_orb();
 								Ships[ WhoIAm ].NumMultiples--;
 
 								CreateOrbitPulsar( WhoIAm );
@@ -7393,11 +7393,11 @@ void PrimaryWeapons::give_all_weapons()
 		SecondaryWeaponsGot[ Count ] = 1;
 	}
 
-	if( Ships[ WhoIAm ].Invul && PickupInvulnerability ) NumInvuls++;
+	if( Ships[ WhoIAm ].Invul && PickupState.invul_from_pickup() ) PickupState.owe_invul();
 
 	Ships[ WhoIAm ].InvulTimer = INVULNERABILITY_TIME;
 	Ships[ WhoIAm ].Invul = true;
-	PickupInvulnerability = false;
+	PickupState.end_pickup_invul();
 
 	GivemeSuperNashram();
 }
@@ -7432,7 +7432,7 @@ void PrimaryWeapons::lose_all_weapons()
 
 	Ships[ WhoIAm ].InvulTimer = 0.0F;
 	Ships[ WhoIAm ].Invul = false;
-	PickupInvulnerability = false;
+	PickupState.end_pickup_invul();
 }
 
 /*===================================================================
@@ -8060,7 +8060,7 @@ void LoseSuperNashram( void )
 
 	if( !GodMode )
 	{
-		NumSuperNashrams++;
+		PickupState.owe_golden_pod();
 	}
 }
 

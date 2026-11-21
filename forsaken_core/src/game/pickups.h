@@ -4,7 +4,7 @@
  *
  * PickupAttribs[] (pickups.cpp) gives each PICKUP_* type its model and light.
  * Pickups[MAXPICKUPS] is the live pool, reset by InitPickups at scene init;
- * the used list (whose head is private to pickups.cpp's PickupPool) is walked
+ * the used list (whose head is private to PickupPool, below) is walked
  * through Prev, and each pickup is also on a per-group list (PickupGroups[]). LoadPickupsPositions
  * reads the level .PIC into RegenPoints[] (malloc'd per level, plus one copy
  * per player in RegenSlotsCopy[]) and seeds the level's pickups.
@@ -320,7 +320,6 @@ u_int16_t FindPickup( u_int16_t Owner, u_int16_t ID );
 /* Defined in pickups.cpp; shared with the modules that use it. */
 bool PreLoadPickups( void );
 extern PICKUP * PickupGroups[ MAXGROUPS ];
-extern int16_t PickupsGot[ MAXPICKUPTYPES ];
 extern u_int16_t CopyOfSeed1;
 extern u_int16_t CopyOfSeed2;
 extern bool RandomPickups;
@@ -328,17 +327,9 @@ extern int8_t TeamFlagPickup[ MAX_TEAMS ];
 extern int16_t NumPickupType[ MAXPICKUPTYPES ];
 extern PICKUP Pickups[ MAXPICKUPS ];
 extern int16_t NumPickupsPerGroup[ MAXGROUPS ];
-extern int16_t NumGoldBars;
 extern REGENPOINT * RegenPoints;
 extern int16_t NumRegenPoints;
 extern REGENPOINT * RegenSlotsCopy[ MAX_PLAYERS ];
-extern int16_t NumOrbs;
-extern int16_t NumSuperNashrams;
-extern bool PickupInvulnerability;
-extern int16_t NumInvuls;
-extern int16_t NumStealths;
-extern float RegenDelay;
-extern int FlagsToGenerate;
 extern bool PickupValid[ MAXPICKUPTYPES ];
 extern bool MyPickupValid[ MAXPICKUPTYPES ];
 extern bool MyRandomPickups;
@@ -347,3 +338,122 @@ extern char CTFMessage[ MAXTEXTMSG ];
 void SfxForCollectPickup( u_int16_t Owner, u_int16_t ID );
 extern const char *Messages[];
 void InitValidPickups();
+
+/* The pickup pool's bookkeeping and the pickups owed back to the level (one
+ * instance, PickupState):
+ * - the used and free list heads through Pickups[], changed whenever a
+ *   pickup is placed or killed and walked by the per-frame processing;
+ * - the counts still to regenerate (primaries, power pods, golden power
+ *   pods, stealth mantles, invulnerabilities, orbit pulsars, flags and the
+ *   bounty), raised when one leaves play and drained by the per-frame
+ *   regeneration, and the delay that holds that drain off after a drop;
+ * - the per-type caps the level's .PIC sets (MaxPickupType), loaded with
+ *   the level and lowered when a once-only pickup goes;
+ * - what the local player carries (PickupsGot: keys, idols, flags, the
+ *   bounty), the gold bars found and whether the running invulnerability
+ *   came from a pickup;
+ * - in the Remaster, the model slots PreLoadPickups gives the N64 meshes.
+ * Other files use the intent members below; the C API forwards to the rest.
+ * Pickups[] and its per-group and per-type counts stay global with it. */
+class PickupPool {
+	public:
+	/* The intent members are always_inline so each caller compiles as the
+	 * raw global access did. As plain inline, the x86 -O3 build inlined
+	 * lose() later and then fully unrolled ProcessShips' four-team CTF loop.
+	 *
+	 * What the local player carries, by pickup type: doors and bgobjects
+	 * test for a key, spend a skeleton key or idol, and the flag and bounty
+	 * games drop what was carried. */
+	[[gnu::always_inline]] int16_t carrying( int Type ) const { return PickupsGot[ Type ]; }
+	[[gnu::always_inline]] void carry( int Type ) { PickupsGot[ Type ]++; }
+	[[gnu::always_inline]] void use_up( int Type ) { PickupsGot[ Type ]--; }
+	[[gnu::always_inline]] void lose( int Type ) { PickupsGot[ Type ] = 0; }
+
+	/* A pickup of this kind left play without being dropped, so the
+	 * regeneration owes the level another one. */
+	[[gnu::always_inline]] void owe_golden_pod() { NumSuperNashrams++; }
+	[[gnu::always_inline]] void owe_stealth() { NumStealths++; }
+	[[gnu::always_inline]] void owe_invul() { NumInvuls++; }
+	[[gnu::always_inline]] void owe_orb() { NumOrbs++; }
+	[[gnu::always_inline]] void owe_flag() { FlagsToGenerate++; }
+	/* Hold the regeneration off for this many frames (after a drop). */
+	[[gnu::always_inline]] void delay_regen( float Frames ) { RegenDelay = Frames; }
+
+	/* Whether the running invulnerability came from a pickup (and so is
+	 * owed back when it ends early). */
+	[[gnu::always_inline]] bool invul_from_pickup() const { return PickupInvulnerability; }
+	[[gnu::always_inline]] void start_pickup_invul() { PickupInvulnerability = true; }
+	[[gnu::always_inline]] void end_pickup_invul() { PickupInvulnerability = false; }
+
+	/* Gold bars found this game (single player). */
+	[[gnu::always_inline]] int16_t gold_bars() const { return NumGoldBars; }
+	[[gnu::always_inline]] void add_gold_bar() { NumGoldBars ++; }
+	[[gnu::always_inline]] void reset_gold_bars() { NumGoldBars = 0; }
+
+	/* The C API (InitPickups, ProcessPickups and the rest) forwards to
+	 * these, one forwarder each, and other files call the C API. They are
+	 * always_inline so each forwarder keeps the body, with no this pointer,
+	 * as when the class was private to pickups.cpp. */
+	[[gnu::always_inline]] inline void init();
+	[[gnu::always_inline]] inline void clear_got();
+	[[gnu::always_inline]] inline void kill( u_int16_t Owner, u_int16_t ID, int16_t Style );
+	[[gnu::always_inline]] inline u_int16_t find_free();
+	[[gnu::always_inline]] inline void kill_used( u_int16_t i );
+	[[gnu::always_inline]] inline u_int16_t init_one( VECTOR * Pos, u_int16_t Group, VECTOR * Dir, float Speed, int16_t Type, u_int16_t Owner, u_int16_t ID, int16_t RegenSlot, bool Sparkle, float LifeCount, u_int16_t TriggerMod );
+	[[gnu::always_inline]] inline void process();
+	[[gnu::always_inline]] inline void save_positions();
+#ifdef EDITION_REMASTER
+	[[gnu::always_inline]] inline bool preload();
+#endif
+	[[gnu::always_inline]] inline bool load_positions();
+	[[gnu::always_inline]] inline void regenerate();
+	[[gnu::always_inline]] inline void kill_all();
+	[[gnu::always_inline]] inline void copy( u_int16_t Player );
+	[[gnu::always_inline]] inline void add_to_regen( u_int16_t Type );
+	[[gnu::always_inline]] inline void sfx_for_collect( u_int16_t Owner, u_int16_t ID );
+	[[gnu::always_inline]] inline FILE * save( FILE * fp );
+	[[gnu::always_inline]] inline FILE * restore( FILE * fp );
+	[[gnu::always_inline]] inline void kill_all_of_type( u_int16_t Type, int16_t Style );
+	[[gnu::always_inline]] inline void model_valid();
+	[[gnu::always_inline]] inline u_int16_t find( u_int16_t Owner, u_int16_t ID );
+
+	private:
+#ifdef EDITION_REMASTER
+	[[gnu::always_inline]] inline void LoadPickupsN64Templates();
+#endif
+	[[gnu::always_inline]] inline void LoadPickupsSetupRegenPoints();
+	[[gnu::always_inline]] inline void LoadPickupsSetMinimums();
+
+	/* The list heads and the counts the per-frame regeneration reads come
+	 * first, within ldrh range of the object's base. MaxPickupType stays at
+	 * an 8-byte offset, so its level-load fill keeps its strd; the gold bars
+	 * and the invulnerability flag (ldrb reaches further) follow it. */
+	u_int16_t FirstPickupUsed = 0;
+	u_int16_t FirstPickupFree = 0;
+	int16_t   NumPowerPods = 0;
+	int16_t   NumPrimWeapons[ MAXPRIMARYWEAPONS ] = {};
+	int       BountyToGenerate = 0;
+	float     RegenDelay = 0.0F;
+	int       FlagsToGenerate = 0;
+	int16_t   NumSuperNashrams = 0;
+	int16_t   NumStealths = 0;
+	int16_t   NumInvuls = 0;
+	int16_t   NumOrbs = 0;
+	int16_t   MaxPickupType[ MAXPICKUPTYPES ] = {};
+	int16_t   NumGoldBars = 0;
+	bool      PickupInvulnerability = false;
+	/* Static, so it stays its own symbol: as an instance member the other
+	 * files' indexed stores (flag and bounty drops, door keys) lose their
+	 * register-offset strh to an add from the object's base. */
+	static int16_t PickupsGot[ MAXPICKUPTYPES ];
+#ifdef EDITION_REMASTER
+	/* Slot indices (into ModelNames[]) where PreLoadPickups registers each
+	 * N64 pickup mesh. PickupAttribs[].ModelType is a ModelNames[] index, so
+	 * once the slots are reserved we point the new pickup IDs at them. -1
+	 * means the slot wasn't allocated (mesh file missing, or PreLoadPickups
+	 * has not run). */
+	int16_t   s_n64_pickup_model_idx[5] = { -1, -1, -1, -1, -1 };
+#endif
+};
+
+extern PickupPool PickupState;

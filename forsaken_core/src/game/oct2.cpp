@@ -2547,7 +2547,7 @@ char NodeName[256];
 	LevelNum = -1;
 	if( !NewLevelNum )
 	{
-		NumGoldBars = 0;
+		PickupState.reset_gold_bars();
 		CrystalsFound = 0;
 	}
 	GameCompleted = GameComplete::NotComplete;
@@ -2728,7 +2728,7 @@ char NodeName[256];
 	MyGameStatus = STATUS_TitleLoadGamePostStartingSinglePlayer;
 	GameStatus[WhoIAm] = MyGameStatus;
 	LevelNum = -1;
-	NumGoldBars = 0;
+	PickupState.reset_gold_bars();
 	CrystalsFound = 0;
 	GameCompleted = GameComplete::NotComplete;
 	if( !ChangeLevel() ) return( false );
@@ -2747,7 +2747,7 @@ char NodeName[256];
 	MyGameStatus = STATUS_TitleLoadGamePostStartingSinglePlayer;
 	GameStatus[WhoIAm] = MyGameStatus;
 	LevelNum = -1;
-	NumGoldBars = 0;
+	PickupState.reset_gold_bars();
 	CrystalsFound = 0;
 	GameCompleted = GameComplete::NotComplete;
 	if( !ChangeLevel() ) return( false );

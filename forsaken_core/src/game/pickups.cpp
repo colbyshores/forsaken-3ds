@@ -65,16 +65,8 @@ PICKUP	*		PickupGroups[ MAXGROUPS ];
 PICKUP			Pickups[ MAXPICKUPS ];
 PICKUP			PickupsCopy[ MAX_PLAYERS ][ MAXPICKUPS ];
 REGENPOINT	*	RegenSlotsCopy[ MAX_PLAYERS ];
-int16_t			NumStealths = 0;
-int16_t			NumInvuls = 0;
-int16_t			NumSuperNashrams = 0;
-int16_t			NumOrbs = 0;
-bool			PickupInvulnerability = false;
-int16_t			NumGoldBars = 0;
-int16_t			PickupsGot[ MAXPICKUPTYPES ];
 bool			MyPickupValid[ MAXPICKUPTYPES ];
 bool			PickupValid[ MAXPICKUPTYPES ];
-int				FlagsToGenerate = 0;
 int8_t			TeamFlagPickup[ MAX_TEAMS ] = {
 	PICKUP_Flag1,
 	PICKUP_Flag2,
@@ -150,70 +142,6 @@ static const char *PickupMessage( u_int16_t Type )
 	if ((int)Type < n && Messages[Type]) return Messages[Type];
 	return "";
 }
-
-namespace {
-
-/* The pickup pool's private bookkeeping (one instance, g_pickups):
- * - the used and free list heads through Pickups[], changed whenever a
- *   pickup is placed or killed and walked by the per-frame processing;
- * - the per-type caps the level's .PIC sets (MaxPickupType), loaded with
- *   the level and lowered when a once-only pickup goes;
- * - the counts still to regenerate (primaries and power pods), raised when
- *   one goes back to the regen list and drained by the per-frame
- *   regeneration, and BountyToGenerate, which only that drain touches;
- * - in the Remaster, the model slots PreLoadPickups gives the N64 meshes.
- * The list heads, caps, primary and power-pod counts are saved and restored
- * with the game. Pickups[] and the other counts stay global because other
- * files use them. */
-class PickupPool {
-	public:
-	void      init();
-	void      clear_got();
-	void      kill( u_int16_t Owner, u_int16_t ID, int16_t Style );
-	u_int16_t find_free();
-	void      kill_used( u_int16_t i );
-	u_int16_t init_one( VECTOR * Pos, u_int16_t Group, VECTOR * Dir, float Speed, int16_t Type, u_int16_t Owner, u_int16_t ID, int16_t RegenSlot, bool Sparkle, float LifeCount, u_int16_t TriggerMod );
-	void      process();
-	void      save_positions();
-#ifdef EDITION_REMASTER
-	bool      preload();
-#endif
-	bool      load_positions();
-	void      regenerate();
-	void      kill_all();
-	void      copy( u_int16_t Player );
-	void      add_to_regen( u_int16_t Type );
-	void      sfx_for_collect( u_int16_t Owner, u_int16_t ID );
-	FILE *    save( FILE * fp );
-	FILE *    restore( FILE * fp );
-	void      kill_all_of_type( u_int16_t Type, int16_t Style );
-	void      model_valid();
-	u_int16_t find( u_int16_t Owner, u_int16_t ID );
-
-	private:
-#ifdef EDITION_REMASTER
-	[[gnu::always_inline]] inline void LoadPickupsN64Templates();
-#endif
-	[[gnu::always_inline]] inline void LoadPickupsSetupRegenPoints();
-	[[gnu::always_inline]] inline void LoadPickupsSetMinimums();
-
-	u_int16_t FirstPickupUsed = 0;
-	u_int16_t FirstPickupFree = 0;
-	int16_t   NumPowerPods = 0;
-	int16_t   NumPrimWeapons[ MAXPRIMARYWEAPONS ] = {};
-	int       BountyToGenerate = 0;
-	int16_t   MaxPickupType[ MAXPICKUPTYPES ] = {};
-#ifdef EDITION_REMASTER
-	/* Slot indices (into ModelNames[]) where PreLoadPickups registers each
-	 * N64 pickup mesh. PickupAttribs[].ModelType is a ModelNames[] index, so
-	 * once the slots are reserved we point the new pickup IDs at them. -1
-	 * means the slot wasn't allocated (mesh file missing, or PreLoadPickups
-	 * has not run). */
-	int16_t   s_n64_pickup_model_idx[5] = { -1, -1, -1, -1, -1 };
-#endif
-};
-
-} // namespace
 
 PICKUPATTRIB PickupAttribs[ MAXPICKUPTYPES ] = {
 
@@ -1342,7 +1270,7 @@ void PickupPool::clear_got()
 	{
 		Ships[ WhoIAm ].InvulTimer = INVULNERABILITY_TIME;
 		Ships[ WhoIAm ].Invul = true;
-		PickupInvulnerability = true;
+		PickupState.start_pickup_invul();
 		MessageSFX = SFX_Select_Invul;
 	}
 	else
@@ -1403,8 +1331,8 @@ void PickupPool::clear_got()
 /* PICKUP_Gold */
 [[gnu::always_inline]] static inline void CollectGold( u_int8_t (&Message)[ 128 ], int16_t & MessageSFX, bool & ShowTextAnyway, bool & Speech )
 {
-	NumGoldBars ++;
-	if( !( NumGoldBars % 10 ) )
+	PickupState.add_gold_bar();
+	if( !( PickupState.gold_bars() % 10 ) )
 	{
 		Lives += 1;
 		snprintf( (char*)&Message[0], sizeof( Message ), YOUVE_EARNED_EXTRA_LIFE );
@@ -1412,8 +1340,8 @@ void PickupPool::clear_got()
 	}
 	else
 	{
-		if( NumGoldBars == 1 ) snprintf( (char*)&Message[0], sizeof( Message ), YOU_HAVE_ONE_GOLD_BAR, NumGoldBars );
-		else snprintf( (char*)&Message[0], sizeof( Message ), YOU_HAVE_GOLD_BARS, NumGoldBars );
+		if( PickupState.gold_bars() == 1 ) snprintf( (char*)&Message[0], sizeof( Message ), YOU_HAVE_ONE_GOLD_BAR, PickupState.gold_bars() );
+		else snprintf( (char*)&Message[0], sizeof( Message ), YOU_HAVE_GOLD_BARS, PickupState.gold_bars() );
 	}
 	MessageSFX = SFX_GoldBarPickup;
 	Speech = false;
@@ -1815,7 +1743,7 @@ bool CollectPickup( u_int16_t i )
 				if( Speech )
 					PlaySfx( SFX_PickupGeneral, Sfx_Volume );
 
-			PickupsGot[ Pickups[ i ].Type ]++;
+			PickupState.carry( Pickups[ i ].Type );
 
 			KillPickupSend( Pickups[ i ].Owner, Pickups[ i ].ID, PICKUPKILL_Immediate );
 			KillPickup( Pickups[ i ].Owner, Pickups[ i ].ID, PICKUPKILL_Immediate );
@@ -3528,8 +3456,6 @@ u_int16_t InitSlotPickup( u_int16_t Slot )
 	Input		:	nothing
 	Output		:	nothing
 ===================================================================*/
-float	RegenDelay = 0.0F;
-
 void PickupPool::regenerate()
 {
 	int16_t				Count;
@@ -3895,7 +3821,7 @@ bool RegeneratePickup( u_int16_t Type )
 	}
 
 	/* tell others in networked game */
-	RegenDelay = ( ANIM_SECOND * 0.5F );
+	PickupState.delay_regen( ANIM_SECOND * 0.5F );
 	DropPickupSend( &RegenPoints[ Slot ].Pos, RegenPoints[ Slot ].Group, &Dir,
 					0.0F, Type, Ships[WhoIAm].PickupIdCount, Slot, true, -1.0F,
 					INDEX_NONE );
@@ -5088,27 +5014,28 @@ u_int16_t PickupPool::find( u_int16_t Owner, u_int16_t ID )
 	return( INDEX_NONE );
 }
 
-namespace { PickupPool g_pickups; }
+int16_t PickupPool::PickupsGot[ MAXPICKUPTYPES ] = {};
+PickupPool PickupState;
 
-void InitPickups( void ) { g_pickups.init(); }
-void ClearPickupsGot( void ) { g_pickups.clear_got(); }
-void KillPickup( u_int16_t Owner, u_int16_t ID, int16_t Style ) { g_pickups.kill( Owner, ID, Style ); }
-u_int16_t FindFreePickup( void ) { return g_pickups.find_free(); }
-void KillUsedPickup( u_int16_t i ) { g_pickups.kill_used( i ); }
-u_int16_t InitOnePickup( VECTOR * Pos, u_int16_t Group, VECTOR * Dir, float Speed, int16_t Type, u_int16_t Owner, u_int16_t ID, int16_t RegenSlot, bool Sparkle, float LifeCount, u_int16_t TriggerMod ) { return g_pickups.init_one( Pos, Group, Dir, Speed, Type, Owner, ID, RegenSlot, Sparkle, LifeCount, TriggerMod ); }
-void ProcessPickups( void ) { g_pickups.process(); }
-void SavePickupsPositions( void ) { g_pickups.save_positions(); }
+void InitPickups( void ) { PickupState.init(); }
+void ClearPickupsGot( void ) { PickupState.clear_got(); }
+void KillPickup( u_int16_t Owner, u_int16_t ID, int16_t Style ) { PickupState.kill( Owner, ID, Style ); }
+u_int16_t FindFreePickup( void ) { return PickupState.find_free(); }
+void KillUsedPickup( u_int16_t i ) { PickupState.kill_used( i ); }
+u_int16_t InitOnePickup( VECTOR * Pos, u_int16_t Group, VECTOR * Dir, float Speed, int16_t Type, u_int16_t Owner, u_int16_t ID, int16_t RegenSlot, bool Sparkle, float LifeCount, u_int16_t TriggerMod ) { return PickupState.init_one( Pos, Group, Dir, Speed, Type, Owner, ID, RegenSlot, Sparkle, LifeCount, TriggerMod ); }
+void ProcessPickups( void ) { PickupState.process(); }
+void SavePickupsPositions( void ) { PickupState.save_positions(); }
 #ifdef EDITION_REMASTER
-bool PreLoadPickups( void ) { return g_pickups.preload(); }
+bool PreLoadPickups( void ) { return PickupState.preload(); }
 #endif
-bool LoadPickupsPositions( void ) { return g_pickups.load_positions(); }
-void RegeneratePickups( void ) { g_pickups.regenerate(); }
-void KillAllPickups( void ) { g_pickups.kill_all(); }
-void CopyPickups( u_int16_t Player ) { g_pickups.copy( Player ); }
-void AddPickupToRegen( u_int16_t Type ) { g_pickups.add_to_regen( Type ); }
-void SfxForCollectPickup( u_int16_t Owner, u_int16_t ID ) { g_pickups.sfx_for_collect( Owner, ID ); }
-FILE * SaveAllPickups( FILE * fp ) { return g_pickups.save( fp ); }
-FILE * LoadAllPickups( FILE * fp ) { return g_pickups.restore( fp ); }
-void KillAllPickupsOfType( u_int16_t Type, int16_t Style ) { g_pickups.kill_all_of_type( Type, Style ); }
-void PickupModelValid( void ) { g_pickups.model_valid(); }
-u_int16_t FindPickup( u_int16_t Owner, u_int16_t ID ) { return g_pickups.find( Owner, ID ); }
+bool LoadPickupsPositions( void ) { return PickupState.load_positions(); }
+void RegeneratePickups( void ) { PickupState.regenerate(); }
+void KillAllPickups( void ) { PickupState.kill_all(); }
+void CopyPickups( u_int16_t Player ) { PickupState.copy( Player ); }
+void AddPickupToRegen( u_int16_t Type ) { PickupState.add_to_regen( Type ); }
+void SfxForCollectPickup( u_int16_t Owner, u_int16_t ID ) { PickupState.sfx_for_collect( Owner, ID ); }
+FILE * SaveAllPickups( FILE * fp ) { return PickupState.save( fp ); }
+FILE * LoadAllPickups( FILE * fp ) { return PickupState.restore( fp ); }
+void KillAllPickupsOfType( u_int16_t Type, int16_t Style ) { PickupState.kill_all_of_type( Type, Style ); }
+void PickupModelValid( void ) { PickupState.model_valid(); }
+u_int16_t FindPickup( u_int16_t Owner, u_int16_t ID ) { return PickupState.find( Owner, ID ); }
