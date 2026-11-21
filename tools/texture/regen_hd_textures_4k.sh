@@ -7,11 +7,12 @@
 #   3. data/textures/<name>.png      — global original (fallback)
 #
 # Output: romfs/hd_textures/{textures,levels/<lvl>/textures}/<name>.t3x
-# Each t3x is downscaled to fit within 512x512 preserving aspect, with
-# a full Gaussian mip chain. At runtime the engine loads the whole
-# chain on New 3DS (512 base) and strips mip 0 on OG 3DS (effective
-# 256 base) — one pack, both targets. See render_c3d.c's
-# try_load_hd_texture.
+# Each t3x is downscaled to fit within 512x512 preserving aspect, with a
+# Gaussian mip chain. This is the 512² pack (New 3DS, and OG with the HIMEM
+# grant). The 256² pack (romfs/hd_textures_lomem/) is a separate encode that
+# this script does not produce; it is not the 512² pack's mip levels
+# (checked 2026-11-21). HdTexturePacks::resolve (render_c3d texture slice)
+# picks the pack by memory region at runtime.
 #
 # Setup — the 4K pack is hosted on Moddb behind Cloudflare so it cannot be
 # scripted-downloaded. Get it once, manually:
@@ -111,7 +112,7 @@ EOF
 ensure_4k_pack
 
 PARALLEL_JOBS=14
-MAX_DIM=512   # New 3DS base level; OG 3DS strips mip 0 at load (→ 256 effective)
+MAX_DIM=512   # base level of the 512² pack
 TASKSET_CPUS=0-13  # leaves cores 14,15 free for OS/desktop
 
 # Convert one source image to t3x.
