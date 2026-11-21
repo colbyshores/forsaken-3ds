@@ -33,10 +33,23 @@
 
 int Num_Joysticks = 1; /* pretend we have one joystick (the circle pad) */
 
-/* Cached at first poll. APT_CheckNew3DS is cheap but not free, no
- * point hitting it every frame. */
-static bool s_is_n3ds = false;
-static bool s_n3ds_checked = false;
+namespace {
+
+/* The per-frame HID poll (one instance, g_hid): whether this is a New 3DS,
+ * cached at the first poll (APT_CheckNew3DS is cheap but not free, no
+ * point hitting it every frame), and whether that first poll, which also
+ * loads the bindings, has run. Written once by the first handle_events,
+ * read by every later one. */
+class HidPoller {
+	public:
+	bool poll();
+
+	private:
+	bool s_is_n3ds = false;
+	bool s_n3ds_checked = false;
+};
+
+} // namespace
 
 JOYSTICKINFO JoystickInfo[MAX_JOYSTICKS];
 
@@ -132,7 +145,7 @@ mouse_state_t* read_mouse(void)
  * We do the same: map ±155 to ±100. */
 constexpr auto CPAD_SCALE = (100.0f / 155.0f);
 
-bool handle_events(void)
+bool HidPoller::poll()
 {
 	circlePosition cpad;
 	circlePosition cstick;
@@ -291,5 +304,9 @@ bool handle_events(void)
 
 	return true;
 }
+
+namespace { HidPoller g_hid; }
+
+bool handle_events(void) { return g_hid.poll(); }
 
 #endif /* __3DS__ */
