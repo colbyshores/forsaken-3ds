@@ -20,8 +20,9 @@
  *
  * Ship hits follow ColPerspective: COLPERS_Forsaken lets the machine that
  * owns the bullet resolve the hit (IHitYou for a remote victim), while
- * COLPERS_Descent only resolves hits on the local ship. The ammo globals,
- * PowerLevel and LaserTemperature describe the local player only.
+ * COLPERS_Descent only resolves hits on the local ship. The ammo, PowerLevel
+ * and LaserTemperature (in PrimaryWeapons, below) describe the local player
+ * only.
  * NmeDamageModifier (set from the difficulty level by PreLoadEnemies) scales
  * the damage enemy weapons do to ships.
  */
@@ -313,25 +314,199 @@ void KillPrimBullsByOwner(  u_int16_t OwnerType, u_int16_t Owner );
 extern PRIMARYWEAPONATTRIB PrimaryWeaponAttribs[ TOTALPRIMARYWEAPONS ];
 extern PRIMARYWEAPONBULLET PrimBulls[ MAXPRIMARYWEAPONBULLETS ];
 extern float NmeDamageModifier;
-extern u_int16_t GlobalPrimBullsID;
 extern int32_t ColPerspective;
-extern float PyroliteAmmo;
-extern float SussGunAmmo;
-extern float GeneralAmmo;
-extern float PowerLevel;
-extern float LaserTemperature;
-extern bool GodModeOnceOnly;
-extern int16_t PrimaryWeaponsGot[ MAXPRIMARYWEAPONS ];
-extern BYTE CopyOfOrbitals;
-extern float CopyOfOrbAmmo[ MAXMULTIPLES ];
-extern int16_t CopyOfPowerLevel;
-extern float CopyOfNitroFuel;
-extern float CopyOfGeneralAmmo;
-extern float CopyOfSussGunAmmo;
-extern float CopyOfPyroliteAmmo;
 extern float GlobalFramelagAddition;
 extern int8_t PrimaryToFireLookup[ MAXPRIMARYWEAPONS ];
 extern bool PrimaryWeaponCheat;
 extern int32_t MyColPerspective;
 extern const char *PrimaryDescription[ MAXPRIMARYWEAPONS ];
 extern bool PrimaryValid[ MAXPRIMARYWEAPONS ];
+
+/* The primary weapons' state (one instance, Primaries):
+ * - the PrimBulls[] used and free list heads, reset with the scene and
+ *   changed as each bullet is made and dies, and the ID counter for the
+ *   bullets no ship owns (spot FX lightning);
+ * - the local ship's firing state: its fire delays, the pulsar/pyrolite side
+ *   it fires from next (Toggle), the trojax charge (PowerLevel) and its
+ *   sound, the laser temperature and overheat latch, changed as it fires
+ *   each frame;
+ * - the local player's primary weapons (PrimaryWeaponsGot) and ammo, and the
+ *   ammo it has used (InitAmmoUsed clears it);
+ * - the loadout Super Nashram replaced (the CopyOf* bank), given back when
+ *   it ends;
+ * - the per-ship trojax charge sounds of the other ships (TrojaxOwnersID),
+ *   started and stopped as their ship updates arrive;
+ * - the pyrolite light and laser width shared by bullet creation and the
+ *   laser beam builders, and the pyrolite flame timer the per-frame
+ *   processing advances;
+ * - the invulnerability sparkle timer, whether GodMode still has to arm the
+ *   ship (GodModeOnceOnly), and the weapons and ammo GodMode copies on
+ *   GivemeAllWeapons and gives back on LoseAllWeapons;
+ * - the constant tables only primary.cpp reads, as static members.
+ * Other files use the intent members below; the C API forwards to the rest.
+ * PrimBulls[] and PrimaryWeaponAttribs[] stay global with it. */
+class PrimaryWeapons {
+	public:
+	/* The intent members are always_inline so each caller compiles as the
+	 * raw global access did.
+	 *
+	 * The primary weapons the local player holds (PULSAR..LASER): the HUD
+	 * and the death scatter test them, a weapon pickup gives one and the
+	 * scatter takes one away. */
+	[[gnu::always_inline]] int16_t got_weapon( int Weapon ) const { return PrimaryWeaponsGot[ Weapon ]; }
+	[[gnu::always_inline]] void give_weapon( int Weapon ) { PrimaryWeaponsGot[ Weapon ] = 1; }
+	[[gnu::always_inline]] void take_weapon( int Weapon ) { PrimaryWeaponsGot[ Weapon ] = 0; }
+
+	/* The local player's ammo, by pool: the HUD shows it, an ammo pod adds
+	 * to it and a weapon pickup fills it. */
+	[[gnu::always_inline]] float general_ammo() const { return GeneralAmmo; }
+	[[gnu::always_inline]] float pyrolite_ammo() const { return PyroliteAmmo; }
+	[[gnu::always_inline]] float sussgun_ammo() const { return SussGunAmmo; }
+	[[gnu::always_inline]] void add_general_ammo( float Ammo ) { GeneralAmmo += Ammo; }
+	[[gnu::always_inline]] void add_pyrolite_ammo( float Ammo ) { PyroliteAmmo += Ammo; }
+	[[gnu::always_inline]] void add_sussgun_ammo( float Ammo ) { SussGunAmmo += Ammo; }
+	[[gnu::always_inline]] void fill_pyrolite_ammo() { PyroliteAmmo = MAXPYROLITEAMMO; }
+	[[gnu::always_inline]] void fill_sussgun_ammo() { SussGunAmmo = MAXSUSSGUNAMMO; }
+
+	/* While Super Nashram runs, the loadout it replaced is banked
+	 * (GivemeSuperNashram) and given back when it ends (LoseSuperNashram),
+	 * so what the player collects meanwhile goes into the bank. */
+	[[gnu::always_inline]] float banked_general_ammo() const { return CopyOfGeneralAmmo; }
+	[[gnu::always_inline]] float banked_pyrolite_ammo() const { return CopyOfPyroliteAmmo; }
+	[[gnu::always_inline]] float banked_sussgun_ammo() const { return CopyOfSussGunAmmo; }
+	[[gnu::always_inline]] void bank_general_ammo( float Ammo ) { CopyOfGeneralAmmo += Ammo; }
+	[[gnu::always_inline]] void bank_pyrolite_ammo( float Ammo ) { CopyOfPyroliteAmmo += Ammo; }
+	[[gnu::always_inline]] void bank_sussgun_ammo( float Ammo ) { CopyOfSussGunAmmo += Ammo; }
+	[[gnu::always_inline]] void fill_banked_pyrolite_ammo() { CopyOfPyroliteAmmo = MAXPYROLITEAMMO; }
+	[[gnu::always_inline]] void fill_banked_sussgun_ammo() { CopyOfSussGunAmmo = MAXSUSSGUNAMMO; }
+	[[gnu::always_inline]] int16_t banked_power_level() const { return CopyOfPowerLevel; }
+	[[gnu::always_inline]] void bank_power_pod() { CopyOfPowerLevel++; }
+	[[gnu::always_inline]] float banked_nitro() const { return CopyOfNitroFuel; }
+	[[gnu::always_inline]] void bank_nitro( float Fuel ) { CopyOfNitroFuel += Fuel; }
+	[[gnu::always_inline]] void cap_banked_nitro( float Max ) { CopyOfNitroFuel = Max; }
+	[[gnu::always_inline]] BYTE banked_orbitals() const { return CopyOfOrbitals; }
+	[[gnu::always_inline]] void bank_orbital() { CopyOfOrbAmmo[ CopyOfOrbitals ] = MAXMULTIPLEAMMO; CopyOfOrbitals++; }
+
+	/* The HUD's energy bar: the trojax charge and the laser temperature
+	 * (each 0 to 100). */
+	[[gnu::always_inline]] float trojax_charge() const { return PowerLevel; }
+	[[gnu::always_inline]] float laser_temperature() const { return LaserTemperature; }
+
+	/* On a level change: if GodMode is on, the next FirePrimary gives the
+	 * ship every weapon again. */
+	[[gnu::always_inline]] void rearm_god_mode() { GodModeOnceOnly = true; }
+
+	/* The ID for the next bullet no ship owns (spot FX lightning). */
+	[[gnu::always_inline]] u_int16_t next_bullet_id() { return GlobalPrimBullsID++; }
+
+	/* The C API (InitPrimBulls, FirePrimary and the rest) forwards to these,
+	 * one forwarder each, and other files and primary.cpp itself call the C
+	 * API. They are always_inline so each forwarder keeps the body, with no
+	 * this pointer, as when the class was private to primary.cpp. */
+	[[gnu::always_inline]] inline void init();
+	[[gnu::always_inline]] inline void restore_weapons();
+	[[gnu::always_inline]] inline void restore_ammo();
+	[[gnu::always_inline]] inline void init_ammo_used();
+	[[gnu::always_inline]] inline u_int16_t find_free();
+	[[gnu::always_inline]] inline void kill_used( u_int16_t i );
+	[[gnu::always_inline]] inline void fire();
+	[[gnu::always_inline]] inline void process();
+	[[gnu::always_inline]] inline u_int16_t init_one( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t BulletID, int8_t Weapon,
+						u_int16_t Group, VECTOR * Pos, VECTOR * Offset, VECTOR * Dir, VECTOR * Up,
+						int16_t PowerLevel, float PLevel, bool NetFlag );
+	[[gnu::always_inline]] inline void create_laser_pulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16_t EndGroup );
+	[[gnu::always_inline]] inline void create_nme_laser_pulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16_t EndGroup );
+	[[gnu::always_inline]] inline void create_nme_power_laser_pulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16_t EndGroup );
+	[[gnu::always_inline]] inline void auto_select();
+	[[gnu::always_inline]] inline void fire_weapons( u_int8_t Ship );
+	[[gnu::always_inline]] inline void check_charging( u_int16_t Ship, u_int32_t OldFlags, u_int32_t NewFlags );
+	[[gnu::always_inline]] inline void give_all_weapons();
+	[[gnu::always_inline]] inline void lose_all_weapons();
+	[[gnu::always_inline]] inline void drop_primary();
+	[[gnu::always_inline]] inline void drop_ammo();
+	[[gnu::always_inline]] inline void give_super_nashram();
+	[[gnu::always_inline]] inline void lose_super_nashram();
+	[[gnu::always_inline]] inline void inv_effect( u_int16_t ShipHit, int16_t Num, u_int8_t RVal, u_int8_t GVal, u_int8_t BVal );
+	[[gnu::always_inline]] inline int16_t ammo_pickup_to_gen();
+	[[gnu::always_inline]] inline FILE * save( FILE * fp );
+	[[gnu::always_inline]] inline FILE * restore( FILE * fp );
+	[[gnu::always_inline]] inline u_int8_t next_valid_weapon();
+	[[gnu::always_inline]] inline u_int8_t prev_valid_weapon();
+	[[gnu::always_inline]] inline void kill_by_owner( u_int16_t OwnerType, u_int16_t Owner );
+
+	/* Public only so the count check after its definition can read it. */
+	static int8_t * DebugPrimStrings[];
+
+	private:
+	[[gnu::always_inline]] inline void FireShootPulsar( VECTOR & DownVector, VECTOR & LeftVector, VECTOR & Pos, VECTOR & Dir, VECTOR & UpVector );
+	[[gnu::always_inline]] inline void FireShootTrojax( VECTOR & DownVector, VECTOR & LeftVector, VECTOR & Pos, VECTOR & Dir, VECTOR & UpVector, float & Ammo );
+	[[gnu::always_inline]] inline void FireShootPyroliteRifle( VECTOR & DownVector, VECTOR & Pos, VECTOR & Dir, VECTOR & UpVector, float & Speed );
+	[[gnu::always_inline]] inline void FireShootSussGun( VECTOR & DownVector, VECTOR & Pos, VECTOR & Dir, VECTOR & UpVector, int16_t & Count );
+	[[gnu::always_inline]] inline void FireShootLaser( VECTOR & Pos, VECTOR & Dir, VECTOR & UpVector );
+	[[gnu::always_inline]] inline void FireShootNmeLightning( VECTOR & Pos, VECTOR & Dir, VECTOR & UpVector );
+	[[gnu::always_inline]] inline void FirePrimaryShoot( VECTOR & DownVector, VECTOR & LeftVector, VECTOR & Pos, VECTOR & Dir, VECTOR & UpVector, float & Ammo, int16_t & Count, float & Speed );
+	[[gnu::always_inline]] inline void FirePrimarySelect( int16_t & OnceOnlyFlag, float & Ammo );
+	[[gnu::always_inline]] inline void FirePrimaryTrojaxCharge( float & Old_PowerLevel, float & Freq );
+	[[gnu::always_inline]] inline void FirePrimaryOrbitPulsars( VECTOR & Pos, VECTOR & UpVector, VECTOR & DirVector, VECTOR & Rotation, int16_t & Count, u_int16_t & Model );
+
+	/* The per-ship charge sounds first (indexed by ship), then the list
+	 * heads and halfword scalars, so every halfword access keeps an
+	 * ldrh/strh immediate; then the firing state the per-frame firing
+	 * reads; the GodMode copies (cold) last. */
+	u_int32_t TrojaxOwnersID[ MAX_PLAYERS ] = {};
+	u_int16_t FirstPrimBullUsed = 0;
+	u_int16_t FirstPrimBullFree = 0;
+	int16_t   Toggle = 0;
+	int16_t   LaserOverheated = 0;
+	u_int16_t GlobalPrimBullsID = 0;
+	u_int32_t TrojaxChargeID = 0;
+	float     PrimaryFireDelay = 0.0F;
+	float     OrbitFireDelay = 0.0F;
+	float     PowerLevel = 0.0F;
+	float     LaserTemperature = 0.0F;
+	float     PyroCount = 0.0F;
+	float     LaserDiameter = ( 40.0F * GLOBAL_SCALE );
+	float     GeneralAmmoUsed = 0.0F;
+	float     PyroliteAmmoUsed = 0.0F;
+	float     SussGunAmmoUsed = 0.0F;
+	float     InvulInterval = 1.0F;
+	float     InvulCount = 0.0F;
+	bool      PyroLightFlag = true;
+	bool      GodModeOnceOnly = true;
+	BYTE      GodModeCopyOfPrimary = PULSAR;
+	BYTE      GodModeCopyOfSecondary = 0;	/* MUGMISSILE (checked in primary.cpp) */
+	int16_t   GodModeCopyOfPowerLevel = 0;
+	int16_t   GodModeCopyOfSecondaryAmmo[ MAXSECONDARYWEAPONS ] = {};
+	int16_t   GodModeCopyOfSecondaryWeaponsGot[ MAXSECONDARYWEAPONS ] = {};
+	int16_t   GodModeCopyOfWeaponsGot[ MAXPRIMARYWEAPONS ] = {};
+	float     GodModeCopyOfGeneralAmmo = 0.0F;
+	float     GodModeCopyOfSussGunAmmo = 0.0F;
+	float     GodModeCopyOfPyroliteAmmo = 0.0F;
+	float     GodModeCopyOfNitroFuel = 0.0F;
+
+	/* Static, so each stays its own symbol:
+	 * - the HUD, pickups and the death scatter index PrimaryWeaponsGot by
+	 *   weapon, as the per-frame weapon select does;
+	 * - DropAmmo and the pickup collection pick the live ammo or its Super
+	 *   Nashram bank and then share one compare-and-add on the selected
+	 *   address. As instance members the two differ only in offset, and
+	 *   GCC keeps a copy of that code for each (DropAmmo 136 -> 152,
+	 *   CollectPickup 1469 -> 1502). */
+	static int16_t  PrimaryWeaponsGot[ MAXPRIMARYWEAPONS ];
+	static float    GeneralAmmo;
+	static float    PyroliteAmmo;
+	static float    SussGunAmmo;
+	static int16_t  CopyOfPowerLevel;
+	static float    CopyOfGeneralAmmo;
+	static float    CopyOfSussGunAmmo;
+	static float    CopyOfPyroliteAmmo;
+	static float    CopyOfNitroFuel;
+	static BYTE     CopyOfOrbitals;
+	static float    CopyOfOrbAmmo[ MAXMULTIPLES ];
+	static int16_t  PrimarySfxLookup[ MAXPRIMARYWEAPONS ];
+	static float    SussgunTable[ MAXPOWERLEVELS ];
+	static float    TrojaxFreqTable[];
+	static float    TrojaxChargeRateTable[];
+};
+
+extern PrimaryWeapons Primaries;

@@ -925,9 +925,9 @@ bool SetMatrixViewPort( void )
 
 int GetCurPrimAmmo( void )
 {
-	if( Ships[WhoIAm].Primary == PYROLITE_RIFLE ) return PyroliteAmmo;
-	else if( Ships[WhoIAm].Primary == SUSS_GUN )  return SussGunAmmo;
-	else                                          return GeneralAmmo;
+	if( Ships[WhoIAm].Primary == PYROLITE_RIFLE ) return Primaries.pyrolite_ammo();
+	else if( Ships[WhoIAm].Primary == SUSS_GUN )  return Primaries.sussgun_ammo();
+	else                                          return Primaries.general_ammo();
 }
 
 /* HUD shown only in normal (not watch) mode: the weapons-possessed bar and the other normal-mode panel items */
@@ -941,30 +941,30 @@ int GetCurPrimAmmo( void )
 			if(Count == PYROLITE_RIFLE || Count == SUSS_GUN)
 				continue;
 			current = (Count == Ships[WhoIAm].Primary);
-			if( current || PrimaryWeaponsGot[ Count ] > 0 )
+			if( current || Primaries.got_weapon( Count ) > 0 )
 			{
 				Print4x5Text( PrimaryNames[ Count ], left, top, HUDColour );
 				if( Count == PULSAR )
-					Printu_int16_t( GeneralAmmo, right, top, HUDColour );
+					Printu_int16_t( Primaries.general_ammo(), right, top, HUDColour );
 			}
 			top += FontHeight;
 		}
 
 		// primaries using pyro ammo
 		current = (PYROLITE_RIFLE == Ships[WhoIAm].Primary);
-		if( current || PrimaryWeaponsGot[ PYROLITE_RIFLE ] > 0 )
+		if( current || Primaries.got_weapon( PYROLITE_RIFLE ) > 0 )
 		{
 			Print4x5Text( PrimaryNames[ PYROLITE_RIFLE ], left, top, HUDColour );
-			Printu_int16_t( PyroliteAmmo, right, top, HUDColour );
+			Printu_int16_t( Primaries.pyrolite_ammo(), right, top, HUDColour );
 		}
 		top += FontHeight;
 
 		// primaries using suss ammo
 		current = (SUSS_GUN == Ships[WhoIAm].Primary);
-		if( current || PrimaryWeaponsGot[ SUSS_GUN ] > 0 )
+		if( current || Primaries.got_weapon( SUSS_GUN ) > 0 )
 		{
 			Print4x5Text( PrimaryNames[ SUSS_GUN ], left, top, HUDColour );
-			Printu_int16_t( SussGunAmmo, right, top, HUDColour );
+			Printu_int16_t( Primaries.sussgun_ammo(), right, top, HUDColour );
 		}
 		top += FontHeight*2;
 
@@ -998,11 +998,11 @@ int GetCurPrimAmmo( void )
 	top = render_info.window_size.cy - FontHeight*5;
 
 	// trojax level
-	energy = (int) ( ( PowerLevel * 0.01F ) * 9.0F );
+	energy = (int) ( ( Primaries.trojax_charge() * 0.01F ) * 9.0F );
 
 	// or lazer temperature
 	if( !energy )
-		energy = (int) ( ( LaserTemperature *0.01F ) * 9.0F );
+		energy = (int) ( ( Primaries.laser_temperature() *0.01F ) * 9.0F );
 
 	// render trojax/lazer bar
 	if( energy )
@@ -2998,7 +2998,7 @@ char NodeName[256];
 		}
 	}
 
-	GodModeOnceOnly = true;
+	Primaries.rearm_god_mode();
 
 	MyGameStatus = ChangeLevel_MyGameStatus;
 

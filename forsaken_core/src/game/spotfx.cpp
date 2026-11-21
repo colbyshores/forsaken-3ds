@@ -1229,7 +1229,7 @@ void CreateSpotFXElectricBeams( VECTOR * Pos, VECTOR * Dir, VECTOR * Up, u_int16
 		TempDir.z = Dir->z + Random_Jitter();
 		NormaliseVector( &TempDir );
 
-		InitOnePrimBull( OWNER_NOBODY, WhoIAm, GlobalPrimBullsID++, NME_LIGHTNING, Group, Pos, &TempVector, &TempDir, Up, 2, 0.0F, false );
+		InitOnePrimBull( OWNER_NOBODY, WhoIAm, Primaries.next_bullet_id(), NME_LIGHTNING, Group, Pos, &TempVector, &TempDir, Up, 2, 0.0F, false );
 	}
 }
 

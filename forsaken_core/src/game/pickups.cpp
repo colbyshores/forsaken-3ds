@@ -744,9 +744,9 @@ void PickupPool::clear_got()
 /* PICKUP_Trojax */
 [[gnu::always_inline]] static inline void CollectTrojax( u_int16_t & i, int16_t & PickupEnable, u_int8_t (&Message)[ 128 ], int16_t & MessageSFX, int16_t & TriggeredSFX )
 {
-	if( !PrimaryWeaponsGot[ TROJAX ] )
+	if( !Primaries.got_weapon( TROJAX ) )
 	{
-		PrimaryWeaponsGot[ TROJAX ] = 1;
+		Primaries.give_weapon( TROJAX );
 		MessageSFX = SFX_Select_Trojax;
 		TriggeredSFX = SFX_BIKER_BW;
 		NewPrimaryWeapon( TROJAX );
@@ -762,17 +762,17 @@ void PickupPool::clear_got()
 /* PICKUP_Pyrolite */
 [[gnu::always_inline]] static inline void CollectPyrolite( u_int16_t & i, int16_t & PickupEnable, u_int8_t (&Message)[ 128 ], int16_t & MessageSFX )
 {
-	if( !PrimaryWeaponsGot[ PYROLITE_RIFLE ] )
+	if( !Primaries.got_weapon( PYROLITE_RIFLE ) )
 	{
-		PrimaryWeaponsGot[ PYROLITE_RIFLE ] = 1;
+		Primaries.give_weapon( PYROLITE_RIFLE );
 
 		if( ( Ships[ WhoIAm ].Object.Flags & SHIP_SuperNashram ) )
 		{
-			CopyOfPyroliteAmmo = MAXPYROLITEAMMO;
+			Primaries.fill_banked_pyrolite_ammo();
 		}
 		else
 		{
-			PyroliteAmmo = MAXPYROLITEAMMO;
+			Primaries.fill_pyrolite_ammo();
 		}
 		NewPrimaryWeapon( PYROLITE_RIFLE );
 		MessageSFX = SFX_Select_Pyrolite;
@@ -789,9 +789,9 @@ void PickupPool::clear_got()
 /* PICKUP_Transpulse */
 [[gnu::always_inline]] static inline void CollectTranspulse( u_int16_t & i, int16_t & PickupEnable, u_int8_t (&Message)[ 128 ], int16_t & MessageSFX, int16_t & TriggeredSFX )
 {
-	if( !PrimaryWeaponsGot[ TRANSPULSE_CANNON ] )
+	if( !Primaries.got_weapon( TRANSPULSE_CANNON ) )
 	{
-		PrimaryWeaponsGot[ TRANSPULSE_CANNON ] = 1;
+		Primaries.give_weapon( TRANSPULSE_CANNON );
 		NewPrimaryWeapon( TRANSPULSE_CANNON );
 		MessageSFX = SFX_Select_Transpulse;
 		TriggeredSFX = SFX_BIKER_BW;
@@ -808,17 +808,17 @@ void PickupPool::clear_got()
 /* PICKUP_SussGun */
 [[gnu::always_inline]] static inline void CollectSussGun( u_int16_t & i, int16_t & PickupEnable, u_int8_t (&Message)[ 128 ], int16_t & MessageSFX )
 {
-	if( !PrimaryWeaponsGot[ SUSS_GUN ] )
+	if( !Primaries.got_weapon( SUSS_GUN ) )
 	{
-		PrimaryWeaponsGot[ SUSS_GUN ] = 1;
+		Primaries.give_weapon( SUSS_GUN );
 
 		if( ( Ships[ WhoIAm ].Object.Flags & SHIP_SuperNashram ) )
 		{
-			CopyOfSussGunAmmo = MAXSUSSGUNAMMO;
+			Primaries.fill_banked_sussgun_ammo();
 		}
 		else
 		{
-			SussGunAmmo = MAXSUSSGUNAMMO;
+			Primaries.fill_sussgun_ammo();
 		}
 		NewPrimaryWeapon( SUSS_GUN );
 		MessageSFX = SFX_Select_SussGun;
@@ -834,9 +834,9 @@ void PickupPool::clear_got()
 /* PICKUP_Laser */
 [[gnu::always_inline]] static inline void CollectLaser( u_int16_t & i, int16_t & PickupEnable, u_int8_t (&Message)[ 128 ], int16_t & MessageSFX )
 {
-	if( !PrimaryWeaponsGot[ LASER ] )
+	if( !Primaries.got_weapon( LASER ) )
 	{
-		PrimaryWeaponsGot[ LASER ] = 1;
+		Primaries.give_weapon( LASER );
 		NewPrimaryWeapon( LASER );
 		MessageSFX = SFX_Select_BeamLaser;
 	}
@@ -1081,9 +1081,9 @@ void PickupPool::clear_got()
 {
 	if( ( Ships[ WhoIAm ].Object.Flags & SHIP_SuperNashram ) )
 	{
-		if( CopyOfGeneralAmmo < MAXGENERALAMMO )
+		if( Primaries.banked_general_ammo() < MAXGENERALAMMO )
 		{
-			CopyOfGeneralAmmo += GENERALAMMOPERPOD;
+			Primaries.bank_general_ammo( GENERALAMMOPERPOD );
 			MessageSFX = SFX_Select_Ammo;
 		}
 		else
@@ -1095,9 +1095,9 @@ void PickupPool::clear_got()
 	}
 	else
 	{
-		if( GeneralAmmo < MAXGENERALAMMO )
+		if( Primaries.general_ammo() < MAXGENERALAMMO )
 		{
-			GeneralAmmo += GENERALAMMOPERPOD;
+			Primaries.add_general_ammo( GENERALAMMOPERPOD );
 			MessageSFX = SFX_Select_Ammo;
 		}
 		else
@@ -1114,9 +1114,9 @@ void PickupPool::clear_got()
 {
 	if( ( Ships[ WhoIAm ].Object.Flags & SHIP_SuperNashram ) )
 	{
-		if( CopyOfPyroliteAmmo < MAXPYROLITEAMMO )
+		if( Primaries.banked_pyrolite_ammo() < MAXPYROLITEAMMO )
 		{
-			CopyOfPyroliteAmmo += PYROLITEAMMOPERPOD;
+			Primaries.bank_pyrolite_ammo( PYROLITEAMMOPERPOD );
 			MessageSFX = SFX_Select_Ammo;
 		}
 		else
@@ -1128,9 +1128,9 @@ void PickupPool::clear_got()
 	}
 	else
 	{
-		if( PyroliteAmmo < MAXPYROLITEAMMO )
+		if( Primaries.pyrolite_ammo() < MAXPYROLITEAMMO )
 		{
-			PyroliteAmmo += PYROLITEAMMOPERPOD;
+			Primaries.add_pyrolite_ammo( PYROLITEAMMOPERPOD );
 			MessageSFX = SFX_Select_Ammo;
 		}
 		else
@@ -1148,9 +1148,9 @@ void PickupPool::clear_got()
 {
 	if( ( Ships[ WhoIAm ].Object.Flags & SHIP_SuperNashram ) )
 	{
-		if( CopyOfSussGunAmmo < MAXSUSSGUNAMMO )
+		if( Primaries.banked_sussgun_ammo() < MAXSUSSGUNAMMO )
 		{
-			CopyOfSussGunAmmo += SUSSGUNAMMOPERPOD;
+			Primaries.bank_sussgun_ammo( SUSSGUNAMMOPERPOD );
 			MessageSFX = SFX_Select_Ammo;
 		}
 		else
@@ -1162,9 +1162,9 @@ void PickupPool::clear_got()
 	}
 	else
 	{
-		if( SussGunAmmo < MAXSUSSGUNAMMO )
+		if( Primaries.sussgun_ammo() < MAXSUSSGUNAMMO )
 		{
-			SussGunAmmo += SUSSGUNAMMOPERPOD;
+			Primaries.add_sussgun_ammo( SUSSGUNAMMOPERPOD );
 			MessageSFX = SFX_Select_Ammo;
 		}
 		else
@@ -1181,10 +1181,10 @@ void PickupPool::clear_got()
 {
 	if( ( Ships[ WhoIAm ].Object.Flags & SHIP_SuperNashram ) )
 	{
-		if( CopyOfPowerLevel != ( MAXPOWERLEVELS - 1 ) )
+		if( Primaries.banked_power_level() != ( MAXPOWERLEVELS - 1 ) )
 		{
-			CopyOfPowerLevel++;
-			if( CopyOfPowerLevel == ( MAXPOWERLEVELS - 1 ) )
+			Primaries.bank_power_pod();
+			if( Primaries.banked_power_level() == ( MAXPOWERLEVELS - 1 ) )
 			{
 				snprintf( (char*)&Message[ 0 ], sizeof( Message ), FULL_POWER_LEVEL );
 			}
@@ -1287,14 +1287,14 @@ void PickupPool::clear_got()
 {
 	if( ( Ships[ WhoIAm ].Object.Flags & SHIP_SuperNashram ) )
 	{
-		if( CopyOfNitroFuel < MAX_NITRO_FUEL )
+		if( Primaries.banked_nitro() < MAX_NITRO_FUEL )
 		{
-			CopyOfNitroFuel += 50.0F;
-			if( CopyOfNitroFuel > MAX_NITRO_FUEL )
+			Primaries.bank_nitro( 50.0F );
+			if( Primaries.banked_nitro() > MAX_NITRO_FUEL )
 			{
-				TempFloat = ( CopyOfNitroFuel - MAX_NITRO_FUEL );
+				TempFloat = ( Primaries.banked_nitro() - MAX_NITRO_FUEL );
 				NitroFuelUsed += TempFloat;
-				CopyOfNitroFuel = MAX_NITRO_FUEL;
+				Primaries.cap_banked_nitro( MAX_NITRO_FUEL );
 			}
 			MessageSFX = SFX_Select_Nitro;
 		}
@@ -1487,10 +1487,9 @@ void PickupPool::clear_got()
 {
 	if( ( Ships[ WhoIAm ].Object.Flags & SHIP_SuperNashram ) )
 	{
-		if( CopyOfOrbitals < MAXMULTIPLES )
+		if( Primaries.banked_orbitals() < MAXMULTIPLES )
 		{
-			CopyOfOrbAmmo[ CopyOfOrbitals ] = MAXMULTIPLEAMMO;
-			CopyOfOrbitals++;
+			Primaries.bank_orbital();
 			MessageSFX = SFX_Orbital;
 		}
 		else

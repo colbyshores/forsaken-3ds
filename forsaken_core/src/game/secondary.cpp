@@ -4833,7 +4833,7 @@ void SecondaryWeapons::scatter_weapons( VECTOR * Dir, int16_t MaxPickupsAllowed 
 
 	for( Count = 1; Count < MAXPRIMARYWEAPONS; Count++ )
 	{
-		if( PrimaryWeaponsGot[ Count ] && ( TotalPickups < MaxPickupsAllowed ) )
+		if( Primaries.got_weapon( Count ) && ( TotalPickups < MaxPickupsAllowed ) )
 		{
 			DirVector.x = ( Dir->x + Random_Jitter() );
 			DirVector.y = ( Dir->y + Random_Jitter() );
@@ -4849,7 +4849,7 @@ void SecondaryWeapons::scatter_weapons( VECTOR * Dir, int16_t MaxPickupsAllowed 
 				DropPickupSend( &Ships[ WhoIAm ].Object.Pos, Ships[ WhoIAm ].Object.Group ,&DirVector, Speed, PickupNum, Ships[ WhoIAm ].PickupIdCount, -1, false, LifeCount, INDEX_NONE );
 				TotalPickups++;
 			}
-			PrimaryWeaponsGot[ Count ] = 0;
+			Primaries.take_weapon( Count );
 		}
 	}
 
