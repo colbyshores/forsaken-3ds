@@ -25,16 +25,17 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from gates_vfp import find_source  # noqa: E402  (files are keyed by basename)
 
 # file -> {function: expected SMEMO_PASS_* constant}. A class member is keyed
-# Class::member (polys.cpp's fills are PolyPool members; PolyDispGroupClipped
-# and PolyDispGroupUnclipped are one-line forwarders to them).
+# Class::member (polys.cpp's fills are PolyPool members and 2dpolys.cpp's are
+# FmPolyPool members; PolyDispGroup* and FmPolyDispGroup* are one-line
+# forwarders to them).
 REQUIRED = {
     "polys.cpp": {
         "PolyPool::disp_group_clipped": "SMEMO_PASS_POLYS_CLIPPED",
         "PolyPool::disp_group_unclipped": "SMEMO_PASS_POLYS_UNCLIPPED",
     },
     "2dpolys.cpp": {
-        "FmPolyDispGroupClipped": "SMEMO_PASS_FM_CLIPPED",
-        "FmPolyDispGroupUnclipped": "SMEMO_PASS_FM_UNCLIPPED",
+        "FmPolyPool::disp_group_clipped": "SMEMO_PASS_FM_CLIPPED",
+        "FmPolyPool::disp_group_unclipped": "SMEMO_PASS_FM_UNCLIPPED",
     },
     "lines.cpp": {
         "LinesDispGroup": "SMEMO_PASS_LINES",

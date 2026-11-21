@@ -27,10 +27,49 @@
 	Globals
 ===================================================================*/
 FMPOLY		FmPolys[ MAXNUMOF2DPOLYS ];
-u_int16_t		FirstFmPolyUsed;
-u_int16_t		FirstFmPolyFree;
 u_int32_t		TotalFmPolysInUse = 0;
-TPAGEINFO	FmPolyTPages[ MAXTPAGESPERTLOAD + 1 ];
+
+namespace {
+
+/* The FmPolys[] pool's private bookkeeping (one instance, g_fmpolys):
+ * - the used and free list heads through FmPolys[];
+ * - each texture page's chain through the pool, which the fills walk and
+ *   fill in with that page's vertex counts.
+ * Reset by InitFmPoly with the scene, changed as sprites are found and killed
+ * (weapons, pickups, spot effects, goals and FmPolyProcess's own trails),
+ * walked each frame by FmPolyProcess and by every fill, and saved with the
+ * game. FmPolys[] and TotalFmPolysInUse stay global (weapons, pickups, spot
+ * effects, goals, oct2 and the saved game use them). */
+class FmPolyPool {
+	public:
+	void      init();
+	u_int16_t find_free();
+	void      kill_used( u_int16_t i );
+	void      process();
+	void      init_tpages();
+	void      add_to_tpage( u_int16_t i, int16_t TPage );
+	void      remove_from_tpage( u_int16_t i, int16_t TPage );
+	bool      display_group_clipped( RENDEROBJECT *renderObject, u_int16_t Group );
+	bool      display_group_unclipped( RENDEROBJECT *renderObject );
+	bool      disp_group_clipped( u_int16_t Group, RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * NextFmPoly );
+	bool      disp_group_unclipped( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * NextFmPoly );
+	FILE     *save( FILE * fp );
+	FILE     *restore( FILE * fp );
+
+	private:
+	[[gnu::always_inline]] inline bool fill( bool Clipped, u_int16_t Group, RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * NextFmPoly );
+
+	/* Static, so it keeps its own address as the global did (the PolyPool
+	 * precedent: as an instance member at offset 0 it would put the list
+	 * heads past ldrh/strh's 255-byte reach). */
+	static TPAGEINFO FmPolyTPages[ MAXTPAGESPERTLOAD + 1 ];
+	u_int16_t FirstFmPolyUsed = 0;
+	u_int16_t FirstFmPolyFree = 0;
+};
+
+TPAGEINFO FmPolyPool::FmPolyTPages[ MAXTPAGESPERTLOAD + 1 ];
+
+} // namespace
 
 void FadeColour( u_int8_t * Colour, u_int8_t WantedColour, float Speed );
 
@@ -39,7 +78,7 @@ void FadeColour( u_int8_t * Colour, u_int8_t WantedColour, float Speed );
 	Input		:	Nothing
 	Output		:	Nothing
 ===================================================================*/
-void InitFmPoly( void )
+void FmPolyPool::init()
 {
 	int i;
 
@@ -80,7 +119,7 @@ void InitFmPoly( void )
 	Input		:	Nothing
 	Output		:	u_int16_t	Number of the free FmPoly
 ===================================================================*/
-u_int16_t FindFreeFmPoly( void )
+u_int16_t FmPolyPool::find_free()
 {
 	u_int16_t i;
 
@@ -107,7 +146,7 @@ u_int16_t FindFreeFmPoly( void )
 	Input		:	u_int16_t		Number of FmPoly to free....
 	Output		:	Nothing
 ===================================================================*/
-void KillUsedFmPoly( u_int16_t i )
+void FmPolyPool::kill_used( u_int16_t i )
 {
 	u_int16_t	its_prev;
 	u_int16_t	its_next;
@@ -1569,7 +1608,7 @@ static	u_int8_t	SmokeRingShadeTable[ 5 ] = { 255, 200, 150, 100, 50 };
 	}
 }
 
-void FmPolyProcess( void )
+void FmPolyPool::process()
 {
 	u_int16_t	i;
 	u_int16_t	nextprim;
@@ -1851,7 +1890,7 @@ void FmPolyProcess( void )
 	Input		:	Nothing
 	Output		:	Nothing
 ===================================================================*/
-void InitFmPolyTPages( void )
+void FmPolyPool::init_tpages()
 {
 	u_int16_t	i;
 
@@ -1867,7 +1906,7 @@ void InitFmPolyTPages( void )
 				:	u_int16_t		TPage to add to
 	Output		:	Nothing
 ===================================================================*/
-void AddFmPolyToTPage( u_int16_t i, int16_t TPage )
+void FmPolyPool::add_to_tpage( u_int16_t i, int16_t TPage )
 {
 	if( TPage == -1 ) TPage = MAXTPAGESPERTLOAD;
 
@@ -1888,7 +1927,7 @@ void AddFmPolyToTPage( u_int16_t i, int16_t TPage )
 				:	u_int16_t		TPage to remove from
 	Output		:	Nothing
 ===================================================================*/
-void RemoveFmPolyFromTPage( u_int16_t i, int16_t TPage )
+void FmPolyPool::remove_from_tpage( u_int16_t i, int16_t TPage )
 {
 	if( TPage == -1 ) TPage = MAXTPAGESPERTLOAD;
 
@@ -1910,7 +1949,7 @@ void RemoveFmPolyFromTPage( u_int16_t i, int16_t TPage )
 	FmPolys[ i ].NextInTPage = INDEX_NONE;
 }
 
-bool DisplayGroupClippedFmPolys( RENDEROBJECT *renderObject, u_int16_t Group )
+bool FmPolyPool::display_group_clipped( RENDEROBJECT *renderObject, u_int16_t Group )
 {
 	int16_t	TPage;
 	u_int16_t	i;
@@ -1934,7 +1973,7 @@ bool DisplayGroupClippedFmPolys( RENDEROBJECT *renderObject, u_int16_t Group )
 	return( false );
 }
 
-bool DisplayGroupUnclippedFmPolys(RENDEROBJECT *renderObject )
+bool FmPolyPool::display_group_unclipped(RENDEROBJECT *renderObject )
 {
 	int16_t	TPage;
 	u_int16_t	i;
@@ -2136,7 +2175,7 @@ bool DisplayGroupUnclippedFmPolys(RENDEROBJECT *renderObject )
  * every FM_FLAG_DONTCLIP one (unclipped). The two public wrappers stamp the
  * memo epoch and pass a constant Clipped, so each compiles to its own
  * specialised copy. */
-[[gnu::always_inline]] static inline bool FmPolyDispGroupFill( bool Clipped, u_int16_t Group, RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * NextFmPoly )
+[[gnu::always_inline]] inline bool FmPolyPool::fill( bool Clipped, u_int16_t Group, RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * NextFmPoly )
 {
 	u_int16_t			i;
 	int16_t			Count;
@@ -2355,13 +2394,13 @@ bool DisplayGroupUnclippedFmPolys(RENDEROBJECT *renderObject )
 				:	u_int16_t	*					Current FmPoly (in/out)
 	Output		:	true if a batch was filled and should be drawn
 ===================================================================*/
-bool FmPolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * NextFmPoly )
+bool FmPolyPool::disp_group_clipped( u_int16_t Group, RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * NextFmPoly )
 {
 	/* opt5b memo epoch: stamp this fill's content identity. */
 	renderObject->memoEpochPass = SMEMO_PASS_FM_CLIPPED;
 	renderObject->memoEpochGroup = Group;
 	renderObject->memoEpochResume = smemo_resume(*TPage, *NextFmPoly);
-	return FmPolyDispGroupFill( true, Group, renderObject, TPage, NextFmPoly );
+	return fill( true, Group, renderObject, TPage, NextFmPoly );
 }
 
 /*===================================================================
@@ -2371,13 +2410,13 @@ bool FmPolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int16_
 				:	u_int16_t	*					Current FmPoly (in/out)
 	Output		:	true if a batch was filled and should be drawn
 ===================================================================*/
-bool FmPolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * NextFmPoly )
+bool FmPolyPool::disp_group_unclipped( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * NextFmPoly )
 {
 	/* opt5b memo epoch: whole-scene fill (no single group). */
 	renderObject->memoEpochPass = SMEMO_PASS_FM_UNCLIPPED;
 	renderObject->memoEpochGroup = SMEMO_WHOLE_GROUP;
 	renderObject->memoEpochResume = smemo_resume(*TPage, *NextFmPoly);
-	return FmPolyDispGroupFill( false, 0, renderObject, TPage, NextFmPoly );
+	return fill( false, 0, renderObject, TPage, NextFmPoly );
 }
 
 /*===================================================================
@@ -2413,7 +2452,7 @@ void FadeColour( u_int8_t * Colour, u_int8_t WantedColour, float Speed )
 	Input		:	FILE	*	File Pointer
 	Output		:	FILE	*	Updated File Pointer
 ===================================================================*/
-FILE * SaveFmPolys( FILE * fp )
+FILE * FmPolyPool::save( FILE * fp )
 {
 	u_int16_t i;
 	int16_t	Frm_Info_Index;
@@ -2485,7 +2524,7 @@ FILE * SaveFmPolys( FILE * fp )
 	Input		:	FILE	*	File Pointer
 	Output		:	FILE	*	Updated File Pointer
 ===================================================================*/
-FILE * LoadFmPolys( FILE * fp )
+FILE * FmPolyPool::restore( FILE * fp )
 {
 	u_int16_t i;
 	int16_t	Frm_Info_Index;
@@ -2567,3 +2606,25 @@ FILE * LoadFmPolys( FILE * fp )
 
 	return( fp );
 }
+
+namespace {
+FmPolyPool g_fmpolys;
+}
+
+void InitFmPoly( void ) { g_fmpolys.init(); }
+/* Out of line, as they were before the class: weapons, pickups, spot effects
+ * and FmPolyProcess's own trails call them per sprite, so inlining them (or
+ * branching through to a clone) would bulk up those callers. */
+[[gnu::noinline]] u_int16_t FindFreeFmPoly( void ) { return g_fmpolys.find_free(); }
+[[gnu::noinline]] void KillUsedFmPoly( u_int16_t i ) { g_fmpolys.kill_used( i ); }
+void FmPolyProcess( void ) { g_fmpolys.process(); }
+void InitFmPolyTPages( void ) { g_fmpolys.init_tpages(); }
+void AddFmPolyToTPage( u_int16_t i, int16_t TPage ) { g_fmpolys.add_to_tpage( i, TPage ); }
+/* Out of line, as it was: KillUsedFmPoly calls it for every sprite it kills. */
+[[gnu::noinline]] void RemoveFmPolyFromTPage( u_int16_t i, int16_t TPage ) { g_fmpolys.remove_from_tpage( i, TPage ); }
+bool DisplayGroupClippedFmPolys( RENDEROBJECT *renderObject, u_int16_t Group ) { return g_fmpolys.display_group_clipped( renderObject, Group ); }
+bool DisplayGroupUnclippedFmPolys( RENDEROBJECT *renderObject ) { return g_fmpolys.display_group_unclipped( renderObject ); }
+bool FmPolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * NextFmPoly ) { return g_fmpolys.disp_group_clipped( Group, renderObject, TPage, NextFmPoly ); }
+bool FmPolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * NextFmPoly ) { return g_fmpolys.disp_group_unclipped( renderObject, TPage, NextFmPoly ); }
+FILE * SaveFmPolys( FILE * fp ) { return g_fmpolys.save( fp ); }
+FILE * LoadFmPolys( FILE * fp ) { return g_fmpolys.restore( fp ); }

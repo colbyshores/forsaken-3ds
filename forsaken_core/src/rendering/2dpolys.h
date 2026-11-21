@@ -6,10 +6,10 @@
  * world position. Each frame of a sprite's FRAME_INFO is one or more bits, and
  * each bit becomes one textured quad. The pool is per level: InitFmPoly (from
  * InitScene) resets it. FindFreeFmPoly / KillUsedFmPoly move an entry between
- * the free list and the used list (FirstFmPolyUsed, walked through Prev); the
- * owner also links it into its texture page with
- * AddFmPolyToTPage(GetTPage(*Frm_Info, 0)), which KillUsedFmPoly undoes, so
- * Frm_Info must be valid when it is killed. FmPolyProcess runs once per frame:
+ * the free list and the used list (walked through Prev; the list heads are
+ * 2dpolys.cpp's FmPolyPool's); the owner also links it into its texture page
+ * with AddFmPolyToTPage(GetTPage(*Frm_Info, 0)), which KillUsedFmPoly undoes,
+ * so Frm_Info must be valid when it is killed. FmPolyProcess runs once per frame:
  * it plays each sprite's FM_* sequence (animate, move, fade, rotate, spawn
  * trails) and kills sprites whose sequence has ended.
  *
@@ -191,4 +191,3 @@ FILE * LoadFmPolys( FILE * fp );
 /* Defined in 2dpolys.cpp; shared with the modules that use it. */
 extern FMPOLY FmPolys[ MAXNUMOF2DPOLYS ];
 extern u_int32_t TotalFmPolysInUse;
-extern u_int16_t FirstFmPolyUsed;

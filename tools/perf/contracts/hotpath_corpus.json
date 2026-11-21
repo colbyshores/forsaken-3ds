@@ -153,7 +153,10 @@
       "symbols": [
         "*"
       ],
-      "why": "per-frame 2D poly/HUD batches"
+      "cold_symbols": [
+        "restore"
+      ],
+      "why": "per-frame 2D poly/HUD batches; restore is the saved-game load (LoadFmPolys)"
     },
     {
       "file": "screenpolys.cpp",
