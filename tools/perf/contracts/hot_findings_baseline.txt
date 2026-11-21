@@ -108,7 +108,7 @@ R3|collision.cpp|ObjectCollide|float comparison driving control flow in hot loop
 R3|collision.cpp|QCollide|float comparison driving control flow in hot loop
 R3|collision.cpp|QCollide|float comparison driving control flow in hot loop
 R3|collision.cpp|QCollide|float comparison driving control flow in hot loop
-R3|models.cpp|ModelDisp|float comparison driving control flow in hot loop
+R3|models.cpp|disp|float comparison driving control flow in hot loop
 R4|new3d.cpp|spline|unsuffixed float literal promotes to double
 R4|new3d.cpp|spline|unsuffixed float literal promotes to double
 R4|new3d.cpp|spline|unsuffixed float literal promotes to double
@@ -175,7 +175,7 @@ R7|lights.cpp|XLight1Group|float division in hot loop
 R7|lights.cpp|XLight1Group|float division in hot loop
 R7|lights.cpp|XLight1Group|float division in hot loop
 R7|lights.cpp|XLight1Group|sqrtf in hot loop
-R7|models.cpp|ModelDisp|float division in hot loop
+R7|models.cpp|disp|float division in hot loop
 R7|new3d.cpp|NormaliseVector|float division inner_loop=false
 R7|new3d.cpp|NormaliseVector|sqrtf inner_loop=false
 R7|oct2.cpp|MainGameRender|float division inner_loop=false

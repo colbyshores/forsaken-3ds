@@ -50,9 +50,6 @@ constexpr auto BALL_RADIUS = ( 256 * GLOBAL_SCALE );
 ===================================================================*/
 void CheckModelLinkList( void );
 MODEL	Models[MAXNUMOFMODELS];
-u_int16_t	FirstModelUsed;
-u_int16_t	FirstModelFree;
-static u_int32_t ModelVisGeneration;
 
 int16_t	NextNewModel = -1;
 bool	ShowBoundingBoxes = false;
@@ -68,6 +65,76 @@ constexpr auto RETAIN_POLYS = true;
 constexpr auto DISCARD_POLYS = false;
 void GetRealLightAmbient( VECTOR * Pos , float * Red , float * Green , float * Blue );
 bool	ENVMxa( MXALOADHEADER * Mxaloadheader , MATRIX * Mat ,VECTOR * Pos);
+
+namespace {
+
+/* The Models[] pool's private bookkeeping (one instance, g_models):
+ * - the used and free list heads, changed by FindFreeModel and KillUsedModel
+ *   as models are created and killed, walked each frame by ProcessModels and
+ *   CheckForGravgons, and saved with the game;
+ * - ModelVisGeneration, bumped on every list change, and the per-camera
+ *   visibility buckets ModelDisp walks for each visible group (see "Per-camera
+ *   model visibility buckets" below); they are rebuilt on the first ModelDisp
+ *   after a new camera, a title/game switch or a list change;
+ * - TomFrame, the Tom Cruise animation frame ProcessModels advances;
+ * - BloodOffsets, the body parts' blood trail directions and offsets, as a
+ *   static member.
+ * Models[] itself stays global (most of the game indexes it). */
+class ModelPool {
+	public:
+	void      once_only_init();
+	u_int16_t find_free();
+	void      kill_used( u_int16_t i );
+	void      vis_new_frame();
+	bool      disp( u_int16_t group, MODELNAME * NamePnt );
+	void      process();
+	bool      check_for_gravgons( VECTOR * Pos );
+	FILE *    save( FILE * fp );
+	FILE *    restore( FILE * fp );
+	void      check_link_list();
+
+	private:
+	void ModelVisBucket_Build( int InTitle );
+	[[gnu::always_inline]] inline void ModelBodyPart( u_int16_t & i, VECTOR & Int_Point, NORMAL & Int_Normal, VECTOR & TempVector, float & Speed, float & Cos, QUAT & TempQuat, VECTOR & FrameLag_Rot, VECTOR & Pos, VECTOR & TempDir, VECTOR & OffVector, VECTOR *& BloodPtr, MATRIX & UpMatrix, MATRIX & InvUpMatrix );
+	[[gnu::always_inline]] inline void ModelTomCruise( u_int16_t & i, VECTOR & Int_Point, NORMAL & Int_Normal, VECTOR & TempVector, QUAT & TempQuat, VECTOR & TempDir, MATRIX & UpMatrix, MATRIX & InvUpMatrix );
+
+	/* The list heads and the bucket build stamps first, inside the halfword
+	 * load immediates; then the per-group bucket heads and tails, and the
+	 * per-model bucket chains. */
+	u_int16_t FirstModelUsed = 0;
+	u_int16_t FirstModelFree = 0;
+	u_int32_t ModelVisGeneration = 0;
+	u_int32_t VisBucketGeneration = 0;
+	float     TomFrame = 0.0F;
+	u_int8_t  VisBucketTitle = 0;
+	u_int8_t  VisBucketDirty = 1;
+	u_int16_t VisBucketHead[MAXGROUPS] = {};
+	u_int16_t VisBucketTail[MAXGROUPS] = {};
+	u_int16_t VisBucketNext[MAXNUMOFMODELS] = {};
+	u_int16_t VisBucketClip[MAXNUMOFMODELS] = {};
+
+	static VECTOR BloodOffsets[];
+};
+
+/* Each ship's engine sound speed history (one instance, g_engine_speeds):
+ * framelag carried between frames and the last ENGINEUPDATEPAUSEFRAMES
+ * speeds. Cleared by InitShipSpeeds at level start and filled each frame
+ * by EngineCode, which ProcessModels calls for ship-owned spot sounds. Not
+ * saved with the game. */
+class EngineSpeeds {
+	public:
+	void      init();
+	u_int32_t engine_code( u_int16_t OwnerType, u_int16_t OwnerID, u_int32_t SoundFX_ID, float Speed );
+
+	private:
+	static constexpr int ENGINEUPDATEPAUSEFRAMES = 5;
+
+	float FrameLagStore[ MAX_PLAYERS ] = {};
+	int   CurrentStoredSpeed[ MAX_PLAYERS ] = {};
+	float SpeedStore[ MAX_PLAYERS ][ ENGINEUPDATEPAUSEFRAMES ] = {};
+};
+
+} // namespace
 
 /*===================================================================
 	In game models
@@ -470,7 +537,7 @@ MODELNAME	SplashModelNames[ MAXMODELHEADERS ] ={
 /*===================================================================
 *		Set up 2d exec buff etc...
 ===================================================================*/
-void OnceOnlyInitModel( void )
+void ModelPool::once_only_init()
 {
 	int i;
 	int	Count;
@@ -696,7 +763,7 @@ bool InitModel( MODELNAME * NamePnt)
 	Input		:	nothing
 	Output		:	u_int16_t number of Model free....
 ===================================================================*/
-u_int16_t	FindFreeModel()
+u_int16_t ModelPool::find_free()
 {
 	u_int16_t i;
 
@@ -743,7 +810,7 @@ u_int16_t	FindFreeModel()
 	Input		:	u_int16_t number of Model free....
 	Output		:	nothing
 ===================================================================*/
-void	KillUsedModel( u_int16_t i )
+void ModelPool::kill_used( u_int16_t i )
 {
 	u_int16_t		its_prev;
 	u_int16_t		its_next;
@@ -921,16 +988,7 @@ void KillAttachedSpotFX( u_int16_t i )
 *	submission sequence - and every drawn polygon - is unchanged.
 ===================================================================*/
 
-static u_int16_t VisBucketHead[MAXGROUPS];
-static u_int16_t VisBucketTail[MAXGROUPS];
-static u_int16_t VisBucketNext[MAXNUMOFMODELS];
-static u_int16_t VisBucketClip[MAXNUMOFMODELS];
-static u_int8_t  VisBucketTitle;
-static u_int8_t VisBucketDirty = 1;
-static u_int32_t VisBucketGeneration;
-
-
-static void ModelVisBucket_Build( int InTitle )
+void ModelPool::ModelVisBucket_Build( int InTitle )
 {
 	int i;
 	int g;
@@ -971,7 +1029,7 @@ static void ModelVisBucket_Build( int InTitle )
 	VisBucketDirty = 0;
 }
 
-void ModelVisCache_NewFrame( void )
+void ModelPool::vis_new_frame()
 {
 	VisBucketDirty = 1;
 }
@@ -1224,7 +1282,7 @@ void ModelVisCache_NewFrame( void )
 	}
 }
 
-bool ModelDisp( u_int16_t group, MODELNAME * NamePnt  )
+bool ModelPool::disp( u_int16_t group, MODELNAME * NamePnt  )
 {
 	RENDERMATRIX TempWorld;
 	u_int16_t	i;
@@ -1430,15 +1488,13 @@ bool ReleaseModels( )
 	Input		:	Nothing
 	Output		:	Nothing
 ===================================================================*/
-VECTOR BloodOffsets[] = {
+VECTOR ModelPool::BloodOffsets[] = {
 
 	{ 0.0F, -1.0F, 0.0F }, { 0.0F, -25.0F, 0.0F },					// Head Dir, Offsets
 	{ -0.276F, 0.92F, -0.276F },	{ -30.0F, 100.0F, -30.0F },		// Leg Dir, Offsets
 	{ 0.0F, 0.0F, 1.0F }, { 0.0F, 35.0F, 40.0F },					// Arm Dir, Offsets
 
 };
-
-float TomFrame = 0.0F;
 
 /* MODFUNC_Explode */
 [[gnu::always_inline]] static inline void ModelExplode( u_int16_t & i )
@@ -1477,7 +1533,7 @@ float TomFrame = 0.0F;
 }
 
 /* MODFUNC_BodyPart */
-[[gnu::always_inline]] static inline void ModelBodyPart( u_int16_t & i, VECTOR & Int_Point, NORMAL & Int_Normal, VECTOR & TempVector, float & Speed, float & Cos, QUAT & TempQuat, VECTOR & FrameLag_Rot, VECTOR & Pos, VECTOR & TempDir, VECTOR & OffVector, VECTOR *& BloodPtr, MATRIX & UpMatrix, MATRIX & InvUpMatrix )
+[[gnu::always_inline]] inline void ModelPool::ModelBodyPart( u_int16_t & i, VECTOR & Int_Point, NORMAL & Int_Normal, VECTOR & TempVector, float & Speed, float & Cos, QUAT & TempQuat, VECTOR & FrameLag_Rot, VECTOR & Pos, VECTOR & TempDir, VECTOR & OffVector, VECTOR *& BloodPtr, MATRIX & UpMatrix, MATRIX & InvUpMatrix )
 {
 	if( Models[i].Group != INDEX_NONE )
 	{
@@ -1621,7 +1677,7 @@ float TomFrame = 0.0F;
 }
 
 /* MODFUNC_TomCruise */
-[[gnu::always_inline]] static inline void ModelTomCruise( u_int16_t & i, VECTOR & Int_Point, NORMAL & Int_Normal, VECTOR & TempVector, QUAT & TempQuat, VECTOR & TempDir, MATRIX & UpMatrix, MATRIX & InvUpMatrix )
+[[gnu::always_inline]] inline void ModelPool::ModelTomCruise( u_int16_t & i, VECTOR & Int_Point, NORMAL & Int_Normal, VECTOR & TempVector, QUAT & TempQuat, VECTOR & TempDir, MATRIX & UpMatrix, MATRIX & InvUpMatrix )
 {
 	if( Models[i].Group != INDEX_NONE )
 	{
@@ -2495,7 +2551,7 @@ float TomFrame = 0.0F;
 	return true;
 }
 
-void ProcessModels( void )
+void ModelPool::process()
 {
 	u_int16_t		i;
 	u_int16_t		nextmodel;
@@ -3846,7 +3902,7 @@ void GravityWave( VECTOR * Pos, float Radius, float Center_Grav, u_int16_t Group
 	Input		:	VECTOR	*	Pos
 	Output		:	bool		True/False ( True if collision )
 ===================================================================*/
-bool CheckForGravgons( VECTOR * Pos )
+bool ModelPool::check_for_gravgons( VECTOR * Pos )
 {
 	u_int16_t		i;
 	u_int16_t		nextmodel;
@@ -5130,13 +5186,8 @@ void GetRealLightAmbient( VECTOR * Pos , float * Red , float * Green , float * B
 
 constexpr float SHIP_MIN_FREQ = 0.5F;
 constexpr float SHIP_MAX_FREQ = 1.0F;
-constexpr int ENGINEUPDATEPAUSEFRAMES = 5;
 
-float FrameLagStore[ MAX_PLAYERS ];
-int CurrentStoredSpeed[ MAX_PLAYERS ];
-float SpeedStore[ MAX_PLAYERS ][ ENGINEUPDATEPAUSEFRAMES ];
-
-void InitShipSpeeds( void )
+void EngineSpeeds::init()
 {
 	memset( FrameLagStore, 0, sizeof( FrameLagStore ) );
 	memset( CurrentStoredSpeed, 0, sizeof( CurrentStoredSpeed ) );
@@ -5151,7 +5202,7 @@ void InitShipSpeeds( void )
 				:	float		Speed
 	Output		:	u_int32_t		New SoundFX ID
 ===================================================================*/
-u_int32_t EngineCode( u_int16_t OwnerType, u_int16_t OwnerID, u_int32_t SoundFX_ID, float Speed )
+u_int32_t EngineSpeeds::engine_code( u_int16_t OwnerType, u_int16_t OwnerID, u_int32_t SoundFX_ID, float Speed )
 {
 	float fracspeed, newfreq;
 	int i;
@@ -5277,7 +5328,7 @@ u_int32_t EngineCode( u_int16_t OwnerType, u_int16_t OwnerID, u_int32_t SoundFX_
 	Input		:	FILE	*	File Pointer
 	Output		:	FILE	*	Updated File Pointer
 ===================================================================*/
-FILE * SaveModels( FILE * fp )
+FILE * ModelPool::save( FILE * fp )
 {
 	u_int16_t i;
 
@@ -5354,7 +5405,7 @@ FILE * SaveModels( FILE * fp )
 	Input		:	FILE	*	File Pointer
 	Output		:	FILE	*	Updated File Pointer
 ===================================================================*/
-FILE * LoadModels( FILE * fp )
+FILE * ModelPool::restore( FILE * fp )
 {
 	u_int16_t	i;
 	int16_t	Count;
@@ -5594,7 +5645,7 @@ void EnableRelavantModels( MODELNAME * ModelNamesPtr )
 	}
 }
 
-void CheckModelLinkList( void )
+void ModelPool::check_link_list()
 {
 	u_int16_t i;
 	u_int16_t Count;
@@ -5696,3 +5747,21 @@ bool	ENVMxa( MXALOADHEADER * Mxloadheader , MATRIX * Mat ,VECTOR * /*Pos*/)
 	}
 	return true;
 }
+
+namespace {
+ModelPool    g_models;
+EngineSpeeds g_engine_speeds;
+}
+
+void OnceOnlyInitModel( void ) { g_models.once_only_init(); }
+u_int16_t FindFreeModel() { return g_models.find_free(); }
+void KillUsedModel( u_int16_t i ) { g_models.kill_used( i ); }
+void ModelVisCache_NewFrame( void ) { g_models.vis_new_frame(); }
+bool ModelDisp( u_int16_t group, MODELNAME * NamePnt ) { return g_models.disp( group, NamePnt ); }
+void ProcessModels( void ) { g_models.process(); }
+bool CheckForGravgons( VECTOR * Pos ) { return g_models.check_for_gravgons( Pos ); }
+FILE * SaveModels( FILE * fp ) { return g_models.save( fp ); }
+FILE * LoadModels( FILE * fp ) { return g_models.restore( fp ); }
+void CheckModelLinkList( void ) { g_models.check_link_list(); }
+void InitShipSpeeds( void ) { g_engine_speeds.init(); }
+u_int32_t EngineCode( u_int16_t OwnerType, u_int16_t OwnerID, u_int32_t SoundFX_ID, float Speed ) { return g_engine_speeds.engine_code( OwnerType, OwnerID, SoundFX_ID, Speed ); }

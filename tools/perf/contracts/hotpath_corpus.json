@@ -55,9 +55,10 @@
     {
       "file": "models.cpp",
       "symbols": [
-        "ModelDisp"
+        "ModelDisp",
+        "disp"
       ],
-      "why": "per-group model display, per-model matrix apply"
+      "why": "per-group model display, per-model matrix apply; disp is ModelDisp's body (ModelPool::disp)"
     },
     {
       "file": "mxaload.cpp",
