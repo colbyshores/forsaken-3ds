@@ -42,66 +42,18 @@ constexpr auto CUTOFF = ( 5.0F * BLOCKSIZE );
 	Globals
 ===================================================================*/
 bool		CountDownOn = false;
-static 	bool		Toggle = false;
-static 	float		ScaleInc = 0.0F;
-static	float		Interp_Time = 0.0F;
-static	float		CountDown_X = TIMERSTARTSCREENX;
-static	float		CountDown_Y = TIMERSTARTSCREENY;
-static	float		CountDown_Xoff = 0.0F;
-static	float		CountDown_Yoff = 0.0F;
-static	float		CountDown_Wanted_X = TIMERSTARTSCREENX;
-static	float		CountDown_Wanted_Y = TIMERSTARTSCREENY;
-static	float		CountDown_Scale = TIMERSTARTSCALE;
-static	float		CountDown_Wanted_Scale = TIMERSTARTSCALE;
-static	float		CountDown_Col = 1.0F;
 
 int		SinglePlayerTimeLimit = 0;
-u_int16_t	ThermoScrPoly = INDEX_NONE;
 u_int16_t	FlashScreenPoly	= INDEX_NONE;
-
-/* [3DS bottom-screen HUD routing] When g_scrpoly_route_bottom is true at
-   Add-time, the new screen poly gets SCRFLAG_BottomHUD. At display time,
-   g_scrpoly_display_mode selects which subset to render:
-	 0 = all polys (pre-routing behavior)
-	 1 = only polys WITHOUT SCRFLAG_BottomHUD (stereo top screen)
-	 2 = only polys WITH    SCRFLAG_BottomHUD (mono bottom screen)
-   Two-pass render keeps in-world overlays (aim reticle, enemy markers,
-   damage flash) on the stereo top screen while the gameplay text HUD
-   (ammo/shield/messages) moves to the bottom. */
-bool g_scrpoly_route_bottom    = false;
-int  g_scrpoly_display_mode    = 0;
-
-void ScrPolySetRouteBottom(bool b)    { g_scrpoly_route_bottom = b; }
-void ScrPolySetDisplayMode(int mode)  { g_scrpoly_display_mode = mode; }
-bool ScrPolyGetRouteBottom(void)      { return g_scrpoly_route_bottom; }
 
 u_int32_t	TotalScrPolysInUse = 0;
 SCRPOLY	ScrPolys[ MAXNUMOFSCRPOLYS ];
 
-/* Skip-filter used inside ScrPolyDispSolid / ScrPolyDispNonSolid to drop
-   polys that don't belong on the current render target. Declared after
-   ScrPolys[] so the inline body can reference it. */
-static inline bool scrpoly_skip(u_int16_t i)
-{
-	if (g_scrpoly_display_mode == 1 && (ScrPolys[i].Flags & SCRFLAG_BottomHUD))
-		return true;
-	if (g_scrpoly_display_mode == 2 && !(ScrPolys[i].Flags & SCRFLAG_BottomHUD))
-		return true;
-	return false;
-}
 u_int16_t	FirstScrPolyUsed;
-u_int16_t	FirstScrPolyFree;
 float	Countdown_Float = 3000.0F;	// 30 Seconds
-float	ZValue;
-float	RHWValue;
-float	ThermalTemp = 0.0F;
-float	WantedThermalTemp = 0.0F;
-float	ThermalMinimum = 0.0F;
 
 FRAME_INFO	**	CountDownFontGraphics[ 2 ] = { &Numbers2_Header, &Numbers_Header };
 float	CountDownFontWidth[ 2 ] = { 16.0F, 23.0F };
-int16_t	CurrentCountDownFont = 1;
-float		Time_Diff= 0.0F;
 bool		KilledPlayer = false;
 bool		IllegalTime = false;
 
@@ -120,17 +72,133 @@ int16_t	NumberSegments[ 11 ][ 7 ] = {
 		{  0,  0,  0,  0,  0,  0,  0 },	// Blank
 };
 
-u_int16_t	Min1Digit[ 7 ] = { 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff };
-u_int16_t	Min0Digit[ 7 ] = { 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff };
-u_int16_t	Bit0Digit[ 1 ] = { 0xffff };
-u_int16_t	Sec1Digit[ 7 ] = { 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff };
-u_int16_t	Sec0Digit[ 7 ] = { 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff };
-u_int16_t	Bit1Digit[ 1 ] = { 0xffff };
-u_int16_t	Hun1Digit[ 7 ] = { 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff };
-u_int16_t	Hun0Digit[ 7 ] = { 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff };
+namespace {
+
+/* The ScrPolys[] pool's private bookkeeping (one instance, g_scrpolys):
+ * - the free-list head, and each texture page's chain through the pool,
+ *   which the fills walk and fill in with that page's vertex counts;
+ * - the 3DS bottom-screen HUD routing. While g_scrpoly_route_bottom is true,
+ *   polys added or reset get SCRFLAG_BottomHUD. g_scrpoly_display_mode picks
+ *   the subset a draw shows: 0 = all polys (the pre-routing behaviour),
+ *   1 = only polys WITHOUT SCRFLAG_BottomHUD (stereo top screen), 2 = only
+ *   polys WITH it (mono bottom screen). The two-pass render keeps in-world
+ *   overlays (aim reticle, enemy markers, damage flash) on the stereo top
+ *   screen while the gameplay text HUD (ammo/shield/messages) moves to the
+ *   bottom;
+ * - the Z and RHW every fill gives its vertices;
+ * - the thermometer: its poly and temperatures, which InitThermo resets, the
+ *   Thermo sequence in ScreenPolyProcess moves each frame, and the saved game
+ *   stores.
+ * Reset by InitScrPolys with the scene, changed as polys are found and
+ * killed, and walked by every fill. ScrPolys[] and the used-list head
+ * FirstScrPolyUsed stay global (oct2, title and secondary use them). */
+class ScrPolyPool {
+	public:
+	void      init();
+	u_int16_t find_free();
+	void      kill_used( u_int16_t i );
+	void      set_route_bottom( bool b )   { g_scrpoly_route_bottom = b; }
+	void      set_display_mode( int mode ) { g_scrpoly_display_mode = mode; }
+	bool      route_bottom() const         { return g_scrpoly_route_bottom; }
+	void      add_text( u_int16_t Frame, float XPos, float YPos, u_int8_t Red, u_int8_t Green, u_int8_t Blue, u_int8_t Trans );
+	void      add_text_scale( u_int16_t Frame, float XPos, float YPos, float XScale, float YScale, u_int8_t Red, u_int8_t Green, u_int8_t Blue, u_int8_t Trans );
+	void      init_tpages();
+	void      add_to_tpage( u_int16_t i, int16_t TPage );
+	void      remove_from_tpage( u_int16_t i, int16_t TPage );
+	bool      display_solid( RENDEROBJECT *renderObject );
+	bool      display_non_solid( RENDEROBJECT *renderObject );
+	/* Always inlined: ScrPolyDispSolid and ScrPolyDispNonSolid pass a
+	 * constant Solid, so each is its own specialised copy. */
+	[[gnu::always_inline]] bool disp_fill( bool Solid, RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * NextScrPoly );
+	void      process();
+	void      init_thermo();
+	void      kill_thermo();
+	FILE     *save( FILE * fp );
+	FILE     *restore( FILE * fp );
+
+	private:
+	void init_poly( u_int16_t i );
+	bool skip( u_int16_t i );
+	[[gnu::always_inline]] bool in_fill( u_int16_t i, bool Solid );
+	[[gnu::always_inline]] void build_textured_quad( u_int16_t & i, float & Xoff, float & Yoff, float & Xsize, float & Ysize, BOX_INFO *& Box_Ptr, OFF_INFO *& Off_Ptr, COLOR & Colour, TLVERTEX *& ScrPolyVertPnt, float & u1, float & v1, float & u2, float & v2, float & x1, float & y1, float & x3, float & y3 );
+	[[gnu::always_inline]] void build_plain_quad( bool & Solid, u_int16_t & i, COLOR & Colour, TLVERTEX *& ScrPolyVertPnt, float & u1, float & v1, float & u2, float & v2, float & x1, float & y1, float & x3, float & y3 );
+	[[gnu::always_inline]] void count_verts( bool & Solid, int16_t *& TPage, u_int16_t *& NextScrPoly, u_int16_t & i, int16_t & Count, int16_t & TotalVerts, int16_t & StartVert, int16_t & NumVerts, int16_t & NumTris, BIT_INFO *& Bit_Ptr, bool & Textured );
+
+	/* Static, so it keeps its own address as the global did. As an instance
+	 * member, either it or FirstScrPolyFree would sit at an offset that costs
+	 * an instruction in AddScrPolyToTPage (inlined into every poly builder)
+	 * or KillUsedScrPoly. */
+	static TPAGEINFO ScrPolyTPages[ MAXTPAGESPERTLOAD + 1 ];
+	u_int16_t FirstScrPolyFree = 0;
+	u_int16_t ThermoScrPoly = INDEX_NONE;
+	int       g_scrpoly_display_mode = 0;
+	float     ZValue = 0.0F;
+	float     RHWValue = 0.0F;
+	bool      g_scrpoly_route_bottom = false;
+	float     ThermalTemp = 0.0F;
+	float     WantedThermalTemp = 0.0F;
+	float     ThermalMinimum = 0.0F;
+};
+
+/* The countdown clock's digits and their animation (one instance,
+ * g_countdown): the ScrPolys each digit's segments use, the font, and the
+ * position, scale and fade as the clock slides from the corner to the
+ * centre in the last ten seconds. Reset by StartCountDown and
+ * ResetCountDownBombTag, moved each frame by UpdateCountdownDigits while
+ * CountDownOn, and its digits made and freed with the scene. The time left
+ * (Countdown_Float), CountDownOn and countdown_timer stay global (triggers,
+ * networking, the game loop and the saved game use them). */
+class CountdownClock {
+	public:
+	void update();
+	void create_digits();
+	void delete_digits();
+	void clear_buffers();
+	void start( int16_t Minutes, int16_t Seconds );
+	void reset_bomb_tag( float Amount );
+
+	private:
+	int16_t   CurrentCountDownFont = 1;
+	bool      Toggle = false;
+	float     ScaleInc = 0.0F;
+	float     Interp_Time = 0.0F;
+	float     CountDown_X = TIMERSTARTSCREENX;
+	float     CountDown_Y = TIMERSTARTSCREENY;
+	float     CountDown_Xoff = 0.0F;
+	float     CountDown_Yoff = 0.0F;
+	float     CountDown_Wanted_X = TIMERSTARTSCREENX;
+	float     CountDown_Wanted_Y = TIMERSTARTSCREENY;
+	float     CountDown_Scale = TIMERSTARTSCALE;
+	float     CountDown_Wanted_Scale = TIMERSTARTSCALE;
+	float     CountDown_Col = 1.0F;
+	float     Time_Diff = 0.0F;
+	u_int16_t Min1Digit[ 7 ] = { 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff };
+	u_int16_t Min0Digit[ 7 ] = { 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff };
+	u_int16_t Bit0Digit[ 1 ] = { 0xffff };
+	u_int16_t Sec1Digit[ 7 ] = { 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff };
+	u_int16_t Sec0Digit[ 7 ] = { 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff };
+	u_int16_t Bit1Digit[ 1 ] = { 0xffff };
+	u_int16_t Hun1Digit[ 7 ] = { 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff };
+	u_int16_t Hun0Digit[ 7 ] = { 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff };
+};
+
+TPAGEINFO ScrPolyPool::ScrPolyTPages[ MAXTPAGESPERTLOAD + 1 ];
+
+} // namespace
+
+/* Skip-filter used inside ScrPolyDispSolid / ScrPolyDispNonSolid to drop
+   polys that don't belong on the current render target. */
+inline bool ScrPolyPool::skip(u_int16_t i)
+{
+	if (g_scrpoly_display_mode == 1 && (ScrPolys[i].Flags & SCRFLAG_BottomHUD))
+		return true;
+	if (g_scrpoly_display_mode == 2 && !(ScrPolys[i].Flags & SCRFLAG_BottomHUD))
+		return true;
+	return false;
+}
 
 // defaults a screen poly
-void InitScrPoly( u_int16_t i )
+void ScrPolyPool::init_poly( u_int16_t i )
 {
 	ScrPolys[i].Flags = g_scrpoly_route_bottom ? SCRFLAG_BottomHUD : SCRFLAG_Nothing;
 	ScrPolys[i].Type = SCRTYPE_Normal;
@@ -186,7 +254,7 @@ void InitScrPoly( u_int16_t i )
 
 }
 
-void InitScrPolys( void )
+void ScrPolyPool::init()
 {
 	u_int16_t	i;
 
@@ -202,7 +270,7 @@ void InitScrPolys( void )
 	{
 		ScrPolys[i].Next = i + 1;
 		ScrPolys[i].Prev = INDEX_NONE;
-		InitScrPoly(i);
+		init_poly(i);
 	}
 
 	ScrPolys[ MAXNUMOFSCRPOLYS-1 ].Next = INDEX_NONE;
@@ -218,7 +286,7 @@ void InitScrPolys( void )
 	Input		:	Nothing
 	Output		:	u_int16_t	Number of the free ScrPoly
 ===================================================================*/
-u_int16_t FindFreeScrPoly( void )
+u_int16_t ScrPolyPool::find_free()
 {
 	u_int16_t i;
 
@@ -246,7 +314,7 @@ u_int16_t FindFreeScrPoly( void )
 	Input		:	u_int16_t		Number of ScrPoly to free....
 	Output		:	Nothing
 ===================================================================*/
-void KillUsedScrPoly( u_int16_t i )
+void ScrPolyPool::kill_used( u_int16_t i )
 {
 	u_int16_t	its_prev;
 	u_int16_t	its_next;
@@ -280,7 +348,7 @@ void KillUsedScrPoly( u_int16_t i )
 	// not all routines that get a poly
 	// clear out all previous possible settings
 
-	InitScrPoly( i );
+	init_poly( i );
 }
 
 /*===================================================================
@@ -321,7 +389,7 @@ void FreeAllLastAFrameScrPolys( void )
 	Input		:	Nothing
 	Output		:	Nothing
 ===================================================================*/
-void ScreenPolyProcess( void )
+void ScrPolyPool::process()
 {
 	u_int16_t	i;
 	u_int16_t	NextScrPoly;
@@ -1105,7 +1173,7 @@ void SecBullLensflare( u_int16_t i )
 	Output		:	Nothing
 ===================================================================*/
 px_timer_t countdown_timer;
-void UpdateCountdownDigits( void )
+void CountdownClock::update()
 {
 	float		XPos, YPos;
 	int			DigitNumber;
@@ -1329,7 +1397,7 @@ void UpdateDigit( u_int16_t * DigitArray, float XPos, float YPos, int16_t Number
 	Input		:	Nothing
 	Output		:	Nothing
 ===================================================================*/
-void CreateCountdownDigits( void )
+void CountdownClock::create_digits()
 {
 	DeleteCountdownDigits();
 
@@ -1348,7 +1416,7 @@ void CreateCountdownDigits( void )
 	Input		:	Nothing
 	Output		:	Nothing
 ===================================================================*/
-void DeleteCountdownDigits( void )
+void CountdownClock::delete_digits()
 {
 	DeleteDigit( &Min1Digit[ 0 ] );
 	DeleteDigit( &Min0Digit[ 0 ] );
@@ -1365,7 +1433,7 @@ void DeleteCountdownDigits( void )
 	Input		:	Nothing
 	Output		:	Nothing
 ===================================================================*/
-void ClearCountdownBuffers( void )
+void CountdownClock::clear_buffers()
 {
 	int16_t	Count;
 
@@ -1498,7 +1566,7 @@ void DeleteSeperatorDigit( u_int16_t * DigitArray )
 				:	int16_t	Seconds
 	Output		:	Nothing
 ===================================================================*/
-void StartCountDown( int16_t Minutes, int16_t Seconds )
+void CountdownClock::start( int16_t Minutes, int16_t Seconds )
 {
 	CurrentCountDownFont = 0;
 	Countdown_Float = ( ( Minutes * 6000.0F ) + ( Seconds * 100.0F ) );
@@ -1532,7 +1600,7 @@ void StartCountDown( int16_t Minutes, int16_t Seconds )
 	Output		:	void
 ===================================================================*/
 
-void AddScreenPolyText( u_int16_t Frame, float XPos, float YPos, u_int8_t Red, u_int8_t Green, u_int8_t Blue, u_int8_t Trans )
+void ScrPolyPool::add_text( u_int16_t Frame, float XPos, float YPos, u_int8_t Red, u_int8_t Green, u_int8_t Blue, u_int8_t Trans )
 {
 	u_int16_t	i;
 
@@ -1583,7 +1651,7 @@ void AddScreenPolyText( u_int16_t Frame, float XPos, float YPos, u_int8_t Red, u
 				:	int16_t	Seconds
 	Output		:	Nothing
 ===================================================================*/
-void ResetCountDownBombTag( float Amount )
+void CountdownClock::reset_bomb_tag( float Amount )
 {
 	CurrentCountDownFont = 0;
 	Countdown_Float = Amount;
@@ -1646,7 +1714,7 @@ void ResetCountDownBombTag( float Amount )
 				:	u_int8_t	Trans
 	Output		:	void
 ===================================================================*/
-void AddScreenPolyTextScale( u_int16_t Frame, float XPos, float YPos, float XScale, float YScale, u_int8_t Red, u_int8_t Green, u_int8_t Blue, u_int8_t Trans )
+void ScrPolyPool::add_text_scale( u_int16_t Frame, float XPos, float YPos, float XScale, float YScale, u_int8_t Red, u_int8_t Green, u_int8_t Blue, u_int8_t Trans )
 {
 	u_int16_t	i;
 
@@ -1836,7 +1904,7 @@ void MakeScreenFlash( u_int8_t Red, u_int8_t Green, u_int8_t Blue, u_int8_t Tran
 	Input		:	Nothing
 	Output		:	Nothing
 ===================================================================*/
-void InitThermo( void )
+void ScrPolyPool::init_thermo()
 {
 	u_int16_t	i;
 	float	Center_X;
@@ -1896,7 +1964,7 @@ void InitThermo( void )
 	Input		:	Nothing
 	Output		:	Nothing
 ===================================================================*/
-void KillThermo( void )
+void ScrPolyPool::kill_thermo()
 {
 	if( ThermoScrPoly != INDEX_NONE )
 	{
@@ -1906,14 +1974,12 @@ void KillThermo( void )
 }
 
 
-TPAGEINFO	ScrPolyTPages[ MAXTPAGESPERTLOAD + 1 ];
-
 /*===================================================================
 	Procedure	:	Init ScreenPoly TPage Groups
 	Input		:	Nothing
 	Output		:	Nothing
 ===================================================================*/
-void InitScrPolyTPages( void )
+void ScrPolyPool::init_tpages()
 {
 	u_int16_t	i;
 
@@ -1929,7 +1995,7 @@ void InitScrPolyTPages( void )
 				:	u_int16_t		TPage to add to
 	Output		:	Nothing
 ===================================================================*/
-void AddScrPolyToTPage( u_int16_t i, int16_t TPage )
+void ScrPolyPool::add_to_tpage( u_int16_t i, int16_t TPage )
 {
 	if( TPage == -1 ) TPage = MAXTPAGESPERTLOAD;
 
@@ -1950,7 +2016,7 @@ void AddScrPolyToTPage( u_int16_t i, int16_t TPage )
 				:	u_int16_t		TPage to remove from
 	Output		:	Nothing
 ===================================================================*/
-void RemoveScrPolyFromTPage( u_int16_t i, int16_t TPage )
+void ScrPolyPool::remove_from_tpage( u_int16_t i, int16_t TPage )
 {
 	if( TPage == -1 ) TPage = MAXTPAGESPERTLOAD;
 
@@ -1972,7 +2038,7 @@ void RemoveScrPolyFromTPage( u_int16_t i, int16_t TPage )
 	ScrPolys[ i ].NextInTPage = INDEX_NONE;
 }
 
-bool DisplaySolidScrPolys( RENDEROBJECT *renderObject )
+bool ScrPolyPool::display_solid( RENDEROBJECT *renderObject )
 {
 	int16_t	TPage;
 	u_int16_t	i;
@@ -1998,7 +2064,7 @@ bool DisplaySolidScrPolys( RENDEROBJECT *renderObject )
 	return( false );
 }
 
-bool DisplayNonSolidScrPolys( RENDEROBJECT *renderObject )
+bool ScrPolyPool::display_non_solid( RENDEROBJECT *renderObject )
 {
 	int16_t	TPage;
 	u_int16_t	i;
@@ -2025,9 +2091,9 @@ bool DisplayNonSolidScrPolys( RENDEROBJECT *renderObject )
 }
 
 /* Is ScrPoly i in this fill? Not skipped, and solid (Solid) or not solid. */
-[[gnu::always_inline]] static inline bool ScrPolyInFill( u_int16_t i, bool Solid )
+[[gnu::always_inline]] inline bool ScrPolyPool::in_fill( u_int16_t i, bool Solid )
 {
-	if( scrpoly_skip( i ) )
+	if( skip( i ) )
 		return false;
 	if( Solid )
 		return ( ScrPolys[ i ].Flags & SCRFLAG_Solid ) != 0;
@@ -2035,7 +2101,7 @@ bool DisplayNonSolidScrPolys( RENDEROBJECT *renderObject )
 }
 
 /* one bit of a textured screen poly: its box position and size (explicit coords, or offset and scale with flips), four pre-transformed vertices, the clip test and the Rot90 texture rotation */
-[[gnu::always_inline]] static inline void ScrPolyBuildTexturedQuad( u_int16_t & i, float & Xoff, float & Yoff, float & Xsize, float & Ysize, BOX_INFO *& Box_Ptr, OFF_INFO *& Off_Ptr, COLOR & Colour, TLVERTEX *& ScrPolyVertPnt, float & u1, float & v1, float & u2, float & v2, float & x1, float & y1, float & x3, float & y3 )
+[[gnu::always_inline]] inline void ScrPolyPool::build_textured_quad( u_int16_t & i, float & Xoff, float & Yoff, float & Xsize, float & Ysize, BOX_INFO *& Box_Ptr, OFF_INFO *& Off_Ptr, COLOR & Colour, TLVERTEX *& ScrPolyVertPnt, float & u1, float & v1, float & u2, float & v2, float & x1, float & y1, float & x3, float & y3 )
 {
 	/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 	Box_Ptr = ( (*ScrPolys[ i ].Frm_Info)->Box_Info + ( Off_Ptr->box & 0x0fff ) );
@@ -2192,7 +2258,7 @@ bool DisplayNonSolidScrPolys( RENDEROBJECT *renderObject )
 }
 
 /* an untextured screen poly: four pre-transformed vertices with one colour (solid) or a colour per vertex, the clip test and the Rot90 texture rotation */
-[[gnu::always_inline]] static inline void ScrPolyBuildPlainQuad( bool & Solid, u_int16_t & i, COLOR & Colour, TLVERTEX *& ScrPolyVertPnt, float & u1, float & v1, float & u2, float & v2, float & x1, float & y1, float & x3, float & y3 )
+[[gnu::always_inline]] inline void ScrPolyPool::build_plain_quad( bool & Solid, u_int16_t & i, COLOR & Colour, TLVERTEX *& ScrPolyVertPnt, float & u1, float & v1, float & u2, float & v2, float & x1, float & y1, float & x3, float & y3 )
 {
 	u1 = 0.0F;
 	v1 = 0.0F;
@@ -2283,7 +2349,7 @@ bool DisplayNonSolidScrPolys( RENDEROBJECT *renderObject )
 }
 
 /* pass 1: count this fill's vertices and triangles per texture page from the resume point, setting each page's StartVert/NumVerts/NumTris and TotalVerts */
-[[gnu::always_inline]] static inline void ScrPolyCountVerts( bool & Solid, int16_t *& TPage, u_int16_t *& NextScrPoly, u_int16_t & i, int16_t & Count, int16_t & TotalVerts, int16_t & StartVert, int16_t & NumVerts, int16_t & NumTris, BIT_INFO *& Bit_Ptr, bool & Textured )
+[[gnu::always_inline]] inline void ScrPolyPool::count_verts( bool & Solid, int16_t *& TPage, u_int16_t *& NextScrPoly, u_int16_t & i, int16_t & Count, int16_t & TotalVerts, int16_t & StartVert, int16_t & NumVerts, int16_t & NumTris, BIT_INFO *& Bit_Ptr, bool & Textured )
 {
 	for( Count = *TPage; Count <= MAXTPAGESPERTLOAD; Count++ )
 	{
@@ -2299,7 +2365,7 @@ bool DisplayNonSolidScrPolys( RENDEROBJECT *renderObject )
 
 		while( ( i != INDEX_NONE ) && ( ( StartVert + NumVerts ) < MAXSCREENPOLYVERTS ) )
 		{
-			if( ScrPolyInFill( i, Solid ) )
+			if( in_fill( i, Solid ) )
 			{
 				if( Textured )
 				{
@@ -2332,7 +2398,7 @@ bool DisplayNonSolidScrPolys( RENDEROBJECT *renderObject )
 /* Fill one batch of screen polys: the solid ones (one colour per quad) or the
  * non-solid ones (a colour per vertex). The two public wrappers pass a constant
  * Solid, so each compiles to its own specialised copy. */
-[[gnu::always_inline]] static inline bool ScrPolyDispFill( bool Solid, RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * NextScrPoly )
+[[gnu::always_inline]] inline bool ScrPolyPool::disp_fill( bool Solid, RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * NextScrPoly )
 {
 	u_int16_t			i;
 	int16_t			Count;
@@ -2366,7 +2432,7 @@ bool DisplayNonSolidScrPolys( RENDEROBJECT *renderObject )
 	===================================================================*/
 	TotalVerts = 0;
 
-	ScrPolyCountVerts( Solid, TPage, NextScrPoly, i, Count, TotalVerts, StartVert, NumVerts, NumTris, Bit_Ptr, Textured );
+	count_verts( Solid, TPage, NextScrPoly, i, Count, TotalVerts, StartVert, NumVerts, NumTris, Bit_Ptr, Textured );
 
 	if( !TotalVerts ) return( false );
 
@@ -2424,7 +2490,7 @@ bool DisplayNonSolidScrPolys( RENDEROBJECT *renderObject )
 
 			while( ( i != INDEX_NONE ) && ( Solid || ( i < MAXNUMOFSCRPOLYS ) ) && ( StartVert < MAXSCREENPOLYVERTS ) )
 			{
-				if( ScrPolyInFill( i, Solid ) )
+				if( in_fill( i, Solid ) )
 				{
 					if( Textured && ScrPolys[i].Frm_Info && (*ScrPolys[i].Frm_Info ) )
 					{
@@ -2435,7 +2501,7 @@ bool DisplayNonSolidScrPolys( RENDEROBJECT *renderObject )
 						{
 							int ntris = 0;
 
-							ScrPolyBuildTexturedQuad( i, Xoff, Yoff, Xsize, Ysize, Box_Ptr, Off_Ptr, Colour, ScrPolyVertPnt, u1, v1, u2, v2, x1, y1, x3, y3 );
+							build_textured_quad( i, Xoff, Yoff, Xsize, Ysize, Box_Ptr, Off_Ptr, Colour, ScrPolyVertPnt, u1, v1, u2, v2, x1, y1, x3, y3 );
 
 							ScrPolyFacePnt->v1 = 0;
 							ScrPolyFacePnt->v2 = 1;
@@ -2532,7 +2598,7 @@ bool DisplayNonSolidScrPolys( RENDEROBJECT *renderObject )
 						{
 							int ntris = 0;
 
-							ScrPolyBuildPlainQuad( Solid, i, Colour, ScrPolyVertPnt, u1, v1, u2, v2, x1, y1, x3, y3 );
+							build_plain_quad( Solid, i, Colour, ScrPolyVertPnt, u1, v1, u2, v2, x1, y1, x3, y3 );
 
 							ScrPolyFacePnt->v1 = 0;
 							ScrPolyFacePnt->v2 = 1;
@@ -2629,31 +2695,6 @@ bool DisplayNonSolidScrPolys( RENDEROBJECT *renderObject )
 }
 
 /*===================================================================
-	Procedure	:	Display All Solid Screen Polygons
-	Input		:	RENDEROBJECT *			Render object
-				:	int16_t	*					Current TPage List
-				:	u_int16_t	*					Current ScrPoly
-	Output		:	True/False
-===================================================================*/
-bool ScrPolyDispSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * NextScrPoly )
-{
-	return ScrPolyDispFill( true, renderObject, TPage, NextScrPoly );
-}
-
-
-/*===================================================================
-	Procedure	:	Display All NonSolid Screen Polygons
-	Input		:	RENDEROBJECT  *				RenderObject struct pointer
-				:	int16_t	*					Current TPage List
-				:	u_int16_t	*					Current ScrPoly
-	Output		:	True/False
-===================================================================*/
-bool ScrPolyDispNonSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * NextScrPoly )
-{
-	return ScrPolyDispFill( false, renderObject, TPage, NextScrPoly );
-}
-
-/*===================================================================
 	Procedure	:	Load Time for level
 	Input		:	Nothing
 	Output		:	Nothing
@@ -2671,7 +2712,7 @@ void LoadTimeForLevel( void )
 	Input		:	FILE	*	File Pointer
 	Output		:	FILE	*	Updated File Pointer
 ===================================================================*/
-FILE * SaveScreenPolys( FILE * fp )
+FILE * ScrPolyPool::save( FILE * fp )
 {
 	if( fp )
 	{
@@ -2690,7 +2731,7 @@ FILE * SaveScreenPolys( FILE * fp )
 	Input		:	FILE	*	File Pointer
 	Output		:	FILE	*	Updated File Pointer
 ===================================================================*/
-FILE * LoadScreenPolys( FILE * fp )
+FILE * ScrPolyPool::restore( FILE * fp )
 {
 	int16_t minutes;
 	int16_t seconds;
@@ -3141,3 +3182,41 @@ void ShowCTFFlags( u_int16_t Ship )
 		}
 	}
 }
+
+namespace {
+ScrPolyPool    g_scrpolys;
+CountdownClock g_countdown;
+}
+
+void InitScrPolys( void ) { g_scrpolys.init(); }
+/* Out of line, as they were before the class: the HUD text, lens flares,
+ * flags and countdown call them per poly each frame, so inlining them (or
+ * branching through to a clone) would bulk up those callers. */
+[[gnu::noinline]] u_int16_t FindFreeScrPoly( void ) { return g_scrpolys.find_free(); }
+[[gnu::noinline]] void KillUsedScrPoly( u_int16_t i ) { g_scrpolys.kill_used( i ); }
+void ScrPolySetRouteBottom(bool b) { g_scrpolys.set_route_bottom( b ); }
+void ScrPolySetDisplayMode(int mode) { g_scrpolys.set_display_mode( mode ); }
+bool ScrPolyGetRouteBottom(void) { return g_scrpolys.route_bottom(); }
+void ScreenPolyProcess( void ) { g_scrpolys.process(); }
+void AddScreenPolyText( u_int16_t Frame, float XPos, float YPos, u_int8_t Red, u_int8_t Green, u_int8_t Blue, u_int8_t Trans ) { g_scrpolys.add_text( Frame, XPos, YPos, Red, Green, Blue, Trans ); }
+void AddScreenPolyTextScale( u_int16_t Frame, float XPos, float YPos, float XScale, float YScale, u_int8_t Red, u_int8_t Green, u_int8_t Blue, u_int8_t Trans ) { g_scrpolys.add_text_scale( Frame, XPos, YPos, XScale, YScale, Red, Green, Blue, Trans ); }
+void InitThermo( void ) { g_scrpolys.init_thermo(); }
+void KillThermo( void ) { g_scrpolys.kill_thermo(); }
+void InitScrPolyTPages( void ) { g_scrpolys.init_tpages(); }
+void AddScrPolyToTPage( u_int16_t i, int16_t TPage ) { g_scrpolys.add_to_tpage( i, TPage ); }
+void RemoveScrPolyFromTPage( u_int16_t i, int16_t TPage ) { g_scrpolys.remove_from_tpage( i, TPage ); }
+bool DisplaySolidScrPolys( RENDEROBJECT *renderObject ) { return g_scrpolys.display_solid( renderObject ); }
+bool DisplayNonSolidScrPolys( RENDEROBJECT *renderObject ) { return g_scrpolys.display_non_solid( renderObject ); }
+/* Fill one batch of the solid / non-solid screen polys from the resume point
+ * (*TPage, *NextScrPoly); false when nothing is left to draw. */
+bool ScrPolyDispSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * NextScrPoly ) { return g_scrpolys.disp_fill( true, renderObject, TPage, NextScrPoly ); }
+bool ScrPolyDispNonSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * NextScrPoly ) { return g_scrpolys.disp_fill( false, renderObject, TPage, NextScrPoly ); }
+FILE * SaveScreenPolys( FILE * fp ) { return g_scrpolys.save( fp ); }
+FILE * LoadScreenPolys( FILE * fp ) { return g_scrpolys.restore( fp ); }
+
+void UpdateCountdownDigits( void ) { g_countdown.update(); }
+void CreateCountdownDigits( void ) { g_countdown.create_digits(); }
+void DeleteCountdownDigits( void ) { g_countdown.delete_digits(); }
+void ClearCountdownBuffers( void ) { g_countdown.clear_buffers(); }
+void StartCountDown( int16_t Minutes, int16_t Seconds ) { g_countdown.start( Minutes, Seconds ); }
+void ResetCountDownBombTag( float Amount ) { g_countdown.reset_bomb_tag( Amount ); }

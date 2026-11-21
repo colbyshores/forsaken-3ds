@@ -233,10 +233,10 @@ R7|render_c3d.cpp|c3d_update_phong_tint_for_object_pos|float division inner_loop
 R7|render_c3d.cpp|c3d_update_phong_tint_for_object_pos|float division inner_loop=false
 R7|render_c3d.cpp|c3d_update_phong_tint_for_object_pos|float division inner_loop=false
 R7|render_c3d.cpp|proctex_phase_from_path|float division inner_loop=false
-R7|screenpolys.cpp|AddScreenPolyTextScale|float division inner_loop=false
-R7|screenpolys.cpp|AddScreenPolyTextScale|float division inner_loop=false
-R7|screenpolys.cpp|AddScreenPolyText|float division inner_loop=false
-R7|screenpolys.cpp|AddScreenPolyText|float division inner_loop=false
+R7|screenpolys.cpp|add_text_scale|float division inner_loop=false
+R7|screenpolys.cpp|add_text_scale|float division inner_loop=false
+R7|screenpolys.cpp|add_text|float division inner_loop=false
+R7|screenpolys.cpp|add_text|float division inner_loop=false
 R7|screenpolys.cpp|ClipBox|float division inner_loop=false
 R7|screenpolys.cpp|ClipBox|float division inner_loop=false
 R7|screenpolys.cpp|ClipBox|float division inner_loop=false
@@ -253,8 +253,8 @@ R7|screenpolys.cpp|ScrPolyDispNonSolid|float division in hot loop
 R7|screenpolys.cpp|ScrPolyDispNonSolid|float division in hot loop
 R7|screenpolys.cpp|ScrPolyDispNonSolid|float division in hot loop
 R7|screenpolys.cpp|ScrPolyDispNonSolid|float division inner_loop=false
-R7|screenpolys.cpp|ScreenPolyProcess|float division in hot loop
-R7|screenpolys.cpp|ScreenPolyProcess|float division in hot loop
+R7|screenpolys.cpp|process|float division in hot loop
+R7|screenpolys.cpp|process|float division in hot loop
 R7|screenpolys.cpp|SecBullLensflare|float division inner_loop=false
 R7|screenpolys.cpp|SecBullLensflare|float division inner_loop=false
 R7|screenpolys.cpp|SecBullLensflare|float division inner_loop=false
@@ -273,12 +273,12 @@ R7|screenpolys.cpp|ShowFlagOnShip|float division inner_loop=false
 R7|screenpolys.cpp|ShowFlag|float division inner_loop=false
 R7|screenpolys.cpp|ShowScreenMultiples|float division inner_loop=false
 R7|screenpolys.cpp|ShowScreenMultiples|float division inner_loop=false
-R7|screenpolys.cpp|UpdateCountdownDigits|float division inner_loop=false
-R7|screenpolys.cpp|UpdateCountdownDigits|float division inner_loop=false
-R7|screenpolys.cpp|UpdateCountdownDigits|float division inner_loop=false
-R7|screenpolys.cpp|UpdateCountdownDigits|float division inner_loop=false
-R7|screenpolys.cpp|UpdateCountdownDigits|float division inner_loop=false
-R7|screenpolys.cpp|UpdateCountdownDigits|float division inner_loop=false
+R7|screenpolys.cpp|update|float division inner_loop=false
+R7|screenpolys.cpp|update|float division inner_loop=false
+R7|screenpolys.cpp|update|float division inner_loop=false
+R7|screenpolys.cpp|update|float division inner_loop=false
+R7|screenpolys.cpp|update|float division inner_loop=false
+R7|screenpolys.cpp|update|float division inner_loop=false
 R7|screenpolys.cpp|UpdateDigit|float division inner_loop=false
 R7|screenpolys.cpp|UpdateDigit|float division inner_loop=false
 R7|secondary.cpp|ProcessSecondaryBullets|float division inner_loop=false

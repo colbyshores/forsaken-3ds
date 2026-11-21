@@ -153,7 +153,10 @@
       "symbols": [
         "*"
       ],
-      "why": "screen effect polys per frame"
+      "cold_symbols": [
+        "restore"
+      ],
+      "why": "screen effect polys per frame; restore is the saved-game load (LoadScreenPolys)"
     },
     {
       "file": "spotfx.cpp",
