@@ -12,6 +12,7 @@
 #include "rendering/lights.h"
 #include "game/water.h"
 #include "world/visi.h"
+#include "rendering/render.h"
 #include "rendering/text.h"
 #include "game/main.h"
 #include "data/file.h"
@@ -1256,7 +1257,7 @@ bool	XLightMxaloadHeader( MXALOADHEADER * MXloadheader , VECTOR * Pos , float Ra
 				:	VECTOR *		Position
 				:	u_int16_t		Group
 	Output		:	COLOR	cell colour with alpha 0; black outside
-				:			the grid; halved while BrightShips is on
+				:			the grid; halved while VideoOpts.BrightShips is on
 				:			in STATUS_Normal
 ===================================================================*/
 COLOR FindNearestCellColour( MLOADHEADER * Mloadheader,VECTOR * Pos, u_int16_t group )
@@ -1325,7 +1326,7 @@ COLOR FindNearestCellColour( MLOADHEADER * Mloadheader,VECTOR * Pos, u_int16_t g
 		b = RGBA_GETBLUE(Col);
 	}
 
-	if( BrightShips && (MyGameStatus == STATUS_Normal) )
+	if( VideoOpts.BrightShips && (MyGameStatus == STATUS_Normal) )
 	{
 		r >>= 1;
 		g >>= 1;

@@ -32,7 +32,6 @@ void SetUpGameType( int type );
 /* Defined in multiplayer.cpp; shared with the modules that use it. */
 extern u_int16_t RandomStartPosModify;
 extern bool IpOnCLI;
-extern bool TintBikeTeamColor;
 extern bool ResetKillsPerLevel;
 extern MENU * GetPlayerNumMenu;
 extern bool MyResetKillsPerLevel;

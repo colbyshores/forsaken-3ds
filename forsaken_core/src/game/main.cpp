@@ -290,8 +290,8 @@ static bool ParseCommandLine(char* args)
 				render_info.aspect_ratio = (float) w / (float) h;
 			}
 
-			// texel inset mload applies to level UVs (default UV_FUDGE)
-			else if ( sscanf( option, "UVFix:%f", &UV_Fix ) ){}
+			// texel inset mload applies to level UVs (default 0.5)
+			else if ( sscanf( option, "UVFix:%f", &VideoOpts.UV_Fix ) ){}
 
 			// set the horizontal frame of view
 			// this is the screen stretching when you go into nitro

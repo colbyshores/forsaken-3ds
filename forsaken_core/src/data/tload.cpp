@@ -3,6 +3,7 @@
 
 #include "ui/title.h"
 #include "util/platform.h"
+#include "rendering/render.h"
 #include "rendering/text.h"
 
 /*===================================================================
@@ -281,7 +282,6 @@ int16_t	AddTexture( TLOADHEADER * Tloadheader , const char * Name , u_int16_t Co
 	return i;
 }
 
-bool use_original_textures = false;	// UseOriginalTextures in the config
 
 /* Choose the file for a level texture (destination: size bytes). The level's
    own textures folder wins, then data\textures\original when
@@ -317,7 +317,7 @@ void GetLevelTexturePath( char * destination, size_t size, const char * file, co
 	}
 
 	// use old textures if requested and available
-	if( use_original_textures
+	if( VideoOpts.use_original_textures
 		&& snprintf( path, sizeof( path ), "data\\textures\\original\\%s", new_file ) < (int) sizeof( path )
 		&& FSTextureExists( path ) )
 	{

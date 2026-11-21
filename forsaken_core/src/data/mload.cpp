@@ -97,13 +97,11 @@ static void ReadSoundInfo( MLOADHEADER *m, FileReader & in );
 ===================================================================*/
 constexpr int MXV_VERSION_NUMBER = 3;
 
-constexpr float UV_FUDGE = (0.5F);
 constexpr float SAME_UV = (2.0F);
 
 /*===================================================================
 		Globals...
 ===================================================================*/
-float	UV_Fix = UV_FUDGE;
 u_int16_t	num_start_positions = 0;
 u_int16_t	last_start_position = 0;
 GAMESTARTPOS		StartPositions[MAXSTARTPOSITIONS];			// pos and group info...
@@ -161,7 +159,7 @@ static bool read_visible( MLOADHEADER * Mloadheader, VISTREE *v, u_int16_t group
 	return ok;
 }
 
-/* Pull a triangle's texture coordinates in by UV_Fix (half a texel) where an
+/* Pull a triangle's texture coordinates in by VideoOpts.UV_Fix (half a texel) where an
    edge runs along a line of constant u or v (within SAME_UV texels), so
    filtering doesn't sample the neighbouring area of the texture page across
    that edge. Tpage is the texture's index in Tloadheader (a loader's local
@@ -227,8 +225,8 @@ void FixUV( TRIANGLE *Tri, LVERTEX *Vert, u_int16_t Tpage, LVERTEX *Orig_Vert )
 	Orig_TriVert[ 1 ] = &Orig_Vert[ Tri->v2 ];
 	Orig_TriVert[ 2 ] = &Orig_Vert[ Tri->v3 ];
 
-	du = ( UV_Fix / Xsize );
-	dv = ( UV_Fix / Ysize );
+	du = ( VideoOpts.UV_Fix / Xsize );
+	dv = ( VideoOpts.UV_Fix / Ysize );
 	su = du * ( ( TriVert[ ( uz + 2 ) % 3 ]->tu > TriVert[ uz ]->tu ) ? 1 : -1 );
 	sv = dv * ( ( TriVert[ ( vz + 2 ) % 3 ]->tv > TriVert[ vz ]->tv ) ? 1 : -1 );
 	if ( fabsf( TriVert[ uz ]->tu + su - Orig_TriVert[ uz ]->tu ) <= du )

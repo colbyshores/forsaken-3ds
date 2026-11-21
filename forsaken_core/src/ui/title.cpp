@@ -72,7 +72,6 @@ constexpr int MAX_KEYDEF_PAGES = (4);
 constexpr size_t KEYDEF_LABEL_SIZE = 24;	// a key definition's "selected/total" label: two ints
 int CurrentPage = 0;
 int MaxPage = 0;
-bool MissileCameraEnable;
 void MenuItemSelect( MENUITEM * item );
 void MenuItemDrawPageName( MENUITEM *Item );
 void InitKeyDef( MENU *Menu );
@@ -611,13 +610,10 @@ bool ShowTeamInfo;
 bool NoTeamSelect				= false;
 bool Autoleveling				= true;
 DebugView DebugViews;
-bool BrightShips;
-bool MyBrightShips;
-bool BikeExhausts;
+VideoOptions VideoOpts;
 bool ScreenSaving				= true;
 bool TeamGame					= false;
 bool BountyBonus;
-bool BikeEnginesOn;
 
 bool	CanSelectBike[ MAXBIKETYPES ] =
 {
@@ -1399,10 +1395,10 @@ MENU	MENU_NEW_VisualsStereo = {
 
 #ifdef __3DS__
 /* Declared in render_c3d.cpp. Toggle the new graphics features:
- *   g_object_shine — Phong specular highlight on enemy / pickup / crate
+ *   VideoOpts.g_object_shine — Phong specular highlight on enemy / pickup / crate
  *                    surfaces. Free if disabled (skips fragment-lighting
  *                    binding + extra TexEnv stage).
- *   g_wall_detail  — ADD_SIGNED detail-map modulation on wall textures
+ *   VideoOpts.g_wall_detail  — ADD_SIGNED detail-map modulation on wall textures
  *                    that ship with a sibling <name>_d.t3x file.
  * Saved as ObjectShine / WallDetail in configs/main.txt. */
 #endif
@@ -1418,7 +1414,7 @@ MENU	MENU_NEW_Visuals = {
 		{ 20, 100, 200, 100, 0,					(u_int8_t*)LT_MENU_InGame2  /*"Toggle Full Screen" */,			FONT_Small, TEXTFLAG_CentreY,						nullptr,			nullptr,						MenuGoFullScreen,		DrawFlatMenuItem,	nullptr, 0 },
 		{ 20, 112, 150, 112, 0,					(u_int8_t*)"Vertical Sync (requires restart)",			FONT_Small, TEXTFLAG_CentreY,	&render_info.vsync,	(void*)NewMenuSelectMode,	SelectFlatMenuToggle, DrawFlatMenuToggle,		nullptr, 0 },
 		{ 20, 124, 200, 124, 0,					(u_int8_t*)"anaglyph stereo 3d options",						FONT_Small, TEXTFLAG_CentreY,						nullptr,			&MENU_NEW_VisualsStereo,	MenuChange,				DrawFlatMenuItem,	nullptr, 0 },
-		{ 20, 136, 150, 136, 0,					(u_int8_t*)"Tint Bike to Team Color",						FONT_Small, TEXTFLAG_CentreY,		&TintBikeTeamColor,		nullptr,	SelectFlatMenuToggle,	DrawFlatMenuToggle,	nullptr, 0 },
+		{ 20, 136, 150, 136, 0,					(u_int8_t*)"Tint Bike to Team Color",						FONT_Small, TEXTFLAG_CentreY,		&VideoOpts.TintBikeTeamColor,		nullptr,	SelectFlatMenuToggle,	DrawFlatMenuToggle,	nullptr, 0 },
 		{ 20, 160, 100, 160, 0,					(u_int8_t*)LT_MENU_NEW_Visuals5 /*"back"*/,					FONT_Small, TEXTFLAG_CentreY,						nullptr,			nullptr,						MenuItemBack,			DrawFlatMenuItem,	nullptr, 0 },
 		{ -1, -1, 0, 0, 0, (u_int8_t*)"", 0, 0,  nullptr, nullptr, nullptr, nullptr, nullptr, 0 }
 	}
@@ -1429,9 +1425,9 @@ MENU	MENU_NEW_3DS_Visuals = {
 	(u_int8_t*)"", nullptr, nullptr, nullptr, TITLE_TIMER_Visuals,
 	{
 		{  0,   0, 200,  20, 0, (u_int8_t*)"3DS Visual Settings",	FONT_Large, TEXTFLAG_CentreX | TEXTFLAG_CentreY, nullptr, nullptr, nullptr, DrawFlatMenuItem, nullptr, 0 },
-		{ 20,  40, 150,  40, 0, (u_int8_t*)"Object shine",			FONT_Small, TEXTFLAG_CentreY, &g_object_shine,      nullptr, SelectFlatMenuToggle, DrawFlatMenuToggle, nullptr, 0 },
-		{ 20,  56, 150,  56, 0, (u_int8_t*)"Wall detail",			FONT_Small, TEXTFLAG_CentreY, &g_wall_detail,       nullptr, SelectFlatMenuToggle, DrawFlatMenuToggle, nullptr, 0 },
-		{ 20,  72, 150,  72, 0, (u_int8_t*)"Invert 3D depth",		FONT_Small, TEXTFLAG_CentreY, &g_stereo_invert,     nullptr, SelectFlatMenuToggle, DrawFlatMenuToggle, nullptr, 0 },
+		{ 20,  40, 150,  40, 0, (u_int8_t*)"Object shine",			FONT_Small, TEXTFLAG_CentreY, &VideoOpts.g_object_shine,      nullptr, SelectFlatMenuToggle, DrawFlatMenuToggle, nullptr, 0 },
+		{ 20,  56, 150,  56, 0, (u_int8_t*)"Wall detail",			FONT_Small, TEXTFLAG_CentreY, &VideoOpts.g_wall_detail,       nullptr, SelectFlatMenuToggle, DrawFlatMenuToggle, nullptr, 0 },
+		{ 20,  72, 150,  72, 0, (u_int8_t*)"Invert 3D depth",		FONT_Small, TEXTFLAG_CentreY, &VideoOpts.g_stereo_invert,     nullptr, SelectFlatMenuToggle, DrawFlatMenuToggle, nullptr, 0 },
 		{ 20,  88, 100,  88, 0, (u_int8_t*)"back",					FONT_Small, TEXTFLAG_CentreY, nullptr, nullptr, MenuItemBack, DrawFlatMenuItem, nullptr, 0 },
 		{ -1, -1, 0, 0, 0, (u_int8_t*)"", 0, 0,  nullptr, nullptr, nullptr, nullptr, nullptr, 0 }
 	}
@@ -1803,7 +1799,7 @@ MENU	MENU_NEW_Sound = {
 	{
 		{ 0,	0,		200,	20,	0, (u_int8_t*)LT_MENU_NEW_Sound1 /*"sound options"		*/, FONT_Medium,	TEXTFLAG_CentreX | TEXTFLAG_CentreY,		nullptr,								nullptr, nullptr,							DrawFlatMenuItem,		nullptr, 0 } ,
 		{ 10,	40,	100,	50,	0, (u_int8_t*)LT_MENU_NEW_Sound2 /*"sfx volume"			*/, FONT_Small,		TEXTFLAG_AutoSelect | TEXTFLAG_CentreY,	&SfxSlider,						nullptr, SelectSlider,				DrawFlatMenuSlider,		nullptr, 0 } ,
-		{ 10,	60,	100,	70,	0, (u_int8_t*)LT_MENU_NEW_Sound4 /*"bike engines"		*/, FONT_Small,		TEXTFLAG_CentreY,										&BikeEnginesOn,				nullptr, SelectFlatMenuToggle,	DrawFlatMenuToggle,	nullptr, 0 } ,
+		{ 10,	60,	100,	70,	0, (u_int8_t*)LT_MENU_NEW_Sound4 /*"bike engines"		*/, FONT_Small,		TEXTFLAG_CentreY,										&VideoOpts.BikeEnginesOn,				nullptr, SelectFlatMenuToggle,	DrawFlatMenuToggle,	nullptr, 0 } ,
 		{ 0,	80,	200,	100,	0, (u_int8_t*)LT_MENU_NEW_Sound5 /*"speech options"	*/, FONT_Medium,	TEXTFLAG_CentreX | TEXTFLAG_CentreY,		nullptr,								nullptr, nullptr,							DrawFlatMenuItem,		nullptr, 0 } ,
 		{ 10, 100,	100,	110,	0, (u_int8_t*)LT_MENU_NEW_Sound6 /*"biker speech"		*/, FONT_Small,		TEXTFLAG_AutoSelect | TEXTFLAG_CentreY,	&BikerSpeechSlider,			nullptr, SelectSlider,				DrawFlatMenuSlider,		nullptr, 0 } ,
 		{ 10, 110,	100,	120,	0, (u_int8_t*)LT_MENU_NEW_Sound7 /*"bike computer"		*/, FONT_Small,		TEXTFLAG_AutoSelect | TEXTFLAG_CentreY,	&BikeCompSpeechSlider,	nullptr, SelectSlider,				DrawFlatMenuSlider,		nullptr, 0 } ,
@@ -1817,7 +1813,7 @@ MENU	MENU_NEW_InGameSound = {
 	(u_int8_t*)LT_MENU_NEW_InGameSound0 /*"sound"*/ , nullptr, nullptr, SetSoundLevels, 0,
 	{
 		{ 200, 128				 , 0, 0, 0, (u_int8_t*)LT_MENU_NEW_InGameSound1 /*"sfx volume    "		*/, 0, 0, &SfxSlider,						nullptr,						SelectSlider,	DrawSlider,		nullptr, 0 },
-		{ 200, 128 + (2*16)	 , 0, 0, 0, (u_int8_t*)LT_MENU_NEW_InGameSound3 /*"bike engines  "		*/, 0, 0, &BikeEnginesOn,				(void*)ToggleBikeEngines,	SelectToggle,	DrawToggle,	nullptr, 0 },
+		{ 200, 128 + (2*16)	 , 0, 0, 0, (u_int8_t*)LT_MENU_NEW_InGameSound3 /*"bike engines  "		*/, 0, 0, &VideoOpts.BikeEnginesOn,				(void*)ToggleBikeEngines,	SelectToggle,	DrawToggle,	nullptr, 0 },
 		{ 200, 128 + (3*16)  , 0, 0, 0, (u_int8_t*)LT_MENU_NEW_InGameSound4 /*"biker volume  "		*/, 0, 0, &BikerSpeechSlider,			nullptr,						SelectSlider,	DrawSlider,		nullptr, 0 },
 		{ 200, 128 + (4*16)  , 0, 0, 0, (u_int8_t*)LT_MENU_NEW_InGameSound5 /*"bike computer "	*/, 0, 0, &BikeCompSpeechSlider,	nullptr,						SelectSlider,	DrawSlider,		nullptr, 0 },
 		{ 200, 128 + (5*16)  , 0, 0, 0, (u_int8_t*)LT_MENU_NEW_InGameSound6 /*"flag sfx "				*/, 0, 0, &FlagSfxSlider,					nullptr,						SelectSlider,	DrawSlider,		nullptr, 0 },
@@ -2287,9 +2283,9 @@ MENU	MENU_Visuals = {
 MENU	MENU_3DS_Visuals = {
 	(u_int8_t*)"3DS Visual Settings", nullptr, nullptr, nullptr, 0,
 	{
-		{ 200, 128 + ( 0*16 ), 0, 0, 0, (u_int8_t*)"Object shine",      0, 0, &g_object_shine,      nullptr, SelectToggle, DrawToggle, nullptr, 0 },
-		{ 200, 128 + ( 1*16 ), 0, 0, 0, (u_int8_t*)"Wall detail",       0, 0, &g_wall_detail,       nullptr, SelectToggle, DrawToggle, nullptr, 0 },
-		{ 200, 128 + ( 2*16 ), 0, 0, 0, (u_int8_t*)"Invert 3D depth",   0, 0, &g_stereo_invert,     nullptr, SelectToggle, DrawToggle, nullptr, 0 },
+		{ 200, 128 + ( 0*16 ), 0, 0, 0, (u_int8_t*)"Object shine",      0, 0, &VideoOpts.g_object_shine,      nullptr, SelectToggle, DrawToggle, nullptr, 0 },
+		{ 200, 128 + ( 1*16 ), 0, 0, 0, (u_int8_t*)"Wall detail",       0, 0, &VideoOpts.g_wall_detail,       nullptr, SelectToggle, DrawToggle, nullptr, 0 },
+		{ 200, 128 + ( 2*16 ), 0, 0, 0, (u_int8_t*)"Invert 3D depth",   0, 0, &VideoOpts.g_stereo_invert,     nullptr, SelectToggle, DrawToggle, nullptr, 0 },
 		{ -1 , -1, 0, 0, 0, (u_int8_t*)"" , 0, 0, nullptr, nullptr , nullptr , nullptr, nullptr, 0 }
 	}
 };
@@ -7724,14 +7720,14 @@ void GetGamePrefs( void )
 
 	// booleans
 
-	TintBikeTeamColor                = config_get_bool( "TintBikeTeamColor",		true );
+	VideoOpts.TintBikeTeamColor                = config_get_bool( "TintBikeTeamColor",		true );
 	MyResetKillsPerLevel             = config_get_bool( "ResetKillsPerLevel",		false );
-	MyBrightShips                    = config_get_bool( "BrightShips",				false );
+	VideoOpts.MyBrightShips                    = config_get_bool( "BrightShips",				false );
 	MyRandomPickups                  = config_get_bool( "RandomPickups",			false );
 
-	MissileCameraEnable              = config_get_bool( "MissileCameraEnable",		true );
+	VideoOpts.MissileCameraEnable              = config_get_bool( "MissileCameraEnable",		true );
 	RearCameraActive                 = config_get_bool( "RearCameraActive",			true );
-	BikeEnginesOn                    = config_get_bool( "BikeEnginesOn",			true );
+	VideoOpts.BikeEnginesOn                    = config_get_bool( "BikeEnginesOn",			true );
 	ShowWeaponsPossessedOnHUD		 = config_get_bool( "ShowWeaponsPossessedOnHUD", false );
 	JoystickInput					 = config_get_bool( "JoystickInput", true );
 	ShowClockOnHUD				     = config_get_bool( "ShowClockOnHUD", true );
@@ -7742,7 +7738,7 @@ void GetGamePrefs( void )
 	ShowPlayerHealthAboveBikes       = config_get_bool( "ShowPlayerHealthAboveBikes", true );
 	ShowPlayerHealthByScores         = config_get_bool( "ShowPlayerHealthByScores", true );
 	ScaleFontPlayerHealthAboveBikes  = config_get_bool( "ScaleFontPlayerHealthAboveBikes", true );
-	BikeExhausts                     = config_get_bool( "BikeExhausts",				true );
+	VideoOpts.BikeExhausts                     = config_get_bool( "BikeExhausts",				true );
 	BountyBonus                      = config_get_bool( "BountyBonus",				true );
 	MyUseShortPackets                = config_get_bool( "UseShortPackets",			true );
 	ShowTeamInfo                     = config_get_bool( "ShowTeamInfo",				true );
@@ -7855,9 +7851,9 @@ void GetGamePrefs( void )
 	CLAMP( GameType, MAX_GAMETYPE );
 
 #ifdef __3DS__
-	g_object_shine      = config_get_bool( "ObjectShine",     true );
-	g_wall_detail       = config_get_bool( "WallDetail",      true );
-	g_stereo_invert     = config_get_bool( "Invert3D",        false );
+	VideoOpts.g_object_shine      = config_get_bool( "ObjectShine",     true );
+	VideoOpts.g_wall_detail       = config_get_bool( "WallDetail",      true );
+	VideoOpts.g_stereo_invert     = config_get_bool( "Invert3D",        false );
 #endif
 
 	// Stereo options
@@ -7872,7 +7868,7 @@ void GetGamePrefs( void )
 	StereoModeSlider.value = render_info.stereo_mode;
 
 	// use original textures if requested and textures/original folder exists
-	use_original_textures = config_get_bool( "UseOriginalTextures", false );
+	VideoOpts.use_original_textures = config_get_bool( "UseOriginalTextures", false );
 }
 
 /*===================================================================
@@ -7896,12 +7892,12 @@ void SetGamePrefs( void )
 
 	// booleans
 
-	config_set_bool( "TintBikeTeamColor",     TintBikeTeamColor );
+	config_set_bool( "TintBikeTeamColor",     VideoOpts.TintBikeTeamColor );
 	config_set_bool( "ResetKillsPerLevel",		MyResetKillsPerLevel );
-	config_set_bool( "BrightShips",			MyBrightShips );
-	config_set_bool( "MissileCameraEnable",		MissileCameraEnable );
+	config_set_bool( "BrightShips",			VideoOpts.MyBrightShips );
+	config_set_bool( "MissileCameraEnable",		VideoOpts.MissileCameraEnable );
 	config_set_bool( "RearCameraActive",		RearCameraActive );
-	config_set_bool( "BikeEnginesOn",		BikeEnginesOn );
+	config_set_bool( "BikeEnginesOn",		VideoOpts.BikeEnginesOn );
 	config_set_bool( "ShowWeaponsPossessedOnHUD", ShowWeaponsPossessedOnHUD );
 	config_set_bool( "JoystickInput", JoystickInput );
 	config_set_bool( "ShowClockOnHUD", ShowClockOnHUD );
@@ -7912,7 +7908,7 @@ void SetGamePrefs( void )
 	config_set_bool( "ShowPlayerHealthAboveBikes", ShowPlayerHealthAboveBikes );
 	config_set_bool( "ShowPlayerHealthByScores", ShowPlayerHealthByScores );
 	config_set_bool( "ScaleFontPlayerHealthAboveBikes", ScaleFontPlayerHealthAboveBikes );
-	config_set_bool( "BikeExhausts",		BikeExhausts );
+	config_set_bool( "BikeExhausts",		VideoOpts.BikeExhausts );
 	config_set_bool( "BountyBonus",			BountyBonus );
 	config_set_bool( "RandomPickups",		MyRandomPickups );
 	config_set_bool( "UseShortPackets",		MyUseShortPackets );
@@ -7987,9 +7983,9 @@ void SetGamePrefs( void )
 	config_set_float( "StereoRightColor",		render_info.stereo_right_color );
 
 #ifdef __3DS__
-	config_set_bool( "ObjectShine",     g_object_shine );
-	config_set_bool( "WallDetail",      g_wall_detail );
-	config_set_bool( "Invert3D",        g_stereo_invert );
+	config_set_bool( "ObjectShine",     VideoOpts.g_object_shine );
+	config_set_bool( "WallDetail",      VideoOpts.g_wall_detail );
+	config_set_bool( "Invert3D",        VideoOpts.g_stereo_invert );
 #endif
 
 	config_save();
@@ -12790,13 +12786,13 @@ bool SetWaterDetail( SLIDER *slider )
 	switch( slider->value )
 	{
 	case 1:
-		WATER_CELLSIZE = 128.0F;
+		VideoOpts.WATER_CELLSIZE = 128.0F;
 		break;
 	case 2:
-		WATER_CELLSIZE = 64.0F;
+		VideoOpts.WATER_CELLSIZE = 64.0F;
 		break;
 	default:
-		WATER_CELLSIZE = 64.0F;
+		VideoOpts.WATER_CELLSIZE = 64.0F;
 	}
 
 	return true;

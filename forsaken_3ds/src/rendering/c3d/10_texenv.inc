@@ -132,10 +132,10 @@ void TexEnvState::apply_for_texture(texture_t *texdata)
 	 * both, but the object toggle wraps narrow draw_object call sites
 	 * while AUX is the fall-through path for level-mesh draws. */
 	texenv_mode_t mode;
-	if (objProcTexOn && objLightReady && g_object_shine &&
+	if (objProcTexOn && objLightReady && VideoOpts.g_object_shine &&
 		objShineEligible)
 		mode = TEXENV_MODE_OBJECT;
-	else if (procTexReady && g_wall_detail && !isOrthoDraw &&
+	else if (procTexReady && VideoOpts.g_wall_detail && !isOrthoDraw &&
 			 !skipAuxProcTex)
 		mode = TEXENV_MODE_AUX;
 	else

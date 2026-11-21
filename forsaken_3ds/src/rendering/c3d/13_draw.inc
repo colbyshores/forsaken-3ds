@@ -193,7 +193,7 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 	 * sample the lit ambient at the object's world position and blend
 	 * with the dominant nearby XLight to drive the Phong specular hue.
 	 * world_matrix's translation row holds the object's world pos. */
-	if (g_texenv.objProcTexOn && g_texenv.objLightReady && g_object_shine &&
+	if (g_texenv.objProcTexOn && g_texenv.objLightReady && VideoOpts.g_object_shine &&
 		g_texenv.objShineEligible && !orthographic) {
 		VECTOR pos;
 		pos.x = world_matrix._41;

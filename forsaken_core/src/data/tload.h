@@ -71,8 +71,6 @@ int16_t	FindTexture( TLOADHEADER * Tloadheader , const char * Name );
 
 bool TloadReloadPlaceHolder( TLOADHEADER *Tloadheader, int16_t n );
 
-extern bool use_original_textures;
-
 /* Defined in tload.cpp; shared with the modules that use it. */
 extern TLOADHEADER Tloadheader;
 extern double Gamma;

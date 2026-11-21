@@ -368,6 +368,25 @@ bool draw_2d_object(RENDEROBJECT *renderObject);
 
 void FSReleaseRenderObject(RENDEROBJECT *renderObject);
 
+/* The video and visual settings. Plain public fields, one instance. The
+   menus keep &VideoOpts.<Field> in their item tables, so every field's type
+   is the type the toggle writes. Defined in title.cpp. */
+struct VideoOptions {
+	bool BrightShips = false;			// the in-game value, copied from MyBrightShips
+	bool MyBrightShips = false;			// the menu's own copy (BrightShips in the config)
+	bool BikeExhausts = false;
+	bool BikeEnginesOn = false;
+	bool TintBikeTeamColor = false;
+	bool MissileCameraEnable = false;
+	bool use_original_textures = false;	// UseOriginalTextures in the config
+	bool g_object_shine = true;			// Phong specular on models (citro3d)
+	bool g_wall_detail = true;			// ProcTex grain on walls (citro3d)
+	float UV_Fix = 0.5F;				// texel inset mload applies to level UVs (UVFix: on the command line)
+	float WATER_CELLSIZE = 64.0F;		// world units between water surface vertices
+	bool g_stereo_invert = false;		// flips the per-eye parallax sign (Invert3D in the config)
+};
+extern VideoOptions VideoOpts;
+
 #ifdef __3DS__
 /* Citro3D backend extensions (render_c3d.cpp). Material-class switches set
    per draw by the model paths, and the Visuals menu toggles behind them
@@ -382,8 +401,6 @@ void c3d_clear_bottom_screen(void);
 bool c3d_hud_begin_bottom(void);			/* route HUD draws to the bottom screen */
 void c3d_hud_end_bottom(void);
 int forsaken_get_fps(void);
-extern bool g_object_shine;
-extern bool g_wall_detail;
 #endif
 
 

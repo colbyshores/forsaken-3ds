@@ -6,7 +6,7 @@
  * file, WaterLoad builds the objects later in the load) and the per-group
  * tables GroupWaterInfo (WATERSTATE_*), GroupWaterLevel (world Y of the
  * surface) and the tint colours, all private to WaterSurfaces. A surface
- * is an XVerts x YVerts grid WATER_CELLSIZE world units apart, capped at
+ * is an XVerts x YVerts grid VideoOpts.WATER_CELLSIZE world units apart, capped at
  * MAXMESHX * MAXMESHY cells;
  * Verts and Vels are per-vertex Y offsets and velocities. offset moves
  * between MinLevel and MaxLevel at FillRate / DrainRate (file rates / 60,
@@ -101,9 +101,6 @@ bool SingleWaterObjectCollide( WATEROBJECT * Wo, VECTOR *Origin, VECTOR *Offset,
 bool InWater( u_int16_t group , VECTOR *OrgPos , float * Damage);
 bool WaterObjectCollide( u_int16_t group , VECTOR *Origin, VECTOR *Offset, VECTOR *CollidePos , float Damage );
 void GetWaterColour( u_int16_t Group, u_int8_t * Red, u_int8_t * Green, u_int8_t * Blue );
-
-/* Defined in water.cpp; shared with the modules that use it. */
-extern float WATER_CELLSIZE;
 
 /* The level's water surfaces (one instance, Water): the WATEROBJECT array
  * and its count, each group's chain of surfaces and its damage rate, each

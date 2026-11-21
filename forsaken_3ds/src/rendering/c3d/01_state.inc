@@ -51,11 +51,9 @@ enum material_class_t {
 /* The per-class ProcTex tables live in TexEnvState (03_context.inc). */
 
 /* User-toggleable graphics features (persisted via title.cpp's config_*).
- * TexEnvState::apply_for_texture reads these per draw: g_object_shine
- * enables the OBJECT mode (Phong specular on models), g_wall_detail the AUX
+ * TexEnvState::apply_for_texture reads these per draw: VideoOpts.g_object_shine
+ * enables the OBJECT mode (Phong specular on models), VideoOpts.g_wall_detail the AUX
  * mode (ProcTex grain ADD_SIGNED onto walls). Both default true. */
-bool g_object_shine = true;
-bool g_wall_detail  = true;
 
 /* Color write mask — always GPU_WRITE_ALL on citro3d (software anaglyph
  * removed; hardware stereo uses separate render targets instead). */

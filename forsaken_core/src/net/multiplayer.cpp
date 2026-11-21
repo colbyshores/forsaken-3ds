@@ -40,7 +40,6 @@
  */
 
 bool ResetKillsPerLevel;
-bool TintBikeTeamColor;
 bool MyResetKillsPerLevel;
 bool IpOnCLI = false;
 
@@ -261,7 +260,7 @@ void StartAHostSession ( MENUITEM * Item )
 
 
 
-	BrightShips = MyBrightShips;
+	VideoOpts.BrightShips = VideoOpts.MyBrightShips;
 
 	return;
 }

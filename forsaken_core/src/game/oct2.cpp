@@ -657,7 +657,7 @@ void SetViewportError( const char *where, render_viewport_t *vp )
 
 	// F5
 	if ( input_buffer_find( SDLK_F5 ) )
-		MissileCameraEnable = !MissileCameraEnable;
+		VideoOpts.MissileCameraEnable = !VideoOpts.MissileCameraEnable;
 
 	// F6
 	if ( input_buffer_find( SDLK_F6 ) )
@@ -3291,7 +3291,6 @@ void CheckLevelEnd ( void )
  * touching the eye->panel (GFX_LEFT/RIGHT) mapping. Default false = the
  * shipped behaviour. Defined here (always compiled) so the flip works for
  * every stereo mode; the toggle UI is citro3d-only. */
-bool g_stereo_invert = false;
 
 /* The group an eye is in: walk its offset from the camera through the
    portals. Each eye sits half the eye separation to the camera's side; near
@@ -3321,7 +3320,7 @@ bool RenderCurrentCameraInStereo( RenderCurrentCameraPt render_camera )
 	 * Do NOT use ApplyMatrix — it adds _41/_42/_43 (world translation). */
 	{
 		float half_sep = render_info.stereo_eye_sep / 2.0f;
-		if (g_stereo_invert) half_sep = -half_sep;  /* pop-out <-> depth */
+		if (VideoOpts.g_stereo_invert) half_sep = -half_sep;  /* pop-out <-> depth */
 		cam_offset.x = CurrentCamera.Mat._11 * half_sep;
 		cam_offset.y = CurrentCamera.Mat._12 * half_sep;
 		cam_offset.z = CurrentCamera.Mat._13 * half_sep;
@@ -3502,7 +3501,7 @@ bool RenderCurrentCameraWithMainGameMenu(void)
 	 * dispatcher's per-eye position offset math (applied to
 	 * CurrentCamera.Pos) uses the SHIP's matrix between eye calls,
 	 * not the leftover missile state from this block. */
-	if( ActiveRemoteCamera || (MissileCameraActive && MissileCameraEnable) )
+	if( ActiveRemoteCamera || (MissileCameraActive && VideoOpts.MissileCameraEnable) )
 	{
 		CAMERA saved_camera = CurrentCamera;
 		CamRendering saved_cam_rendering = CameraRendering;
@@ -3877,7 +3876,7 @@ bool MainGame( void )
 
 	InitIndirectVisible( Ships[Current_Camera_View].Object.Group );
 
-	if( ActiveRemoteCamera || (MissileCameraActive && MissileCameraEnable) )
+	if( ActiveRemoteCamera || (MissileCameraActive && VideoOpts.MissileCameraEnable) )
 		AddIndirectVisible( (u_int16_t) ( ( ActiveRemoteCamera ) ? ActiveRemoteCamera->Group : SecBulls[ CameraMissile ].GroupImIn ) );
 
 	MainRoutines();

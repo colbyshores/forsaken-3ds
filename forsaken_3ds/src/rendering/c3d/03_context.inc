@@ -113,7 +113,7 @@ class TexEnvState {
 	/* Per-mesh ProcTex phase variation. draw_render_object writes a
 	 * per-renderObject seed; apply_for_texture reads it to pick a
 	 * phase bucket so two adjacent walls sharing the same base texture
-	 * get visually distinct grain. Folded into g_wall_detail — there's no
+	 * get visually distinct grain. Folded into VideoOpts.g_wall_detail — there's no
 	 * scenario where you'd want detail-grain on but the repeating version. */
 	u32  atlasSeed        = 0;
 	int  lastMatClass     = -1;

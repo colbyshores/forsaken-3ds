@@ -37,7 +37,6 @@ constexpr int WAT_VERSION_NUMBER = 1;
 /*===================================================================
 		Globals...
 ===================================================================*/
-float WATER_CELLSIZE = 64.0F;
 
 void DisplayWaterObject(WATEROBJECT * WO);
 
@@ -204,7 +203,7 @@ bool WaterSurfaces::load()
 		WO->Group = in.u16();
 		WO->Pos = in.vec();
 		WO->offset = 0.0F;
-		GroupWaterLevel[WO->Group] = WO->Pos.y + WATER_CELLSIZE;
+		GroupWaterLevel[WO->Group] = WO->Pos.y + VideoOpts.WATER_CELLSIZE;
 		WO->XSize = in.f32();
 		WO->YSize = in.f32();
 		WO->uTL = in.f32();
@@ -215,14 +214,14 @@ bool WaterSurfaces::load()
 		WO->uRange = WO->uBR - WO->uTL;
 		WO->vRange = WO->vBR - WO->vTL;
 
-		WO->XVerts = ((int) (WO->XSize / WATER_CELLSIZE))+1;
-		WO->YVerts = ((int) (WO->YSize / WATER_CELLSIZE))+1;
+		WO->XVerts = ((int) (WO->XSize / VideoOpts.WATER_CELLSIZE))+1;
+		WO->YVerts = ((int) (WO->YSize / VideoOpts.WATER_CELLSIZE))+1;
 
 		if ( WO->XVerts < 1 || WO->YVerts < 1 )
 		{
 			DebugPrintf("Not loading water, either xVerts or yVerts was less than 1\n");
 			DebugPrintf("xVerts=%d, yVerts=%d, xSize=%d, ySize=%d, cellSize=%d\n",
-				WO->XVerts,WO->YVerts,WO->XSize,WO->YSize,WATER_CELLSIZE);
+				WO->XVerts,WO->YVerts,WO->XSize,WO->YSize,VideoOpts.WATER_CELLSIZE);
 			goto load_fail;
 		}
 
@@ -385,8 +384,8 @@ bool WaterSurfaces::init_object(WATEROBJECT * WO)
 	{
 		for( y = 0 ; y < WO->YVerts ; y++ )
 		{
-			LVert->x = -( ((WO->XVerts-1) * WATER_CELLSIZE ) * 0.5F ) + (x*WATER_CELLSIZE);
-			LVert->z = -( ((WO->YVerts-1) * WATER_CELLSIZE ) * 0.5F ) + (y*WATER_CELLSIZE);
+			LVert->x = -( ((WO->XVerts-1) * VideoOpts.WATER_CELLSIZE ) * 0.5F ) + (x*VideoOpts.WATER_CELLSIZE);
+			LVert->z = -( ((WO->YVerts-1) * VideoOpts.WATER_CELLSIZE ) * 0.5F ) + (y*VideoOpts.WATER_CELLSIZE);
 			LVert->y = 0.0F;
 			LVert->tu = 0.0F;
 			LVert->tv = 0.0F;
@@ -726,8 +725,8 @@ bool WaterSurfaces::single_collide( WATEROBJECT * Wo, VECTOR *Origin, VECTOR *Of
 
 	// ideally, now we'd use the WaterNormal (and other parameters, such as water orientation in the plane)
 	// to find out the correct WaterX and Y positions.  for now, though... [assuming WaterNormal is (0,1,0)]
-	WaterX = ( Delta.x + ( (Wo->XVerts * WATER_CELLSIZE ) * 0.5F ) ) / WATER_CELLSIZE;
-	WaterY = ( Delta.z + ( (Wo->YVerts * WATER_CELLSIZE ) * 0.5F ) ) / WATER_CELLSIZE;
+	WaterX = ( Delta.x + ( (Wo->XVerts * VideoOpts.WATER_CELLSIZE ) * 0.5F ) ) / VideoOpts.WATER_CELLSIZE;
+	WaterY = ( Delta.z + ( (Wo->YVerts * VideoOpts.WATER_CELLSIZE ) * 0.5F ) ) / VideoOpts.WATER_CELLSIZE;
 
 
 	IWaterX = (int) floorf( WaterX );
@@ -826,7 +825,7 @@ void WaterSurfaces::process()
 				if( WO->Trigger_WhenDrained != 0xffff )
 					ApplyTriggerMod( &TrigMods[WO->Trigger_WhenDrained] );
 			}
-			GroupWaterLevel[WO->Group] = WO->Pos.y + WO->offset + WATER_CELLSIZE;
+			GroupWaterLevel[WO->Group] = WO->Pos.y + WO->offset + VideoOpts.WATER_CELLSIZE;
 		}else if( WO->Status == WaterStatus::Filling )
 		{
 
@@ -838,7 +837,7 @@ void WaterSurfaces::process()
 				if( WO->Trigger_WhenFilled != 0xffff )
 					ApplyTriggerMod( &TrigMods[WO->Trigger_WhenFilled] );
 			}
-			GroupWaterLevel[WO->Group] = WO->Pos.y + WO->offset + WATER_CELLSIZE;
+			GroupWaterLevel[WO->Group] = WO->Pos.y + WO->offset + VideoOpts.WATER_CELLSIZE;
 		}
 
 		WO++;

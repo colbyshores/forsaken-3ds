@@ -22,6 +22,7 @@
 #include "game/primary.h"
 #include "game/enemies.h"
 #include "ui/title.h"
+#include "rendering/render.h"
 #include "rendering/text.h"
 #include "rendering/lines.h"
 #include "rendering/2dpolys.h"
@@ -2164,11 +2165,11 @@ VECTOR ModelPool::BloodOffsets[] = {
 				break;
 
 			case SPOTFX_BeardAfterburner:
-				if( BikeExhausts ) CreateSpotFXBeardAfterburner( &Pos, &DirVector, SpotFXGroup, Speed );
+				if( VideoOpts.BikeExhausts ) CreateSpotFXBeardAfterburner( &Pos, &DirVector, SpotFXGroup, Speed );
 				break;
 
 			case SPOTFX_Hk5Afterburner:
-				if( BikeExhausts ) CreateSpotFXHk5Afterburner( &Pos, &DirVector, SpotFXGroup, ShipSpeed, 32, 32, 128 );
+				if( VideoOpts.BikeExhausts ) CreateSpotFXHk5Afterburner( &Pos, &DirVector, SpotFXGroup, ShipSpeed, 32, 32, 128 );
 				break;
 
 			case SPOTFX_SoundFX:
@@ -2299,67 +2300,67 @@ VECTOR ModelPool::BloodOffsets[] = {
 			break;
 
 		case SPOTFX_BorgAfterburner:
-			if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
+			if( VideoOpts.BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
 			break;
 
 		case SPOTFX_ExcopAfterburner:
-			if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
+			if( VideoOpts.BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
 			break;
 
 		case SPOTFX_TruckerAfterburner:
-			if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
+			if( VideoOpts.BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
 			break;
 
 		case SPOTFX_NubiaAfterburner:
-			if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
+			if( VideoOpts.BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
 			break;
 
 		case SPOTFX_CerberoAfterburner:
-			if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
+			if( VideoOpts.BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
 			break;
 
 		case SPOTFX_FoetoidAfterburner:
-			if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
+			if( VideoOpts.BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
 			break;
 
 		case SPOTFX_FoetoidSmallAfterburner:
-			if( BikeExhausts ) CreateSpotFXSmallAfterburner( &Pos, SpotFXGroup, ShipSpeed );
+			if( VideoOpts.BikeExhausts ) CreateSpotFXSmallAfterburner( &Pos, SpotFXGroup, ShipSpeed );
 			break;
 
 		case SPOTFX_JapBirdAfterburner:
-			if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
+			if( VideoOpts.BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
 			break;
 
 		case SPOTFX_JoAfterburner:
-			if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
+			if( VideoOpts.BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
 			break;
 
 		case SPOTFX_JoSmallAfterburner:
-			if( BikeExhausts ) CreateSpotFXSmallAfterburner( &Pos, SpotFXGroup, ShipSpeed );
+			if( VideoOpts.BikeExhausts ) CreateSpotFXSmallAfterburner( &Pos, SpotFXGroup, ShipSpeed );
 			break;
 
 		case SPOTFX_LaJayAfterburner:
-			if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
+			if( VideoOpts.BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
 			break;
 
 		case SPOTFX_MofistoAfterburner:
-			if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
+			if( VideoOpts.BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
 			break;
 
 		case SPOTFX_NutterAfterburner:
-			if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
+			if( VideoOpts.BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
 			break;
 
 		case SPOTFX_RhesusAfterburner:
-			if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
+			if( VideoOpts.BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
 			break;
 
 		case SPOTFX_SharkAfterburner:
-			if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
+			if( VideoOpts.BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
 			break;
 
 		case SPOTFX_SlickAfterburner:
-			if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
+			if( VideoOpts.BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
 			break;
 
 		default:
@@ -5066,7 +5067,7 @@ void UpdateShipModel( u_int16_t Ship )
 		}
 	}
 
-	if( TeamGame && TintBikeTeamColor && Ships[Ship].enable )
+	if( TeamGame && VideoOpts.TintBikeTeamColor && Ships[Ship].enable )
 	{
 		int team = TeamNumber[Ship]; if(team >= MAX_TEAMS || team < 0) return;
 		int color = TeamCol[team]; if(color >= MAXFONTCOLOURS || color < 0) return;
@@ -5694,7 +5695,7 @@ void ModelPool::check_link_list()
 ===================================================================*/
 bool EngineEnabled( u_int16_t OwnerType, u_int16_t Owner )
 {
-	if( BikeEnginesOn ) return( true );
+	if( VideoOpts.BikeEnginesOn ) return( true );
 	if( ( OwnerType != OWNER_SHIP ) || ( Owner >= MAX_PLAYERS ) ) return( true );
 	return( false );
 }

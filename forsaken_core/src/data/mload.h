@@ -253,7 +253,6 @@ extern FILE *SaveTextureAnimations( FILE *f );
 extern float SoundInfo[ MAXGROUPS ][ MAXGROUPS ];
 void FixUV( TRIANGLE *Tri, LVERTEX *Vert, u_int16_t Tpage, LVERTEX *Orig_Vert );
 void FixUV_Anim( POLYANIM *PolyAnim, LVERTEX *Vert, LVERTEX *Orig_Vert );
-extern float UV_Fix;
 void InitSoundInfo( MLOADHEADER * Mloadheader );
 extern u_int16_t num_start_positions;
 extern GAMESTARTPOS StartPositions[ MAXSTARTPOSITIONS ];

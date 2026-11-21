@@ -27,7 +27,7 @@
  * The PC build lights on the CPU.
  *
  * FindNearestCellColour samples the level's baked colour grid at a point
- * (alpha 0; halved while BrightShips is on in STATUS_Normal).
+ * (alpha 0; halved while VideoOpts.BrightShips is on in STATUS_Normal).
  */
 
 #include <math.h>
