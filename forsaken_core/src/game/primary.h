@@ -317,7 +317,6 @@ extern float NmeDamageModifier;
 extern int32_t ColPerspective;
 extern float GlobalFramelagAddition;
 extern int8_t PrimaryToFireLookup[ MAXPRIMARYWEAPONS ];
-extern bool PrimaryWeaponCheat;
 extern int32_t MyColPerspective;
 extern const char *PrimaryDescription[ MAXPRIMARYWEAPONS ];
 extern bool PrimaryValid[ MAXPRIMARYWEAPONS ];

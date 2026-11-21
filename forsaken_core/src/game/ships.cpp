@@ -865,7 +865,7 @@ void (* ShipUpdate::RemoteCameraModeControl[ ])( GLOBALSHIP * ShipPnt , BYTE i )
 
 		if ( ( control.turbo || ( !control.forward && ShipObjPnt->CruiseControl == CRUISE_NITRO ) ) && NitroFuel > 0.0F )
 		{
-			if( !GodMode && !( ShipObjPnt->Flags & SHIP_SuperNashram ) )
+			if( !CheatFlags.GodMode && !( ShipObjPnt->Flags & SHIP_SuperNashram ) )
 			{
 				if( NitroFuel <= ( NITROLOSS * framelag ) )
 				{
@@ -1203,7 +1203,7 @@ bool ShipUpdate::process()
 				}
 
 
-				if( !GodMode )
+				if( !CheatFlags.GodMode )
 				{
 					if( ShipPnt->InvulTimer != 0.0F )
 					{
@@ -1610,7 +1610,7 @@ int16_t ShipUpdate::do_damage( bool OverrideInvul )
 
 	Message[ 0 ] = 0;
 
-	if( GodMode ) return 0;
+	if( CheatFlags.GodMode ) return 0;
 	if( Ships[ WhoIAm ].Invul && !OverrideInvul && GameStatus[ WhoIAm ] == STATUS_SinglePlayer ) return 0;
 
 	if( Ships[WhoIAm].Object.Mode == NORMAL_MODE )
@@ -2113,7 +2113,7 @@ void ShipMode1( GLOBALSHIP * ShipPnt , BYTE i )
 void ShipMode2( GLOBALSHIP * ShipPnt , BYTE i )
 {
 	input_grab(false);
-	if( GodMode )
+	if( CheatFlags.GodMode )
 	{
 		Current_Camera_View = WhoIAm;		// set it back to me...
 		Ships[MAX_PLAYERS].enable = 0;		// Turn Off the remote camera...

@@ -927,7 +927,7 @@ void DestroyGame( void )
 
 		KillOwnersSecBulls( WhoIAm );
 
-		if( GodMode ) LoseAllWeapons();
+		if( CheatFlags.GodMode ) LoseAllWeapons();
 
 		ScatterWeapons( &DirVector, MAXPICKUPS );
 		RegeneratePickups();
@@ -2098,7 +2098,7 @@ void ReceiveGameMessages( void )
 				switch( ColPerspective )
 				{
 				case COLPERS_Forsaken:
-					if( !GodMode )
+					if( !CheatFlags.GodMode )
 					{
 						ScatterWeapons( &NullVector, MAXSCATTERED );
 						PlayPannedSfx( SFX_Scattered, Ships[ WhoIAm ].Object.Group , &Ships[ WhoIAm ].Object.Pos, 0.0F );
@@ -2170,7 +2170,7 @@ void ReceiveGameMessages( void )
 		{
 			if( TeamNumber[ShipDiedMsg->WhoIAm] == TeamNumber[WhoIAm] )
 			{
-				if( !GodMode )
+				if( !CheatFlags.GodMode )
 				{
 					// you killed someone on your own team
 					AddColourMessageToQue( KillMessageColour, "%s %s %s %s" " %s",
@@ -2208,7 +2208,7 @@ void ReceiveGameMessages( void )
 							Names[ ShipDiedMsg->WhoIAm ] );
 					}
 				}
-				else if( !GodMode )
+				else if( !CheatFlags.GodMode )
 					// any other team game
 				{
 					// you killed someone in a team game
@@ -2250,7 +2250,7 @@ void ReceiveGameMessages( void )
 				}
 			}
 			// not a team game or bounty hunt
-			else if( !GodMode )
+			else if( !CheatFlags.GodMode )
 			{
 				// you killed someone
 				AddColourMessageToQue( KillMessageColour, "%s %s %s" "%s", "YOU KILLED", &Names[ShipDiedMsg->WhoIAm][0], "WITH ", &methodstr[0] );

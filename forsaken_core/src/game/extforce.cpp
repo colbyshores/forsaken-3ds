@@ -249,7 +249,7 @@ bool ExternalForceSet::area_check( VECTOR * OldPos , VECTOR * NewPos , u_int16_t
 				switch( EFpnt->ForceType )
 				{
 				case EXTERNALFORCETYPE_Shield:
-					if( !GodMode )
+					if( !CheatFlags.GodMode )
 					{
 						*Shield += (Force * framelag);
 					}

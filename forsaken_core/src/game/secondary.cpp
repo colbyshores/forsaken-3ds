@@ -149,7 +149,6 @@ int8_t SecondaryToFireLookup[ MAXSECONDARYWEAPONS ] = {
 	SPIDERMINE,
 };
 
-bool	SecondaryWeaponCheat = false;
 
 
 SECONDARYWEAPONATTRIB	SecondaryWeaponAttribs[ TOTALSECONDARYWEAPONS ] = {
@@ -1050,7 +1049,7 @@ void SecondaryWeapons::FireSecondarySelect( int16_t & OnceOnlyFlag )
 			{
 				if( !OnceOnlyFlag )
 				{
-					if( SecondaryWeaponCheat )
+					if( CheatFlags.SecondaryWeaponCheat )
 					{
 						if( Ships[ WhoIAm ].Secondary == ( control.select_secondary - 1 ) )
 						{
@@ -1448,7 +1447,7 @@ u_int16_t	SecondaryWeapons::init_one( u_int16_t OwnerType, u_int16_t Owner, u_in
 		{
 			if( SecBulls[i].SecType != SEC_XMISSILE )
 			{
-				if( !GodMode )
+				if( !CheatFlags.GodMode )
 				{
 					int8_t TempWeapon = ConvSecToNormWeapon( Weapon );
 					if( TempWeapon < MAXSECONDARYWEAPONS )
@@ -2662,7 +2661,7 @@ bool ProcessMines( u_int16_t i )
 			case COLPERS_Descent:
 				if( HitTarget == WhoIAm )
 				{
-					if( !GodMode )
+					if( !CheatFlags.GodMode )
 					{
 						TempVector.x = ( Ships[ SecBulls[ i ].Owner ].Object.Pos.x - Ships[ WhoIAm ].Object.Pos.x );
 						TempVector.y = ( Ships[ SecBulls[ i ].Owner ].Object.Pos.y - Ships[ WhoIAm ].Object.Pos.y );

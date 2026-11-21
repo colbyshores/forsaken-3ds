@@ -315,7 +315,7 @@ bool InGameLoad( MENUITEM * /*MenuItem*/ )
 		fp = LoadAllText( fp );
 		if( !load_ok( fp ) ) return false;
 
-		file_read( &Cheated, sizeof( bool ), 1, fp );
+		file_read( &CheatFlags.Cheated, sizeof( bool ), 1, fp );
 		if( !load_ok( fp ) ) return false;
 
 		DebugPrintf( "Loaded OK\n" );
@@ -506,7 +506,7 @@ bool InGameSave( MENUITEM * /*MenuItem*/ )
 		fp = SaveAllText( fp );
 		if( !fp ) goto fail;
 
-		fwrite( &Cheated, sizeof( bool ), 1, fp );
+		fwrite( &CheatFlags.Cheated, sizeof( bool ), 1, fp );
 
 		if( ferror( out ) )
 			goto fail;

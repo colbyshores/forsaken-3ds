@@ -148,7 +148,6 @@ int8_t PrimaryToFireLookup[ MAXPRIMARYWEAPONS ] = {
 	LASER,
 };
 
-bool	PrimaryWeaponCheat = false;
 
 PRIMARYWEAPONATTRIB	PrimaryWeaponAttribs[ TOTALPRIMARYWEAPONS ] = {
 
@@ -790,7 +789,7 @@ void PrimaryWeapons::FireShootTrojax( VECTOR & DownVector, VECTOR & LeftVector, 
 {
 	if( GeneralAmmo )
 	{
-		if( !GodMode && !( Ships[ WhoIAm ].Object.Flags & SHIP_SuperNashram ) )
+		if( !CheatFlags.GodMode && !( Ships[ WhoIAm ].Object.Flags & SHIP_SuperNashram ) )
 		{
 			Ammo = PrimaryWeaponAttribs[ Ships[ WhoIAm ].Primary ].AmmoUsage[ Ships[ WhoIAm ].Object.PowerLevel ] * framelag;
 			GeneralAmmoUsed += Ammo;
@@ -1145,7 +1144,7 @@ void PrimaryWeapons::FirePrimarySelect( int16_t & OnceOnlyFlag, float & Ammo )
 
 					OnceOnlyFlag = 1;
 
-					if( PrimaryWeaponCheat )
+					if( CheatFlags.PrimaryWeaponCheat )
 					{
 						if( Ships[ WhoIAm ].Primary == ( control.select_primary - 1 ) )
 						{
@@ -1243,7 +1242,7 @@ void PrimaryWeapons::FirePrimaryOrbitPulsars( VECTOR & Pos, VECTOR & UpVector, V
 
 					if( Model != INDEX_NONE )
 					{
-						if( !GodMode && !( Ships[ WhoIAm ].Object.Flags & SHIP_SuperNashram ) )
+						if( !CheatFlags.GodMode && !( Ships[ WhoIAm ].Object.Flags & SHIP_SuperNashram ) )
 						{
 							Ships[ WhoIAm ].OrbAmmo[ Count ] -= (float) PrimaryWeaponAttribs[ ORBITPULSAR ].AmmoUsage[ Ships[ WhoIAm ].Object.PowerLevel ];
 						}
@@ -1324,12 +1323,12 @@ void PrimaryWeapons::fire()
 
 	if( GodModeOnceOnly )
 	{
-		if( GodMode ) GivemeAllWeapons();
+		if( CheatFlags.GodMode ) GivemeAllWeapons();
 		GodModeOnceOnly = false;
 	}
 
 
-	if( !GodMode )
+	if( !CheatFlags.GodMode )
 	{
 		if( ( Ships[ WhoIAm ].Object.Flags & SHIP_SuperNashram ) )
 		{
@@ -3632,7 +3631,7 @@ u_int16_t PrimaryWeapons::init_one( u_int16_t OwnerType, u_int16_t OwnerID, u_in
 		case PULSAR:
 			if( ( OwnerType == OWNER_SHIP ) && ( OwnerID == WhoIAm ) )
 			{
-				if( !GodMode && !( Ships[ OwnerID ].Object.Flags & SHIP_SuperNashram ) )
+				if( !CheatFlags.GodMode && !( Ships[ OwnerID ].Object.Flags & SHIP_SuperNashram ) )
 				{
 					GeneralAmmoUsed += PrimaryWeaponAttribs[ Weapon ].AmmoUsage[ PowerLevel ];
 					GeneralAmmo -= PrimaryWeaponAttribs[ Weapon ].AmmoUsage[ PowerLevel ];
@@ -3853,7 +3852,7 @@ u_int16_t PrimaryWeapons::init_one( u_int16_t OwnerType, u_int16_t OwnerID, u_in
 		case PYROLITE_RIFLE:
 			if( ( OwnerType == OWNER_SHIP ) && ( OwnerID == WhoIAm ) )
 			{
-				if( !GodMode && !( Ships[ OwnerID ].Object.Flags & SHIP_SuperNashram ) )
+				if( !CheatFlags.GodMode && !( Ships[ OwnerID ].Object.Flags & SHIP_SuperNashram ) )
 				{
 					PyroliteAmmoUsed += PrimaryWeaponAttribs[ Weapon ].AmmoUsage[ PowerLevel ];
 					PyroliteAmmo -= PrimaryWeaponAttribs[ Weapon ].AmmoUsage[ PowerLevel ];
@@ -3918,7 +3917,7 @@ u_int16_t PrimaryWeapons::init_one( u_int16_t OwnerType, u_int16_t OwnerID, u_in
 
 			if( ( OwnerType == OWNER_SHIP ) && ( OwnerID == WhoIAm ) )
 			{
-				if( !GodMode && !( Ships[ OwnerID ].Object.Flags & SHIP_SuperNashram ) )
+				if( !CheatFlags.GodMode && !( Ships[ OwnerID ].Object.Flags & SHIP_SuperNashram ) )
 				{
 					if( MyGameStatus == STATUS_SinglePlayer )
 					{
@@ -4002,7 +4001,7 @@ u_int16_t PrimaryWeapons::init_one( u_int16_t OwnerType, u_int16_t OwnerID, u_in
 		case SUSS_GUN:
 			if( ( OwnerType == OWNER_SHIP ) && ( OwnerID == WhoIAm ) )
 			{
-				if( !GodMode && !( Ships[ OwnerID ].Object.Flags & SHIP_SuperNashram ) )
+				if( !CheatFlags.GodMode && !( Ships[ OwnerID ].Object.Flags & SHIP_SuperNashram ) )
 				{
 					SussGunAmmoUsed += PrimaryWeaponAttribs[ Weapon ].AmmoUsage[ PowerLevel ];
 					SussGunAmmo -= PrimaryWeaponAttribs[ Weapon ].AmmoUsage[ PowerLevel ];
@@ -4062,7 +4061,7 @@ u_int16_t PrimaryWeapons::init_one( u_int16_t OwnerType, u_int16_t OwnerID, u_in
 		case LASER:
 			if( ( OwnerType == OWNER_SHIP ) && ( OwnerID == WhoIAm ) )
 			{
-				if( !GodMode && !( Ships[ OwnerID ].Object.Flags & SHIP_SuperNashram ) )
+				if( !CheatFlags.GodMode && !( Ships[ OwnerID ].Object.Flags & SHIP_SuperNashram ) )
 				{
 					GeneralAmmoUsed += PrimaryWeaponAttribs[ Weapon ].AmmoUsage[ PowerLevel ];
 					GeneralAmmo -= PrimaryWeaponAttribs[ Weapon ].AmmoUsage[ PowerLevel ];
@@ -4245,7 +4244,7 @@ u_int16_t PrimaryWeapons::init_one( u_int16_t OwnerType, u_int16_t OwnerID, u_in
 		case NME_BULLET1:
 			if( ( OwnerType == OWNER_SHIP ) && ( OwnerID == WhoIAm ) )
 			{
-				if( !GodMode && !( Ships[ OwnerID ].Object.Flags & SHIP_SuperNashram ) )
+				if( !CheatFlags.GodMode && !( Ships[ OwnerID ].Object.Flags & SHIP_SuperNashram ) )
 				{
 					GeneralAmmoUsed += PrimaryWeaponAttribs[ Weapon ].AmmoUsage[ PowerLevel ];
 					GeneralAmmo -= PrimaryWeaponAttribs[ Weapon ].AmmoUsage[ PowerLevel ];
@@ -4312,7 +4311,7 @@ u_int16_t PrimaryWeapons::init_one( u_int16_t OwnerType, u_int16_t OwnerID, u_in
 		case NME_PULSAR:
 			if( ( OwnerType == OWNER_SHIP ) && ( OwnerID == WhoIAm ) )
 			{
-				if( !GodMode && !( Ships[ OwnerID ].Object.Flags & SHIP_SuperNashram ) )
+				if( !CheatFlags.GodMode && !( Ships[ OwnerID ].Object.Flags & SHIP_SuperNashram ) )
 				{
 					GeneralAmmoUsed += PrimaryWeaponAttribs[ Weapon ].AmmoUsage[ PowerLevel ];
 					GeneralAmmo -= PrimaryWeaponAttribs[ Weapon ].AmmoUsage[ PowerLevel ];
@@ -4516,7 +4515,7 @@ u_int16_t PrimaryWeapons::init_one( u_int16_t OwnerType, u_int16_t OwnerID, u_in
 		case NME_PYROLITE:
 			if( ( OwnerType == OWNER_SHIP ) && ( OwnerID == WhoIAm ) )
 			{
-				if( !GodMode && !( Ships[ OwnerID ].Object.Flags & SHIP_SuperNashram ) )
+				if( !CheatFlags.GodMode && !( Ships[ OwnerID ].Object.Flags & SHIP_SuperNashram ) )
 				{
 					PyroliteAmmoUsed += PrimaryWeaponAttribs[ Weapon ].AmmoUsage[ PowerLevel ];
 					PyroliteAmmo -= PrimaryWeaponAttribs[ Weapon ].AmmoUsage[ PowerLevel ];
@@ -4575,7 +4574,7 @@ u_int16_t PrimaryWeapons::init_one( u_int16_t OwnerType, u_int16_t OwnerID, u_in
 
 			if( ( OwnerType == OWNER_SHIP ) && ( OwnerID == WhoIAm ) )
 			{
-				if( !GodMode && !( Ships[ OwnerID ].Object.Flags & SHIP_SuperNashram ) )
+				if( !CheatFlags.GodMode && !( Ships[ OwnerID ].Object.Flags & SHIP_SuperNashram ) )
 				{
 					GeneralAmmoUsed += PrimaryWeaponAttribs[ Weapon ].AmmoUsage[ PowerLevel ];
 					GeneralAmmo -= PrimaryWeaponAttribs[ Weapon ].AmmoUsage[ PowerLevel ];
@@ -4651,7 +4650,7 @@ u_int16_t PrimaryWeapons::init_one( u_int16_t OwnerType, u_int16_t OwnerID, u_in
 		case NME_SUSS_GUN:
 			if( ( OwnerType == OWNER_SHIP ) && ( OwnerID == WhoIAm ) )
 			{
-				if( !GodMode && !( Ships[ OwnerID ].Object.Flags & SHIP_SuperNashram ) )
+				if( !CheatFlags.GodMode && !( Ships[ OwnerID ].Object.Flags & SHIP_SuperNashram ) )
 				{
 					SussGunAmmoUsed += PrimaryWeaponAttribs[ Weapon ].AmmoUsage[ PowerLevel ];
 					SussGunAmmo -= PrimaryWeaponAttribs[ Weapon ].AmmoUsage[ PowerLevel ];
@@ -4711,7 +4710,7 @@ u_int16_t PrimaryWeapons::init_one( u_int16_t OwnerType, u_int16_t OwnerID, u_in
 		case NME_LASER:
 			if( ( OwnerType == OWNER_SHIP ) && ( OwnerID == WhoIAm ) )
 			{
-				if( !GodMode && !( Ships[ OwnerID ].Object.Flags & SHIP_SuperNashram ) )
+				if( !CheatFlags.GodMode && !( Ships[ OwnerID ].Object.Flags & SHIP_SuperNashram ) )
 				{
 					GeneralAmmoUsed += PrimaryWeaponAttribs[ Weapon ].AmmoUsage[ PowerLevel ];
 					GeneralAmmo -= PrimaryWeaponAttribs[ Weapon ].AmmoUsage[ PowerLevel ];
@@ -4844,7 +4843,7 @@ u_int16_t PrimaryWeapons::init_one( u_int16_t OwnerType, u_int16_t OwnerID, u_in
 		case NME_POWERLASER:
 			if( ( OwnerType == OWNER_SHIP ) && ( OwnerID == WhoIAm ) )
 			{
-				if( !GodMode && !( Ships[ OwnerID ].Object.Flags & SHIP_SuperNashram ) )
+				if( !CheatFlags.GodMode && !( Ships[ OwnerID ].Object.Flags & SHIP_SuperNashram ) )
 				{
 					GeneralAmmoUsed += PrimaryWeaponAttribs[ Weapon ].AmmoUsage[ PowerLevel ];
 					GeneralAmmo -= PrimaryWeaponAttribs[ Weapon ].AmmoUsage[ PowerLevel ];
@@ -4979,7 +4978,7 @@ u_int16_t PrimaryWeapons::init_one( u_int16_t OwnerType, u_int16_t OwnerID, u_in
 		case NME_LIGHTNING:
 			if( ( OwnerType == OWNER_SHIP ) && ( OwnerID == WhoIAm ) )
 			{
-				if( !GodMode && !( Ships[ OwnerID ].Object.Flags & SHIP_SuperNashram ) )
+				if( !CheatFlags.GodMode && !( Ships[ OwnerID ].Object.Flags & SHIP_SuperNashram ) )
 				{
 					GeneralAmmoUsed += PrimaryWeaponAttribs[ Weapon ].AmmoUsage[ PowerLevel ];
 					GeneralAmmo -= PrimaryWeaponAttribs[ Weapon ].AmmoUsage[ PowerLevel ];
@@ -5041,7 +5040,7 @@ u_int16_t PrimaryWeapons::init_one( u_int16_t OwnerType, u_int16_t OwnerID, u_in
 		case FLAMES:
 			if( ( OwnerType == OWNER_SHIP ) && ( OwnerID == WhoIAm ) )
 			{
-				if( !GodMode && !( Ships[ OwnerID ].Object.Flags & SHIP_SuperNashram ) )
+				if( !CheatFlags.GodMode && !( Ships[ OwnerID ].Object.Flags & SHIP_SuperNashram ) )
 				{
 					PyroliteAmmoUsed += PrimaryWeaponAttribs[ Weapon ].AmmoUsage[ PowerLevel ];
 					PyroliteAmmo -= PrimaryWeaponAttribs[ Weapon ].AmmoUsage[ PowerLevel ];
@@ -7962,7 +7961,7 @@ void PrimaryWeapons::lose_super_nashram()
 	Ships[ WhoIAm ].Object.Flags &= ~SHIP_SuperNashram;
 	Ships[ WhoIAm ].SuperNashramTimer = 0.0F;
 
-	if( !GodMode )
+	if( !CheatFlags.GodMode )
 	{
 		PickupState.owe_golden_pod();
 	}

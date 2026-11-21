@@ -73,10 +73,9 @@ VECTOR OldPos;
 float SpeedInterval = 0.0F;
 float BikeSpeed = 0.0F;
 
-bool CheatsDisabled = false;
+CheatState CheatFlags;
 bool WaitingToQuit;
 
-bool Cheated = false;
 
 
 u_int32_t        AnimOncePerFrame = 0;         // used for stuff that is displayed more than once in a single frame..
@@ -1253,7 +1252,7 @@ void ReleaseLevel(void)
 		break;
 
 	default:
-		if( GodMode ) LoseAllWeapons();
+		if( CheatFlags.GodMode ) LoseAllWeapons();
 
 		ReleaseComponentedShips();
 		KillThermo();
@@ -1441,7 +1440,7 @@ bool InitView( void )
 {
 	DebugPrintf("InitView Starting...\n");
 
-	CheatsDisabled = false;
+	CheatFlags.CheatsDisabled = false;
 
 	input_buffer_reset();
 
@@ -1812,7 +1811,7 @@ char NodeName[256];
 {
 	DebugState("STATUS_Normal\n");
 
-	if ( !CheatsDisabled )
+	if ( !CheatFlags.CheatsDisabled )
 		DisableCheats();
 
 	if( IMustQuit )
@@ -3250,7 +3249,7 @@ void CheckLevelEnd ( void )
 		if( NewLevelNum == ( LevelList.items - 2 ) )
 		{
 			// if they cheated at any point
-			if ( Cheated )
+			if ( CheatFlags.Cheated )
 			{
 				GameCompleted = GameComplete::Cheated;
 			}else

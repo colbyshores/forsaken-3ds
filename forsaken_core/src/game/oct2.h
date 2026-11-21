@@ -38,7 +38,20 @@ extern VECTOR SlideRight;
 extern MCLOADHEADER MCloadheader;
 extern MCLOADHEADER MCloadheadert0;
 bool SaveSnapShot( int8_t * Filename );
-extern bool Cheated;
+
+/* The cheat switches and the flag that records their use. GodMode and the two
+ * weapon cheats are set by the cheat codes (and the title menu); CheatsDisabled
+ * turns the codes off; Cheated marks a run that used one (saved with the game,
+ * so keep it a bool). */
+struct CheatState
+{
+	bool GodMode = false;
+	bool CheatsDisabled = false;
+	bool Cheated = false;
+	bool PrimaryWeaponCheat = false;
+	bool SecondaryWeaponCheat = false;
+};
+extern CheatState CheatFlags;
 extern int CrystalsFound;
 extern int16_t LevelNum;
 extern char MissionTextNames[ MAXLEVELS ][ 128 ];
@@ -75,7 +88,6 @@ extern int Depth;
 extern bool Inside;
 extern px_timer_t level_timer;
 extern bool WaitingToQuit;
-extern bool CheatsDisabled;
 extern bool Panel;
 extern BYTE PreSynchupStatus;
 extern float GetPlayerNumCount1;

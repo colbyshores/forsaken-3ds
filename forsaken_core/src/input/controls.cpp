@@ -240,14 +240,14 @@ int Cheats::enable()
 {
 	CheatsEnabled = true;
 	FlashMenuText( "cheat mode enabled", 120.0F, SFX_Secret );
-	Cheated = true;
+	CheatFlags.Cheated = true;
 
 	return 1;
 }
 
 int JimBeam( char * /*cheat*/ )
 {
-	if( PrimaryWeaponCheat )
+	if( CheatFlags.PrimaryWeaponCheat )
 	{
 		PrimaryToFireLookup[ PULSAR ] = PULSAR;
 		PrimaryToFireLookup[ TROJAX ] = TROJAX;
@@ -255,12 +255,12 @@ int JimBeam( char * /*cheat*/ )
 		PrimaryToFireLookup[ TRANSPULSE_CANNON ] = TRANSPULSE_CANNON;
 		PrimaryToFireLookup[ SUSS_GUN ] = SUSS_GUN;
 		PrimaryToFireLookup[ LASER ] = LASER;
-		PrimaryWeaponCheat = false;
+		CheatFlags.PrimaryWeaponCheat = false;
 		FlashMenuText( "Beam me down", 120.0F, SFX_Secret );
 	}
 	else
 	{
-		PrimaryWeaponCheat = true;
+		CheatFlags.PrimaryWeaponCheat = true;
 		FlashMenuText( "Beam me up", 120.0F, SFX_Secret );
 	}
 	return 1;
@@ -268,7 +268,7 @@ int JimBeam( char * /*cheat*/ )
 
 int Lumberjack( char * /*cheat*/ )
 {
-	if( SecondaryWeaponCheat )
+	if( CheatFlags.SecondaryWeaponCheat )
 	{
 		FlashMenuText( "...and he sleeps all day", 120.0F, SFX_Secret );
 		SecondaryToFireLookup[ MUGMISSILE ] = MUGMISSILE;
@@ -282,11 +282,11 @@ int Lumberjack( char * /*cheat*/ )
 		SecondaryToFireLookup[ PINEMINE ] = PINEMINE;
 		SecondaryToFireLookup[ QUANTUMMINE ] = QUANTUMMINE;
 		SecondaryToFireLookup[ SPIDERMINE ] = SPIDERMINE;
-		SecondaryWeaponCheat = false;
+		CheatFlags.SecondaryWeaponCheat = false;
 	}
 	else
 	{
-		SecondaryWeaponCheat = true;
+		CheatFlags.SecondaryWeaponCheat = true;
 		FlashMenuText( "He works all night...", 120.0F, SFX_Secret );
 	}
 	return 1;
@@ -294,9 +294,9 @@ int Lumberjack( char * /*cheat*/ )
 
 int ToggleGodMode( char * /*cheat*/ )
 {
-	if( !GodMode )
+	if( !CheatFlags.GodMode )
 	{
-		GodMode = true;
+		CheatFlags.GodMode = true;
 		FlashMenuText( "God mode enabled", 120.0F, SFX_Secret );
 		GivemeAllWeapons();
 	}
@@ -304,7 +304,7 @@ int ToggleGodMode( char * /*cheat*/ )
 	{
 		FlashMenuText( "God mode disabled", 120.0F, SFX_Secret );
 		LoseAllWeapons();
-		GodMode = false;
+		CheatFlags.GodMode = false;
 	}
 	return 1;
 }
@@ -444,13 +444,13 @@ void Cheats::disable()
 	DebugViews.DebugInfo = false;
 
 	// used to indicate cheats disabled for multiplayer game...
-	CheatsDisabled = true;
+	CheatFlags.CheatsDisabled = true;
 
-	if( PrimaryWeaponCheat )
+	if( CheatFlags.PrimaryWeaponCheat )
 		JimBeam( nullptr );
-	if( SecondaryWeaponCheat )
+	if( CheatFlags.SecondaryWeaponCheat )
 		Lumberjack( nullptr );
-	if( GodMode )
+	if( CheatFlags.GodMode )
 		ToggleGodMode( nullptr );
 }
 

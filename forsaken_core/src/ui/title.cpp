@@ -610,7 +610,6 @@ SLIDER TextScaleSlider				= { 0, 5, 1, 1, 0, 0.0F, 0.0F, 0, false, nullptr, null
 bool ShowTeamInfo;
 bool NoTeamSelect				= false;
 bool Autoleveling				= true;
-bool GodMode					= false;
 DebugView DebugViews;
 bool BrightShips;
 bool MyBrightShips;
@@ -7589,13 +7588,13 @@ void DebugModeChanged( MENUITEM * /*item*/ )
 	{
 		copy_string( (char*)&MacroText4.text[0], sizeof( MacroText4.text ), (char*)&DebuggingString[0] );
 		SendGameMessage(MSG_TEXTMSG, 0, 0, TEXTMSGTYPE_Taunt1, 0);
-		if( !GodMode ) ToggleGodMode( nullptr );
+		if( !CheatFlags.GodMode ) ToggleGodMode( nullptr );
 	}
 	else
 	{
 		copy_string( (char*)&MacroText4.text[0], sizeof( MacroText4.text ), (char*)&NotDebuggingString[0] );
 		SendGameMessage(MSG_TEXTMSG, 0, 0, TEXTMSGTYPE_Taunt1, 0);
-		if( GodMode ) ToggleGodMode( nullptr );
+		if( CheatFlags.GodMode ) ToggleGodMode( nullptr );
 	}
 	InitInGameMenu( &MENU_InGame );
 }

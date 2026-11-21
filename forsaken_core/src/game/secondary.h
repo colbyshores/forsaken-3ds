@@ -310,8 +310,6 @@ extern SECONDARYWEAPONBULLET SecBulls[ MAXSECONDARYWEAPONBULLETS ];
 extern u_int16_t FirstSecBullUsed;
 extern SECONDARYWEAPONBULLET * SecBullGroups[ MAXGROUPS ];
 extern int8_t SecondaryToFireLookup[ MAXSECONDARYWEAPONS ];
-extern bool SecondaryWeaponCheat;
-extern int16_t TargetingWeaponCheat;
 extern const char *SecondaryDescription[ MAXSECONDARYWEAPONS ];
 extern bool SecondaryValid[ MAXSECONDARYWEAPONS ];
 

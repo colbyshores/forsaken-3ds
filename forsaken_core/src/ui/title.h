@@ -563,7 +563,6 @@ extern bool TeamGame;
 extern bool CTF;
 extern int CameraStatus;
 extern int DifficultyLevel;
-extern bool GodMode;
 extern int NetUpdateIntervalCmdLine;
 extern char * config_name;
 extern TEXT local_port_str;
