@@ -12593,13 +12593,13 @@ void InitCrystalsFoundText( MENU * /*Menu*/ )
 		snprintf( SecretsFoundText, sizeof( SecretsFoundText ), LT_SecretsFoundOutOf, Secrets, TotalSecrets );
 	}
 
-	if( NumKilledEnemies == 1 )
+	if( EnemyState.enemies_killed() == 1 )
 	{
-		snprintf( EnemiesKilledText, sizeof( EnemiesKilledText ), LT_OneEnemyKilled, (int)NumKilledEnemies, (int)NumInitEnemies );
+		snprintf( EnemiesKilledText, sizeof( EnemiesKilledText ), LT_OneEnemyKilled, (int)EnemyState.enemies_killed(), (int)EnemyState.enemies_in_level() );
 	}
 	else
 	{
-		snprintf( EnemiesKilledText, sizeof( EnemiesKilledText ), LT_EnemysKilled, (int)NumKilledEnemies, (int)NumInitEnemies );
+		snprintf( EnemiesKilledText, sizeof( EnemiesKilledText ), LT_EnemysKilled, (int)EnemyState.enemies_killed(), (int)EnemyState.enemies_in_level() );
 	}
 
 	if ( ( ( LevelTimeTaken / 60 ) == 1 ) && ( ( (int)LevelTimeTaken % 60 ) == 1 ) )

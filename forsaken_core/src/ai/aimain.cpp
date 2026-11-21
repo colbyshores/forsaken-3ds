@@ -231,9 +231,9 @@ void AI_LITTLEGEEK( ENEMY * Enemy )
 ===================================================================*/
 void AI_FLESHMORPH( ENEMY * Enemy )
 {
-	if(FleshMorphTimer > 0.0F)
+	if(EnemyState.fleshmorph_dormant())
 	{
-		FleshMorphTimer -= framelag;
+		EnemyState.count_down_fleshmorph( framelag );
 		Enemy->AIFlags |= AI_ANYPLAYERINRANGE;
 		return;
 	}

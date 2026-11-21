@@ -199,8 +199,8 @@ bool InGameLoad( MENUITEM * /*MenuItem*/ )
 		file_read( &Hours, sizeof( Hours ), 1, fp );
 		file_read( &Minutes, sizeof( Minutes ), 1, fp );
 		file_read( &Seconds, sizeof( Seconds ), 1, fp );
-		file_read( &InitEnemiesNum, sizeof( NumInitEnemies ), 1, fp );
-		file_read( &KilledEnemiesNum, sizeof( NumKilledEnemies ), 1, fp );
+		file_read( &InitEnemiesNum, sizeof( InitEnemiesNum ), 1, fp );
+		file_read( &KilledEnemiesNum, sizeof( KilledEnemiesNum ), 1, fp );
 		file_read( &Lives, sizeof( Lives ), 1, fp );
 
 		DebugPrintf( "Loading Ships\n" );
@@ -458,8 +458,7 @@ bool InGameSave( MENUITEM * /*MenuItem*/ )
 		fwrite( &Hours, sizeof( Hours ), 1, fp );
 		fwrite( &Minutes, sizeof( Minutes ), 1, fp );
 		fwrite( &Seconds, sizeof( Seconds ), 1, fp );
-		fwrite( &NumInitEnemies, sizeof( NumInitEnemies ), 1, fp );
-		fwrite( &NumKilledEnemies, sizeof( NumKilledEnemies ), 1, fp );
+		EnemyState.write_kill_tally( fp );
 		fwrite( &Lives, sizeof( Lives ), 1, fp );
 
 		fp = SaveShips( fp );
@@ -565,8 +564,8 @@ char *SavedGameInfo( int slot )
 		file_read( &Hours, sizeof( Hours ), 1, fp );
 		file_read( &Minutes, sizeof( Minutes ), 1, fp );
 		file_read( &Seconds, sizeof( Seconds ), 1, fp );
-		file_read( &InitEnemiesNum, sizeof( NumInitEnemies ), 1, fp );
-		file_read( &KilledEnemiesNum, sizeof( NumKilledEnemies ), 1, fp );
+		file_read( &InitEnemiesNum, sizeof( InitEnemiesNum ), 1, fp );
+		file_read( &KilledEnemiesNum, sizeof( KilledEnemiesNum ), 1, fp );
 		file_read( &Lives, sizeof( Lives ), 1, fp );
 		if ( strcasecmp( biker, DEFAULT_PLAYER_NAME ) )
 			format_display_text( info, sizeof( info ), "%s in %s %hd'%02hd %hd/%hd",

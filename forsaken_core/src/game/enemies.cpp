@@ -53,11 +53,8 @@ constexpr int SPECIALENEMYNODENUM = 16384;
 	Global Variables
 ===================================================================*/
 bool	ShowUntriggeredNMEs = false;
-int		Exogenon_Num_StartPos = 0;
-VECTOR	Exogenon_StartPos[6];
 
 ENEMY * BigGeek = nullptr;
-float	FleshMorphTimer;
 float	Difficulty = 1.0F;
 //float	DifficlutyTab[4] = { 0.5F , 1.25F , 1.75F , 2.75F }; // easy medium hard deathwish....
 //float	NmeDamageModifierTab[4] = { 0.35F, 0.65F , 0.95F , 1.9F }; // easy medium hard deathwish....
@@ -457,41 +454,9 @@ GUNTYPE	GunTypes[] = {
 
 //	bool	OnlyOnce = true;// Use this to display an enemy...
 
-int16_t		NumInitEnemies;
-int16_t		NumKilledEnemies = 0;
 ENEMY		Enemies[ MAXENEMIES ];
 ENEMY	*	EnemyGroups[ MAXGROUPS ];
 ENEMY	*	FirstEnemyUsed = nullptr;
-
-namespace {
-
-/* The Enemies[] pool's private bookkeeping (one instance, g_enemypool): the
- * free-list head and the per-group counts. Reset with the level, changed as
- * enemies are made, die and move between groups, and saved with the game.
- * Enemies[], FirstEnemyUsed and EnemyGroups[] stay global (the AI, weapons,
- * models and collision walk them). */
-class EnemyPool {
-	public:
-	void   init();
-	ENEMY *find_free();
-#ifdef DEBUG_ON
-	void   kill_used( ENEMY * Object, const char *in_file, int in_line );
-#else
-	void   kill_used( ENEMY * Object );
-#endif
-	void   release_all();
-	void   setup_groups();
-	void   add_to_group( ENEMY * Enemy, u_int16_t Group );
-	void   remove_from_group( ENEMY * Enemy, u_int16_t Group );
-	bool   save( FILE * fp );
-	bool   restore( FILE * fp );
-
-	private:
-	u_int16_t NumEnemiesPerGroup[ MAXGROUPS ] = {};
-	ENEMY *   FirstEnemyFree = nullptr;
-};
-
-} // namespace
 
 ANIM_SEQ	PulseTurretSeqs[] = {
 	{ 0.0F * ANIM_SECOND, 0.0F * ANIM_SECOND },	// Closed
@@ -4620,7 +4585,7 @@ void EnemyPool::release_all()
 	Input		:	Nothing
 	Output		:	bool	True/False
 ===================================================================*/
-bool PreLoadEnemies( void )
+bool EnemyPool::preload()
 {
 	FILE	*	fp;
 	int16_t		Count;
@@ -5466,7 +5431,7 @@ bool PreLoadEnemies( void )
 	}
 }
 
-bool LoadEnemies( void )
+bool EnemyPool::load()
 {
 	FILE	*	fp;
 	int16_t		Count;
@@ -6198,7 +6163,7 @@ void EnableEnemy( u_int16_t EnemyIndex )
 	NORMAL		Int_Normal;
 	u_int16_t		Int_Group;
 
-	if( EnemyIndex < NumInitEnemies )
+	if( EnemyIndex < EnemyState.enemies_in_level() )
 	{
 		Enemy = &Enemies[ EnemyIndex];
 
@@ -9647,7 +9612,7 @@ bool Object_Save( FILE * fp , OBJECT * Obj )
 	e = -1;
 	if( Obj->Type == OBJECT_TYPE_ENEMY )
 	{
-		for( i = 0 ; i < NumInitEnemies ; i++ )
+		for( i = 0 ; i < EnemyState.enemies_in_level() ; i++ )
 		{
 			if( &Enemies[i] == Obj->ID )
 			{
@@ -9923,18 +9888,22 @@ bool Gun_Load( BYTE HowManyGuns , GUNOBJECT * GO , FILE * fp )
 	return true;
 }
 
-namespace { EnemyPool g_enemypool; }
+int EnemyPool::Exogenon_Num_StartPos = 0;
+VECTOR EnemyPool::Exogenon_StartPos[ 6 ] = {};
+EnemyPool EnemyState;
 
-void InitEnemies( void ) { g_enemypool.init(); }
-ENEMY * FindFreeEnemy( void ) { return g_enemypool.find_free(); }
+void InitEnemies( void ) { EnemyState.init(); }
+ENEMY * FindFreeEnemy( void ) { return EnemyState.find_free(); }
 #ifdef DEBUG_ON
-void KillUsedEnemyDebugOn( ENEMY * Object, const char *in_file, int in_line ) { g_enemypool.kill_used( Object, in_file, in_line ); }
+void KillUsedEnemyDebugOn( ENEMY * Object, const char *in_file, int in_line ) { EnemyState.kill_used( Object, in_file, in_line ); }
 #else
-void KillUsedEnemy( ENEMY * Object ) { g_enemypool.kill_used( Object ); }
+void KillUsedEnemy( ENEMY * Object ) { EnemyState.kill_used( Object ); }
 #endif
-void ReleaseAllEnemies( void ) { g_enemypool.release_all(); }
-void SetupEnemyGroups( void ) { g_enemypool.setup_groups(); }
-void AddEnemyToGroup( ENEMY * Enemy, u_int16_t Group ) { g_enemypool.add_to_group( Enemy, Group ); }
-void RemoveEnemyFromGroup( ENEMY * Enemy, u_int16_t Group ) { g_enemypool.remove_from_group( Enemy, Group ); }
-bool Enemy_Save( FILE * fp ) { return g_enemypool.save( fp ); }
-bool Enemy_Load( FILE * fp ) { return g_enemypool.restore( fp ); }
+void ReleaseAllEnemies( void ) { EnemyState.release_all(); }
+void SetupEnemyGroups( void ) { EnemyState.setup_groups(); }
+void AddEnemyToGroup( ENEMY * Enemy, u_int16_t Group ) { EnemyState.add_to_group( Enemy, Group ); }
+void RemoveEnemyFromGroup( ENEMY * Enemy, u_int16_t Group ) { EnemyState.remove_from_group( Enemy, Group ); }
+bool Enemy_Save( FILE * fp ) { return EnemyState.save( fp ); }
+bool Enemy_Load( FILE * fp ) { return EnemyState.restore( fp ); }
+bool PreLoadEnemies( void ) { return EnemyState.preload(); }
+bool LoadEnemies( void ) { return EnemyState.load(); }

@@ -80,7 +80,7 @@ void AI_EXOGENON_IDLE( ENEMY * Enemy )
 		return;
 	}
 
-	Enemy->Object.Pos = Exogenon_StartPos[0];
+	Enemy->Object.Pos = EnemyState.exogenon_start( 0 );
 	Enemy->Object.Pos.y += 256.0F * 10.0F;
 	if( !(Enemy->AIFlags & AI_ANYPLAYERINRANGE) )
 		return;
@@ -95,14 +95,14 @@ void AI_EXOGENON_IDLE( ENEMY * Enemy )
 		return;
 	}
 
-	startpos = Random_Range( (u_int16_t) Exogenon_Num_StartPos);
-	i = Exogenon_Num_StartPos;
+	startpos = Random_Range( (u_int16_t) EnemyState.exogenon_starts());
+	i = EnemyState.exogenon_starts();
 
 	while( Distance < (SHIP_RADIUS * 3.0F ) && i >= 0 )
 	{
-		Enemy->Object.Pos = Exogenon_StartPos[startpos];
+		Enemy->Object.Pos = EnemyState.exogenon_start( startpos );
 		startpos++;
-		if( startpos >= Exogenon_Num_StartPos )
+		if( startpos >= EnemyState.exogenon_starts() )
 			startpos = 0;
 		Distance = DistanceVector2Vector( &Enemy->Object.Pos,&Ships[WhoIAm].Object.Pos );
 		i--;

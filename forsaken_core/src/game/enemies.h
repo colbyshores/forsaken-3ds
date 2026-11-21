@@ -449,16 +449,84 @@ bool Gun_Load( BYTE HowManyGuns , GUNOBJECT * GO , FILE * fp );
 /* Defined in enemies.cpp; shared with the modules that use it. */
 extern FIREPOS BigGeekFirePos2;
 extern FIREPOS BigGeekFirePos3;
-extern int Exogenon_Num_StartPos;
-extern VECTOR Exogenon_StartPos[ 6 ];
 extern ENEMY_TYPES EnemyTypes[ MAX_ENEMY_TYPES ];
 extern ENEMY * FirstEnemyUsed;
 extern float Difficulty;
 extern float DifficlutyTab[ 4 ];
-extern float FleshMorphTimer;
 extern ENEMY Enemies[ MAXENEMIES ];
-extern int16_t NumInitEnemies;
-extern int16_t NumKilledEnemies;
 extern ENEMY * EnemyGroups[ MAXGROUPS ];
 void UpdateEnemiesClipGroup( CAMERA * Camera );
 extern bool ShowUntriggeredNMEs;
+
+/* The Enemies[] pool's bookkeeping and the level's enemy tallies (one
+ * instance, EnemyState):
+ * - the per-group counts and the free-list head, reset with the level and
+ *   changed as enemies are made, die and move between groups;
+ * - how many enemies the level's .NME placed and how many have been killed,
+ *   which the end-of-level text and the saved-game header show;
+ * - the Exogenon's start positions (it moves between them) and the
+ *   Fleshmorph's wake-up delay, both set as the .NME loads.
+ * All of it is saved and restored with the game. Other files use the intent
+ * members below; the C API forwards to the rest. Enemies[], FirstEnemyUsed
+ * and EnemyGroups[] stay global (the AI, weapons, models and collision walk
+ * them). */
+class EnemyPool {
+	public:
+	/* The intent members are always_inline so each caller compiles as the
+	 * raw global access did.
+	 *
+	 * The level's tally: enemies placed by the .NME and enemies killed (the
+	 * end-of-level text, and the saved game's header for the load menu). */
+	[[gnu::always_inline]] int16_t enemies_in_level() const { return NumInitEnemies; }
+	[[gnu::always_inline]] int16_t enemies_killed() const { return NumKilledEnemies; }
+	[[gnu::always_inline]] void write_kill_tally( FILE * fp )
+	{
+		fwrite( &NumInitEnemies, sizeof( NumInitEnemies ), 1, fp );
+		fwrite( &NumKilledEnemies, sizeof( NumKilledEnemies ), 1, fp );
+	}
+
+	/* The Exogenon's start positions (it jumps between them). */
+	[[gnu::always_inline]] int exogenon_starts() const { return Exogenon_Num_StartPos; }
+	[[gnu::always_inline]] const VECTOR & exogenon_start( int i ) const { return Exogenon_StartPos[ i ]; }
+
+	/* The Fleshmorph stays dormant until this delay runs out. */
+	[[gnu::always_inline]] bool fleshmorph_dormant() const { return FleshMorphTimer > 0.0F; }
+	[[gnu::always_inline]] void count_down_fleshmorph( float Frames ) { FleshMorphTimer -= Frames; }
+
+	/* The C API (InitEnemies, LoadEnemies and the rest) forwards to these,
+	 * one forwarder each, and other files call the C API. They are
+	 * always_inline so each forwarder keeps the body, with no this pointer,
+	 * as when the class was private to enemies.cpp. */
+	[[gnu::always_inline]] inline void init();
+	[[gnu::always_inline]] inline ENEMY * find_free();
+#ifdef DEBUG_ON
+	[[gnu::always_inline]] inline void kill_used( ENEMY * Object, const char *in_file, int in_line );
+#else
+	[[gnu::always_inline]] inline void kill_used( ENEMY * Object );
+#endif
+	[[gnu::always_inline]] inline void release_all();
+	[[gnu::always_inline]] inline bool preload();
+	[[gnu::always_inline]] inline bool load();
+	[[gnu::always_inline]] inline void setup_groups();
+	[[gnu::always_inline]] inline void add_to_group( ENEMY * Enemy, u_int16_t Group );
+	[[gnu::always_inline]] inline void remove_from_group( ENEMY * Enemy, u_int16_t Group );
+	[[gnu::always_inline]] inline bool save( FILE * fp );
+	[[gnu::always_inline]] inline bool restore( FILE * fp );
+
+	private:
+	/* The per-group counts come first, so a group index stays an unoffset
+	 * access in the per-move group changes; the free-list head follows. */
+	u_int16_t NumEnemiesPerGroup[ MAXGROUPS ] = {};
+	ENEMY *   FirstEnemyFree = nullptr;
+	float     FleshMorphTimer = 0.0F;
+	int16_t   NumInitEnemies = 0;
+	int16_t   NumKilledEnemies = 0;
+	/* Static, so they stay their own symbols: as instance members (past
+	 * +260) the Exogenon's per-frame idle placement and its jump loop need
+	 * an add from the object's base for every start position they read, and
+	 * the count's u_int16_t cast loses its ldrh to an ldr and a uxth. */
+	static int    Exogenon_Num_StartPos;
+	static VECTOR Exogenon_StartPos[ 6 ];
+};
+
+extern EnemyPool EnemyState;
