@@ -102,4 +102,3 @@ extern char * StatusTab[ 256 ];
 void MessageQuePrintAll( void );
 extern int FontWidth;
 extern int FontHeight;
-extern float MaxMessageTime;

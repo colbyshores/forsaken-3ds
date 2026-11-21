@@ -464,8 +464,8 @@ void ScrPolyPool::process()
 										}else{
 											Ships[WhoIAm].Object.Mode = DEATH_MODE;
 										}
-										AddColourMessageToQue(SystemMessageColour, IF_YOU_CANT_TAKE_THE_HEAT );
-										AddColourMessageToQue(SystemMessageColour, GET_OUT_OF_THE_KITCHEN );
+										AddColourMessageToQue(MsgColours.SystemMessageColour, IF_YOU_CANT_TAKE_THE_HEAT );
+										AddColourMessageToQue(MsgColours.SystemMessageColour, GET_OUT_OF_THE_KITCHEN );
 										Ships[WhoIAm].Timer = 0.0F;
 
 										Countdown.note_player_killed();
@@ -1191,7 +1191,7 @@ inline void CountdownClock::update()
 				}else{
 					Ships[WhoIAm].Object.Mode = DEATH_MODE;
 				}
-				AddColourMessageToQue(SystemMessageColour, OUT_OF_TIME );
+				AddColourMessageToQue(MsgColours.SystemMessageColour, OUT_OF_TIME );
 				Ships[WhoIAm].Timer = 0.0F;
 
 				KilledPlayer = true;

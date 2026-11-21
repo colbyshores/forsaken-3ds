@@ -1074,7 +1074,7 @@ void SecondaryWeapons::FireSecondarySelect( int16_t & OnceOnlyFlag )
 			if( !OnceOnlyFlag )
 			{
 				OnceOnlyFlag = 1;
-				if( !AudioOpts.bSoundEnabled ) AddColourMessageToQue( PickupMessageColour, YOU_DONT_HAVE_THAT_WEAPON );
+				if( !AudioOpts.bSoundEnabled ) AddColourMessageToQue( MsgColours.PickupMessageColour, YOU_DONT_HAVE_THAT_WEAPON );
 				PlaySfx( SFX_DontHaveThat, 1.0F );
 			}
 		}

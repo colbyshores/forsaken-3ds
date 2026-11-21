@@ -53,7 +53,6 @@ u_int8_t Colourtrans[MAXFONTCOLOURS][3] = {
 		Globals ...
 ===================================================================*/
 
-float MaxMessageTime = 5.0f;
 
 int	TeamCol[MAX_TEAMS] = { 1, 2, 3, 4 };
 const char *TeamName[ MAX_TEAMS ] = // team colour names should match TeamCol[] colours (given in Colourtrans[][] below)
@@ -520,9 +519,9 @@ void HudText::add_player_message( int Colour, const char * Text, va_list args )
 		Pnt = &TempMessage[0];
 
 		MessageSize = (float) strlen(&TempMessage[0]);
-		ThisMessageTime = MaxMessageTime * (MessageSize / MAXPERLINE);
-		if( ThisMessageTime < MaxMessageTime )
-			ThisMessageTime = MaxMessageTime;
+		ThisMessageTime = MsgColours.MaxMessageTime * (MessageSize / MAXPERLINE);
+		if( ThisMessageTime < MsgColours.MaxMessageTime )
+			ThisMessageTime = MsgColours.MaxMessageTime;
 
 		while( Pnt )
 			add_player_short( &Pnt, Colour );
@@ -557,9 +556,9 @@ void HudText::add_colour_message( int Colour, const char * Text, va_list args )
 		Pnt = &TempMessage[0];
 
 		MessageSize = (float) strlen(&TempMessage[0]);
-		ThisMessageTime = MaxMessageTime * (MessageSize / MAXPERLINE);
-		if( ThisMessageTime < MaxMessageTime )
-			ThisMessageTime = MaxMessageTime;
+		ThisMessageTime = MsgColours.MaxMessageTime * (MessageSize / MAXPERLINE);
+		if( ThisMessageTime < MsgColours.MaxMessageTime )
+			ThisMessageTime = MsgColours.MaxMessageTime;
 
 		while( Pnt )
 			add_colour_short( &Pnt, Colour );
@@ -863,7 +862,7 @@ void HudText::trigger( u_int16_t * Data )
 	if(!DoneBefore)
 	{
 		PlaySfx( SFX_MessageBeep, 1.0F );
-		AddColourMessageToQue( SystemMessageColour, "%s\n", TextMessagesPnt[*Data] );
+		AddColourMessageToQue( MsgColours.SystemMessageColour, "%s\n", TextMessagesPnt[*Data] );
 		if( Tmi->ActivatedOrder == -1 )
 		{
 			Tmi->ActivatedOrder = TextActivatedOrder++;
@@ -1001,7 +1000,7 @@ void HudText::display_old()
 		if( Tmi->ActivatedOrder == CurrentTextActivated )
 		{
 			PlaySfx( SFX_MessageBeep, 1.0F );
-			AddColourMessageToQue( SystemMessageColour, "%s\n", TextMessagesPnt[i] );
+			AddColourMessageToQue( MsgColours.SystemMessageColour, "%s\n", TextMessagesPnt[i] );
 			return;
 		}
 		Tmi++;

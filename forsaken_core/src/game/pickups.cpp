@@ -1392,7 +1392,7 @@ void PickupPool::clear_got()
 	{
 		// now I have the flag....?
 		Ships[ WhoIAm ].Object.Flags |= SHIP_CarryingFlag;
-		AddColourMessageToQue(FlagMessageColour, TAKE_FLAG_TO_GOAL,
+		AddColourMessageToQue(MsgColours.FlagMessageColour, TAKE_FLAG_TO_GOAL,
 			TeamName[ TeamNumber[ WhoIAm ] ] );
 
 		snprintf( CTFMessage, sizeof( CTFMessage ), SOMEONE_HAS_GOT_THE_FLAG, Names[ WhoIAm ], TeamName[ TeamNumber[ WhoIAm ] ] );
@@ -1409,7 +1409,7 @@ void PickupPool::clear_got()
 		// now I have the bounty....?
 		BountyTime = 0.0F;
 		Ships[ WhoIAm ].Object.Flags |= SHIP_CarryingBounty;
-		AddColourMessageToQue(FlagMessageColour, YOU_HAVE_GOT_THE_BOUNTY );
+		AddColourMessageToQue(MsgColours.FlagMessageColour, YOU_HAVE_GOT_THE_BOUNTY );
 
 		SendGameMessage(MSG_TEXTMSG, 0, 0, TEXTMSGTYPE_BountyMessage, 0);
 
@@ -1445,7 +1445,7 @@ void PickupPool::clear_got()
 							KillPickupSend( Pickups[ i ].Owner, Pickups[ i ].ID, PICKUPKILL_Immediate );
 							KillPickup( Pickups[ i ].Owner, Pickups[ i ].ID, PICKUPKILL_Immediate );
 							GenerateFlagAtHome( team );
-							AddColourMessageToQue(FlagMessageColour, TEAM_FLAG_RETURNED,
+							AddColourMessageToQue(MsgColours.FlagMessageColour, TEAM_FLAG_RETURNED,
 								TeamName[ TeamNumber[ WhoIAm ] ] );
 							SendGameMessage(MSG_TEXTMSG, 0, 0, TEXTMSGTYPE_ReturnedFlag, 0);
 						}
@@ -1453,13 +1453,13 @@ void PickupPool::clear_got()
 					else if ( CanCarryOwnFlag )
 					{
 						Ships[ WhoIAm ].Object.Flags |= TeamFlagMask[ team ];
-						AddColourMessageToQue(FlagMessageColour, RETURN_TEAM_FLAG,
+						AddColourMessageToQue(MsgColours.FlagMessageColour, RETURN_TEAM_FLAG,
 							TeamName[ TeamNumber[ WhoIAm ] ] );
 						SendGameMessage(MSG_TEXTMSG, 0, 0, TEXTMSGTYPE_ReturningFlag, 0);
 					}
 					else
 					{
-						AddColourMessageToQue(FlagMessageColour, CANNOT_PICKUP_OWN_FLAG );
+						AddColourMessageToQue(MsgColours.FlagMessageColour, CANNOT_PICKUP_OWN_FLAG );
 						PickupEnable = false;
 					}
 				}
@@ -1467,7 +1467,7 @@ void PickupPool::clear_got()
 				{
 					// now I have the flag....?
 					Ships[ WhoIAm ].Object.Flags |= TeamFlagMask[ team ];
-					AddColourMessageToQue(FlagMessageColour, TAKE_FLAG_TO_GOAL,
+					AddColourMessageToQue(MsgColours.FlagMessageColour, TAKE_FLAG_TO_GOAL,
 						TeamName[ TeamNumber[ WhoIAm ] ] );
 
 					snprintf( CTFMessage, sizeof( CTFMessage ), SOMEONE_HAS_OTHER_TEAM_FLAG,
@@ -1737,7 +1737,7 @@ bool CollectPickup( u_int16_t i )
 				else
 					PlaySfx( MessageSFX, Sfx_Volume );
 				if( ShowTextAnyway )
-					AddColourMessageToQue( PickupMessageColour, "%s", &Message[ 0 ] );
+					AddColourMessageToQue( MsgColours.PickupMessageColour, "%s", &Message[ 0 ] );
 			}
 			else
 				if( Speech )
@@ -1761,7 +1761,7 @@ bool CollectPickup( u_int16_t i )
 						PlaySfx( MessageSFX, Sfx_Volume );
 
 					if( ShowTextAnyway )
-						AddColourMessageToQue( PickupMessageColour, "%s", &Message[ 0 ] );
+						AddColourMessageToQue( MsgColours.PickupMessageColour, "%s", &Message[ 0 ] );
 				}
 				Pickups[ i ].CouldNotPickup = true;
 			}
@@ -2792,7 +2792,7 @@ void PickupPool::process()
 								Move.z = Pickups[ i ].Pos.z - OldPos.z;
 								MoveDist = VectorLength( &Move );
 								if ( MoveDist > 0.0F )
-									AddColourMessageToQue(FlagMessageColour, FLAG_DRIFTED_BACK, TeamName[ team ] );
+									AddColourMessageToQue(MsgColours.FlagMessageColour, FLAG_DRIFTED_BACK, TeamName[ team ] );
 								TeamFlagAtHome[ team ] = true;
 							}
 							break;
@@ -2804,7 +2804,7 @@ void PickupPool::process()
 								Move.z = Pickups[ i ].Pos.z - OldPos.z;
 								MoveDist = VectorLength( &Move );
 								if ( MoveDist > 0.0F )
-									AddColourMessageToQue(FlagMessageColour, FLAG_ESCAPED, TeamName[ team ] );
+									AddColourMessageToQue(MsgColours.FlagMessageColour, FLAG_ESCAPED, TeamName[ team ] );
 								TeamFlagAtHome[ team ] = false;
 							}
 						}
@@ -2894,11 +2894,11 @@ void PickupPool::save_positions()
 
 		fclose( fp );
 
-		AddColourMessageToQue(SystemMessageColour, "Saved Pickup Positions: %s", &NewFilename[ 0 ] );
+		AddColourMessageToQue(MsgColours.SystemMessageColour, "Saved Pickup Positions: %s", &NewFilename[ 0 ] );
 	}
 	else
 	{
-		AddColourMessageToQue(SystemMessageColour, "Error Saving Pickup Positions: %s", &NewFilename[ 0 ] );
+		AddColourMessageToQue(MsgColours.SystemMessageColour, "Error Saving Pickup Positions: %s", &NewFilename[ 0 ] );
 	}
 }
 

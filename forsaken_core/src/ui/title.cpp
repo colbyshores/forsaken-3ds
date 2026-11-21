@@ -109,6 +109,7 @@ bool CanCarryOwnFlag = false;
 bool OwnFlagTeleportsHome = true;
 
 HudOptions HudOpts;
+MessageColours MsgColours;
 
 
 int	NetUpdateIntervalCmdLine = 0;
@@ -322,16 +323,7 @@ void DrawFlatMenuToggle( MENUITEM *Item );
 void DrawMessagesToggle( MENUITEM *Item);	// message colour toggle - in game
 
 int MatureContent;
-int HUDColour;
 int InGameMenuColour;
-int KillMessageColour;
-int MilestoneMessagesColour;
-int SystemMessageColour;
-int FlagMessageColour;
-int PlayerMessageColour;
-int PickupMessageColour;
-int TauntMessageColour;
-int MyMessageColour;
 
 void DrawColToggle( MENUITEM *Item);			// collisoin perspective - in game
 void SelectFlatMenuKey( MENUITEM *Item );
@@ -2256,16 +2248,16 @@ MENU	MENU_Visuals = {
 
 		{ 200, 128 + ( 2*16 ), 0, 0, 0, (u_int8_t*)"TEXT SCALE", 0, 0,	&TextScaleSlider,	nullptr,	SelectSlider,	DrawSlider, nullptr, 0 },
 
-		{ 200, 128 + ( 3*16 ), 0, 0, 0, (u_int8_t*)"HUD COLOUR ", 0, 0, &HUDColour,	nullptr,		SelectColourToggle,	DrawMessagesToggle,	nullptr, 0 },
+		{ 200, 128 + ( 3*16 ), 0, 0, 0, (u_int8_t*)"HUD COLOUR ", 0, 0, &MsgColours.HUDColour,	nullptr,		SelectColourToggle,	DrawMessagesToggle,	nullptr, 0 },
 		{ 200, 128 + ( 4*16 ), 0, 0, 0, (u_int8_t*)"MENU COLOUR ", 0, 0, &InGameMenuColour,	nullptr,		SelectColourToggle,	DrawMessagesToggle,	nullptr, 0 },
-		{ 200, 128 + ( 5*16 ), 0, 0, 0, (u_int8_t*)LT_MENU_InGame28	/*"normal kill messages"		*/, 0, 0, &KillMessageColour,				nullptr,										SelectColourToggle,	DrawMessagesToggle,	nullptr, 0 },
-		{ 200, 128 + ( 6*16 ), 0, 0, 0, (u_int8_t*)LT_MENU_InGame29	/*"milestone kill messages"	*/, 0, 0,	&MilestoneMessagesColour,	nullptr,										SelectColourToggle,	DrawMessagesToggle,	nullptr, 0 },
-		{ 200, 128 + ( 7*16 ), 0, 0, 0, (u_int8_t*)LT_MENU_InGame30	/*"system messages"		*/, 0, 0,	&SystemMessageColour,		nullptr,										SelectColourToggle,	DrawMessagesToggle,	nullptr, 0 },
-		{ 200, 128 + ( 8*16 ), 0, 0, 0, (u_int8_t*)LT_MENU_InGame31	/*"flag/bounty messages"	*/, 0, 0,	&FlagMessageColour,				nullptr,										SelectColourToggle, DrawMessagesToggle,	nullptr, 0 },
-		{ 200, 128 + ( 9*16 ), 0, 0, 0, (u_int8_t*)LT_MENU_InGame32	/*"player messages"			*/, 0, 0,	&PlayerMessageColour,			nullptr,										SelectColourToggle,	DrawMessagesToggle,	nullptr, 0 },
-		{ 200, 128 + ( 10*16 ), 0, 0, 0, (u_int8_t*)LT_MENU_InGame33	/*"pickup messages"			*/, 0, 0,	&PickupMessageColour,			nullptr,										SelectColourToggle,	DrawMessagesToggle,	nullptr, 0 },
-		{ 200, 128 + ( 11*16 ), 0, 0, 0, (u_int8_t*)LT_MENU_InGame34	/*"taunt messages"			*/, 0, 0,	&TauntMessageColour,			nullptr,										SelectColourToggle,	DrawMessagesToggle,	nullptr, 0 },
-		{ 200, 128 + ( 12*16 ), 0, 0, 0, (u_int8_t*)LT_MENU_InGame35	/*"your messages"			*/, 0, 0,	&MyMessageColour,				nullptr,										SelectColourToggle,	DrawMessagesToggle,	nullptr, 0 },
+		{ 200, 128 + ( 5*16 ), 0, 0, 0, (u_int8_t*)LT_MENU_InGame28	/*"normal kill messages"		*/, 0, 0, &MsgColours.KillMessageColour,				nullptr,										SelectColourToggle,	DrawMessagesToggle,	nullptr, 0 },
+		{ 200, 128 + ( 6*16 ), 0, 0, 0, (u_int8_t*)LT_MENU_InGame29	/*"milestone kill messages"	*/, 0, 0,	&MsgColours.MilestoneMessagesColour,	nullptr,										SelectColourToggle,	DrawMessagesToggle,	nullptr, 0 },
+		{ 200, 128 + ( 7*16 ), 0, 0, 0, (u_int8_t*)LT_MENU_InGame30	/*"system messages"		*/, 0, 0,	&MsgColours.SystemMessageColour,		nullptr,										SelectColourToggle,	DrawMessagesToggle,	nullptr, 0 },
+		{ 200, 128 + ( 8*16 ), 0, 0, 0, (u_int8_t*)LT_MENU_InGame31	/*"flag/bounty messages"	*/, 0, 0,	&MsgColours.FlagMessageColour,				nullptr,										SelectColourToggle, DrawMessagesToggle,	nullptr, 0 },
+		{ 200, 128 + ( 9*16 ), 0, 0, 0, (u_int8_t*)LT_MENU_InGame32	/*"player messages"			*/, 0, 0,	&MsgColours.PlayerMessageColour,			nullptr,										SelectColourToggle,	DrawMessagesToggle,	nullptr, 0 },
+		{ 200, 128 + ( 10*16 ), 0, 0, 0, (u_int8_t*)LT_MENU_InGame33	/*"pickup messages"			*/, 0, 0,	&MsgColours.PickupMessageColour,			nullptr,										SelectColourToggle,	DrawMessagesToggle,	nullptr, 0 },
+		{ 200, 128 + ( 11*16 ), 0, 0, 0, (u_int8_t*)LT_MENU_InGame34	/*"taunt messages"			*/, 0, 0,	&MsgColours.TauntMessageColour,			nullptr,										SelectColourToggle,	DrawMessagesToggle,	nullptr, 0 },
+		{ 200, 128 + ( 12*16 ), 0, 0, 0, (u_int8_t*)LT_MENU_InGame35	/*"your messages"			*/, 0, 0,	&MsgColours.MyMessageColour,				nullptr,										SelectColourToggle,	DrawMessagesToggle,	nullptr, 0 },
 		{ -1 , -1, 0, 0, 0, (u_int8_t*)"" , 0, 0, nullptr, nullptr , nullptr , nullptr, nullptr, 0 }
 	}
 };
@@ -7538,12 +7530,12 @@ void SetRoomName( MENUITEM * /*item*/ )
 	if ( GotoRoom( WhoIAm, RoomName.text ) )
 	{
 		RoomList.selected_item = Ships[WhoIAm].Object.Group;
-		AddColourMessageToQue( SystemMessageColour, "You are now in %s", RoomName.text );
+		AddColourMessageToQue( MsgColours.SystemMessageColour, "You are now in %s", RoomName.text );
 	}
 	else
 	{
-		AddColourMessageToQue( SystemMessageColour, "Could not find %s", RoomName.text );
-		AddColourMessageToQue( SystemMessageColour, "You are still in %s", Mloadheader.Group[ Ships[WhoIAm].Object.Group ].name );
+		AddColourMessageToQue( MsgColours.SystemMessageColour, "Could not find %s", RoomName.text );
+		AddColourMessageToQue( MsgColours.SystemMessageColour, "You are still in %s", Mloadheader.Group[ Ships[WhoIAm].Object.Group ].name );
 	}
 	MenuExit();
 }
@@ -7556,12 +7548,12 @@ void ChooseRoom( MENUITEM * /*item*/ )
 	if ( GotoRoom( WhoIAm, (char*)(char*)RoomList.item[ RoomList.selected_item ] ) )
 	{
 		copy_string( RoomName.text, sizeof( RoomName.text ), (char*)RoomList.item[ RoomList.selected_item ] );
-		AddColourMessageToQue( SystemMessageColour, "You are now in %s", (char*)RoomList.item[ RoomList.selected_item ] );
+		AddColourMessageToQue( MsgColours.SystemMessageColour, "You are now in %s", (char*)RoomList.item[ RoomList.selected_item ] );
 	}
 	else
 	{
-		AddColourMessageToQue( SystemMessageColour, "Could not find %s", (char*)RoomList.item[ RoomList.selected_item ] );
-		AddColourMessageToQue( SystemMessageColour, "You are still in %s", Mloadheader.Group[ Ships[WhoIAm].Object.Group ].name );
+		AddColourMessageToQue( MsgColours.SystemMessageColour, "Could not find %s", (char*)RoomList.item[ RoomList.selected_item ] );
+		AddColourMessageToQue( MsgColours.SystemMessageColour, "You are still in %s", Mloadheader.Group[ Ships[WhoIAm].Object.Group ].name );
 	}
 	MenuExit();
 }
@@ -7813,27 +7805,27 @@ void GetGamePrefs( void )
 	render_info.vsync  = config_get_int( "VSync", 0 );
 
 	MatureContent										 = config_get_int( "MatureContent", 2);
-	HUDColour												 = config_get_int( "HUDColour", YELLOW );
+	MsgColours.HUDColour												 = config_get_int( "HUDColour", YELLOW );
 	InGameMenuColour								 = config_get_int( "InGameMenuColour", YELLOW );
-	MilestoneMessagesColour          = config_get_int( "MilestoneMessagesColour",	RED );
-	KillMessageColour                = config_get_int( "KillMessageColour",			GREEN );
-	SystemMessageColour              = config_get_int( "SystemMessageColour",		YELLOW );
-	FlagMessageColour                = config_get_int( "FlagMessageColour",			BLUE );
-	PlayerMessageColour              = config_get_int( "PlayerMessageColour",		WHITE );
-	PickupMessageColour              = config_get_int( "PickupMessageColour",		GREEN );
-	TauntMessageColour               = config_get_int( "TauntMessageColour",		GREEN );
-	MyMessageColour                  = config_get_int( "MyMessageColour",			  WHITE );
-	MaxMessageTime                   = config_get_float( "MaxMessageTime",    5.0f );
+	MsgColours.MilestoneMessagesColour          = config_get_int( "MilestoneMessagesColour",	RED );
+	MsgColours.KillMessageColour                = config_get_int( "KillMessageColour",			GREEN );
+	MsgColours.SystemMessageColour              = config_get_int( "SystemMessageColour",		YELLOW );
+	MsgColours.FlagMessageColour                = config_get_int( "FlagMessageColour",			BLUE );
+	MsgColours.PlayerMessageColour              = config_get_int( "PlayerMessageColour",		WHITE );
+	MsgColours.PickupMessageColour              = config_get_int( "PickupMessageColour",		GREEN );
+	MsgColours.TauntMessageColour               = config_get_int( "TauntMessageColour",		GREEN );
+	MsgColours.MyMessageColour                  = config_get_int( "MyMessageColour",			  WHITE );
+	MsgColours.MaxMessageTime                   = config_get_float( "MaxMessageTime",    5.0f );
 
 	CLAMP( InGameMenuColour, MAXFONTCOLOURS );
-	CLAMP( MilestoneMessagesColour,	MAXFONTCOLOURS );
-	CLAMP( KillMessageColour,		MAXFONTCOLOURS );
-	CLAMP( SystemMessageColour,		MAXFONTCOLOURS );
-	CLAMP( FlagMessageColour,		MAXFONTCOLOURS );
-	CLAMP( PlayerMessageColour,		MAXFONTCOLOURS );
-	CLAMP( PickupMessageColour,		MAXFONTCOLOURS );
-	CLAMP( TauntMessageColour,		MAXFONTCOLOURS );
-	CLAMP( MyMessageColour,			MAXFONTCOLOURS );
+	CLAMP( MsgColours.MilestoneMessagesColour,	MAXFONTCOLOURS );
+	CLAMP( MsgColours.KillMessageColour,		MAXFONTCOLOURS );
+	CLAMP( MsgColours.SystemMessageColour,		MAXFONTCOLOURS );
+	CLAMP( MsgColours.FlagMessageColour,		MAXFONTCOLOURS );
+	CLAMP( MsgColours.PlayerMessageColour,		MAXFONTCOLOURS );
+	CLAMP( MsgColours.PickupMessageColour,		MAXFONTCOLOURS );
+	CLAMP( MsgColours.TauntMessageColour,		MAXFONTCOLOURS );
+	CLAMP( MsgColours.MyMessageColour,			MAXFONTCOLOURS );
 
 	MyColPerspective                   = config_get_int( "ColPerspective",			COLPERS_Descent );
 	CLAMP( MyColPerspective, 1 );
@@ -7939,16 +7931,16 @@ void SetGamePrefs( void )
 	config_set_int( "water",			WaterDetailSlider.value );
 	config_set_int( "TextScale", TextScaleSlider.value );
 	config_set_int( "TimeLimit",			MyTimeLimit.value );
-	config_set_int( "HUDColour", HUDColour );
+	config_set_int( "HUDColour", MsgColours.HUDColour );
 	config_set_int( "InGameMenuColour", InGameMenuColour );
-	config_set_int( "KillMessageColour",		KillMessageColour );
-	config_set_int( "MilestoneMessagesColour",	MilestoneMessagesColour );
-	config_set_int( "SystemMessageColour",		SystemMessageColour );
-	config_set_int( "FlagMessageColour",		FlagMessageColour );
-	config_set_int( "PlayerMessageColour",		PlayerMessageColour );
-	config_set_int( "PickupMessageColour",		PickupMessageColour );
-	config_set_int( "TauntMessageColour",		TauntMessageColour );
-	config_set_int( "MyMessageColour",		MyMessageColour );
+	config_set_int( "KillMessageColour",		MsgColours.KillMessageColour );
+	config_set_int( "MilestoneMessagesColour",	MsgColours.MilestoneMessagesColour );
+	config_set_int( "SystemMessageColour",		MsgColours.SystemMessageColour );
+	config_set_int( "FlagMessageColour",		MsgColours.FlagMessageColour );
+	config_set_int( "PlayerMessageColour",		MsgColours.PlayerMessageColour );
+	config_set_int( "PickupMessageColour",		MsgColours.PickupMessageColour );
+	config_set_int( "TauntMessageColour",		MsgColours.TauntMessageColour );
+	config_set_int( "MyMessageColour",		MsgColours.MyMessageColour );
 	config_set_int( "ColPerspective",		MyColPerspective );
 	config_set_int( "MaxKills",			MaxKillsSlider.value );
 	config_set_int( "GameType",			GameType );
@@ -7964,7 +7956,7 @@ void SetGamePrefs( void )
 	GoalScore = GoalScoreSlider.value;
 
 	// floats
-	config_set_float( "MaxMessageTime",	MaxMessageTime );
+	config_set_float( "MaxMessageTime",	MsgColours.MaxMessageTime );
 
 	// Stereo options
 	config_set_bool( "StereoEnabled",		render_info.stereo_enabled );

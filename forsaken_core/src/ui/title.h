@@ -43,6 +43,24 @@ struct HudOptions
 };
 extern HudOptions HudOpts;
 
+/* Message and HUD colours (indices into the font colour table) and how long a
+ * message stays up, one plain struct (no methods). The in-game menu tables
+ * point at these fields; config prefs persist them by string key. */
+struct MessageColours
+{
+	int HUDColour = 0;
+	int KillMessageColour = 0;
+	int MilestoneMessagesColour = 0;
+	int SystemMessageColour = 0;
+	int FlagMessageColour = 0;
+	int PlayerMessageColour = 0;
+	int PickupMessageColour = 0;
+	int TauntMessageColour = 0;
+	int MyMessageColour = 0;
+	float MaxMessageTime = 5.0f;
+};
+extern MessageColours MsgColours;
+
 /* A start-up shortcut past the title menus (command-line host or join),
    or Notify for a pending message box. */
 enum class QuickStartMode : u_int8_t
@@ -595,9 +613,7 @@ extern QuickStartMode QuickStart;
 void GetGamePrefs( void );
 void GetDefaultPilot(void);
 extern VECTOR HoloRot;
-extern int KillMessageColour;
 extern int MatureContent;
-extern int HUDColour;
 extern VECTOR View;
 extern VECTOR Look;
 extern VECTOR Up;
@@ -630,14 +646,9 @@ extern int16_t SelectedBike;
 extern SLIDER TimeLimit;
 bool VduFinished( MENU *Menu );
 void SelectQuitCurrentGame( MENUITEM *Item );
-extern int SystemMessageColour;
-extern int FlagMessageColour;
 extern SLIDER WatchPlayerSelect;
 extern int GoalScore;
-extern int PickupMessageColour;
-extern int PlayerMessageColour;
 extern int BountyBonusInterval;
-extern int MilestoneMessagesColour;
 extern MENU MENU_NEW_Battle;
 extern bool JoystickInput;
 extern MENU MENU_QuickTextSend;
@@ -668,8 +679,6 @@ extern TEXT MacroText4;
 extern TEXT QuickText;
 extern TEXT QuickTextWhisper;
 void AddTitleMessage(TEXTMSG *TextMsg);
-extern int TauntMessageColour;
-extern int MyMessageColour;
 extern SLIDER FlagSfxSlider;
 extern SLIDER TextScaleSlider;
 bool RenderModeReset( void );

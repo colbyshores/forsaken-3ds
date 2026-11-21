@@ -617,14 +617,14 @@ void (* ShipUpdate::RemoteCameraModeControl[ ])( GLOBALSHIP * ShipPnt , BYTE i )
 			PickupState.owe_flag();
 			// update bonus 2 (stats.cpp) -- flag chase scored
 			UpdateBonusStats(i,GoalScore);
-			AddColourMessageToQue(FlagMessageColour, TEAM_SCORED,
+			AddColourMessageToQue(MsgColours.FlagMessageColour, TEAM_SCORED,
 				TeamName[ TeamNumber[ i ] ] );
 
 			SendGameMessage(MSG_TEXTMSG, 0, 0, TEXTMSGTYPE_ScoredWithFlag, 0);
 		}
 		else if ( goalcheck == GOAL_WRONG )
 		{
-			AddColourMessageToQue(FlagMessageColour, TAKE_FLAG_TO_GOAL,
+			AddColourMessageToQue(MsgColours.FlagMessageColour, TAKE_FLAG_TO_GOAL,
 				TeamName[ TeamNumber[ i ] ] );
 		}
 	}
@@ -665,14 +665,14 @@ void (* ShipUpdate::RemoteCameraModeControl[ ])( GLOBALSHIP * ShipPnt , BYTE i )
 				{
 					// update bonus 3 (stats.cpp) -- CTF scored
 					UpdateBonusStats(i,score);
-					AddColourMessageToQue(FlagMessageColour, TEAM_SCORED,
+					AddColourMessageToQue(MsgColours.FlagMessageColour, TEAM_SCORED,
 						TeamName[ TeamNumber[ i ] ] );
 
 					SendGameMessage(MSG_TEXTMSG, 0, 0, TEXTMSGTYPE_ScoredWithFlag, 0);
 				}
 				else
 				{
-					AddColourMessageToQue(FlagMessageColour, OTHER_TEAM_FLAG_RETURNED,
+					AddColourMessageToQue(MsgColours.FlagMessageColour, OTHER_TEAM_FLAG_RETURNED,
 						TeamName[ TeamNumber[ i ] ] );
 					SendGameMessage(MSG_TEXTMSG, 0, 0, TEXTMSGTYPE_ReturnedFlag, 0);
 				}
@@ -683,7 +683,7 @@ void (* ShipUpdate::RemoteCameraModeControl[ ])( GLOBALSHIP * ShipPnt , BYTE i )
 			{
 				if ( !IKnowINeedFlag )
 				{
-					AddColourMessageToQue(FlagMessageColour, YOU_NEED_FLAG,
+					AddColourMessageToQue(MsgColours.FlagMessageColour, YOU_NEED_FLAG,
 						TeamName[ TeamNumber[ i ] ] );
 					IKnowINeedFlag = true;
 				}
@@ -694,7 +694,7 @@ void (* ShipUpdate::RemoteCameraModeControl[ ])( GLOBALSHIP * ShipPnt , BYTE i )
 			if ( goalcheck == GOAL_WRONG )
 			{
 				/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
-				AddColourMessageToQue(FlagMessageColour, TAKE_FLAG_TO_GOAL,
+				AddColourMessageToQue(MsgColours.FlagMessageColour, TAKE_FLAG_TO_GOAL,
 					TeamName[ TeamNumber[ i ] ] );
 			}
 			IKnowINeedFlag = false;
@@ -818,7 +818,7 @@ void (* ShipUpdate::RemoteCameraModeControl[ ])( GLOBALSHIP * ShipPnt , BYTE i )
 						if ( PointInsideSkin( &ShipObjPnt->Pos, g ) )
 						{
 							ShipObjPnt->Group = g;
-							AddColourMessageToQue(SystemMessageColour, "You are now in %s", Mloadheader.Group[ g ].name );
+							AddColourMessageToQue(MsgColours.SystemMessageColour, "You are now in %s", Mloadheader.Group[ g ].name );
 							break;
 						}
 					}
@@ -992,7 +992,7 @@ void (* ShipUpdate::RemoteCameraModeControl[ ])( GLOBALSHIP * ShipPnt , BYTE i )
 				ShipObjPnt->Mode = DEATH_MODE;
 				ShipPnt->Timer = 0.0F;
 				// print up I killed Myself
-				AddColourMessageToQue(KillMessageColour, YOU_KILLED_YOURSELF );
+				AddColourMessageToQue(MsgColours.KillMessageColour, YOU_KILLED_YOURSELF );
 				PlaySfx( SFX_BIKECOMP_DY, 1.0F );
 			}
 		}
@@ -1691,7 +1691,7 @@ int16_t ShipUpdate::do_damage( bool OverrideInvul )
 	{
 		if ( Message[ 0 ] )
 		{
-			AddColourMessageToQue( SystemMessageColour, "%s", &Message[ 0 ] );
+			AddColourMessageToQue( MsgColours.SystemMessageColour, "%s", &Message[ 0 ] );
 		}
 	}
 
@@ -2139,7 +2139,7 @@ void ShipMode2( GLOBALSHIP * ShipPnt , BYTE i )
 			{
 				if( Lives == 0 )
 				{
-					AddColourMessageToQue(SystemMessageColour, NO_LIVES_LEFT );
+					AddColourMessageToQue(MsgColours.SystemMessageColour, NO_LIVES_LEFT );
 					ShipPnt->Timer = 0.0F;
 					ShipPnt->Object.Mode = GAMEOVER_MODE;
 					PlaySfx( SFX_BIKER_LP, 1.0F );
@@ -2147,13 +2147,13 @@ void ShipMode2( GLOBALSHIP * ShipPnt , BYTE i )
 				}
 				Lives--;
 				if( Lives == 0 )
-					AddColourMessageToQue(SystemMessageColour, LAST_LIFE );
+					AddColourMessageToQue(MsgColours.SystemMessageColour, LAST_LIFE );
 				else
 				{
 					if( Lives == 1 )
-						AddColourMessageToQue(SystemMessageColour, ONE_LIFE_LEFT , Lives );
+						AddColourMessageToQue(MsgColours.SystemMessageColour, ONE_LIFE_LEFT , Lives );
 					else
-						AddColourMessageToQue(SystemMessageColour, LIVES_LEFT, Lives );
+						AddColourMessageToQue(MsgColours.SystemMessageColour, LIVES_LEFT, Lives );
 				}
 			}
 
@@ -2495,7 +2495,7 @@ void	UpdateStartPos( void )
 					(Temp.z <= SHIP_RADIUS * 4.0F ) )
 				{
 					PlaySfx( SFX_RestartPointReached, 1.0F );
-					AddColourMessageToQue(SystemMessageColour, RESTART_ACTIVATED );
+					AddColourMessageToQue(MsgColours.SystemMessageColour, RESTART_ACTIVATED );
 					last_start_position = startpos;
 					return;
 				}

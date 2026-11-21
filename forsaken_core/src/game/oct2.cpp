@@ -517,7 +517,7 @@ void SetViewportError( const char *where, render_viewport_t *vp )
 		if ( input_buffer_find( SDLK_F5 ) )
 		{
 			InitShipStartPos( WhoIAm, ++startpos );
-			AddColourMessageToQue(SystemMessageColour,
+			AddColourMessageToQue(MsgColours.SystemMessageColour,
 				"You are now in %s\n",
 				Mloadheader.Group[ Ships[ WhoIAm ].Object.Group ].name
 				);
@@ -943,9 +943,9 @@ int GetCurPrimAmmo( void )
 			current = (Count == Ships[WhoIAm].Primary);
 			if( current || Primaries.got_weapon( Count ) > 0 )
 			{
-				Print4x5Text( PrimaryNames[ Count ], left, top, HUDColour );
+				Print4x5Text( PrimaryNames[ Count ], left, top, MsgColours.HUDColour );
 				if( Count == PULSAR )
-					Printu_int16_t( Primaries.general_ammo(), right, top, HUDColour );
+					Printu_int16_t( Primaries.general_ammo(), right, top, MsgColours.HUDColour );
 			}
 			top += FontHeight;
 		}
@@ -954,8 +954,8 @@ int GetCurPrimAmmo( void )
 		current = (PYROLITE_RIFLE == Ships[WhoIAm].Primary);
 		if( current || Primaries.got_weapon( PYROLITE_RIFLE ) > 0 )
 		{
-			Print4x5Text( PrimaryNames[ PYROLITE_RIFLE ], left, top, HUDColour );
-			Printu_int16_t( Primaries.pyrolite_ammo(), right, top, HUDColour );
+			Print4x5Text( PrimaryNames[ PYROLITE_RIFLE ], left, top, MsgColours.HUDColour );
+			Printu_int16_t( Primaries.pyrolite_ammo(), right, top, MsgColours.HUDColour );
 		}
 		top += FontHeight;
 
@@ -963,8 +963,8 @@ int GetCurPrimAmmo( void )
 		current = (SUSS_GUN == Ships[WhoIAm].Primary);
 		if( current || Primaries.got_weapon( SUSS_GUN ) > 0 )
 		{
-			Print4x5Text( PrimaryNames[ SUSS_GUN ], left, top, HUDColour );
-			Printu_int16_t( Primaries.sussgun_ammo(), right, top, HUDColour );
+			Print4x5Text( PrimaryNames[ SUSS_GUN ], left, top, MsgColours.HUDColour );
+			Printu_int16_t( Primaries.sussgun_ammo(), right, top, MsgColours.HUDColour );
 		}
 		top += FontHeight*2;
 
@@ -975,8 +975,8 @@ int GetCurPrimAmmo( void )
 			if(Count == 7) top += FontHeight; // add space for mines
 			if( current || (u_int16_t) Secondaries.ammo( Count ) > 0 )
 			{
-				Print4x5Text( SecondaryNames[Count], left, top, HUDColour );
-				Printu_int16_t( (u_int16_t) Secondaries.ammo( Count ) , right, top, HUDColour );
+				Print4x5Text( SecondaryNames[Count], left, top, MsgColours.HUDColour );
+				Printu_int16_t( (u_int16_t) Secondaries.ammo( Count ) , right, top, MsgColours.HUDColour );
 			}
 			top += FontHeight;
 		}
@@ -990,8 +990,8 @@ int GetCurPrimAmmo( void )
 	if( mine != 65535 )
 	{
 		int left = render_info.window_size.cx;
-		Print4x5Text( SecondaryNames[mine], left-FontWidth*10, top, HUDColour );
-		Printu_int16_t( (u_int16_t) Secondaries.ammo( mine ), left-FontWidth*2, top, HUDColour );
+		Print4x5Text( SecondaryNames[mine], left-FontWidth*10, top, MsgColours.HUDColour );
+		Printu_int16_t( (u_int16_t) Secondaries.ammo( mine ), left-FontWidth*2, top, MsgColours.HUDColour );
 	}
 
 	// bottom right
@@ -1050,9 +1050,9 @@ void DrawSimplePanel()
 	int top   = render_info.window_size.cy - FontHeight*30;
 	int energy;
 	u_int8_t Count;
-	u_int8_t r = Colourtrans[HUDColour][0];
-	u_int8_t g = Colourtrans[HUDColour][1];
-	u_int8_t b = Colourtrans[HUDColour][2];
+	u_int8_t r = Colourtrans[MsgColours.HUDColour][0];
+	u_int8_t g = Colourtrans[MsgColours.HUDColour][1];
+	u_int8_t b = Colourtrans[MsgColours.HUDColour][2];
 	char MessageBuff[150];
 
 	if( Panel )
@@ -1079,26 +1079,26 @@ void DrawSimplePanel()
 			right = FontWidth*8;
 
 			// shield
-			Print4x5Text( "Shield", left, top, HUDColour );
+			Print4x5Text( "Shield", left, top, MsgColours.HUDColour );
 			if( WatchPlayerSelect.value == WhoIAm )
 			{
-				Printu_int16_t( (u_int16_t) Ships[WhoIAm].Object.Shield, right, top, HUDColour );
+				Printu_int16_t( (u_int16_t) Ships[WhoIAm].Object.Shield, right, top, MsgColours.HUDColour );
 				if( ShieldHit ) ShieldHit -=1;
 			}
 			else
-				Printu_int16_t( PlayerHealths[WatchPlayerSelect.value].Shield, right, top, HUDColour );
+				Printu_int16_t( PlayerHealths[WatchPlayerSelect.value].Shield, right, top, MsgColours.HUDColour );
 			top += FontHeight;
 
 			// hull
 			top++;
-			Print4x5Text( "Hull", left, top, HUDColour );
+			Print4x5Text( "Hull", left, top, MsgColours.HUDColour );
 			if( WatchPlayerSelect.value == WhoIAm )
 			{
-				Printu_int16_t( (u_int16_t) Ships[WhoIAm].Object.Hull, right, top, HUDColour );
+				Printu_int16_t( (u_int16_t) Ships[WhoIAm].Object.Hull, right, top, MsgColours.HUDColour );
 				if( HullHit ) HullHit -=1;
 			}
 			else
-				Printu_int16_t( PlayerHealths[WatchPlayerSelect.value].Hull, right, top, HUDColour );
+				Printu_int16_t( PlayerHealths[WatchPlayerSelect.value].Hull, right, top, MsgColours.HUDColour );
 			top += FontHeight;
 
 			// Add Crosshair Polygon..
@@ -1153,47 +1153,47 @@ void DrawSimplePanel()
 			left  = render_info.window_size.cx - FontWidth*14;
 
 			// power pods
-			Print4x5Text( "Power", left+FontWidth*3, top, HUDColour );
-			Printu_int16_t( (u_int16_t) Ships[WatchPlayerSelect.value].Object.PowerLevel+1, right, top, HUDColour );
+			Print4x5Text( "Power", left+FontWidth*3, top, MsgColours.HUDColour );
+			Printu_int16_t( (u_int16_t) Ships[WatchPlayerSelect.value].Object.PowerLevel+1, right, top, MsgColours.HUDColour );
 			top+=FontHeight;
 
 			// primary
-			Print4x5Text( PrimaryNames[Ships[WatchPlayerSelect.value].Primary], left, top, HUDColour );
+			Print4x5Text( PrimaryNames[Ships[WatchPlayerSelect.value].Primary], left, top, MsgColours.HUDColour );
 			if( WatchPlayerSelect.value == WhoIAm )
-				Printu_int16_t( (u_int16_t) GetCurPrimAmmo() , right, top, HUDColour );
+				Printu_int16_t( (u_int16_t) GetCurPrimAmmo() , right, top, MsgColours.HUDColour );
 			top+=FontHeight;
 
 			// secondary
-			Print4x5Text( SecondaryNames[Ships[WatchPlayerSelect.value].Secondary], left, top, HUDColour );
+			Print4x5Text( SecondaryNames[Ships[WatchPlayerSelect.value].Secondary], left, top, MsgColours.HUDColour );
 			if( WatchPlayerSelect.value == WhoIAm )
-				Printu_int16_t( (u_int16_t) GetCurSecAmmo(), right, top, HUDColour );
+				Printu_int16_t( (u_int16_t) GetCurSecAmmo(), right, top, MsgColours.HUDColour );
 
 			top = render_info.window_size.cy - FontHeight*7;
 
 			// chaos
 			if( Ships[WatchPlayerSelect.value].Invul )
 			{
-				Print4x5Text( "Chaos", right-FontWidth*9, top, HUDColour );
+				Print4x5Text( "Chaos", right-FontWidth*9, top, MsgColours.HUDColour );
 				if( WatchPlayerSelect.value == WhoIAm )
-					Printu_int16_t( (u_int16_t) (Ships[WhoIAm].InvulTimer / 60.0F), right, top, HUDColour );
+					Printu_int16_t( (u_int16_t) (Ships[WhoIAm].InvulTimer / 60.0F), right, top, MsgColours.HUDColour );
 			}
 			top += FontHeight;
 
 			// gulden power pod
 			if( Ships[WatchPlayerSelect.value].Object.Flags & SHIP_SuperNashram )
 			{
-				Print4x5Text( "GPP", right-FontWidth*9, top, HUDColour );
+				Print4x5Text( "GPP", right-FontWidth*9, top, MsgColours.HUDColour );
 				if( WatchPlayerSelect.value == WhoIAm )
-					Printu_int16_t( (u_int16_t) (Ships[WhoIAm].SuperNashramTimer / 60.0F), right, top, HUDColour );
+					Printu_int16_t( (u_int16_t) (Ships[WhoIAm].SuperNashramTimer / 60.0F), right, top, MsgColours.HUDColour );
 			}
 			top += FontHeight;
 
 			// stealth
 			if( Ships[WatchPlayerSelect.value].Object.Flags & SHIP_Stealth )
 			{
-				Print4x5Text( "Stealth", right-FontWidth*9, top, HUDColour );
+				Print4x5Text( "Stealth", right-FontWidth*9, top, MsgColours.HUDColour );
 				if( WatchPlayerSelect.value == WhoIAm )
-					Printu_int16_t( (u_int16_t) (Ships[WhoIAm].StealthTime / 60.0F), right, top, HUDColour );
+					Printu_int16_t( (u_int16_t) (Ships[WhoIAm].StealthTime / 60.0F), right, top, MsgColours.HUDColour );
 			}
 
 		} // end of !DrawPanel
@@ -2634,7 +2634,7 @@ char NodeName[256];
 
 	if( SaveGames.damaged_save_pending() )
 	{
-		AddColourMessageToQue( SystemMessageColour, SAVED_GAME_DAMAGED );
+		AddColourMessageToQue( MsgColours.SystemMessageColour, SAVED_GAME_DAMAGED );
 		SaveGames.damaged_save_reported();
 	}
 

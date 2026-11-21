@@ -4167,7 +4167,7 @@ void MissileShockWave( VECTOR * Pos, float Radius, u_int16_t Owner, float Center
 											Ships[ WhoIAm ].Timer = 0.0F;
 											PlaySfx( SFX_BIKECOMP_DY, 1.0F );
 											// killed yourself with missile splash damage (e.g. mfrl)
-											AddColourMessageToQue( KillMessageColour, YOU_KILLED_YOURSELF_HOW, &methodstr[0] );
+											AddColourMessageToQue( MsgColours.KillMessageColour, YOU_KILLED_YOURSELF_HOW, &methodstr[0] );
 											// update stats 4 (stats.cpp) -- killed yourself with missile splash damage
 											UpdateKillStats(WhoIAm,WhoIAm,WEPTYPE_Secondary, Weapon);
 											ShipDiedSend( WEPTYPE_Secondary, Weapon );
@@ -4340,7 +4340,7 @@ void HitMe( u_int16_t OwnerType, u_int16_t OwnerID, float Damage, u_int8_t Weapo
 			if( ( OwnerType == OWNER_SHIP ) && ( OwnerID == WhoIAm ) )
 			{
 				PlaySfx( SFX_BIKECOMP_DY, 1.0F );
-				AddColourMessageToQue(KillMessageColour, YOU_KILLED_YOURSELF_HOW, &methodstr[0] ); // called in both multiplayer  & single player
+				AddColourMessageToQue(MsgColours.KillMessageColour, YOU_KILLED_YOURSELF_HOW, &methodstr[0] ); // called in both multiplayer  & single player
 				// update stats 5 (stats.cpp) -- i killed myself
 				UpdateKillStats(WhoIAm,WhoIAm,WeaponType,Weapon);
 			}
@@ -4349,7 +4349,7 @@ void HitMe( u_int16_t OwnerType, u_int16_t OwnerID, float Damage, u_int8_t Weapo
 				// single player enemy killed me
 				if( OwnerType == OWNER_ENEMY )
 				{
-					AddColourMessageToQue( KillMessageColour, ENEMY_KILLED_YOU, &methodstr[0] );
+					AddColourMessageToQue( MsgColours.KillMessageColour, ENEMY_KILLED_YOU, &methodstr[0] );
 				}
 				// someone killed me in multiplayer
 				else
@@ -4366,7 +4366,7 @@ void HitMe( u_int16_t OwnerType, u_int16_t OwnerID, float Damage, u_int8_t Weapo
 						}
 
 						// somebody killed me
-						AddColourMessageToQue( KillMessageColour, SOMEONE_KILLED_YOU, &Names[Ships[WhoIAm].ShipThatLastKilledMe][0], &methodstr[0], &teamstr[0] );
+						AddColourMessageToQue( MsgColours.KillMessageColour, SOMEONE_KILLED_YOU, &Names[Ships[WhoIAm].ShipThatLastKilledMe][0], &methodstr[0], &teamstr[0] );
 						// update stats 6 (stats.cpp) -- somebody killed me
 						UpdateKillStats(Ships[WhoIAm].ShipThatLastKilledMe,WhoIAm,WeaponType,Weapon);
 
@@ -4374,7 +4374,7 @@ void HitMe( u_int16_t OwnerType, u_int16_t OwnerID, float Damage, u_int8_t Weapo
 					// wtf i died? why? please tell me!
 					else
 					{
-						AddColourMessageToQue( KillMessageColour, YOU_DIED );
+						AddColourMessageToQue( MsgColours.KillMessageColour, YOU_DIED );
 					}
 				}
 			}

@@ -178,10 +178,10 @@ void GameStats::update_kills(int Killer, int Victim, int WeaponType, int Weapon)
 		{
 			FirstBlood = true;
 			if(Killer == WhoIAm)
-				AddColourMessageToQue(MilestoneMessagesColour, "YOU GOT FIRST BLOOD");
+				AddColourMessageToQue(MsgColours.MilestoneMessagesColour, "YOU GOT FIRST BLOOD");
 			else
 			{
-				AddColourMessageToQue( MilestoneMessagesColour, "%s %s", (const char *)GetName(Killer), "GOT FIRST BLOOD" );
+				AddColourMessageToQue( MsgColours.MilestoneMessagesColour, "%s %s", (const char *)GetName(Killer), "GOT FIRST BLOOD" );
 			}
 
 			if(Killer == WatchPlayerSelect.value)
@@ -205,10 +205,10 @@ void GameStats::update_kills(int Killer, int Victim, int WeaponType, int Weapon)
 		{
 			FirstToFifty = true;
 			if(Killer == WhoIAm)
-				AddColourMessageToQue( MilestoneMessagesColour, "YOU ARE FIRST TO 50 KILLS" );
+				AddColourMessageToQue( MsgColours.MilestoneMessagesColour, "YOU ARE FIRST TO 50 KILLS" );
 			else
 			{
-				AddColourMessageToQue( MilestoneMessagesColour, "%s %s", (const char *)GetName(Killer), "IS FIRST TO 50 KILLS" );
+				AddColourMessageToQue( MsgColours.MilestoneMessagesColour, "%s %s", (const char *)GetName(Killer), "IS FIRST TO 50 KILLS" );
 			}
 
 			if(Killer == WatchPlayerSelect.value)
@@ -220,14 +220,14 @@ void GameStats::update_kills(int Killer, int Victim, int WeaponType, int Weapon)
 	if(WeaponType == WEPTYPE_Secondary && Weapon == 6)
 	{
 		PlaySfx( SFX_HOLYSHIT, 1.0F );
-		AddColourMessageToQue( MilestoneMessagesColour, "HOLY SHIT" );
+		AddColourMessageToQue( MsgColours.MilestoneMessagesColour, "HOLY SHIT" );
 		return;
 	}
 	// killed with a gravgon
 	if(WeaponType == WEPTYPE_Secondary && Weapon == 4)
 	{
 		if(Victim == WatchPlayerSelect.value) PlaySfx( SFX_HUMILIATION, 1.0F );
-		AddColourMessageToQue( MilestoneMessagesColour, "HUMILIATION" );
+		AddColourMessageToQue( MsgColours.MilestoneMessagesColour, "HUMILIATION" );
 		return;
 	}
 
@@ -300,7 +300,7 @@ void GameStats::count_kill(int Killer)
 #define MILESTONE_CASE( count, sound, msg ) \
 		case count: \
 			if(PlaySound) PlaySfx( sound, 1.0F ); \
-			AddColourMessageToQue( MilestoneMessagesColour, "%s %s (%d KILLS)", prefix, msg, count ); \
+			AddColourMessageToQue( MsgColours.MilestoneMessagesColour, "%s %s (%d KILLS)", prefix, msg, count ); \
 			break;
 
 		MILESTONE_CASE(  3,  SFX_KILLINGSPREE, "ON A KILLING SPREE" )

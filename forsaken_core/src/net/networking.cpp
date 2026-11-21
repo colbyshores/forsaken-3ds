@@ -492,7 +492,7 @@ void NetworkGameUpdate()
 			OldPPSValue = PacketsSlider.value;
 			NetUpdateInterval	= (60.0F / PacketsSlider.value);
 			SendGameMessage(MSG_NETSETTINGS, 0, 0, 0, 0);
-			AddColourMessageToQue(SystemMessageColour, "%d %s" , PacketsSlider.value , PACKETS_PER_SECOND_SET );
+			AddColourMessageToQue(MsgColours.SystemMessageColour, "%d %s" , PacketsSlider.value , PACKETS_PER_SECOND_SET );
 		}
 		// changed collision perspective
 		if ( OldColPerspective != ColPerspective )
@@ -500,9 +500,9 @@ void NetworkGameUpdate()
 			OldColPerspective = ColPerspective;
 			SendGameMessage(MSG_NETSETTINGS, 0, 0, 0, 0);
 			if(ColPerspective == COLPERS_Forsaken)
-				AddColourMessageToQue( SystemMessageColour, "SHOOTER NOW DECIDES COLLISIONS" );
+				AddColourMessageToQue( MsgColours.SystemMessageColour, "SHOOTER NOW DECIDES COLLISIONS" );
 			else if(ColPerspective == COLPERS_Descent)
-				AddColourMessageToQue( SystemMessageColour, "TARGET NOW DECIDES COLLISIONS" );
+				AddColourMessageToQue( MsgColours.SystemMessageColour, "TARGET NOW DECIDES COLLISIONS" );
 
 		}
 		// changed short packets
@@ -511,9 +511,9 @@ void NetworkGameUpdate()
 			OldUseShortPackets = UseShortPackets;
 			SendGameMessage(MSG_NETSETTINGS, 0, 0, 0, 0);
 			if(UseShortPackets)
-				AddColourMessageToQue( SystemMessageColour, "SHORT PACKETS ENABLED" );
+				AddColourMessageToQue( MsgColours.SystemMessageColour, "SHORT PACKETS ENABLED" );
 			else
-				AddColourMessageToQue( SystemMessageColour, "SHORT PACKETS DISABLED" );
+				AddColourMessageToQue( MsgColours.SystemMessageColour, "SHORT PACKETS DISABLED" );
 
 		}
 	}
@@ -1050,7 +1050,7 @@ void network_event_player_left( network_player_t * player )
 	if( player == nullptr )
 	{
 		if( MyGameStatus == STATUS_Normal )
-			AddColourMessageToQue(SystemMessageColour, "You have left the game!" );
+			AddColourMessageToQue(MsgColours.SystemMessageColour, "You have left the game!" );
 	}
 
 	// someone left the game
@@ -1061,7 +1061,7 @@ void network_event_player_left( network_player_t * player )
 			if( ( i != WhoIAm ) && (player == Ships[i].network_player) )
 			{
 				if( MyGameStatus == STATUS_Normal )
-					AddColourMessageToQue(SystemMessageColour, "%s %s", &Names[i][0] , HAS_LEFT_THE_GAME );
+					AddColourMessageToQue(MsgColours.SystemMessageColour, "%s %s", &Names[i][0] , HAS_LEFT_THE_GAME );
 
 				if( Ships[i].Object.light != INDEX_NONE  )
 				{
@@ -1103,7 +1103,7 @@ void network_event_new_host( network_player_t * player )
 			else			PrintErrorMessage ( YOU_HAVE_BECOME_THE_HOST , 1, &MENU_NEW_HostWaitingToStart, ERROR_DONTUSE_MENUFUNCS );
 			break;
 		default:
-			AddColourMessageToQue( SystemMessageColour, YOU_HAVE_BECOME_THE_HOST );
+			AddColourMessageToQue( MsgColours.SystemMessageColour, YOU_HAVE_BECOME_THE_HOST );
 		}
 
 		IsHost = true;					// I have Become the host
@@ -1127,7 +1127,7 @@ void network_event_new_host( network_player_t * player )
 		for( i = 0 ; i < MAX_PLAYERS ; i++ )
 			if( player == Ships[i].network_player )
 			{
-				AddColourMessageToQue(SystemMessageColour, "%s %s", &Names[i][0] , "has become the host." );
+				AddColourMessageToQue(MsgColours.SystemMessageColour, "%s %s", &Names[i][0] , "has become the host." );
 			break;
 		}
 	}
@@ -1157,7 +1157,7 @@ void network_event_player_joined( network_player_t * player )
 		DebugPrintf("network_event_player_joined: player '%s' joined the game.\n", player->name);
 		if( MyGameStatus == STATUS_Normal && !TeamGame )
 		{
-			AddColourMessageToQue(SystemMessageColour, "%s %s", player->name, IS_JOINING_THE_GAME );
+			AddColourMessageToQue(MsgColours.SystemMessageColour, "%s %s", player->name, IS_JOINING_THE_GAME );
 		}
 	}
 }
@@ -2038,7 +2038,7 @@ void ReceiveGameMessages( void )
 				else
 					copy_string(&teamstr[0], sizeof( teamstr ), "");
 
-				AddColourMessageToQue(KillMessageColour, "%s %s %s %s",
+				AddColourMessageToQue(MsgColours.KillMessageColour, "%s %s %s %s",
 						&Names[Ships[WhoIAm].ShipThatLastKilledMe][0],
 						"KILLED YOU WITH ", &methodstr[0], &teamstr[0] );
 				ShipDiedSend( ShipHitMsg->ShipHit.WeaponType, ShipHitMsg->ShipHit.Weapon );
@@ -2134,7 +2134,7 @@ void ReceiveGameMessages( void )
 					copy_string(&teamstr[0], sizeof( teamstr ), "");
 
 				// called in TOL OFF multiplayer!!
-				AddColourMessageToQue( KillMessageColour, "%s %s %s %s",
+				AddColourMessageToQue( MsgColours.KillMessageColour, "%s %s %s %s",
 						&Names[Ships[WhoIAm].ShipThatLastKilledMe][0],
 						"KILLED YOU WITH", &methodstr[0]  ,&teamstr[0] );
 				// update stats 1 (stats.cpp) -- somebody killed me
@@ -2173,7 +2173,7 @@ void ReceiveGameMessages( void )
 				if( !CheatFlags.GodMode )
 				{
 					// you killed someone on your own team
-					AddColourMessageToQue( KillMessageColour, "%s %s %s %s" " %s",
+					AddColourMessageToQue( MsgColours.KillMessageColour, "%s %s %s %s" " %s",
 						"YOU KILLED", &Names[ShipDiedMsg->WhoIAm][0], "WITH", &methodstr[0], ON_YOUR_OWN_TEAM );
 					// update stats 7 (stats.cpp) -- you killed someone on your own team
 					UpdateKillStats(WhoIAm, ShipDiedMsg->WhoIAm, ShipDiedMsg->WeaponType, ShipDiedMsg->Weapon);
@@ -2189,11 +2189,11 @@ void ReceiveGameMessages( void )
 					{
 						// you killed the person who was carrying the bounty
 						if ( Ships[ ShipDiedMsg->WhoIAm ].Object.Flags & SHIP_CarryingBounty )
-							AddColourMessageToQue( KillMessageColour, "%s %s %s %s" "%s",
+							AddColourMessageToQue( MsgColours.KillMessageColour, "%s %s %s %s" "%s",
 								"YOU KILLED", &Names[ShipDiedMsg->WhoIAm][0], WITH_THE_BOUNTY, "WITH ", &methodstr[0] );
 						// you had the bounty and killed someone
 						else
-							AddColourMessageToQue( KillMessageColour, "%s %s %s" "%s",
+							AddColourMessageToQue( MsgColours.KillMessageColour, "%s %s %s" "%s",
 								"YOU KILLED", &Names[ShipDiedMsg->WhoIAm][0], "WITH ", &methodstr[0] );
 
 						PlaySfx( SFX_BIKER_VP, 1.0F );
@@ -2204,7 +2204,7 @@ void ReceiveGameMessages( void )
 					else
 					{
 						// you killed someone who wasnt carrying the bounty (team bounty) (no points for you!!)
-						AddColourMessageToQue( KillMessageColour, NO_POINTS_FOR_KILLING_PLAYER_WITHOUT_THE_BOUNTY,
+						AddColourMessageToQue( MsgColours.KillMessageColour, NO_POINTS_FOR_KILLING_PLAYER_WITHOUT_THE_BOUNTY,
 							Names[ ShipDiedMsg->WhoIAm ] );
 					}
 				}
@@ -2212,7 +2212,7 @@ void ReceiveGameMessages( void )
 					// any other team game
 				{
 					// you killed someone in a team game
-					AddColourMessageToQue( KillMessageColour, "%s %s %s" "%s", "YOU KILLED", &Names[ShipDiedMsg->WhoIAm][0], "WITH ", &methodstr[0] );
+					AddColourMessageToQue( MsgColours.KillMessageColour, "%s %s %s" "%s", "YOU KILLED", &Names[ShipDiedMsg->WhoIAm][0], "WITH ", &methodstr[0] );
 					AddKill();
 					// update stats 9 (stats.cpp) -- you killed someone in a team game
 					UpdateKillStats(WhoIAm, ShipDiedMsg->WhoIAm, ShipDiedMsg->WeaponType, ShipDiedMsg->Weapon);
@@ -2232,10 +2232,10 @@ void ReceiveGameMessages( void )
 				{
 					// you killed the person who was carrying the bounty
 					if ( Ships[ ShipDiedMsg->WhoIAm ].Object.Flags & SHIP_CarryingBounty )
-						AddColourMessageToQue( KillMessageColour, "%s %s %s %s" "%s", "YOU KILLED", &Names[ShipDiedMsg->WhoIAm][0], WITH_THE_BOUNTY, "WITH ", &methodstr[0] );
+						AddColourMessageToQue( MsgColours.KillMessageColour, "%s %s %s %s" "%s", "YOU KILLED", &Names[ShipDiedMsg->WhoIAm][0], WITH_THE_BOUNTY, "WITH ", &methodstr[0] );
 					// you had the bounty and killed someone
 					else
-						AddColourMessageToQue( KillMessageColour, "%s %s %s" "%s", "YOU KILLED", &Names[ShipDiedMsg->WhoIAm][0], "WITH ", &methodstr[0] );
+						AddColourMessageToQue( MsgColours.KillMessageColour, "%s %s %s" "%s", "YOU KILLED", &Names[ShipDiedMsg->WhoIAm][0], "WITH ", &methodstr[0] );
 
 					PlaySfx( SFX_BIKER_VP, 1.0F );
 					AddKill();
@@ -2245,7 +2245,7 @@ void ReceiveGameMessages( void )
 				else
 				{
 					// you killed someone who wasnt carrying the bounty (no points for you!!)
-					AddColourMessageToQue( KillMessageColour, NO_POINTS_FOR_KILLING_PLAYER_WITHOUT_THE_BOUNTY,
+					AddColourMessageToQue( MsgColours.KillMessageColour, NO_POINTS_FOR_KILLING_PLAYER_WITHOUT_THE_BOUNTY,
 						Names[ ShipDiedMsg->WhoIAm ] );
 				}
 			}
@@ -2253,7 +2253,7 @@ void ReceiveGameMessages( void )
 			else if( !CheatFlags.GodMode )
 			{
 				// you killed someone
-				AddColourMessageToQue( KillMessageColour, "%s %s %s" "%s", "YOU KILLED", &Names[ShipDiedMsg->WhoIAm][0], "WITH ", &methodstr[0] );
+				AddColourMessageToQue( MsgColours.KillMessageColour, "%s %s %s" "%s", "YOU KILLED", &Names[ShipDiedMsg->WhoIAm][0], "WITH ", &methodstr[0] );
 				AddKill();
 				// update stats 2 (stats.cpp) -- you killed someone
 				UpdateKillStats(WhoIAm,ShipDiedMsg->WhoIAm,ShipDiedMsg->WeaponType,ShipDiedMsg->Weapon);
@@ -2268,7 +2268,7 @@ void ReceiveGameMessages( void )
 		if( ShipDiedMsg->WhoIAm == ShipDiedMsg->WhoKilledMe )
 		{
 			// gee someone killed themselves...
-			AddColourMessageToQue(KillMessageColour, "%s %s %s", &Names[ShipDiedMsg->WhoIAm][0], "KILLED HIMSELF WITH", &methodstr[0] );
+			AddColourMessageToQue(MsgColours.KillMessageColour, "%s %s %s", &Names[ShipDiedMsg->WhoIAm][0], "KILLED HIMSELF WITH", &methodstr[0] );
 		}
 		else
 		{
@@ -2278,7 +2278,7 @@ void ReceiveGameMessages( void )
 				copy_string (&teamstr[0], sizeof( teamstr ), "");
 
 			// gee someone killed somebody...who cares...
-			AddColourMessageToQue( KillMessageColour, "%s %s %s %s %s" " %s", &Names[ShipDiedMsg->WhoKilledMe][0], "KILLED", &Names[ShipDiedMsg->WhoIAm][0], "WITH", &methodstr[0], &teamstr[0] );
+			AddColourMessageToQue( MsgColours.KillMessageColour, "%s %s %s %s %s" " %s", &Names[ShipDiedMsg->WhoKilledMe][0], "KILLED", &Names[ShipDiedMsg->WhoIAm][0], "WITH", &methodstr[0], &teamstr[0] );
 		}
 
 		// update stats 3 (stats.cpp) -- somebody killed someone
@@ -2370,23 +2370,23 @@ void ReceiveGameMessages( void )
 				{
 					// shooter decides
 					if( NetSettingsMsg->CollisionPerspective == COLPERS_Forsaken)
-						AddColourMessageToQue(SystemMessageColour, "SHOOTER NOW DECIDES COLLISIONS");
+						AddColourMessageToQue(MsgColours.SystemMessageColour, "SHOOTER NOW DECIDES COLLISIONS");
 					// target decides
 					else
-						AddColourMessageToQue(SystemMessageColour, "TARGET NOW DECIDES COLLISIONS");
+						AddColourMessageToQue(MsgColours.SystemMessageColour, "TARGET NOW DECIDES COLLISIONS");
 				}
 				// packet rate changed by the host
 				if( NetUpdateInterval != NetSettingsMsg->PacketsPerSecond )
-					AddColourMessageToQue(SystemMessageColour, "%.0f %s" , ( 60.0F / NetSettingsMsg->PacketsPerSecond ) , PACKETS_PER_SECOND_SET );
+					AddColourMessageToQue(MsgColours.SystemMessageColour, "%.0f %s" , ( 60.0F / NetSettingsMsg->PacketsPerSecond ) , PACKETS_PER_SECOND_SET );
 				// short packets changed by the host
 				if( UseShortPackets != NetSettingsMsg->ShortPackets)
 				{
 					// short packets enabled
 					if( NetSettingsMsg->ShortPackets == true)
-						AddColourMessageToQue(SystemMessageColour, "SHORT PACKETS ENABLED BY HOST");
+						AddColourMessageToQue(MsgColours.SystemMessageColour, "SHORT PACKETS ENABLED BY HOST");
 					// short packets disabled
 					else
-						AddColourMessageToQue(SystemMessageColour, "SHORT PACKETS DISABLED BY HOST");
+						AddColourMessageToQue(MsgColours.SystemMessageColour, "SHORT PACKETS DISABLED BY HOST");
 				}
 			}
 			ColPerspective = NetSettingsMsg->CollisionPerspective;
@@ -2583,20 +2583,20 @@ void ReceiveGameMessages( void )
 	case TEXTMSGTYPE_QuickTauntWhisper:
 		if( TeamNumber[WhoIAm] != TeamNumber[TextMsg->WhoIAm] )
 			return;
-		AddPlayerMessageToQue(PlayerMessageColour, "%s whispers %s", &Names[TextMsg->WhoIAm][0],  &TextMsg->Text[0] );
+		AddPlayerMessageToQue(MsgColours.PlayerMessageColour, "%s whispers %s", &Names[TextMsg->WhoIAm][0],  &TextMsg->Text[0] );
 		return;
 	case TEXTMSGTYPE_Taunt1:
 	case TEXTMSGTYPE_Taunt2:
 	case TEXTMSGTYPE_Taunt3:
-		AddColourMessageToQue(TauntMessageColour, "%s says %s", &Names[TextMsg->WhoIAm][0],  &TextMsg->Text[0] );
+		AddColourMessageToQue(MsgColours.TauntMessageColour, "%s says %s", &Names[TextMsg->WhoIAm][0],  &TextMsg->Text[0] );
 		return;
 	case TEXTMSGTYPE_QuickTaunt:
-		AddPlayerMessageToQue(PlayerMessageColour, "%s says %s", &Names[TextMsg->WhoIAm][0],  &TextMsg->Text[0] );
+		AddPlayerMessageToQue(MsgColours.PlayerMessageColour, "%s says %s", &Names[TextMsg->WhoIAm][0],  &TextMsg->Text[0] );
 		// received version request
 		if(strcmp(&TextMsg->Text[0], (const char *) "version") == 0)
 		{
 			// display my version number
-			AddColourMessageToQue(SystemMessageColour, "%s", YourVersion );
+			AddColourMessageToQue(MsgColours.SystemMessageColour, "%s", YourVersion );
 			// send my version number back
 			copy_string( QuickText.text, sizeof( QuickText.text ), PXVersion );
 			SendGameMessage(MSG_TEXTMSG, 0, 0, TEXTMSGTYPE_QuickTaunt, 0);
@@ -2604,27 +2604,27 @@ void ReceiveGameMessages( void )
 		}
 		return;
 	case TEXTMSGTYPE_JoiningTeamGame:
-		AddColourMessageToQue(SystemMessageColour, "%s %s", &Names[TextMsg->WhoIAm][0] ,IS_JOINING_THE_GAME);
+		AddColourMessageToQue(MsgColours.SystemMessageColour, "%s %s", &Names[TextMsg->WhoIAm][0] ,IS_JOINING_THE_GAME);
 		return;
 	case TEXTMSGTYPE_EnteredWatchMode:
-		AddColourMessageToQue(SystemMessageColour, "%s %s", &Names[TextMsg->WhoIAm][0] ,"ENTERED WATCH MODE");
+		AddColourMessageToQue(MsgColours.SystemMessageColour, "%s %s", &Names[TextMsg->WhoIAm][0] ,"ENTERED WATCH MODE");
 		return;
 	case TEXTMSGTYPE_ExitedWatchMode:
-		AddColourMessageToQue(SystemMessageColour, "%s %s", &Names[TextMsg->WhoIAm][0] ,"EXITED WATCH MODE");
+		AddColourMessageToQue(MsgColours.SystemMessageColour, "%s %s", &Names[TextMsg->WhoIAm][0] ,"EXITED WATCH MODE");
 		return;
 	case TEXTMSGTYPE_TitleMessage:
 		AddTitleMessage(TextMsg);
 		return;
 	case TEXTMSGTYPE_CaptureFlagMessage:
 		// this message is instead formatted by the sender
-		AddColourMessageToQue(FlagMessageColour, "%s", TextMsg->Text );
+		AddColourMessageToQue(MsgColours.FlagMessageColour, "%s", TextMsg->Text );
 		if ( TeamNumber[ WhoIAm ] == TeamNumber[ TextMsg->WhoIAm ] )
 			PlaySfx( SFX_MyTeamGotFlag, FlagVolume );
 		else
 			PlaySfx( SFX_OtherTeamGotFlag , FlagVolume );
 		return;
 	case TEXTMSGTYPE_ScoredWithFlag:
-		AddColourMessageToQue(FlagMessageColour, THE_COLOUR_TEAM_HAVE_SCORED, TeamName[ TeamNumber[ TextMsg->WhoIAm ] ] );
+		AddColourMessageToQue(MsgColours.FlagMessageColour, THE_COLOUR_TEAM_HAVE_SCORED, TeamName[ TeamNumber[ TextMsg->WhoIAm ] ] );
 		if ( TeamNumber[ WhoIAm ] == TeamNumber[ TextMsg->WhoIAm ] )
 			PlaySfx( SFX_MyTeamScored, FlagVolume );
 		else
@@ -2634,19 +2634,19 @@ void ReceiveGameMessages( void )
 		return;
 	case TEXTMSGTYPE_ReturningFlag:
 		if ( TextMsg->WhoIAm != WhoIAm )
-			AddColourMessageToQue(FlagMessageColour, THE_COLOUR_TEAM_ARE_RETURNING_THEIR_FLAG,TeamName[ TeamNumber[ TextMsg->WhoIAm ] ]);
+			AddColourMessageToQue(MsgColours.FlagMessageColour, THE_COLOUR_TEAM_ARE_RETURNING_THEIR_FLAG,TeamName[ TeamNumber[ TextMsg->WhoIAm ] ]);
 		return;
 	case TEXTMSGTYPE_ReturnedFlag:
-		AddColourMessageToQue(FlagMessageColour, THE_COLOUR_TEAM_FLAG_HAS_BEEN_RETURNED,TeamName[ TeamNumber[ TextMsg->WhoIAm ] ] );
+		AddColourMessageToQue(MsgColours.FlagMessageColour, THE_COLOUR_TEAM_FLAG_HAS_BEEN_RETURNED,TeamName[ TeamNumber[ TextMsg->WhoIAm ] ] );
 		return;
 	case TEXTMSGTYPE_FlagDriftedIn:
-		AddColourMessageToQue(FlagMessageColour, THE_COLOUR_TEAM_FLAG_HAS_DRIFTED_INTO_THEIR_GOAL,TeamName[ TeamNumber[ TextMsg->WhoIAm ] ] );
+		AddColourMessageToQue(MsgColours.FlagMessageColour, THE_COLOUR_TEAM_FLAG_HAS_DRIFTED_INTO_THEIR_GOAL,TeamName[ TeamNumber[ TextMsg->WhoIAm ] ] );
 		return;
 	case TEXTMSGTYPE_FlagEscaped:
-		AddColourMessageToQue(FlagMessageColour, THE_COLOUR_TEAM_FLAG_HAS_ESCAPED_FROM_THEIR_GOAL, TeamName[ TeamNumber[ TextMsg->WhoIAm ] ] );
+		AddColourMessageToQue(MsgColours.FlagMessageColour, THE_COLOUR_TEAM_FLAG_HAS_ESCAPED_FROM_THEIR_GOAL, TeamName[ TeamNumber[ TextMsg->WhoIAm ] ] );
 		return;
 	case TEXTMSGTYPE_BountyMessage:
-		AddColourMessageToQue(FlagMessageColour, "%s %s", Names[ TextMsg->WhoIAm ] , HAS_GOT_THE_BOUNTY);
+		AddColourMessageToQue(MsgColours.FlagMessageColour, "%s %s", Names[ TextMsg->WhoIAm ] , HAS_GOT_THE_BOUNTY);
 		PlaySfx( SFX_OtherTeamGotFlag, FlagVolume );
 		return;
 	case TEXTMSGTYPE_SpeechTaunt:
@@ -3468,96 +3468,96 @@ enum channel_t {
 	case TEXTMSGTYPE_Taunt1:
 		copy_field( TextMsg->Text, sizeof( TextMsg->Text ), &MacroText1.text[0] );
 		TextMsg->TextMsgType = Type;
-		MessageColour = TauntMessageColour;
+		MessageColour = MsgColours.TauntMessageColour;
 		break;
 	case TEXTMSGTYPE_Taunt2:
 		copy_field( TextMsg->Text, sizeof( TextMsg->Text ), &MacroText2.text[0] );
 		TextMsg->TextMsgType = Type;
-		MessageColour = TauntMessageColour;
+		MessageColour = MsgColours.TauntMessageColour;
 		break;
 	case TEXTMSGTYPE_Taunt3:
 		copy_field( TextMsg->Text, sizeof( TextMsg->Text ), &MacroText3.text[0] );
 		TextMsg->TextMsgType = Type;
-		MessageColour = TauntMessageColour;
+		MessageColour = MsgColours.TauntMessageColour;
 		break;
 	case TEXTMSGTYPE_TitleMessage:
 		copy_field( TextMsg->Text, sizeof( TextMsg->Text ), &MacroText4.text[0] );
 		TextMsg->TextMsgType = Type;
-		MessageColour = SystemMessageColour;
+		MessageColour = MsgColours.SystemMessageColour;
 		break;
 	case TEXTMSGTYPE_JoiningTeamGame:
 		TextMsg->TextMsgType = Type;
-		MessageColour = SystemMessageColour;
+		MessageColour = MsgColours.SystemMessageColour;
 		break;
 	case TEXTMSGTYPE_EnteredWatchMode:
 		TextMsg->TextMsgType = Type;
-		MessageColour = SystemMessageColour;
+		MessageColour = MsgColours.SystemMessageColour;
 		break;
 	case TEXTMSGTYPE_ExitedWatchMode:
 		TextMsg->TextMsgType = Type;
-		MessageColour = SystemMessageColour;
+		MessageColour = MsgColours.SystemMessageColour;
 		break;
 	case TEXTMSGTYPE_QuickTaunt:
 		copy_field( TextMsg->Text, sizeof( TextMsg->Text ), &QuickText.text[0] );
 		TextMsg->TextMsgType = Type;
-		MessageColour = MyMessageColour;
+		MessageColour = MsgColours.MyMessageColour;
 		AddPlayerMessageToQue( MessageColour, "%s", (char*) &TextMsg->Text[0] );
 		// sending version request
 		if(strcmp(&TextMsg->Text[0], (const char *) "version") == 0)
 		{
 			// display my version number
-			AddColourMessageToQue(SystemMessageColour, "%s", YourVersion );
+			AddColourMessageToQue(MsgColours.SystemMessageColour, "%s", YourVersion );
 		}
 		break;
 	case TEXTMSGTYPE_QuickTauntWhisper:
 		copy_field( TextMsg->Text, sizeof( TextMsg->Text ), &QuickTextWhisper.text[0] );
 		TextMsg->TextMsgType = Type;
-		MessageColour = MyMessageColour;
+		MessageColour = MsgColours.MyMessageColour;
 		AddPlayerMessageToQue( MessageColour, "%s", (char*) &TextMsg->Text[0] );
 		break;
 	case TEXTMSGTYPE_CaptureFlagMessage:
 		TextMsg->TextMsgType = Type;
 		copy_field( TextMsg->Text, sizeof( TextMsg->Text ), CTFMessage );
 		PlaySfx( SFX_MyTeamGotFlag , FlagVolume );
-		MessageColour = FlagMessageColour;
+		MessageColour = MsgColours.FlagMessageColour;
 		break;
 	case TEXTMSGTYPE_ScoredWithFlag:
 		TextMsg->TextMsgType = Type;
 		TextMsg->Text[0] = 0;
 		PlaySfx( SFX_MyTeamScored, FlagVolume );
-		MessageColour = FlagMessageColour;
+		MessageColour = MsgColours.FlagMessageColour;
 		flags |= NETWORK_RELIABLE;
 		break;
 	case TEXTMSGTYPE_ReturningFlag:
 		TextMsg->TextMsgType = Type;
 		TextMsg->Text[0] = 0;
-		MessageColour = FlagMessageColour;
+		MessageColour = MsgColours.FlagMessageColour;
 		break;
 	case TEXTMSGTYPE_ReturnedFlag:
 		TextMsg->TextMsgType = Type;
 		TextMsg->Text[0] = 0;
-		MessageColour = FlagMessageColour;
+		MessageColour = MsgColours.FlagMessageColour;
 		break;
 	case TEXTMSGTYPE_FlagDriftedIn:
 		TextMsg->TextMsgType = Type;
 		TextMsg->Text[0] = 0;
-		MessageColour = FlagMessageColour;
+		MessageColour = MsgColours.FlagMessageColour;
 		break;
 	case TEXTMSGTYPE_FlagEscaped:
 		TextMsg->TextMsgType = Type;
 		TextMsg->Text[0] = 0;
-		MessageColour = FlagMessageColour;
+		MessageColour = MsgColours.FlagMessageColour;
 		break;
 	case TEXTMSGTYPE_BountyMessage:
 		TextMsg->TextMsgType = Type;
 		TextMsg->Text[0] = 0;
 		PlaySfx( SFX_MyTeamGotFlag , FlagVolume );
-		MessageColour = FlagMessageColour;
+		MessageColour = MsgColours.FlagMessageColour;
 		break;
 	case TEXTMSGTYPE_SpeechTaunt:
 		TextMsg->TextMsgType = Type;
 		TextMsg->Text[0] = CurrentTauntVariant;
-		MessageColour = PlayerMessageColour;
+		MessageColour = MsgColours.PlayerMessageColour;
 		break;
 	default:
 		TextMsg->TextMsgType = TEXTMSGTYPE_Taunt1;
