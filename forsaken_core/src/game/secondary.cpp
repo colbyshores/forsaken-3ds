@@ -47,95 +47,7 @@ constexpr float SEC_LAUNCH_OFFSET = ( 75.0F * GLOBAL_SCALE );
 #include "game/oct2.h"
 #include "rendering/2dtextures.h"
 
-struct VISISHIP {
-
-	u_int16_t	Ship;
-	int16_t	ScreenX;
-	int16_t	ScreenY;
-	int16_t	InfoX;
-	int16_t	InfoY;
-
-};
-
-namespace {
-
-/* The secondary weapons' private state (one instance, g_secondary):
- * - the SecBulls[] free-list head (FirstSecBullFree) and the per-group bullet
- *   counts (NumSecBullsPerGroup), reset with the scene and changed as
- *   missiles and mines are made, die and change group;
- * - the incoming-missile warning (ImTargeted, TargetedDelay, MissileDistance,
- *   MissileNum), set by each homing missile and played by the per-frame
- *   processing;
- * - the local ship's fire delay and mug/solaris launch side (Toggle), changed
- *   as it fires;
- * - the per-ship damage smoke timers, the HUD name positions (each frame),
- *   the mine-sync tick rate, and the secondary pickups a dying ship drops
- *   (SecWeaponsGot);
- * - the constant tables only this file reads, as static members.
- * The list head, group counts, warning, fire delay and SecWeaponsGot are
- * saved and restored with the game. SecBulls[], FirstSecBullUsed,
- * SecBullGroups[], MinesCopy[] (a data pool) and the ammo tables stay
- * global. */
-class SecondaryWeapons {
-	public:
-	void      init();
-	/* find_free, add_to_group and remove_from_group stay out of line, as
-	 * FindFreeSecBull, AddSecBullToGroup and RemoveSecBullFromGroup were:
-	 * inlined they bulk up the per-bullet InitOneSecBull, CleanUpSecBull
-	 * and MoveSecBullToGroup. */
-	[[gnu::noinline]] u_int16_t find_free();
-	void      kill_used( u_int16_t i );
-	void      fire();
-	void      process();
-	bool      process_missile( u_int16_t i, u_int16_t * NextMissile );
-	void      scatter_weapons( VECTOR * Dir, int16_t MaxPickupsAllowed );
-	int16_t   generate_pickups( int16_t NumAllowed );
-	void      hud_names();
-	void      disp_hud_names();
-	void      create_scatter_trail( u_int16_t i );
-	void      create_tentacle( u_int16_t i );
-	void      gen_mine_list( u_int16_t Ship, SHORTMINE * MineSlots, BYTE * NumMines, BYTE Section );
-	void      sync_mines();
-	void      damaged_effects( u_int16_t i );
-	void      setup_groups();
-	[[gnu::noinline]] void add_to_group( u_int16_t i, u_int16_t Group );
-	[[gnu::noinline]] void remove_from_group( u_int16_t i, u_int16_t Group );
-	FILE *    save( FILE * fp );
-	FILE *    restore( FILE * fp );
-
-	private:
-	[[gnu::always_inline]] inline void FireSecondaryMugMissile( VECTOR & UpVector, VECTOR & Pos, VECTOR & Dir, VECTOR & DropVector );
-	[[gnu::always_inline]] inline void FireSecondarySolarisMissile( VECTOR & UpVector, VECTOR & Pos, VECTOR & Dir, VECTOR & DropVector );
-	[[gnu::always_inline]] inline void FireSecondarySelect( int16_t & OnceOnlyFlag );
-	[[gnu::always_inline]] inline void MissileHoming( u_int16_t & i, QUATLERP & qlerp, VECTOR & NormVector, float & Cos, float & Angle, float & DistToTarget, float & NewFramelag );
-	[[gnu::always_inline]] inline bool MissileStateUpdate( u_int16_t & i, QUATLERP & qlerp, VECTOR & DirVector, VECTOR & TempVector, VECTOR & NormVector, float & Speed, float & Cos, float & Angle, float & DistToTarget, u_int16_t & Light, MATRIX & UpMatrix, MATRIX & InvUpMatrix, QUAT & TempQuat, float & ClosestCos, u_int16_t & Ship, u_int16_t & Enemy, u_int16_t & Secondary, u_int16_t & OldGroup, VECTOR & Rotation, VECTOR & UpVector, VECTOR & TempPoint1, VECTOR & TempPoint2, float & NewFramelag );
-
-	/* The HUD name table first (the per-frame HUD stores index it), then the
-	 * small scalars, so every halfword access keeps an ldrh/strh immediate;
-	 * the larger arrays after them. */
-	int16_t   NumVisibleShips = 0;
-	VISISHIP  VisibleShipsPos[ MAX_PLAYERS ] = {};
-	u_int16_t FirstSecBullFree = 0;
-	u_int16_t MissileNum = 0;
-	int16_t   Toggle = 0;
-	bool      ImTargeted = false;
-	float     TargetedDelay = 0.0F;
-	float     MissileDistance = 0.0F;
-	float     SecondaryFireDelay = 0.0F;
-	float     ShipSmokeInterval = 1.0F;
-	int16_t   NumSecBullsPerGroup[ MAXGROUPS ] = {};
-	float     ShipSmokeTimes[ MAX_PLAYERS ] = {};
-	float     ticksperframe = 14.0F;
-	int8_t    SecWeaponsGot[ MAXPICKUPS ] = {};
-
-	static int8_t * DebugSecStrings[];
-	static int16_t  SecondarySfxLookup[ MAXSECONDARYWEAPONS ];
-	static int      TeamColours[ 4 ];
-	static VECTOR   OutlineOffsets[ NUMSCATTERPOINTS ];
-	static VECTOR   TentOutlineOffsets[ NUMSCATTERPOINTS ];
-};
-
-} // namespace
+static_assert( MAXPICKUPS == 256, "SecondaryWeapons::SecWeaponsGot is MAXPICKUPS long" );
 
 /*===================================================================
 	Globals
@@ -177,14 +89,13 @@ SECONDARYWEAPONBULLET	SecBulls[MAXSECONDARYWEAPONBULLETS];
 SHORTMINE	MinesCopy[ MAX_PLAYERS ][ MAXSECONDARYWEAPONBULLETS ];
 u_int16_t		FirstSecBullUsed;
 
-int16_t		SecondaryWeaponsGot[ MAXSECONDARYWEAPONS ];
-int16_t		SecAmmoUsed[ MAXSECONDARYWEAPONS ];
-int16_t		SecondaryAmmo[ MAXSECONDARYWEAPONS ];
-bool		TargetComputerOn = false;
+int16_t		SecondaryWeapons::SecondaryWeaponsGot[ MAXSECONDARYWEAPONS ];
+int16_t		SecondaryWeapons::SecAmmoUsed[ MAXSECONDARYWEAPONS ];
+int16_t		SecondaryWeapons::SecondaryAmmo[ MAXSECONDARYWEAPONS ];
 
 SECONDARYWEAPONBULLET *	SecBullGroups[ MAXGROUPS ];
 
-u_int16_t		GlobalSecBullsID = 0;
+u_int16_t		SecondaryWeapons::GlobalSecBullsID = 0;
 
 int8_t	*	SecondaryWeapons::DebugSecStrings[] = {
 
@@ -1449,7 +1360,7 @@ void CleanUpSecBull( u_int16_t i )
 				:	bool		NetFlag ( Send to everyone? )
 	Output		:	u_int16_t		SecBull Index ( -1 nothing )
 ===================================================================*/
-u_int16_t	InitOneSecBull( u_int16_t OwnerType, u_int16_t Owner, u_int16_t BulletID, u_int16_t Group,
+u_int16_t	SecondaryWeapons::init_one( u_int16_t OwnerType, u_int16_t Owner, u_int16_t BulletID, u_int16_t Group,
 						VECTOR * Pos, VECTOR * Offset, VECTOR * Dir, VECTOR * UpVector,
 						VECTOR * DropDir, int8_t Weapon, bool NetFlag )
 {
@@ -4487,7 +4398,7 @@ void CreateShockwave( u_int16_t OwnerType, u_int16_t Owner, VECTOR * Pos, u_int1
 				:	float		ShockwaveSize
 	Output		:	Nothing
 ===================================================================*/
-void ExplodeSecondary( u_int16_t OwnerType, u_int16_t Owner, u_int16_t ID, float ShockwaveSize )
+void SecondaryWeapons::explode( u_int16_t OwnerType, u_int16_t Owner, u_int16_t ID, float ShockwaveSize )
 {
 	u_int16_t	i;
 	u_int16_t	Next;
@@ -4528,7 +4439,7 @@ void ExplodeSecondary( u_int16_t OwnerType, u_int16_t Owner, u_int16_t ID, float
 	Input		:	u_int16_t		Owner
 	Output		:	Nothing
 ===================================================================*/
-void KillOwnersSecBulls( u_int16_t Owner )
+void SecondaryWeapons::kill_owners( u_int16_t Owner )
 {
 	u_int16_t	i;
 	u_int16_t	Next;
@@ -5117,7 +5028,7 @@ int16_t SecondaryWeapons::generate_pickups( int16_t NumAllowed )
 	Input		:	Nothing
 	Output		:	int16_t	Ammo Number
 ===================================================================*/
-int16_t GetCurSecAmmo( void )
+int16_t SecondaryWeapons::cur_ammo()
 {
 	return( SecondaryAmmo[ Ships[ WhoIAm ].Secondary ] );
 }
@@ -5128,7 +5039,7 @@ int16_t GetCurSecAmmo( void )
 	Input		:	Nothing
 	Output		:	void
 ===================================================================*/
-void SecondarySelectControl( void )
+void SecondaryWeapons::select_control()
 {
 	int16_t	Count;
 	u_int16_t	CurrentSecType, NewSecType;
@@ -5166,7 +5077,7 @@ void SecondarySelectControl( void )
 	Input		:	Nothing
 	Output		:	u_int16_t	Mine ( -1 None )
 ===================================================================*/
-u_int16_t GetBestMine( void )
+u_int16_t SecondaryWeapons::best_mine()
 {
 	u_int16_t	Mine = INDEX_NONE;
 	int16_t	Count = 0;
@@ -5209,7 +5120,7 @@ u_int16_t GetBestMine( void )
 	Input		:	Nothing
 	Output		:	Nothing
 ===================================================================*/
-void DropMine( void )
+void SecondaryWeapons::drop_mine()
 {
 	u_int16_t	Mine;
 	VECTOR	UpVector;
@@ -5297,8 +5208,7 @@ void DropMine( void )
 	}
 }
 
-u_int16_t		TargScrPolys[ 4 ] = { INDEX_NONE, INDEX_NONE, INDEX_NONE, INDEX_NONE };
-u_int16_t		HitBox = INDEX_NONE;
+u_int16_t		SecondaryWeapons::TargScrPolys[ 4 ] = { INDEX_NONE, INDEX_NONE, INDEX_NONE, INDEX_NONE };
 int			SecondaryWeapons::TeamColours[ 4 ] = { 1, 2, 3 ,4 };
 
 /*===================================================================
@@ -5331,7 +5241,7 @@ void GetFinalMatrix( MATRIX * FinalMatrix )
 				:	u_int16_t	ClosestEnemy
 	Output		:	Nothing
 ===================================================================*/
-void TargetingComputer( u_int16_t ClosestShip, u_int16_t ClosestEnemy )
+void SecondaryWeapons::targeting_computer( u_int16_t ClosestShip, u_int16_t ClosestEnemy )
 {
 	MATRIX	FinalMatrix;
 	VECTOR	LastPos;
@@ -5459,7 +5369,7 @@ void TargetingComputer( u_int16_t ClosestShip, u_int16_t ClosestEnemy )
 				:	u_int16_t	ClosestEnemy
 	Output		:	Nothing
 ===================================================================*/
-void HeatseakerTarget( u_int16_t ClosestShip, u_int16_t ClosestEnemy )
+void SecondaryWeapons::heatseeker_target( u_int16_t ClosestShip, u_int16_t ClosestEnemy )
 {
 	int16_t	Count;
 	bool	TempFlag;
@@ -6878,8 +6788,6 @@ void DestroySecondary( u_int16_t i, VECTOR * Int_Point )
 
 ===================================================================*/
 
-px_timer_t last_mine_timer;
-
 void SecondaryWeapons::gen_mine_list( u_int16_t Ship, SHORTMINE * MineSlots, BYTE * NumMines, BYTE Section )
 {
 	int16_t	Count;
@@ -6923,7 +6831,7 @@ void SecondaryWeapons::gen_mine_list( u_int16_t Ship, SHORTMINE * MineSlots, BYT
 				:	BYTE			Number of Mines
 	Output		:	Nothing
 ===================================================================*/
-void RegenMineList( SHORTMINE * Slots, BYTE Num )
+void SecondaryWeapons::regen_mine_list( SHORTMINE * Slots, BYTE Num )
 {
 	int16_t		Count;
 	u_int16_t		i;
@@ -7014,7 +6922,7 @@ void RegenerateQuedMines( void )
 	Input		:	u_int16_t		Player
 	Output		:	Nothing
 ===================================================================*/
-void CopyMines( u_int16_t Player )
+void SecondaryWeapons::copy_mines( u_int16_t Player )
 {
 	u_int16_t	i;
 	u_int16_t	Next;
@@ -7059,7 +6967,7 @@ void CopyMines( u_int16_t Player )
 				:	u_int16_t		ID
 	Output		:	Nothing
 ===================================================================*/
-void KillOwnerIDSecBulls( u_int16_t OwnerType, u_int16_t Owner, u_int16_t ID )
+void SecondaryWeapons::kill_owner_id( u_int16_t OwnerType, u_int16_t Owner, u_int16_t ID )
 {
 	u_int16_t	i;
 	u_int16_t	Next;
@@ -7212,7 +7120,7 @@ void SecondaryWeapons::damaged_effects( u_int16_t i )
 	Input		:	Nothing
 	Output		:	Nothing
 ===================================================================*/
-void DropSecondary( void )
+void SecondaryWeapons::drop_secondary()
 {
 	float	Speed;
 	float	LifeCount;
@@ -8027,7 +7935,7 @@ void MoveSecBullToGroup( u_int16_t i, u_int16_t OldGroup, u_int16_t NewGroup )
 				:	u_int16_t		Owner
 	Output		:	Nothing
 ===================================================================*/
-u_int16_t GetSecondaryBulletID( u_int16_t OwnerType, u_int16_t Owner )
+u_int16_t SecondaryWeapons::bullet_id( u_int16_t OwnerType, u_int16_t Owner )
 {
 	u_int16_t	BulletID = 0;
 
@@ -8354,7 +8262,7 @@ FILE * SecondaryWeapons::restore( FILE * fp )
 	Input		:	Nothing
 	Output		:	u_int8_t	Primary Weapon
 ===================================================================*/
-u_int8_t GetNextValidSeconadaryWeapon( void )
+u_int8_t SecondaryWeapons::next_valid_weapon()
 {
 	int8_t	TempWeapon;
 
@@ -8377,7 +8285,7 @@ u_int8_t GetNextValidSeconadaryWeapon( void )
 	Input		:	Nothing
 	Output		:	u_int8_t	Primary Weapon
 ===================================================================*/
-u_int8_t GetPrevValidSecondaryWeapon( void )
+u_int8_t SecondaryWeapons::prev_valid_weapon()
 {
 	int8_t	TempWeapon;
 
@@ -8460,25 +8368,47 @@ void ToggleSecondaryWeapons( int8_t Secondary )
 	}
 }
 
-namespace { SecondaryWeapons g_secondary; }
+SecondaryWeapons Secondaries;
 
-void InitSecBulls( void ) { g_secondary.init(); }
-u_int16_t FindFreeSecBull( void ) { return g_secondary.find_free(); }
-void KillUsedSecBull( u_int16_t i ) { g_secondary.kill_used( i ); }
-void FireSecondary( void ) { g_secondary.fire(); }
-void ProcessSecondaryBullets( void ) { g_secondary.process(); }
-bool ProcessMissiles( u_int16_t i, u_int16_t * NextMissile ) { return g_secondary.process_missile( i, NextMissile ); }
-void ScatterWeapons( VECTOR * Dir, int16_t MaxPickupsAllowed ) { g_secondary.scatter_weapons( Dir, MaxPickupsAllowed ); }
-int16_t GenerateSecondaryPickups( int16_t NumAllowed ) { return g_secondary.generate_pickups( NumAllowed ); }
-void HUDNames( void ) { g_secondary.hud_names(); }
-void DispHUDNames( void ) { g_secondary.disp_hud_names(); }
-void CreateScatterTrail( u_int16_t i ) { g_secondary.create_scatter_trail( i ); }
-void CreateTentacle( u_int16_t i ) { g_secondary.create_tentacle( i ); }
-void GenMineList( u_int16_t Ship, SHORTMINE * MineSlots, BYTE * NumMines, BYTE Section ) { g_secondary.gen_mine_list( Ship, MineSlots, NumMines, Section ); }
-void SyncMines( void ) { g_secondary.sync_mines(); }
-void DoDamagedEffects( u_int16_t i ) { g_secondary.damaged_effects( i ); }
-void SetupSecBullGroups( void ) { g_secondary.setup_groups(); }
-void AddSecBullToGroup( u_int16_t i, u_int16_t Group ) { g_secondary.add_to_group( i, Group ); }
-void RemoveSecBullFromGroup( u_int16_t i, u_int16_t Group ) { g_secondary.remove_from_group( i, Group ); }
-FILE * SaveSecBulls( FILE * fp ) { return g_secondary.save( fp ); }
-FILE * LoadSecBulls( FILE * fp ) { return g_secondary.restore( fp ); }
+/* FindFreeSecBull, AddSecBullToGroup and RemoveSecBullFromGroup hold the pool
+ * helpers' bodies and stay out of line, as the phase-1 members did: the x86
+ * -O3 build otherwise inlines them into the per-bullet InitOneSecBull
+ * (1129 -> 1162) and MoveSecBullToGroup (26 -> 48). */
+void InitSecBulls( void ) { Secondaries.init(); }
+[[gnu::noinline]] u_int16_t FindFreeSecBull( void ) { return Secondaries.find_free(); }
+void KillUsedSecBull( u_int16_t i ) { Secondaries.kill_used( i ); }
+void FireSecondary( void ) { Secondaries.fire(); }
+void ProcessSecondaryBullets( void ) { Secondaries.process(); }
+u_int16_t InitOneSecBull( u_int16_t OwnerType, u_int16_t Owner, u_int16_t BulletID, u_int16_t Group,
+						VECTOR * Pos, VECTOR * Offset, VECTOR * Dir, VECTOR * UpVector,
+						VECTOR * DropDir, int8_t Weapon, bool NetFlag ) { return Secondaries.init_one( OwnerType, Owner, BulletID, Group, Pos, Offset, Dir, UpVector, DropDir, Weapon, NetFlag ); }
+bool ProcessMissiles( u_int16_t i, u_int16_t * NextMissile ) { return Secondaries.process_missile( i, NextMissile ); }
+void ExplodeSecondary( u_int16_t OwnerType, u_int16_t Owner, u_int16_t ID, float ShockwaveSize ) { Secondaries.explode( OwnerType, Owner, ID, ShockwaveSize ); }
+void KillOwnersSecBulls( u_int16_t Owner ) { Secondaries.kill_owners( Owner ); }
+void ScatterWeapons( VECTOR * Dir, int16_t MaxPickupsAllowed ) { Secondaries.scatter_weapons( Dir, MaxPickupsAllowed ); }
+int16_t GenerateSecondaryPickups( int16_t NumAllowed ) { return Secondaries.generate_pickups( NumAllowed ); }
+int16_t GetCurSecAmmo( void ) { return Secondaries.cur_ammo(); }
+void SecondarySelectControl( void ) { Secondaries.select_control(); }
+u_int16_t GetBestMine( void ) { return Secondaries.best_mine(); }
+void DropMine( void ) { Secondaries.drop_mine(); }
+void TargetingComputer( u_int16_t ClosestShip, u_int16_t ClosestEnemy ) { Secondaries.targeting_computer( ClosestShip, ClosestEnemy ); }
+void HeatseakerTarget( u_int16_t ClosestShip, u_int16_t ClosestEnemy ) { Secondaries.heatseeker_target( ClosestShip, ClosestEnemy ); }
+void HUDNames( void ) { Secondaries.hud_names(); }
+void DispHUDNames( void ) { Secondaries.disp_hud_names(); }
+void CreateScatterTrail( u_int16_t i ) { Secondaries.create_scatter_trail( i ); }
+void CreateTentacle( u_int16_t i ) { Secondaries.create_tentacle( i ); }
+void GenMineList( u_int16_t Ship, SHORTMINE * MineSlots, BYTE * NumMines, BYTE Section ) { Secondaries.gen_mine_list( Ship, MineSlots, NumMines, Section ); }
+void RegenMineList( SHORTMINE * Slots, BYTE Num ) { Secondaries.regen_mine_list( Slots, Num ); }
+void SyncMines( void ) { Secondaries.sync_mines(); }
+void CopyMines( u_int16_t Player ) { Secondaries.copy_mines( Player ); }
+void KillOwnerIDSecBulls( u_int16_t OwnerType, u_int16_t Owner, u_int16_t ID ) { Secondaries.kill_owner_id( OwnerType, Owner, ID ); }
+void DoDamagedEffects( u_int16_t i ) { Secondaries.damaged_effects( i ); }
+void DropSecondary( void ) { Secondaries.drop_secondary(); }
+void SetupSecBullGroups( void ) { Secondaries.setup_groups(); }
+[[gnu::noinline]] void AddSecBullToGroup( u_int16_t i, u_int16_t Group ) { Secondaries.add_to_group( i, Group ); }
+[[gnu::noinline]] void RemoveSecBullFromGroup( u_int16_t i, u_int16_t Group ) { Secondaries.remove_from_group( i, Group ); }
+u_int16_t GetSecondaryBulletID( u_int16_t OwnerType, u_int16_t Owner ) { return Secondaries.bullet_id( OwnerType, Owner ); }
+FILE * SaveSecBulls( FILE * fp ) { return Secondaries.save( fp ); }
+FILE * LoadSecBulls( FILE * fp ) { return Secondaries.restore( fp ); }
+u_int8_t GetNextValidSeconadaryWeapon( void ) { return Secondaries.next_valid_weapon(); }
+u_int8_t GetPrevValidSecondaryWeapon( void ) { return Secondaries.prev_valid_weapon(); }

@@ -2535,7 +2535,7 @@ void ReceiveGameMessages( void )
 	if( ShortMineMsg->Mines == Ships[WhoIAm].Mines )
 	{
 		if( Ships[WhoIAm].Mines == ( ( MAXSECONDARYWEAPONBULLETS / MAXGENMINECOUNT	) + 1 ) )
-			timer_run( &last_mine_timer );
+			Secondaries.mark_first_mine_message();
 
 		DebugPrintf( "Message from host to init mines\n" );
 

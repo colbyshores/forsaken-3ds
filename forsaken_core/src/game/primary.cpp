@@ -633,12 +633,12 @@ void PrimaryWeapons::restore_ammo()
 
 	for( Count = 0; Count < MAXSECONDARYWEAPONS; Count++ )
 	{
-		SecondaryAmmo[ Count ] = 0;
-		SecondaryWeaponsGot[ Count ] = 0;
+		Secondaries.load_ammo( Count, 0 );
+		Secondaries.take_weapon( Count );
 	}
 
-	SecondaryWeaponsGot[ MUGMISSILE ] = 1;
-	SecondaryAmmo[ MUGMISSILE ] = 5;
+	Secondaries.give_weapon( MUGMISSILE );
+	Secondaries.load_ammo( MUGMISSILE, 5 );
 }
 
 
@@ -653,7 +653,7 @@ void PrimaryWeapons::init_ammo_used()
 
 	for( Count = 0; Count < MAXSECONDARYWEAPONS; Count++ )
 	{
-		SecAmmoUsed[ Count ] = 0;
+		Secondaries.reset_ammo_owed( Count, 0 );
 	}
 
 	GeneralAmmoUsed = 0.0F;
@@ -7264,8 +7264,8 @@ void PrimaryWeapons::give_all_weapons()
 	for( Count = 0; Count < MAXPRIMARYWEAPONS; Count++ ) GodModeCopyOfWeaponsGot[ Count ] = PrimaryWeaponsGot[ Count ];
 	for( Count = 0; Count < MAXSECONDARYWEAPONS; Count++ )
 	{
-		GodModeCopyOfSecondaryAmmo[ Count ] = SecondaryAmmo[ Count ];
-		GodModeCopyOfSecondaryWeaponsGot[ Count ] = SecondaryWeaponsGot[ Count ];
+		GodModeCopyOfSecondaryAmmo[ Count ] = Secondaries.ammo( Count );
+		GodModeCopyOfSecondaryWeaponsGot[ Count ] = Secondaries.got_weapon( Count );
 	}
 
 	GodModeCopyOfPrimary = Ships[ WhoIAm ].Primary;
@@ -7292,8 +7292,8 @@ void PrimaryWeapons::give_all_weapons()
 
 	for( Count = 0; Count < MAXSECONDARYWEAPONS; Count++ )
 	{
-		SecondaryAmmo[ Count ] = 1;
-		SecondaryWeaponsGot[ Count ] = 1;
+		Secondaries.load_ammo( Count, 1 );
+		Secondaries.give_weapon( Count );
 	}
 
 	if( Ships[ WhoIAm ].Invul && PickupState.invul_from_pickup() ) PickupState.owe_invul();
@@ -7321,8 +7321,8 @@ void PrimaryWeapons::lose_all_weapons()
 	for( Count = 0; Count < MAXPRIMARYWEAPONS; Count++ ) PrimaryWeaponsGot[ Count ] = GodModeCopyOfWeaponsGot[ Count ];
 	for( Count = 0; Count < MAXSECONDARYWEAPONS; Count++ )
 	{
-		SecondaryAmmo[ Count ] = GodModeCopyOfSecondaryAmmo[ Count ];
-		SecondaryWeaponsGot[ Count ] = GodModeCopyOfSecondaryWeaponsGot[ Count ];
+		Secondaries.load_ammo( Count, GodModeCopyOfSecondaryAmmo[ Count ] );
+		Secondaries.load_weapon( Count, GodModeCopyOfSecondaryWeaponsGot[ Count ] );
 	}
 
 	Ships[ WhoIAm ].Primary = GodModeCopyOfPrimary;

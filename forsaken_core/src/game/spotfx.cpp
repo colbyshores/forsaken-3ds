@@ -1201,7 +1201,7 @@ void CreateSpotFXFirePrimary( VECTOR * Pos, VECTOR * Dir, VECTOR * Up,
 
 	if( Weapon != (u_int8_t) -1 )
 	{
-		EnemyFirePrimary( OWNER_NOBODY, WhoIAm, GlobalSecBullsID++, Weapon, Group, Pos, &TempVector, Dir, Up, 2, 0.0F, false, nullptr );
+		EnemyFirePrimary( OWNER_NOBODY, WhoIAm, Secondaries.next_bullet_id(), Weapon, Group, Pos, &TempVector, Dir, Up, 2, 0.0F, false, nullptr );
 	}
 }
 

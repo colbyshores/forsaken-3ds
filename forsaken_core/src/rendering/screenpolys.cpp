@@ -211,8 +211,7 @@ void ScrPolyPool::init()
 	u_int16_t	i;
 
 	FlashScreenPoly = INDEX_NONE;
-	HitBox = INDEX_NONE;
-	for( i = 0; i < 4; i++ ) TargScrPolys[ i ] = INDEX_NONE;
+	Secondaries.forget_target_polys();
 	ClearCountdownBuffers();
 
 	FirstScrPolyUsed = INDEX_NONE;

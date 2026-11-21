@@ -852,14 +852,14 @@ void PickupPool::clear_got()
 /* PICKUP_Mugs */
 [[gnu::always_inline]] static inline void CollectMugs( u_int16_t & i, int16_t & PickupEnable, int16_t & Temp, u_int8_t (&Message)[ 128 ], int16_t & MessageSFX )
 {
-	if( SecondaryAmmo[ MUGMISSILE ] < 10 )
+	if( Secondaries.ammo( MUGMISSILE ) < 10 )
 	{
-		SecondaryAmmo[ MUGMISSILE ] += 3;
-		if( SecondaryAmmo[ MUGMISSILE ] > 10 )
+		Secondaries.add_ammo( MUGMISSILE, 3 );
+		if( Secondaries.ammo( MUGMISSILE ) > 10 )
 		{
-			Temp = ( SecondaryAmmo[ MUGMISSILE ] - 10 );
-			SecAmmoUsed[ MUGMISSILE ] = Temp;
-			SecondaryAmmo[ MUGMISSILE ] = 10;
+			Temp = ( Secondaries.ammo( MUGMISSILE ) - 10 );
+			Secondaries.reset_ammo_owed( MUGMISSILE, Temp );
+			Secondaries.load_ammo( MUGMISSILE, 10 );
 		}
 		NewSecondaryWeapon( MUGMISSILE );
 		MessageSFX = SFX_Select_MugMissile;
@@ -875,14 +875,14 @@ void PickupPool::clear_got()
 /* PICKUP_HeatseakerPickup */
 [[gnu::always_inline]] static inline void CollectHeatseakerPickup( u_int16_t & i, int16_t & PickupEnable, int16_t & Temp, u_int8_t (&Message)[ 128 ], int16_t & MessageSFX )
 {
-	if( SecondaryAmmo[ SOLARISMISSILE ] < 10 )
+	if( Secondaries.ammo( SOLARISMISSILE ) < 10 )
 	{
-		SecondaryAmmo[ SOLARISMISSILE ] += 3;
-		if( SecondaryAmmo[ SOLARISMISSILE ] > 10 )
+		Secondaries.add_ammo( SOLARISMISSILE, 3 );
+		if( Secondaries.ammo( SOLARISMISSILE ) > 10 )
 		{
-			Temp = ( SecondaryAmmo[ SOLARISMISSILE ] - 10 );
-			SecAmmoUsed[ SOLARISMISSILE ] = Temp;
-			SecondaryAmmo[ SOLARISMISSILE ] = 10;
+			Temp = ( Secondaries.ammo( SOLARISMISSILE ) - 10 );
+			Secondaries.reset_ammo_owed( SOLARISMISSILE, Temp );
+			Secondaries.load_ammo( SOLARISMISSILE, 10 );
 		}
 		NewSecondaryWeapon( SOLARISMISSILE );
 		MessageSFX = SFX_Select_SolarisMissile;
@@ -898,9 +898,9 @@ void PickupPool::clear_got()
 /* PICKUP_Thief */
 [[gnu::always_inline]] static inline void CollectThief( u_int16_t & i, int16_t & PickupEnable, u_int8_t (&Message)[ 128 ], int16_t & MessageSFX )
 {
-	if( !SecondaryAmmo[ THIEFMISSILE ] )
+	if( !Secondaries.ammo( THIEFMISSILE ) )
 	{
-		SecondaryAmmo[ THIEFMISSILE ] += 1;
+		Secondaries.add_ammo( THIEFMISSILE, 1 );
 		NewSecondaryWeapon( THIEFMISSILE );
 	}
 	else
@@ -915,9 +915,9 @@ void PickupPool::clear_got()
 /* PICKUP_Scatter */
 [[gnu::always_inline]] static inline void CollectScatter( u_int16_t & i, int16_t & PickupEnable, u_int8_t (&Message)[ 128 ], int16_t & MessageSFX )
 {
-	if( SecondaryAmmo[ SCATTERMISSILE ] < 3 )
+	if( Secondaries.ammo( SCATTERMISSILE ) < 3 )
 	{
-		SecondaryAmmo[ SCATTERMISSILE ] += 1;
+		Secondaries.add_ammo( SCATTERMISSILE, 1 );
 		NewSecondaryWeapon( SCATTERMISSILE );
 		MessageSFX = SFX_Select_ScatterMissile;
 	}
@@ -933,9 +933,9 @@ void PickupPool::clear_got()
 /* PICKUP_Gravgon */
 [[gnu::always_inline]] static inline void CollectGravgon( u_int16_t & i, int16_t & PickupEnable, u_int8_t (&Message)[ 128 ], int16_t & MessageSFX )
 {
-	if( !SecondaryAmmo[ GRAVGONMISSILE ] )
+	if( !Secondaries.ammo( GRAVGONMISSILE ) )
 	{
-		SecondaryAmmo[ GRAVGONMISSILE ] += 1;
+		Secondaries.add_ammo( GRAVGONMISSILE, 1 );
 		NewSecondaryWeapon( GRAVGONMISSILE );
 		MessageSFX = SFX_Select_GravgonMissile;
 	}
@@ -950,14 +950,14 @@ void PickupPool::clear_got()
 /* PICKUP_Launcher */
 [[gnu::always_inline]] static inline void CollectLauncher( u_int16_t & i, int16_t & PickupEnable, int16_t & Temp, u_int8_t (&Message)[ 128 ], int16_t & MessageSFX )
 {
-	if( SecondaryAmmo[ MULTIPLEMISSILE ] < 100 )
+	if( Secondaries.ammo( MULTIPLEMISSILE ) < 100 )
 	{
-		SecondaryAmmo[ MULTIPLEMISSILE ] += 50;
-		if( SecondaryAmmo[ MULTIPLEMISSILE ] > 100 )
+		Secondaries.add_ammo( MULTIPLEMISSILE, 50 );
+		if( Secondaries.ammo( MULTIPLEMISSILE ) > 100 )
 		{
-			Temp = ( SecondaryAmmo[ MULTIPLEMISSILE ] - 100 );
-			SecAmmoUsed[ MULTIPLEMISSILE ] = Temp;
-			SecondaryAmmo[ MULTIPLEMISSILE ] = 100;
+			Temp = ( Secondaries.ammo( MULTIPLEMISSILE ) - 100 );
+			Secondaries.reset_ammo_owed( MULTIPLEMISSILE, Temp );
+			Secondaries.load_ammo( MULTIPLEMISSILE, 100 );
 		}
 		NewSecondaryWeapon( MULTIPLEMISSILE );
 		MessageSFX = SFX_Select_MFRL;
@@ -973,9 +973,9 @@ void PickupPool::clear_got()
 /* PICKUP_TitanStar */
 [[gnu::always_inline]] static inline void CollectTitanStar( u_int16_t & i, int16_t & PickupEnable, u_int8_t (&Message)[ 128 ], int16_t & MessageSFX, int16_t & TriggeredSFX )
 {
-	if( SecondaryAmmo[ TITANSTARMISSILE ] < 3 )
+	if( Secondaries.ammo( TITANSTARMISSILE ) < 3 )
 	{
-		SecondaryAmmo[ TITANSTARMISSILE ] += 1;
+		Secondaries.add_ammo( TITANSTARMISSILE, 1 );
 		NewSecondaryWeapon( TITANSTARMISSILE );
 		MessageSFX = SFX_Select_TitanStarMissile;
 		TriggeredSFX = SFX_BIKER_BW;
@@ -991,14 +991,14 @@ void PickupPool::clear_got()
 /* PICKUP_PurgePickup */
 [[gnu::always_inline]] static inline void CollectPurgePickup( u_int16_t & i, int16_t & PickupEnable, int16_t & Temp, u_int8_t (&Message)[ 128 ], int16_t & MessageSFX )
 {
-	if( SecondaryAmmo[ PURGEMINE ] < 10 )
+	if( Secondaries.ammo( PURGEMINE ) < 10 )
 	{
-		SecondaryAmmo[ PURGEMINE ] += 3;
-		if( SecondaryAmmo[ PURGEMINE ] > 10 )
+		Secondaries.add_ammo( PURGEMINE, 3 );
+		if( Secondaries.ammo( PURGEMINE ) > 10 )
 		{
-			Temp = ( SecondaryAmmo[ PURGEMINE ] - 10 );
-			SecAmmoUsed[ PURGEMINE ] = Temp;
-			SecondaryAmmo[ PURGEMINE ] = 10;
+			Temp = ( Secondaries.ammo( PURGEMINE ) - 10 );
+			Secondaries.reset_ammo_owed( PURGEMINE, Temp );
+			Secondaries.load_ammo( PURGEMINE, 10 );
 		}
 		NewSecondaryWeapon( PURGEMINE );
 		MessageSFX = SFX_Select_PurgeMine;
@@ -1014,14 +1014,14 @@ void PickupPool::clear_got()
 /* PICKUP_PinePickup */
 [[gnu::always_inline]] static inline void CollectPinePickup( u_int16_t & i, int16_t & PickupEnable, int16_t & Temp, u_int8_t (&Message)[ 128 ], int16_t & MessageSFX )
 {
-	if( SecondaryAmmo[ PINEMINE ] < 6 )
+	if( Secondaries.ammo( PINEMINE ) < 6 )
 	{
-		SecondaryAmmo[ PINEMINE ] += 3;
-		if( SecondaryAmmo[ PINEMINE ] > 6 )
+		Secondaries.add_ammo( PINEMINE, 3 );
+		if( Secondaries.ammo( PINEMINE ) > 6 )
 		{
-			Temp = ( SecondaryAmmo[ PINEMINE ] - 6 );
-			SecAmmoUsed[ PINEMINE ] = Temp;
-			SecondaryAmmo[ PINEMINE ] = 6;
+			Temp = ( Secondaries.ammo( PINEMINE ) - 6 );
+			Secondaries.reset_ammo_owed( PINEMINE, Temp );
+			Secondaries.load_ammo( PINEMINE, 6 );
 		}
 		NewSecondaryWeapon( PINEMINE );
 		MessageSFX = SFX_Select_PineMine;
@@ -1038,9 +1038,9 @@ void PickupPool::clear_got()
 /* PICKUP_QuantumPickup */
 [[gnu::always_inline]] static inline void CollectQuantumPickup( u_int16_t & i, int16_t & PickupEnable, u_int8_t (&Message)[ 128 ], int16_t & MessageSFX )
 {
-	if( !SecondaryAmmo[ QUANTUMMINE ] )
+	if( !Secondaries.ammo( QUANTUMMINE ) )
 	{
-		SecondaryAmmo[ QUANTUMMINE ] += 1;
+		Secondaries.add_ammo( QUANTUMMINE, 1 );
 		NewSecondaryWeapon( QUANTUMMINE );
 		MessageSFX = SFX_Select_QuantumMine;
 	}
@@ -1056,14 +1056,14 @@ void PickupPool::clear_got()
 /* PICKUP_SpiderPod */
 [[gnu::always_inline]] static inline void CollectSpiderPod( u_int16_t & i, int16_t & PickupEnable, int16_t & Temp, u_int8_t (&Message)[ 128 ], int16_t & MessageSFX )
 {
-	if( SecondaryAmmo[ SPIDERMINE ] < 6 )
+	if( Secondaries.ammo( SPIDERMINE ) < 6 )
 	{
-		SecondaryAmmo[ SPIDERMINE ] += 3;
-		if( SecondaryAmmo[ SPIDERMINE ] > 6 )
+		Secondaries.add_ammo( SPIDERMINE, 3 );
+		if( Secondaries.ammo( SPIDERMINE ) > 6 )
 		{
-			Temp = ( SecondaryAmmo[ SPIDERMINE ] - 6 );
-			SecAmmoUsed[ SPIDERMINE ] = Temp;
-			SecondaryAmmo[ SPIDERMINE ] = 6;
+			Temp = ( Secondaries.ammo( SPIDERMINE ) - 6 );
+			Secondaries.reset_ammo_owed( SPIDERMINE, Temp );
+			Secondaries.load_ammo( SPIDERMINE, 6 );
 		}
 		NewSecondaryWeapon( SPIDERMINE );
 	}
@@ -1652,7 +1652,7 @@ bool CollectPickup( u_int16_t i )
 
 		case PICKUP_Computer:
 
-			TargetComputerOn = true;
+			Secondaries.fit_targeting_computer();
 
 			break;
 
@@ -1780,7 +1780,7 @@ void NewSecondaryWeapon( int16_t Weapon )
 {
 	u_int16_t	Current_Type;
 
-	SecondaryWeaponsGot[ Weapon ] = 1;
+	Secondaries.give_weapon( Weapon );
 
 	Current_Type = SecondaryWeaponAttribs[ Ships[ WhoIAm ].Secondary ].SecType;
 	if( SecondaryWeaponAttribs[ Weapon ].SecType != Current_Type ) return;
@@ -3610,55 +3610,55 @@ void PickupPool::regenerate()
 		if( RegeneratePickup( PICKUP_Orb ) ) NumOrbs--;
 	}
 
-	if( SecAmmoUsed[ SOLARISMISSILE ] >= 3 )
+	if( Secondaries.ammo_owed( SOLARISMISSILE ) >= 3 )
 	{
 		if( RegeneratePickup( PICKUP_HeatseakerPickup ) )
-			SecAmmoUsed[ SOLARISMISSILE ] -= 3;
+			Secondaries.ammo_regenerated( SOLARISMISSILE, 3 );
 	}
 
-	if( SecAmmoUsed[ THIEFMISSILE ] )
+	if( Secondaries.ammo_owed( THIEFMISSILE ) )
 	{
-		if( RegeneratePickup( PICKUP_Thief ) ) SecAmmoUsed[ THIEFMISSILE ] --;
+		if( RegeneratePickup( PICKUP_Thief ) ) Secondaries.ammo_regenerated( THIEFMISSILE, 1 );
 	}
 
-	if( SecAmmoUsed[ SCATTERMISSILE ] )
+	if( Secondaries.ammo_owed( SCATTERMISSILE ) )
 	{
-		if( RegeneratePickup( PICKUP_Scatter ) ) SecAmmoUsed[ SCATTERMISSILE ]--;
+		if( RegeneratePickup( PICKUP_Scatter ) ) Secondaries.ammo_regenerated( SCATTERMISSILE, 1 );
 	}
 
-	if( SecAmmoUsed[ GRAVGONMISSILE ] )
+	if( Secondaries.ammo_owed( GRAVGONMISSILE ) )
 	{
-		if( RegeneratePickup( PICKUP_Gravgon ) ) SecAmmoUsed[ GRAVGONMISSILE ]--;
+		if( RegeneratePickup( PICKUP_Gravgon ) ) Secondaries.ammo_regenerated( GRAVGONMISSILE, 1 );
 	}
 
-	if( SecAmmoUsed[ MULTIPLEMISSILE ] >= 50  )
+	if( Secondaries.ammo_owed( MULTIPLEMISSILE ) >= 50  )
 	{
-		if( RegeneratePickup( PICKUP_Launcher ) ) SecAmmoUsed[ MULTIPLEMISSILE ] -= 50;
+		if( RegeneratePickup( PICKUP_Launcher ) ) Secondaries.ammo_regenerated( MULTIPLEMISSILE, 50 );
 	}
 
-	if( SecAmmoUsed[ TITANSTARMISSILE ] )
+	if( Secondaries.ammo_owed( TITANSTARMISSILE ) )
 	{
-		if( RegeneratePickup( PICKUP_TitanStar ) ) SecAmmoUsed[ TITANSTARMISSILE ]--;
+		if( RegeneratePickup( PICKUP_TitanStar ) ) Secondaries.ammo_regenerated( TITANSTARMISSILE, 1 );
 	}
 
-	if( SecAmmoUsed[ PURGEMINE ] >= 3 )
+	if( Secondaries.ammo_owed( PURGEMINE ) >= 3 )
 	{
-		if( RegeneratePickup( PICKUP_PurgePickup ) ) SecAmmoUsed[ PURGEMINE ] -= 3;
+		if( RegeneratePickup( PICKUP_PurgePickup ) ) Secondaries.ammo_regenerated( PURGEMINE, 3 );
 	}
 
-	if( SecAmmoUsed[ PINEMINE ] >= 3 )
+	if( Secondaries.ammo_owed( PINEMINE ) >= 3 )
 	{
-		if( RegeneratePickup( PICKUP_PinePickup ) ) SecAmmoUsed[ PINEMINE ] -= 3;
+		if( RegeneratePickup( PICKUP_PinePickup ) ) Secondaries.ammo_regenerated( PINEMINE, 3 );
 	}
 
-	if( SecAmmoUsed[ QUANTUMMINE ] )
+	if( Secondaries.ammo_owed( QUANTUMMINE ) )
 	{
-		if( RegeneratePickup( PICKUP_QuantumPickup ) ) SecAmmoUsed[ QUANTUMMINE ]--;
+		if( RegeneratePickup( PICKUP_QuantumPickup ) ) Secondaries.ammo_regenerated( QUANTUMMINE, 1 );
 	}
 
-	if( SecAmmoUsed[ SPIDERMINE ] >= 3 )
+	if( Secondaries.ammo_owed( SPIDERMINE ) >= 3 )
 	{
-		if( RegeneratePickup( PICKUP_SpiderPod ) ) SecAmmoUsed[ SPIDERMINE ]--;
+		if( RegeneratePickup( PICKUP_SpiderPod ) ) Secondaries.ammo_regenerated( SPIDERMINE, 1 );
 	}
 
 }
@@ -4076,47 +4076,47 @@ void PickupPool::add_to_regen( u_int16_t Type )
 		break;
 
 	case PICKUP_PurgePickup:
-		SecAmmoUsed[ PURGEMINE ] += 3;
+		Secondaries.owe_ammo( PURGEMINE, 3 );
 		break;
 
 	case PICKUP_PinePickup:
-		SecAmmoUsed[ PINEMINE ] += 3;
+		Secondaries.owe_ammo( PINEMINE, 3 );
 		break;
 
 	case PICKUP_QuantumPickup:
-		SecAmmoUsed[ QUANTUMMINE ] += 1;
+		Secondaries.owe_ammo( QUANTUMMINE, 1 );
 		break;
 
 	case PICKUP_SpiderPod:
-		SecAmmoUsed[ SPIDERMINE ] += 3;
+		Secondaries.owe_ammo( SPIDERMINE, 3 );
 		break;
 
 	case PICKUP_Gravgon:
-		SecAmmoUsed[ GRAVGONMISSILE ] += 1;
+		Secondaries.owe_ammo( GRAVGONMISSILE, 1 );
 		break;
 
 	case PICKUP_TitanStar:
-		SecAmmoUsed[ TITANSTARMISSILE ] += 1;
+		Secondaries.owe_ammo( TITANSTARMISSILE, 1 );
 		break;
 
 	case PICKUP_Scatter:
-		SecAmmoUsed[ SCATTERMISSILE ] += 1;
+		Secondaries.owe_ammo( SCATTERMISSILE, 1 );
 		break;
 
 	case PICKUP_Thief:
-		SecAmmoUsed[ THIEFMISSILE ] += 1;
+		Secondaries.owe_ammo( THIEFMISSILE, 1 );
 		break;
 
 	case PICKUP_Launcher:
-		SecAmmoUsed[ MULTIPLEMISSILE ] += 50;
+		Secondaries.owe_ammo( MULTIPLEMISSILE, 50 );
 		break;
 
 	case PICKUP_HeatseakerPickup:
-		SecAmmoUsed[ SOLARISMISSILE ] += 3;
+		Secondaries.owe_ammo( SOLARISMISSILE, 3 );
 		break;
 
 	case PICKUP_Mugs:
-		SecAmmoUsed[ MUGMISSILE ] += 3;
+		Secondaries.owe_ammo( MUGMISSILE, 3 );
 		break;
 
 	case PICKUP_Mantle:

@@ -580,13 +580,13 @@ void SetViewportError( const char *where, render_viewport_t *vp )
 		{
 			// Awesome !!!
 			// We need to make this a standard feature!!!
-			if( TargetComputerOn )
+			if( Secondaries.has_targeting_computer() )
 			{
-				TargetComputerOn = false;
+				Secondaries.remove_targeting_computer();
 			}
 			else
 			{
-				TargetComputerOn = true;
+				Secondaries.fit_targeting_computer();
 			}
 		}
 	}
@@ -973,10 +973,10 @@ int GetCurPrimAmmo( void )
 		{
 			current = ( Count == Ships[WhoIAm].Secondary || GetBestMine() == Count );
 			if(Count == 7) top += FontHeight; // add space for mines
-			if( current || (u_int16_t) SecondaryAmmo[ Count ] > 0 )
+			if( current || (u_int16_t) Secondaries.ammo( Count ) > 0 )
 			{
 				Print4x5Text( SecondaryNames[Count], left, top, HUDColour );
-				Printu_int16_t( (u_int16_t) SecondaryAmmo[ Count ] , right, top, HUDColour );
+				Printu_int16_t( (u_int16_t) Secondaries.ammo( Count ) , right, top, HUDColour );
 			}
 			top += FontHeight;
 		}
@@ -991,7 +991,7 @@ int GetCurPrimAmmo( void )
 	{
 		int left = render_info.window_size.cx;
 		Print4x5Text( SecondaryNames[mine], left-FontWidth*10, top, HUDColour );
-		Printu_int16_t( (u_int16_t) SecondaryAmmo[mine], left-FontWidth*2, top, HUDColour );
+		Printu_int16_t( (u_int16_t) Secondaries.ammo( mine ), left-FontWidth*2, top, HUDColour );
 	}
 
 	// bottom right
@@ -3836,7 +3836,7 @@ bool MainGameRender(void)
 		return false;
 
 	/* do the target c omputer trick */
-	if( TargetComputerOn )
+	if( Secondaries.has_targeting_computer() )
 	{
 		set_alpha_states();
 		DispTracker();
