@@ -102,9 +102,9 @@ R2|visi.cpp|find_visible|float-to-int cast in loop body
 R2|visi.cpp|find_visible|float-to-int cast in loop body
 R2|visi.cpp|find_visible|float-to-int cast in loop body
 R2|visi.cpp|find_visible|float-to-int cast in loop body
-R3|collision.cpp|ObjectCollide|float comparison driving control flow in hot loop
-R3|collision.cpp|ObjectCollide|float comparison driving control flow in hot loop
-R3|collision.cpp|ObjectCollide|float comparison driving control flow in hot loop
+R3|collision.cpp|object_collide|float comparison driving control flow in hot loop
+R3|collision.cpp|object_collide|float comparison driving control flow in hot loop
+R3|collision.cpp|object_collide|float comparison driving control flow in hot loop
 R3|collision.cpp|QCollide|float comparison driving control flow in hot loop
 R3|collision.cpp|QCollide|float comparison driving control flow in hot loop
 R3|collision.cpp|QCollide|float comparison driving control flow in hot loop
@@ -162,10 +162,10 @@ R7|aispline.cpp|AI_SPLINE_FOLLOWPATH|float division in hot loop
 R7|aispline.cpp|AI_SPLINE_FOLLOWPATH|float division in hot loop
 R7|aispline.cpp|AI_SPLINE_FOLLOWPATH|float division inner_loop=false
 R7|aispline.cpp|AI_SPLINE_FOLLOWPATH|float division inner_loop=false
-R7|collision.cpp|BackgroundCollide|float division in hot loop
-R7|collision.cpp|BackgroundCollide|sqrtf in hot loop
-R7|collision.cpp|ColRayPlaneIntersect|float division inner_loop=false
-R7|collision.cpp|ObjectCollide|float division in hot loop
+R7|collision.cpp|background_collide|float division in hot loop
+R7|collision.cpp|background_collide|sqrtf in hot loop
+R7|collision.cpp|ray_plane_intersect|float division inner_loop=false
+R7|collision.cpp|object_collide|float division in hot loop
 R7|collision.cpp|QCollide|float division in hot loop
 R7|lights.cpp|XLight1Group|float division in hot loop
 R7|lights.cpp|XLight1Group|float division in hot loop

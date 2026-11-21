@@ -24,8 +24,8 @@
  * moving or bouncing (it still clips *Move_Off); ObjectCollideNoBounce moves
  * without bouncing.
  *
- * Results pass through file-scope state in collision.cpp (the current ray and
- * the nearest component hit), so none of this is re-entrant.
+ * Results pass through collision.cpp's one CollisionQuery instance (the
+ * current ray and the nearest component hit), so none of this is re-entrant.
  *
  * GetComEnemyHitInfo / CheckAnyEnemyHit report the enemy whose components were
  * hit by the most recent BackgroundCollide or OneGroupBGObjectCol (the first
@@ -102,7 +102,5 @@ u_int16_t CheckAnyEnemyHit( void );
 
 /* Defined in collision.cpp. no_collision is a debug toggle (Shift+F12 in
  * oct2.cpp) read by ships.cpp and pickups.cpp; while set, ships skip
- * background collision. ColChild is the component hit by the last zone test;
- * nothing outside collision.cpp reads it. */
+ * background collision. */
 extern int no_collision;
-extern COMP_OBJ * ColChild;

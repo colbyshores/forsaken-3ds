@@ -39,30 +39,86 @@ constexpr float OUTSIDE_GROUP_TOLERANCE = (25.0F);
 
 int no_collision = 0;
 
-static VECTOR		ColPoint;
-static ZONESIDE	*	ColSide;
-static float		ColDist;
-COMP_OBJ	*	ColChild;
-static int			ColCollided;
-static float		ColRadius;
-static VECTOR		ColDir;
-static BGOBJECT *	ColParent;
-static int16_t		ColZoneNum;
+namespace {
 
-static	u_int16_t		CompEnemyHit = INDEX_NONE;
-static	u_int16_t		AnyCompEnemyHit = INDEX_NONE;
-static	VECTOR		CompEnemyHitPos;
-static	NORMAL		CompEnemyHitNormal;
-static	float		CompEnemyHitDist;
+/* The current collision query (one instance, g_colquery): the ray being cast
+ * (Origin / ODir, set by each one-group test), the last plane hit and the
+ * portal plane crossed, the nearest collision-zone hit the component walks
+ * keep (ColPoint ... ColZoneNum, with CurParent the BGObject being walked),
+ * and the enemy-hit report GetComEnemyHitInfo / CheckAnyEnemyHit read back.
+ * Overwritten by every BackgroundCollide, OneGroupBGObjectCol and
+ * CheckBGObject / CheckCompObject collision call (per moving object, bullet
+ * and BGObject each frame); nothing outside collision.cpp reads it. */
+class CollisionQuery {
+	public:
+	bool      background_collide( MCLOADHEADER *c, MLOADHEADER *m,
+					VECTOR *StartPos, u_int16_t StartGroup, VECTOR *MoveOffset,
+					VECTOR *EndPos, u_int16_t *EndGroup,
+					NORMAL *FaceNormal, VECTOR *NewTarget, bool BGCol, BGOBJECT ** BGObject );
+	bool      one_group_poly_col( MCLOADHEADER * MCloadheaderp ,MLOADHEADER * Mloadheader , u_int16_t group ,
+					VECTOR * Pos, VECTOR * Dir  ,
+					VECTOR * ImpactPoint , NORMAL  * FaceNormal , VECTOR * Pos_New, bool BGCol, BGOBJECT ** BGColObject );
+	bool      one_group_portal_col( MLOADHEADER * Mloadheader , u_int16_t group ,
+					VECTOR * Pos, VECTOR * Dir  ,
+					VECTOR * ImpactPoint , NORMAL * FaceNormal, u_int16_t *Next_Group,
+					int collisionhint );
+	bool      check_bgobjects_col( u_int16_t Group, float Distance, VECTOR * ImpactPoint,
+					int collided, VECTOR * New_Pos, NORMAL * FaceNormal, BGOBJECT ** BGObject );
+	void      collide_bgo_children( COMP_OBJ * Children, int16_t NumChildren );
+	bool      one_group_bgobject_col( float Distance, int16_t Collided, u_int16_t Group, VECTOR * Pos, VECTOR * Dir  ,
+					VECTOR * ImpactPoint , NORMAL  * FaceNormal , VECTOR * Pos_New, BGOBJECT ** BGObject, float Radius );
+	bool      check_bgobject_collision( VECTOR * Pos, BGOBJECT * Object, VECTOR * PushVector, float * DamagePtr, float Radius );
+	bool      check_compobject_collision( VECTOR * Pos, COMP_OBJ * Comps, VECTOR * PushVector, float * DamagePtr, float Radius );
+	void      collide_bgo_to_compobj_children( COMP_OBJ * Children, int16_t NumChildren );
+	u_int16_t comp_enemy_hit_info( VECTOR * IntPoint, NORMAL * IntNormal, float * IntDistance );
+	u_int16_t any_enemy_hit();
 
-static	VECTOR	Origin;
-static	VECTOR	ODir;
-static	VECTOR	IPoint;
-static	float	IDist;
+	private:
+	// noinline: one_group_portal_col calls it per portal out of line, as it
+	// called ColRayPlaneIntersect; inlined, that hot loop grows 126 -> 145.
+	[[gnu::noinline]] bool ray_plane_intersect( VECTOR *normal, float offset );
+	bool      check_enemy_poly_col( u_int16_t Group, float Distance, VECTOR * ImpactPoint,
+					int collided, VECTOR * New_Pos, NORMAL * FaceNormal, BGOBJECT ** BGObject );
 
+	VECTOR		Origin = {};
+	VECTOR		ODir = {};
+	float		ColRadius = 0.0F;
+	int			ColCollided = 0;
+	float		ColDist = 0.0F;
+	COMP_OBJ	*	ColChild = nullptr;
+	BGOBJECT	*	CurParent = nullptr;
+	BGOBJECT	*	ColParent = nullptr;
+	ZONESIDE	*	ColSide = nullptr;
+	VECTOR		ColPoint = {};
+	VECTOR		ColDir = {};
+	VECTOR		IPoint = {};
+	float		IDist = 0.0F;
+	float		hit_portal_offset = 0.0F;
+	VECTOR		CompEnemyHitPos = {};
+	NORMAL		CompEnemyHitNormal = {};
+	float		CompEnemyHitDist = 0.0F;
+	int16_t		ColZoneNum = 0;
+	u_int16_t	CompEnemyHit = INDEX_NONE;
+	u_int16_t	AnyCompEnemyHit = INDEX_NONE;
+};
 
-bool CheckEnemyPolyCol( u_int16_t Group, float Distance, VECTOR * ImpactPoint,
-					  int collided, VECTOR * New_Pos, NORMAL * FaceNormal, BGOBJECT ** BGObject );
+/* ObjectCollide's mode (one instance, g_feelers): whether the swept object
+ * is moved, and bounced off what it hits. WouldObjectCollide and
+ * ObjectCollideNoBounce clear one flag around the call and set it again.
+ * NoBGObject (the BGCol argument) is never changed. */
+class FeelerSweep {
+	public:
+	bool object_collide( OBJECT *Obj, VECTOR *Move_Off, float radius, BGOBJECT **BGObject );
+	bool would_collide( OBJECT *Obj, VECTOR *Move_Off, float radius, BGOBJECT **BGObject );
+	bool collide_no_bounce( OBJECT *Obj, VECTOR *Move_Off, float radius, BGOBJECT **BGObject );
+
+	private:
+	bool move_object = true;
+	bool bounce_object = true;
+	bool NoBGObject = true;
+};
+
+} // namespace
 
 /*===================================================================
 	Procedure	:		Stub: .mc collision files are not read
@@ -80,7 +136,7 @@ bool MCload( char * /*Filename*/ , MCLOADHEADER * /*MCloadheader*/ )
 
 
 
-bool ColRayPlaneIntersect( VECTOR *normal, float offset )
+bool CollisionQuery::ray_plane_intersect( VECTOR *normal, float offset )
 {
 	float		t;
 	float		Div, Num;
@@ -117,8 +173,6 @@ bool ColRayPlaneIntersect( VECTOR *normal, float offset )
 }
 
 
-static float hit_portal_offset = 0.0F;
-
 /*
  * BackgroundCollide
  *
@@ -142,7 +196,7 @@ static float hit_portal_offset = 0.0F;
  * Returns
  *	true if collided with background, false if no collision
  */
-bool BackgroundCollide( MCLOADHEADER *c, MLOADHEADER *m,
+bool CollisionQuery::background_collide( MCLOADHEADER *c, MLOADHEADER *m,
 					  VECTOR *StartPos, u_int16_t StartGroup, VECTOR *MoveOffset,
 					  VECTOR *EndPos, u_int16_t *EndGroup,
 					  NORMAL *FaceNormal, VECTOR *NewTarget, bool BGCol, BGOBJECT ** BGObject )
@@ -174,7 +228,7 @@ bool BackgroundCollide( MCLOADHEADER *c, MLOADHEADER *m,
 		OldPMove = pmove;
 		OldPPos = ppos;
 		hit_bg = false;
-		if ( OneGroupPolyCol( c, m, group, &OldPPos, &OldPMove, &epos, &fnorm, &tpos, BGCol, BGObject ) )
+		if ( one_group_poly_col( c, m, group, &OldPPos, &OldPMove, &epos, &fnorm, &tpos, BGCol, BGObject ) )
 		{
 			BSP_PORTAL_GROUP	*pg;
 			BSP_PORTAL			*bp;
@@ -332,7 +386,7 @@ u_int16_t MoveGroup( MLOADHEADER *m, VECTOR *StartPos, u_int16_t StartGroup, VEC
 				:	bool	BGCol
   Output		:	bool
 ===================================================================*/
-bool OneGroupPolyCol( MCLOADHEADER * MCloadheaderp ,MLOADHEADER * /*Mloadheader*/ , u_int16_t group ,
+bool CollisionQuery::one_group_poly_col( MCLOADHEADER * MCloadheaderp ,MLOADHEADER * /*Mloadheader*/ , u_int16_t group ,
 					 VECTOR * Pos, VECTOR * Dir  ,
 					 VECTOR * ImpactPoint , NORMAL  * FaceNormal , VECTOR * Pos_New, bool BGCol, BGOBJECT ** BGColObject )
 {
@@ -387,7 +441,7 @@ bool OneGroupPolyCol( MCLOADHEADER * MCloadheaderp ,MLOADHEADER * /*Mloadheader*
 		if( MCloadheaderp == &MCloadheadert0 ) ColRadius = 0.0F;
 		if( MCloadheaderp == &MCloadheader ) ColRadius = ( 300.0F * GLOBAL_SCALE );
 
-		if( CheckEnemyPolyCol( group, Distance, ImpactPoint, collided, Pos_New, FaceNormal, BGColObject ) )
+		if( check_enemy_poly_col( group, Distance, ImpactPoint, collided, Pos_New, FaceNormal, BGColObject ) )
 		{
 			collided += ColCollided;
 			e.x = ( ImpactPoint->x - Pos->x );
@@ -401,7 +455,7 @@ bool OneGroupPolyCol( MCLOADHEADER * MCloadheaderp ,MLOADHEADER * /*Mloadheader*
 			CollFace = &BSPFace;
 		}
 
-		if( CheckBGObjectsCol( group, Distance, ImpactPoint, collided, Pos_New, FaceNormal, BGColObject ) )
+		if( check_bgobjects_col( group, Distance, ImpactPoint, collided, Pos_New, FaceNormal, BGColObject ) )
 		{
 			CompEnemyHit = INDEX_NONE;
 			AnyCompEnemyHit = INDEX_NONE;
@@ -483,7 +537,7 @@ bool OneGroupPolyCol( MCLOADHEADER * MCloadheaderp ,MLOADHEADER * /*Mloadheader*
 				:	int collisionhint	(unused)
   Output		:	bool
 ===================================================================*/
-bool OneGroupPortalCol( MLOADHEADER * /*Mloadheader*/ , u_int16_t group ,
+bool CollisionQuery::one_group_portal_col( MLOADHEADER * /*Mloadheader*/ , u_int16_t group ,
 						VECTOR * Pos, VECTOR * Dir  ,
 						VECTOR * ImpactPoint , NORMAL * FaceNormal, u_int16_t *Next_Group,
 						int /*collisionhint*/ )
@@ -510,7 +564,7 @@ bool OneGroupPortalCol( MLOADHEADER * /*Mloadheader*/ , u_int16_t group ,
 	for ( j = 0; j < pg->portals; j++ )
 	{
 		bp = &pg->portal[ j ];
-		res = ColRayPlaneIntersect( &bp->normal, bp->offset );
+		res = ray_plane_intersect( &bp->normal, bp->offset );
 		if( res == true )
 		{
 			if ( PISDistRecursive( &IPoint, bp->bsp.Root ) )
@@ -563,8 +617,6 @@ bool AmIOutsideGroup( MLOADHEADER * m, VECTOR * EndPos, u_int16_t EndGroup )
 			dv.z > m->Group[ EndGroup ].half_size.z + OUTSIDE_GROUP_TOLERANCE );
 }
 
-static BGOBJECT	*	CurParent = nullptr;
-
 /* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 /*===================================================================
 	Procedure	:	Check the current ray (Origin / ODir) against BGObject
@@ -579,7 +631,7 @@ static BGOBJECT	*	CurParent = nullptr;
 	Output		:	bool		true if a BGObject zone is the nearest hit
 ===================================================================*/
 /* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
-bool CheckBGObjectsCol( u_int16_t Group, float Distance, VECTOR * ImpactPoint,
+bool CollisionQuery::check_bgobjects_col( u_int16_t Group, float Distance, VECTOR * ImpactPoint,
 					  int collided, VECTOR * New_Pos, NORMAL * FaceNormal, BGOBJECT ** BGObject )
 {
 	float			D;
@@ -610,7 +662,7 @@ bool CheckBGObjectsCol( u_int16_t Group, float Distance, VECTOR * ImpactPoint,
 			{
 				if( RaytoSphereShort( &Object->ColCenter, ( Object->ColRadius + ( SHIP_RADIUS * 1.5F ) ), &Origin, &NormDir, RayLength ) )
 				{
-					CollideBGOChildren( Object->Children, Object->NumChildren );
+					collide_bgo_children( Object->Children, Object->NumChildren );
 				}
 			}
 		}
@@ -687,7 +739,7 @@ bool CheckBGObjectsCol( u_int16_t Group, float Distance, VECTOR * ImpactPoint,
 				:	BGOBJECT ** Bgobject
 	Output		:	bool		True/False
 ===================================================================*/
-bool CheckEnemyPolyCol( u_int16_t Group, float Distance, VECTOR * ImpactPoint,
+bool CollisionQuery::check_enemy_poly_col( u_int16_t Group, float Distance, VECTOR * ImpactPoint,
 					  int collided, VECTOR * New_Pos, NORMAL * FaceNormal, BGOBJECT ** /*BGObject*/ )
 {
 	float			D;
@@ -722,7 +774,7 @@ bool CheckEnemyPolyCol( u_int16_t Group, float Distance, VECTOR * ImpactPoint,
 				{
 					OldColCollided = ColCollided;
 
-					CollideBGOChildren( Object->Object.Components, 1 );
+					collide_bgo_children( Object->Object.Components, 1 );
 
 					if( OldColCollided != ColCollided )
 					{
@@ -791,7 +843,7 @@ bool CheckEnemyPolyCol( u_int16_t Group, float Distance, VECTOR * ImpactPoint,
 				:				ColDist / ColChild / ColZoneNum / ColParent)
 	Sphere zones are ignored; only box and polygonal zones are tested.
 ===================================================================*/
-void CollideBGOChildren( COMP_OBJ * Children, int16_t NumChildren )
+void CollisionQuery::collide_bgo_children( COMP_OBJ * Children, int16_t NumChildren )
 {
 	int16_t					Zone;
 	int16_t					Count;
@@ -919,7 +971,7 @@ void CollideBGOChildren( COMP_OBJ * Children, int16_t NumChildren )
 
 			if( Children->NumChildren )
 			{
-				CollideBGOChildren( Children->Children, Children->NumChildren );
+				collide_bgo_children( Children->Children, Children->NumChildren );
 			}
 
 			Children++;
@@ -942,7 +994,7 @@ void CollideBGOChildren( COMP_OBJ * Children, int16_t NumChildren )
 				:	float		Radius
   Output		:	bool
 ===================================================================*/
-bool OneGroupBGObjectCol( float Distance, int16_t Collided, u_int16_t Group, VECTOR * Pos, VECTOR * Dir  ,
+bool CollisionQuery::one_group_bgobject_col( float Distance, int16_t Collided, u_int16_t Group, VECTOR * Pos, VECTOR * Dir  ,
 					 VECTOR * ImpactPoint , NORMAL  * FaceNormal , VECTOR * Pos_New, BGOBJECT ** BGObject, float Radius )
 {
 
@@ -956,13 +1008,13 @@ bool OneGroupBGObjectCol( float Distance, int16_t Collided, u_int16_t Group, VEC
 	AnyCompEnemyHit = INDEX_NONE;
 	CompEnemyHit = INDEX_NONE;
 
-	if(	CheckEnemyPolyCol( Group, Distance, ImpactPoint, Collided, Pos_New, FaceNormal, BGObject ) )
+	if(	check_enemy_poly_col( Group, Distance, ImpactPoint, Collided, Pos_New, FaceNormal, BGObject ) )
 	{
 		Distance = ColDist;
 		ColCount++;
 	}
 
-	if( CheckBGObjectsCol( Group, Distance, ImpactPoint, ( Collided + ColCount ), Pos_New, FaceNormal, BGObject ) )
+	if( check_bgobjects_col( Group, Distance, ImpactPoint, ( Collided + ColCount ), Pos_New, FaceNormal, BGObject ) )
 	{
 		ColCount++;
 	}
@@ -984,7 +1036,7 @@ bool OneGroupBGObjectCol( float Distance, int16_t Collided, u_int16_t Group, VEC
 	Output		:	bool		true if hit; PushVector is half the
 				:				component's movement at that point
 ===================================================================*/
-bool CheckBGObjectCollision( VECTOR * Pos, BGOBJECT * Object, VECTOR * PushVector, float * DamagePtr, float Radius )
+bool CollisionQuery::check_bgobject_collision( VECTOR * Pos, BGOBJECT * Object, VECTOR * PushVector, float * DamagePtr, float Radius )
 {
 	float	Speed;
 
@@ -998,7 +1050,7 @@ bool CheckBGObjectCollision( VECTOR * Pos, BGOBJECT * Object, VECTOR * PushVecto
 
 	if( Object->NumChildren && Object->Children )
 	{
-		CollideBGOToCompObjChildren( Object->Children, Object->NumChildren );
+		collide_bgo_to_compobj_children( Object->Children, Object->NumChildren );
 
 		if( ColChild )
 		{
@@ -1046,7 +1098,7 @@ bool CheckBGObjectCollision( VECTOR * Pos, BGOBJECT * Object, VECTOR * PushVecto
 	Output		:	bool		true if hit; PushVector as for
 				:				CheckBGObjectCollision
 ===================================================================*/
-bool CheckCompObjectCollision( VECTOR * Pos, COMP_OBJ * Comps, VECTOR * PushVector, float * DamagePtr, float Radius )
+bool CollisionQuery::check_compobject_collision( VECTOR * Pos, COMP_OBJ * Comps, VECTOR * PushVector, float * DamagePtr, float Radius )
 {
 	float	Speed;
 
@@ -1057,7 +1109,7 @@ bool CheckCompObjectCollision( VECTOR * Pos, COMP_OBJ * Comps, VECTOR * PushVect
 
 	if( Comps )
 	{
-		CollideBGOToCompObjChildren( Comps, 1 );
+		collide_bgo_to_compobj_children( Comps, 1 );
 
 		if( ColChild )
 		{
@@ -1099,13 +1151,13 @@ bool CheckCompObjectCollision( VECTOR * Pos, COMP_OBJ * Comps, VECTOR * PushVect
 				:	moved this frame (recursive)
 	Input		:	COMP_OBJ	*	Children
 				:	int16_t			NumChildren
-	Output		:	Nothing		(nearest hit kept in the Col* globals)
+	Output		:	Nothing		(nearest hit kept in the Col* members)
 	The point is taken into each component's space through both its old
 	and its current inverse display matrix; the segment between the two
 	(stretched to 0.065 if shorter; a zero segment stays zero) is
 	ray-tested against the zones. ColDir keeps it for the push vector.
 ===================================================================*/
-void CollideBGOToCompObjChildren( COMP_OBJ * Children, int16_t NumChildren )
+void CollisionQuery::collide_bgo_to_compobj_children( COMP_OBJ * Children, int16_t NumChildren )
 {
 	int16_t					Zone;
 	int16_t					Count;
@@ -1259,7 +1311,7 @@ void CollideBGOToCompObjChildren( COMP_OBJ * Children, int16_t NumChildren )
 
 			if( Children->NumChildren )
 			{
-				CollideBGOToCompObjChildren( Children->Children, Children->NumChildren );
+				collide_bgo_to_compobj_children( Children->Children, Children->NumChildren );
 			}
 
 			Children++;
@@ -1267,10 +1319,6 @@ void CollideBGOToCompObjChildren( COMP_OBJ * Children, int16_t NumChildren )
 	}
 }
 
-
-static bool move_object = true;
-static bool bounce_object = true;
-static bool NoBGObject = true;
 
 
 constexpr float BACKFACING_PLANE_TOLERANCE = (-0.001F);
@@ -1285,7 +1333,7 @@ constexpr float FEELER_LENGTH_TO_RADIUS_RATIO = (1.25F);
  * object is moved and its group updated, and with bounce_object its speed
  * is turned along the wall and a bump force applied. BGObject collision is
  * always on: NoBGObject is passed as BGCol and is true. */
-bool ObjectCollide( OBJECT *Obj, VECTOR *Move_Off, float radius, BGOBJECT **BGObject )
+bool FeelerSweep::object_collide( OBJECT *Obj, VECTOR *Move_Off, float radius, BGOBJECT **BGObject )
 {
 	VECTOR Up, Right;
 	QUAT MoveQuat;
@@ -1471,24 +1519,24 @@ bool ObjectCollide( OBJECT *Obj, VECTOR *Move_Off, float radius, BGOBJECT **BGOb
 }
 
 
-bool WouldObjectCollide( OBJECT *Obj, VECTOR *Move_Off, float radius, BGOBJECT **BGObject )
+bool FeelerSweep::would_collide( OBJECT *Obj, VECTOR *Move_Off, float radius, BGOBJECT **BGObject )
 {
 	bool collide;
 
 	move_object = false;
-	collide = ObjectCollide( Obj, Move_Off, radius, BGObject );
+	collide = object_collide( Obj, Move_Off, radius, BGObject );
 	move_object = true;
 
 	return collide;
 }
 
 
-bool ObjectCollideNoBounce( OBJECT *Obj, VECTOR *Move_Off, float radius, BGOBJECT **BGObject )
+bool FeelerSweep::collide_no_bounce( OBJECT *Obj, VECTOR *Move_Off, float radius, BGOBJECT **BGObject )
 {
 	bool collide;
 
 	bounce_object = false;
-	collide = ObjectCollide( Obj, Move_Off, radius, BGObject );
+	collide = object_collide( Obj, Move_Off, radius, BGObject );
 	bounce_object = true;
 
 	return collide;
@@ -1635,7 +1683,7 @@ bool QCollide( VECTOR *Start_Pos, u_int16_t Start_Group, VECTOR *Move_Off, float
 				:		float	*	Collision Distance (TBFI)
 	Output		:		u_int16_t		EnemyHit (0xffff) None
 ===================================================================*/
-u_int16_t GetComEnemyHitInfo( VECTOR * IntPoint, NORMAL * IntNormal, float * IntDistance )
+u_int16_t CollisionQuery::comp_enemy_hit_info( VECTOR * IntPoint, NORMAL * IntNormal, float * IntDistance )
 {
 	if( CompEnemyHit == INDEX_NONE )
 	{
@@ -1658,7 +1706,31 @@ u_int16_t GetComEnemyHitInfo( VECTOR * IntPoint, NORMAL * IntNormal, float * Int
 	Input		:		Nothing
 	Output		:		u_int16_t		EnemyHit (0xffff) None
 ===================================================================*/
-u_int16_t CheckAnyEnemyHit( void )
+u_int16_t CollisionQuery::any_enemy_hit()
 {
 	return( AnyCompEnemyHit );
 }
+
+namespace {
+CollisionQuery g_colquery;
+FeelerSweep    g_feelers;
+}
+
+// noinline: QCollide and ObjectCollide call BackgroundCollide out of line, as
+// before, so on 3DS background_collide has this one caller and is inlined
+// here. Without it they call the member directly, and every other caller goes
+// through a 15-instruction argument-shifting forwarder.
+[[gnu::noinline]] bool BackgroundCollide( MCLOADHEADER *c, MLOADHEADER *m, VECTOR *StartPos, u_int16_t StartGroup, VECTOR *MoveOffset, VECTOR *EndPos, u_int16_t *EndGroup, NORMAL *FaceNormal, VECTOR *NewTarget, bool BGCol, BGOBJECT ** BGObject ) { return g_colquery.background_collide( c, m, StartPos, StartGroup, MoveOffset, EndPos, EndGroup, FaceNormal, NewTarget, BGCol, BGObject ); }
+bool OneGroupPolyCol( MCLOADHEADER * MCloadheader ,MLOADHEADER * Mloadheader , u_int16_t group , VECTOR * Pos, VECTOR * Dir , VECTOR * ImpactPoint , NORMAL * FaceNormal , VECTOR * Pos_New, bool BGCol, BGOBJECT ** BGObject ) { return g_colquery.one_group_poly_col( MCloadheader, Mloadheader, group, Pos, Dir, ImpactPoint, FaceNormal, Pos_New, BGCol, BGObject ); }
+bool OneGroupPortalCol( MLOADHEADER * Mloadheader , u_int16_t group , VECTOR * Pos, VECTOR * Dir , VECTOR * ImpactPoint , NORMAL * FaceNormal, u_int16_t * PortalHit, int collisionhint ) { return g_colquery.one_group_portal_col( Mloadheader, group, Pos, Dir, ImpactPoint, FaceNormal, PortalHit, collisionhint ); }
+bool CheckBGObjectsCol( u_int16_t Group, float Distance, VECTOR * ImpactPoint, int collided, VECTOR * New_Pos, NORMAL * FaceNormal, BGOBJECT ** BGObject ) { return g_colquery.check_bgobjects_col( Group, Distance, ImpactPoint, collided, New_Pos, FaceNormal, BGObject ); }
+void CollideBGOChildren( COMP_OBJ * Children, int16_t NumChildren ) { g_colquery.collide_bgo_children( Children, NumChildren ); }
+bool OneGroupBGObjectCol( float Distance, int16_t Collided, u_int16_t Group, VECTOR * Pos, VECTOR * Dir , VECTOR * ImpactPoint , NORMAL * FaceNormal , VECTOR * Pos_New, BGOBJECT ** BGObject, float Radius ) { return g_colquery.one_group_bgobject_col( Distance, Collided, Group, Pos, Dir, ImpactPoint, FaceNormal, Pos_New, BGObject, Radius ); }
+bool CheckBGObjectCollision( VECTOR * Pos, BGOBJECT * Object, VECTOR * PushVector, float * DamagePtr, float Radius ) { return g_colquery.check_bgobject_collision( Pos, Object, PushVector, DamagePtr, Radius ); }
+bool CheckCompObjectCollision( VECTOR * Pos, COMP_OBJ * Comps, VECTOR * PushVector, float * DamagePtr, float Radius ) { return g_colquery.check_compobject_collision( Pos, Comps, PushVector, DamagePtr, Radius ); }
+void CollideBGOToCompObjChildren( COMP_OBJ * Children, int16_t NumChildren ) { g_colquery.collide_bgo_to_compobj_children( Children, NumChildren ); }
+u_int16_t GetComEnemyHitInfo( VECTOR * IntPoint, NORMAL * IntNormal, float * IntDistance ) { return g_colquery.comp_enemy_hit_info( IntPoint, IntNormal, IntDistance ); }
+u_int16_t CheckAnyEnemyHit( void ) { return g_colquery.any_enemy_hit(); }
+bool ObjectCollide( OBJECT *Obj, VECTOR *Move_Off, float radius, BGOBJECT **BGObject ) { return g_feelers.object_collide( Obj, Move_Off, radius, BGObject ); }
+bool WouldObjectCollide( OBJECT *Obj, VECTOR *Move_Off, float radius, BGOBJECT **BGObject ) { return g_feelers.would_collide( Obj, Move_Off, radius, BGObject ); }
+bool ObjectCollideNoBounce( OBJECT *Obj, VECTOR *Move_Off, float radius, BGOBJECT **BGObject ) { return g_feelers.collide_no_bounce( Obj, Move_Off, radius, BGObject ); }
