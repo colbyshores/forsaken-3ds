@@ -584,7 +584,7 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 		 * frame to frame) unless white-out or water rewrite them every
 		 * frame; tell the backend's caches which (render.h SMEMO_PASS). */
 		Mloadheader->Group[group].renderObject[mesh].memoEpochPass =
-			( ( GroupWaterInfo[group] == WATERSTATE_NOWATER || ShowPlaneRGB ) && WhiteOut == 0.0F ) ?
+			( ( Water.dry( group ) || ShowPlaneRGB ) && WhiteOut == 0.0F ) ?
 				SMEMO_PASS_UNSET : SMEMO_PASS_PER_FRAME;
 
 
@@ -630,9 +630,9 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 			 * colours in place and this one would only copy them again, as
 			 * for the second stereo eye of a frame. */
 			if( !( color_already_clean && !ShowPlaneRGB && WhiteOut == 0.0F &&
-				   GroupWaterInfo[group] == WATERSTATE_NOWATER ) )
+				   Water.dry( group ) ) )
 			{
-				if( GroupWaterInfo[group] == WATERSTATE_NOWATER || ShowPlaneRGB )
+				if( Water.dry( group ) || ShowPlaneRGB )
 				{
 					if( WhiteOut == 0.0F )
 					{
@@ -677,7 +677,7 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 
 						}
 					}
-				}else if( GroupWaterInfo[group] == WATERSTATE_ALLWATER )
+				}else if( Water.submerged( group ) )
 				{
 					// ****************** Full Water Effect ********************************
 					OrigLVert = Mloadheader->Group[group].originalVerts[mesh];
@@ -700,13 +700,13 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 						g >>=2;
 						b >>=2;
 						intensity = (float) ( ( fast_sinf( D2R( x + cral ) ) + fast_sinf( D2R( y + cral ) ) + fast_sinf( D2R( z + cral ) ) ) * 127.0F * 0.3333333F + 128.0F ) ;
-						r += (int) (GroupWaterIntensity_Red[group] * intensity);
+						r += (int) (Water.tint_red( group ) * intensity);
 						if( r > 255 )
 							r = 255;
-						g += (int) (GroupWaterIntensity_Green[group] * intensity);
+						g += (int) (Water.tint_green( group ) * intensity);
 						if( g > 255 )
 							g = 255;
-						b += (int) (GroupWaterIntensity_Blue[group] * intensity);
+						b += (int) (Water.tint_blue( group ) * intensity);
 						if( b > 255 )
 							b = 255;
 						/* Preserve the baked vertex alpha (typically 255 for
@@ -728,7 +728,7 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 					//	Special Lighting effects
 					while( vert --)
 					{
-						if( OrigLVert->y < GroupWaterLevel[group] )
+						if( Water.below_surface( group, OrigLVert->y ) )
 						{
 							int orig_a;
 							x = (float)((int) (OrigLVert->x * 0.35F) % 360);
@@ -744,13 +744,13 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 							g >>=2;
 							b >>=2;
 							intensity = (float) ( ( fast_sinf( D2R( x + cral ) ) + fast_sinf( D2R( y + cral ) ) + fast_sinf( D2R( z + cral ) ) ) * 127.0F * 0.3333333F + 128.0F ) ;
-							r += (int) (GroupWaterIntensity_Red[group] * intensity);
+							r += (int) (Water.tint_red( group ) * intensity);
 							if( r > 255 )
 								r = 255;
-							g += (int) (GroupWaterIntensity_Green[group] * intensity);
+							g += (int) (Water.tint_green( group ) * intensity);
 							if( g > 255 )
 								g = 255;
-							b += (int) (GroupWaterIntensity_Blue[group] * intensity);
+							b += (int) (Water.tint_blue( group ) * intensity);
 							if( b > 255 )
 								b = 255;
 							/* Preserve baked alpha — see ALLWATER branch

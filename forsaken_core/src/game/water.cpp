@@ -39,64 +39,15 @@ constexpr int WAT_VERSION_NUMBER = 1;
 ===================================================================*/
 float WATER_CELLSIZE = 64.0F;
 
-u_int16_t	GroupWaterInfo[MAXGROUPS];
-
-float	GroupWaterLevel[MAXGROUPS];
-float	GroupWaterIntensity_Red[MAXGROUPS];
-float	GroupWaterIntensity_Green[MAXGROUPS];
-float	GroupWaterIntensity_Blue[MAXGROUPS];
-
 void DisplayWaterObject(WATEROBJECT * WO);
 
-namespace {
-
-/* The level's water surfaces (one instance, g_water): the WATEROBJECT array
- * and its count, each group's chain of surfaces and its damage rate, the
- * water texture page, and the .WAT buffer kept between PreWaterLoad and
- * WaterLoad. Built at level load and freed at release; walked each frame
- * (fill/drain), by each visible group's display, and as ships, models and
- * bullets move. WaterFade (display tint scale) and WaterNormal (the surface
- * plane's normal) are never changed. Fc is the mesh update's scratch copy of
- * the vertex heights.
- * The per-group tables and WATER_CELLSIZE stay global (lights.cpp and
- * title.cpp use them). */
-class WaterSurfaces {
-	public:
-	bool pre_load( char * Filename );
-	bool load();
-	void release();
-	void add_link( WATEROBJECT * WO );
-	void process_display( u_int16_t group );
-	bool object_collide( u_int16_t group , VECTOR *Origin, VECTOR *Offset, VECTOR *CollidePos , float Damage );
-	bool in_water( u_int16_t group , VECTOR *OrgPos , float * Damage );
-	bool single_collide( WATEROBJECT * Wo, VECTOR *Origin, VECTOR *Offset, VECTOR *CollidePos , float Damage );
-	void process();
-	void trigger_drain( u_int16_t * Data );
-	void trigger_fill( u_int16_t * Data );
-
-	private:
-	bool init_object( WATEROBJECT * WO );
-	/* Out of line, as UpdateWaterMesh was: inlining it would put the whole
-	 * mesh integration into each group's process_display. */
-	[[gnu::noinline]] void update_mesh( WATEROBJECT * WO );
-
-	WATEROBJECT	* WaterObjectLink[MAXGROUPS] = {};
-	WATEROBJECT	* FirstWaterObject = nullptr;
-	u_int16_t	NumOfWaterObjects = 0;
-	float	WaterFade = 1.0F;
-	float	GroupDamageInfo[MAXGROUPS] = {};
-	u_int16_t	WaterTPage = 0;
-	char	* WaterBuffer = nullptr;
-	char	* OrgWaterBuffer = nullptr;
-	float	Fc[MAXMESHX*MAXMESHY] = {};
-	/* Static: its own symbol, as the old global was, so single_collide keeps
-	 * one literal and one base register for it across the DotProduct call. */
-	static VECTOR WaterNormal;
-};
-
 VECTOR WaterSurfaces::WaterNormal = { 0.0F, 1.0F, 0.0F };
-
-} // namespace
+float	WaterSurfaces::Fc[MAXMESHX*MAXMESHY] = {};
+u_int16_t	WaterSurfaces::GroupWaterInfo[MAXGROUPS] = {};
+float	WaterSurfaces::GroupWaterLevel[MAXGROUPS] = {};
+float	WaterSurfaces::GroupWaterIntensity_Red[MAXGROUPS] = {};
+float	WaterSurfaces::GroupWaterIntensity_Green[MAXGROUPS] = {};
+float	WaterSurfaces::GroupWaterIntensity_Blue[MAXGROUPS] = {};
 
 /*===================================================================
 	Procedure	:	Pre Water Load..
@@ -936,21 +887,21 @@ void WaterSurfaces::trigger_fill( u_int16_t * Data )
 ===================================================================*/
 void GetWaterColour( u_int16_t Group, u_int8_t * Red, u_int8_t * Green, u_int8_t * Blue )
 {
-	*Red	= (u_int8_t) ( GroupWaterIntensity_Red[ Group ] * 255.0F );
-	*Green	= (u_int8_t) ( GroupWaterIntensity_Green[ Group ] * 255.0F );
-	*Blue	= (u_int8_t) ( GroupWaterIntensity_Blue[ Group ] * 255.0F );
+	*Red	= (u_int8_t) ( Water.tint_red( Group ) * 255.0F );
+	*Green	= (u_int8_t) ( Water.tint_green( Group ) * 255.0F );
+	*Blue	= (u_int8_t) ( Water.tint_blue( Group ) * 255.0F );
 }
 
-namespace { WaterSurfaces g_water; }
+WaterSurfaces Water;
 
-bool PreWaterLoad( char * Filename ) { return g_water.pre_load( Filename ); }
-bool WaterLoad( void ) { return g_water.load(); }
-void WaterRelease( void ) { g_water.release(); }
-void AddWaterLink( WATEROBJECT * WO ) { g_water.add_link( WO ); }
-void GroupWaterProcessDisplay( u_int16_t group ) { g_water.process_display( group ); }
-bool WaterObjectCollide( u_int16_t group , VECTOR *Origin, VECTOR *Offset, VECTOR *CollidePos , float Damage ) { return g_water.object_collide( group, Origin, Offset, CollidePos, Damage ); }
-bool InWater( u_int16_t group , VECTOR *OrgPos , float * Damage ) { return g_water.in_water( group, OrgPos, Damage ); }
-bool SingleWaterObjectCollide( WATEROBJECT * Wo, VECTOR *Origin, VECTOR *Offset, VECTOR *CollidePos , float Damage ) { return g_water.single_collide( Wo, Origin, Offset, CollidePos, Damage ); }
-void WaterProcess( void ) { g_water.process(); }
-void TriggerWaterDrain( u_int16_t * Data ) { g_water.trigger_drain( Data ); }
-void TriggerWaterFill( u_int16_t * Data ) { g_water.trigger_fill( Data ); }
+bool PreWaterLoad( char * Filename ) { return Water.pre_load( Filename ); }
+bool WaterLoad( void ) { return Water.load(); }
+void WaterRelease( void ) { Water.release(); }
+void AddWaterLink( WATEROBJECT * WO ) { Water.add_link( WO ); }
+void GroupWaterProcessDisplay( u_int16_t group ) { Water.process_display( group ); }
+bool WaterObjectCollide( u_int16_t group , VECTOR *Origin, VECTOR *Offset, VECTOR *CollidePos , float Damage ) { return Water.object_collide( group, Origin, Offset, CollidePos, Damage ); }
+bool InWater( u_int16_t group , VECTOR *OrgPos , float * Damage ) { return Water.in_water( group, OrgPos, Damage ); }
+bool SingleWaterObjectCollide( WATEROBJECT * Wo, VECTOR *Origin, VECTOR *Offset, VECTOR *CollidePos , float Damage ) { return Water.single_collide( Wo, Origin, Offset, CollidePos, Damage ); }
+void WaterProcess( void ) { Water.process(); }
+void TriggerWaterDrain( u_int16_t * Data ) { Water.trigger_drain( Data ); }
+void TriggerWaterFill( u_int16_t * Data ) { Water.trigger_fill( Data ); }
