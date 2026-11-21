@@ -1,8 +1,10 @@
 /* ============================================================================
  * 01_state.inc -- part of render_c3d.cpp (SINGLE TRANSLATION UNIT).
  *
- * Uniform register ids, the citro3d state (targets, shader, scratch,
- * texenv/proctex/light caches), the GPU vertex format and the stereo memo.
+ * Uniform register ids, the material classes, the GPU vertex format, the
+ * stereo memo, and the shader and frame state (ShaderState, FrameState).
+ * The other state classes sit with their code: PersistCache and
+ * VertexScratch in 02, TexEnvState in 03, HdTexturePacks in 11.
  *
  * Not a standalone header: no include guard and no includes of its own. It is
  * #included in a fixed order from render_c3d.cpp, which says why.
@@ -20,10 +22,6 @@ constexpr int UNIFORM_LIGHTS = 10;   /* fvec4[24]— GPU_MAX_LIGHTS × 3 fvec4 e
 constexpr int GPU_MAX_LIGHTS = 8; /* must match .v.pica `lights[24]` (= 8*3) */
 
 /* ---- citro3d state ---- */
-
-static DVLB_s          *s_shaderDVLB    = nullptr;
-static shaderProgram_s  s_shaderProgram;
-static bool             s_shaderReady   = false;
 
 /* PICA200 ProcTex — procedural texture unit, used as a per-class
  * detail-noise generator on wall draws. Free per-pixel modulation,
@@ -50,49 +48,14 @@ enum material_class_t {
 	MAT_COUNT
 };
 
-static C3D_ProcTex          s_wallProcTex[MAT_COUNT];
-static C3D_ProcTexColorLut  s_wallProcColor[MAT_COUNT];
-static C3D_ProcTexLut       s_wallProcNoise;   /* shared smoothstep */
-static C3D_ProcTexLut       s_wallProcMap;     /* shared RGB map */
-static bool                 s_procTexReady = false;
-static bool                 s_objProcTexOn = false;  /* per-draw toggle */
-
-/* PICA200 fragment-lighting for object Phong shading. Vshader outputs
- * a pseudo-normal-derived quaternion (outnq) per vertex; the hardware
- * uses it + the bound light env to compute FRAGMENT_PRIMARY_COLOR
- * (diffuse) and FRAGMENT_SECONDARY_COLOR (specular). The OBJECT
- * TexEnv mode reads SECONDARY for the moving shine highlight. */
-static C3D_LightEnv  s_objLightEnv;
-static C3D_Light     s_objLight;
-static C3D_LightLut  s_objLightLut;
-static bool          s_objLightReady = false;
+/* The per-class ProcTex tables live in TexEnvState (03_context.inc). */
 
 /* User-toggleable graphics features (persisted via title.cpp's config_*).
- * apply_texenv_for_texture reads these per draw: g_object_shine enables the
- * OBJECT mode (Phong specular on models), g_wall_detail the AUX mode
- * (ProcTex grain ADD_SIGNED onto walls). Both default true. */
+ * TexEnvState::apply_for_texture reads these per draw: g_object_shine
+ * enables the OBJECT mode (Phong specular on models), g_wall_detail the AUX
+ * mode (ProcTex grain ADD_SIGNED onto walls). Both default true. */
 bool g_object_shine = true;
 bool g_wall_detail  = true;
-
-static C3D_RenderTarget *s_targetLeft    = nullptr;
-static C3D_RenderTarget *s_targetRight   = nullptr;
-static C3D_RenderTarget *s_targetBottom  = nullptr;  /* mono 320×240 for HUD */
-static C3D_RenderTarget *s_targetCurrent = nullptr;  /* active render target */
-static C3D_RenderTarget *s_targetSaved   = nullptr;  /* stashed target for HUD restore */
-static bool s_hudDrawnThisFrame = false;          /* HUD drawn once per frame */
-/* Saved render_info state during HUD-on-bottom pass (restored on End) */
-static int  s_hudSavedThisModeW = 0;
-static int  s_hudSavedThisModeH = 0;
-static int  s_hudSavedWinCx     = 0;
-static int  s_hudSavedWinCy     = 0;
-static bool              s_stereoFrame   = false;
-
-/* GPU lighting uniform registers, set at init to the hardcoded UNIFORM_*
- * values (libctru's uniform lookup returns -1 for these; see
- * c3d_renderer_init). */
-static s8 s_loc_ambient     = -1;
-static s8 s_loc_light_count = -1;
-static s8 s_loc_lights      = -1;
 
 /* Color write mask — always GPU_WRITE_ALL on citro3d (software anaglyph
  * removed; hardware stereo uses separate render targets instead). */
@@ -127,12 +90,97 @@ enum smemo_mode_t {
 	SMEMO_RECORD,     /* left eye: convert live + record ranges */
 	SMEMO_LOOKUP      /* right eye: reuse recorded ranges, convert misses */
 };
-static smemo_mode_t s_memoMode = SMEMO_OFF;
-/* c3d_memo_suspend: a nested camera pass (missile inset) runs inside an
- * eye pass and refills the same stamped fills from another camera, so
- * it must neither record over the eye's ranges nor reuse them. */
-static smemo_mode_t s_memoSaved = SMEMO_OFF;
-static bool s_memoSuspended = false;
+
+namespace {
+
+/* The vertex shader (one instance, g_shader): the parsed DVLB, the program
+ * every frame and target switch binds, and whether c3d_renderer_init has
+ * run. */
+class ShaderState {
+	public:
+	DVLB_s          *shaderDVLB    = nullptr;
+	shaderProgram_s  shaderProgram = {};
+	bool             shaderReady   = false;
+
+	/* GPU lighting uniform registers, set at init to the hardcoded UNIFORM_*
+	 * values (libctru's uniform lookup returns -1 for these; see
+	 * c3d_renderer_init). */
+	s8 loc_ambient     = -1;
+	s8 loc_light_count = -1;
+	s8 loc_lights      = -1;
+
+	/* The ambient term (06_matrices_lights.inc). Static, as the old file
+	 * statics were: nothing writes them, so GCC folds their zeros. */
+	static float ambient_r;
+	static float ambient_g;
+	static float ambient_b;
+};
+
+/* Where and in which frame the GPU draws (one instance, g_frame): the
+ * render targets (left and right top-screen eyes, the bottom screen), the
+ * one being drawn on, whether a frame is open, the HUD's bottom-screen
+ * redirection, the stereo memo's mode, the frame-rate counter and the
+ * viewport. */
+class FrameState {
+	public:
+	void suspend_memo( bool suspend );  // was c3d_memo_suspend
+	void present();                     // was c3d_present
+
+	/* Frame state tracking */
+	bool inFrame = false;
+
+	C3D_RenderTarget *targetLeft    = nullptr;
+	C3D_RenderTarget *targetRight   = nullptr;
+	C3D_RenderTarget *targetBottom  = nullptr;  /* mono 320×240 for HUD */
+	C3D_RenderTarget *targetCurrent = nullptr;  /* active render target */
+	C3D_RenderTarget *targetSaved   = nullptr;  /* stashed target for HUD restore */
+	bool hudDrawnThisFrame = false;          /* HUD drawn once per frame */
+	/* Saved render_info state during HUD-on-bottom pass (restored on End) */
+	int  hudSavedThisModeW = 0;
+	int  hudSavedThisModeH = 0;
+	int  hudSavedWinCx     = 0;
+	int  hudSavedWinCy     = 0;
+
+	smemo_mode_t memoMode = SMEMO_OFF;
+	/* c3d_memo_suspend: a nested camera pass (missile inset) runs inside an
+	 * eye pass and refills the same stamped fills from another camera, so
+	 * it must neither record over the eye's ranges nor reuse them. */
+	smemo_mode_t memoSaved = SMEMO_OFF;
+	bool memoSuspended = false;
+
+	/* Frame-rate counter. Updated once per swap, exposed via the
+	 * `forsaken_get_fps()` accessor so the HUD overlay can draw it. */
+	u32    fps_frames_in_win = 0;
+	u64    fps_window_start_ms = 0;
+	int    fps_current       = 0;
+
+	/* The engine viewport (08_viewport.inc). */
+	render_viewport_t viewport = { 0, 0, 400, 240, 1.0f, 1.0f, 0.0f, 1.0f };
+	/* One-shot flag set by FSSetNextViewPortScissorMode() and consumed
+	 * (then reset) by the next FSSetViewPort() call. Allows visi.cpp
+	 * ClipGroup to hand-off per-group "use scissor instead of sub-rect
+	 * viewport" decisions without changing FSSetViewPort's signature
+	 * (which would touch every caller). */
+	bool next_view_use_scissor = false;
+
+	/* Written and never read, so GCC drops their stores, as it did for the
+	 * old file statics; as instance members the stores would stay.
+	 * stereoFrame: set by c3d_transfer_eye, cleared by c3d_present.
+	 * current_view_used_scissor: persistent record of the most recent
+	 * FSSetViewPort dispatch (full-vp+scissor vs sub-rect vp). Kept for
+	 * viewport-dispatch diagnostics; the stereo vertex memo does not need
+	 * it (both eyes run the live dispatch path). */
+	static bool stereoFrame;
+	static bool current_view_used_scissor;
+};
+
+bool FrameState::stereoFrame = false;
+bool FrameState::current_view_used_scissor = false;
+
+ShaderState g_shader;
+FrameState g_frame;
+
+} // namespace
 
 /* Whether this renderObject's converted vertices may be recorded and
  * reused by the other eye. Stamped shared fills carry their content
@@ -149,16 +197,18 @@ static bool memo_reusable(const RENDEROBJECT *ro)
 	return ro->vertOwner == VERT_OWNER_LEVEL || ro->vertOwner == VERT_OWNER_WATER;
 }
 
-void c3d_memo_suspend(bool suspend)
+void FrameState::suspend_memo(bool suspend)
 {
 	if (suspend) {
-		if (!s_memoSuspended) {
-			s_memoSaved = s_memoMode;
-			s_memoMode = SMEMO_OFF;
-			s_memoSuspended = true;
+		if (!memoSuspended) {
+			memoSaved = memoMode;
+			memoMode = SMEMO_OFF;
+			memoSuspended = true;
 		}
-	} else if (s_memoSuspended) {
-		s_memoMode = s_memoSaved;
-		s_memoSuspended = false;
+	} else if (memoSuspended) {
+		memoMode = memoSaved;
+		memoSuspended = false;
 	}
 }
+
+void c3d_memo_suspend(bool suspend) { g_frame.suspend_memo(suspend); }

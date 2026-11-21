@@ -65,7 +65,7 @@ static void configure_texenv_aux(texture_t *texdata)
 	 * modulate path so walls keep proper color + baked lighting;
 	 * stage 1 ADD_SIGNEDs the procedural noise (TEXTURE3 = proctex
 	 * output). The proctex configuration was selected per material
-	 * class by the caller binding s_wallProcTex[texdata->material_class].
+	 * class by the caller binding wallProcTex[texdata->material_class].
 	 * Alpha REPLACE preserves stage 0's alpha so colour-keyed
 	 * transparent textures still work. */
 	{
@@ -87,12 +87,12 @@ static void configure_texenv_aux(texture_t *texdata)
 	(void)texdata;
 }
 
-static void configure_texenv_object(void)
+void TexEnvState::configure_object(void)
 {
 	/* Bind the object Phong light env so fragment-lighting hardware
 	 * computes FRAGMENT_SECONDARY_COLOR (specular highlight) using
 	 * the per-vertex outnq quat from the vshader. */
-	C3D_LightEnvBind(&s_objLightEnv);
+	C3D_LightEnvBind(&objLightEnv);
 
 	/* Stage 0: legacy TEX0 × PRIMARY — proper model color + baked
 	 * lighting + GPU vertex-light contribution preserved. */
@@ -125,18 +125,18 @@ static void configure_texenv_object(void)
 /* Apply the right TexEnv mode for a textured draw, given the bound
  * texture handle. Caches by mode + texdata pointer (+ ProcTex bucket in
  * AUX mode) to skip redundant GPU state changes within a batch. */
-static void apply_texenv_for_texture(texture_t *texdata)
+void TexEnvState::apply_for_texture(texture_t *texdata)
 {
 	/* OBJECT (Phong shine on enemies / pickups) takes precedence over
 	 * AUX (wall ProcTex grain) — the same texture would never want
 	 * both, but the object toggle wraps narrow draw_object call sites
 	 * while AUX is the fall-through path for level-mesh draws. */
 	texenv_mode_t mode;
-	if (s_objProcTexOn && s_objLightReady && g_object_shine &&
-		s_objShineEligible)
+	if (objProcTexOn && objLightReady && g_object_shine &&
+		objShineEligible)
 		mode = TEXENV_MODE_OBJECT;
-	else if (s_procTexReady && g_wall_detail && !s_isOrthoDraw &&
-			 !s_skipAuxProcTex)
+	else if (procTexReady && g_wall_detail && !isOrthoDraw &&
+			 !skipAuxProcTex)
 		mode = TEXENV_MODE_AUX;
 	else
 		mode = TEXENV_MODE_DIFFUSE;
@@ -153,7 +153,7 @@ static void apply_texenv_for_texture(texture_t *texdata)
 		desired_mc = (material_class_t)texdata->material_class;
 		if ((unsigned)desired_mc >= MAT_COUNT) desired_mc = MAT_METAL;
 		float seed_phase =
-			((s_atlasSeed >> 8) & 0xFFFF) * (1.0f / 65536.0f);
+			((atlasSeed >> 8) & 0xFFFF) * (1.0f / 65536.0f);
 		float combined = texdata->proctex_phase + seed_phase;
 		combined -= fast_floorf(combined);
 		desired_bucket = (int)(combined * (float)ATLAS_PHASE_BUCKETS);
@@ -161,15 +161,15 @@ static void apply_texenv_for_texture(texture_t *texdata)
 			desired_bucket = ATLAS_PHASE_BUCKETS - 1;
 	}
 
-	bool mode_changed = (mode != s_lastTexEnvMode) || !s_lastTexEnvTextured;
+	bool mode_changed = (mode != lastTexEnvMode) || !lastTexEnvTextured;
 	bool aux_state_changed = (mode == TEXENV_MODE_AUX) &&
-		(desired_bucket != s_lastPhaseBucket ||
-		 (int)desired_mc != s_lastMatClass);
+		(desired_bucket != lastPhaseBucket ||
+		 (int)desired_mc != lastMatClass);
 
 	/* Cache check — same mode + same texture + (for AUX) same atlas
 	 * bucket means no GPU state change needed. */
 	if (!mode_changed && !aux_state_changed &&
-		s_lastBoundTexture == (void*)texdata)
+		lastBoundTexture == (void*)texdata)
 		return;
 
 	/* R08: bind only on a cache miss. The early-return path provably
@@ -198,13 +198,13 @@ static void apply_texenv_for_texture(texture_t *texdata)
 		 * material class. */
 		int   freq_step = desired_bucket & 7;          /* 0..7 */
 		float freq      = base_freq * (1.0f + freq_step * 0.06f);
-		C3D_ProcTexNoiseCoefs(&s_wallProcTex[mc],
+		C3D_ProcTexNoiseCoefs(&wallProcTex[mc],
 			C3D_ProcTex_UV, amp, freq, phase);
-		C3D_ProcTexBind(0, &s_wallProcTex[mc]);
-		if (mode_changed || (int)mc != s_lastMatClass)
-			C3D_ProcTexColorLutBind(&s_wallProcColor[mc]);
-		s_lastMatClass    = (int)mc;
-		s_lastPhaseBucket = desired_bucket;
+		C3D_ProcTexBind(0, &wallProcTex[mc]);
+		if (mode_changed || (int)mc != lastMatClass)
+			C3D_ProcTexColorLutBind(&wallProcColor[mc]);
+		lastMatClass    = (int)mc;
+		lastPhaseBucket = desired_bucket;
 	}
 
 	if (mode_changed)
@@ -212,22 +212,22 @@ static void apply_texenv_for_texture(texture_t *texdata)
 		if (mode == TEXENV_MODE_AUX)
 			configure_texenv_aux(texdata);
 		else if (mode == TEXENV_MODE_OBJECT)
-			configure_texenv_object();
+			configure_object();
 		else
 			configure_texenv_diffuse();
 	}
 
-	s_lastTexEnvMode      = mode;
-	s_lastBoundTexture    = (void*)texdata;
-	s_lastTexEnvTextured  = true;
+	lastTexEnvMode      = mode;
+	lastBoundTexture    = (void*)texdata;
+	lastTexEnvTextured  = true;
 }
 
-static void apply_texenv_untextured(void)
+void TexEnvState::apply_untextured(void)
 {
-	if (s_lastTexEnvMode == TEXENV_MODE_NONE && !s_lastTexEnvTextured)
+	if (lastTexEnvMode == TEXENV_MODE_NONE && !lastTexEnvTextured)
 		return;
 	configure_texenv_none();
-	s_lastTexEnvMode     = TEXENV_MODE_NONE;
-	s_lastBoundTexture   = nullptr;
-	s_lastTexEnvTextured = false;
+	lastTexEnvMode     = TEXENV_MODE_NONE;
+	lastBoundTexture   = nullptr;
+	lastTexEnvTextured = false;
 }

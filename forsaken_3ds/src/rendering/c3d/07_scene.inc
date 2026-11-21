@@ -51,14 +51,14 @@ bool render_init(render_info_t *info)
 		{
 			C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
 
-			C3D_RenderTargetClear(s_targetLeft, C3D_CLEAR_ALL, 0x000000FF, 0xFFFFFF);
-			C3D_FrameDrawOn(s_targetLeft);
+			C3D_RenderTargetClear(g_frame.targetLeft, C3D_CLEAR_ALL, 0x000000FF, 0xFFFFFF);
+			C3D_FrameDrawOn(g_frame.targetLeft);
 
-			C3D_RenderTargetClear(s_targetRight, C3D_CLEAR_ALL, 0x000000FF, 0xFFFFFF);
-			C3D_FrameDrawOn(s_targetRight);
+			C3D_RenderTargetClear(g_frame.targetRight, C3D_CLEAR_ALL, 0x000000FF, 0xFFFFFF);
+			C3D_FrameDrawOn(g_frame.targetRight);
 
-			C3D_RenderTargetClear(s_targetBottom, C3D_CLEAR_ALL, 0x000000FF, 0xFFFFFF);
-			C3D_FrameDrawOn(s_targetBottom);
+			C3D_RenderTargetClear(g_frame.targetBottom, C3D_CLEAR_ALL, 0x000000FF, 0xFFFFFF);
+			C3D_FrameDrawOn(g_frame.targetBottom);
 
 			C3D_FrameEnd(0);
 		}
@@ -139,18 +139,18 @@ bool FSBeginScene(void)
 	 * correct in either kind of frame, only the cost differs. */
 	const bool stereo_frame = render_info.stereo_enabled &&
 		render_info.stereo_mode == STEREO_MODE_3DS;
-	s_memoMode = stereo_frame ? SMEMO_RECORD : SMEMO_OFF;
-	s_memoSuspended = false;
-	/* Slider gate: mono only (see s_persistActive comment). */
-	s_persistActive = !stereo_frame;
-	s_scratchUsed = 0;
-	if (!s_inFrame)
+	g_frame.memoMode = stereo_frame ? SMEMO_RECORD : SMEMO_OFF;
+	g_frame.memoSuspended = false;
+	/* Slider gate: mono only (see g_persist.active comment). */
+	g_persist.active = !stereo_frame;
+	g_scratch.scratchUsed = 0;
+	if (!g_frame.inFrame)
 	{
 		C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
-		C3D_RenderTargetClear(s_targetLeft, C3D_CLEAR_ALL, 0x000000FF, 0xFFFFFF);
-		C3D_FrameDrawOn(s_targetLeft);
-		s_targetCurrent = s_targetLeft;
-		C3D_BindProgram(&s_shaderProgram);
+		C3D_RenderTargetClear(g_frame.targetLeft, C3D_CLEAR_ALL, 0x000000FF, 0xFFFFFF);
+		C3D_FrameDrawOn(g_frame.targetLeft);
+		g_frame.targetCurrent = g_frame.targetLeft;
+		C3D_BindProgram(&g_shader.shaderProgram);
 
 		/* Initialize GPU state for the frame — without this, the first
 		 * draw call operates on uninitialized GPU registers */
@@ -172,11 +172,11 @@ bool FSBeginScene(void)
 		C3D_DepthMap(true, 1.0f, 1.0f);
 
 		/* Reset TexEnv cache — force first draw to set up GPU state */
-		s_lastBoundTexture = nullptr;
-		s_lastTexEnvTextured = false;
-		s_lastTexEnvMode = TEXENV_MODE_NONE;
-		s_lastMatClass = -1;
-		s_lastPhaseBucket = -1;
+		g_texenv.lastBoundTexture = nullptr;
+		g_texenv.lastTexEnvTextured = false;
+		g_texenv.lastTexEnvMode = TEXENV_MODE_NONE;
+		g_texenv.lastMatClass = -1;
+		g_texenv.lastPhaseBucket = -1;
 
 		/* Initialize modelView uniform (register 4) to identity, so
 		 * draws before the first upload_matrices (which writes
@@ -194,7 +194,7 @@ bool FSBeginScene(void)
 		c3d_clear_xlights();
 #endif
 
-		s_inFrame = true;
+		g_frame.inFrame = true;
 	}
 	return true;
 }

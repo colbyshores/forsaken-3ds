@@ -23,10 +23,10 @@
  * depth slate. */
 static void clear_sub_viewport_via_quad(void)
 {
-	if (!s_scratch || s_scratchUsed + 6 > s_scratchMax) return;
+	if (!g_scratch.scratch || g_scratch.scratchUsed + 6 > g_scratch.scratchMax) return;
 
-	gpu_vertex_t *dst = s_scratch + s_scratchUsed;
-	s_scratchUsed += 6;
+	gpu_vertex_t *dst = g_scratch.scratch + g_scratch.scratchUsed;
+	g_scratch.scratchUsed += 6;
 
 	/* PICA's clip range is [-1, 0] in z (not [-1, 1] like GL), so
 	 * z=1 would be clipped. Use z=0 (far plane in this convention). */
@@ -76,20 +76,20 @@ static void clear_sub_viewport_via_quad(void)
 	C3D_CullFace(GPU_CULL_FRONT_CCW);
 
 	/* Quad clear writes TexEnv stage 0 directly without going through
-	 * apply_texenv_*. Invalidate the TexEnv cache so the next textured
+	 * g_texenv.apply_*. Invalidate the TexEnv cache so the next textured
 	 * draw re-runs configure_texenv_* — otherwise the cache lies and
 	 * subsequent walls render untextured (chase-cam regression). */
-	s_lastTexEnvMode     = TEXENV_MODE_NONE;
-	s_lastBoundTexture   = nullptr;
-	s_lastTexEnvTextured = false;
-	s_lastMatClass       = -1;
-	s_lastPhaseBucket    = -1;
+	g_texenv.lastTexEnvMode     = TEXENV_MODE_NONE;
+	g_texenv.lastBoundTexture   = nullptr;
+	g_texenv.lastTexEnvTextured = false;
+	g_texenv.lastMatClass       = -1;
+	g_texenv.lastPhaseBucket    = -1;
 }
 
 bool FSClear(XYRECT *rect)
 {
 	(void)rect;
-	if (!s_targetCurrent) return true;
+	if (!g_frame.targetCurrent) return true;
 
 	/* Sub-viewports (missile cam, PIP, rear view) render AFTER the main
 	 * camera. Rasterized quad clear scissored to viewport via the
@@ -102,22 +102,22 @@ bool FSClear(XYRECT *rect)
 		return true;
 	}
 
-	C3D_RenderTargetClear(s_targetCurrent, C3D_CLEAR_ALL, 0x000000FF, 0xFFFFFF);
+	C3D_RenderTargetClear(g_frame.targetCurrent, C3D_CLEAR_ALL, 0x000000FF, 0xFFFFFF);
 	return true;
 }
 
 bool FSClearBlack(void)
 {
-	if (!s_targetCurrent) return true;
-	C3D_RenderTargetClear(s_targetCurrent, C3D_CLEAR_COLOR, 0x000000FF, 0);
+	if (!g_frame.targetCurrent) return true;
+	C3D_RenderTargetClear(g_frame.targetCurrent, C3D_CLEAR_COLOR, 0x000000FF, 0);
 	return true;
 }
 
 bool FSClearDepth(XYRECT *rect)
 {
 	(void)rect;
-	if (s_targetCurrent)
-		C3D_RenderTargetClear(s_targetCurrent, C3D_CLEAR_DEPTH, 0, 0xFFFFFF);
+	if (g_frame.targetCurrent)
+		C3D_RenderTargetClear(g_frame.targetCurrent, C3D_CLEAR_DEPTH, 0, 0xFFFFFF);
 	return true;
 }
 
@@ -125,33 +125,20 @@ bool FSClearDepth(XYRECT *rect)
 	Viewport
 ===================================================================*/
 
-static render_viewport_t s_viewport = { 0, 0, 400, 240, 1.0f, 1.0f, 0.0f, 1.0f };
-
 bool FSGetViewPort(render_viewport_t *view)
 {
-	*view = s_viewport;
+	*view = g_frame.viewport;
 	return true;
 }
 
-/* One-shot flag set by FSSetNextViewPortScissorMode() and consumed
- * (then reset) by the next FSSetViewPort() call. Allows visi.cpp
- * ClipGroup to hand-off per-group "use scissor instead of sub-rect
- * viewport" decisions without changing FSSetViewPort's signature
- * (which would touch every caller). */
-static bool s_next_view_use_scissor = false;
-/* Persistent record of the most recent FSSetViewPort dispatch
- * (full-vp+scissor vs sub-rect vp). Kept for viewport-dispatch
- * diagnostics; the stereo vertex memo does not need it (both eyes
- * run the live dispatch path). */
-static bool s_current_view_used_scissor = false;
 void FSSetNextViewPortScissorMode(bool scissor_mode)
 {
-	s_next_view_use_scissor = scissor_mode;
+	g_frame.next_view_use_scissor = scissor_mode;
 }
 
 bool FSSetViewPort(render_viewport_t *view)
 {
-	s_viewport = *view;
+	g_frame.viewport = *view;
 
 	/* Translate game-space sub-rect into PICA portrait coordinates.
 	 * The engine viewport is 400×240 landscape; PICA top-screen target
@@ -166,10 +153,10 @@ bool FSSetViewPort(render_viewport_t *view)
 	int pica_w = (int)view->Height;
 	int pica_h = (int)view->Width;
 
-	bool use_scissor = s_next_view_use_scissor;
-	s_next_view_use_scissor = false;	/* one-shot — reset after consume */
+	bool use_scissor = g_frame.next_view_use_scissor;
+	g_frame.next_view_use_scissor = false;	/* one-shot — reset after consume */
 
-	s_current_view_used_scissor = use_scissor;
+	g_frame.current_view_used_scissor = use_scissor;
 	if (use_scissor)
 	{
 		/* Per-group draws (level-mesh visibility groups). Full-screen

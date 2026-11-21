@@ -21,32 +21,32 @@
 ===================================================================*/
 bool c3d_hud_begin_bottom(void)
 {
-	if (!s_targetBottom || !s_inFrame)
+	if (!g_frame.targetBottom || !g_frame.inFrame)
 		return false;
-	if (s_hudDrawnThisFrame)
+	if (g_frame.hudDrawnThisFrame)
 		return false;
-	s_hudDrawnThisFrame = true;
+	g_frame.hudDrawnThisFrame = true;
 
 	/* Save + override dimensions so Print4x5Text / 2D layout math
 	   targets 320×240 instead of 400×240. */
-	s_hudSavedThisModeW = (int)render_info.ThisMode.w;
-	s_hudSavedThisModeH = (int)render_info.ThisMode.h;
-	s_hudSavedWinCx     = (int)render_info.window_size.cx;
-	s_hudSavedWinCy     = (int)render_info.window_size.cy;
+	g_frame.hudSavedThisModeW = (int)render_info.ThisMode.w;
+	g_frame.hudSavedThisModeH = (int)render_info.ThisMode.h;
+	g_frame.hudSavedWinCx     = (int)render_info.window_size.cx;
+	g_frame.hudSavedWinCy     = (int)render_info.window_size.cy;
 	render_info.ThisMode.w    = 320;
 	render_info.ThisMode.h    = 240;
 	render_info.window_size.cx = 320;
 	render_info.window_size.cy = 240;
 
-	s_targetSaved = s_targetCurrent;
-	C3D_RenderTargetClear(s_targetBottom, C3D_CLEAR_ALL, 0x000000FF, 0xFFFFFF);
-	C3D_FrameDrawOn(s_targetBottom);
-	s_targetCurrent = s_targetBottom;
+	g_frame.targetSaved = g_frame.targetCurrent;
+	C3D_RenderTargetClear(g_frame.targetBottom, C3D_CLEAR_ALL, 0x000000FF, 0xFFFFFF);
+	C3D_FrameDrawOn(g_frame.targetBottom);
+	g_frame.targetCurrent = g_frame.targetBottom;
 	/* PICA portrait viewport for the 240×320 bottom target. */
 	C3D_SetViewport(0, 0, 240, 320);
 
 	/* Re-bind shader state for the new target (matches c3d_transfer_eye). */
-	C3D_BindProgram(&s_shaderProgram);
+	C3D_BindProgram(&g_shader.shaderProgram);
 	{
 		C3D_AttrInfo *ai = C3D_GetAttrInfo();
 		AttrInfo_Init(ai);
@@ -70,26 +70,26 @@ bool c3d_hud_begin_bottom(void)
  * close it first so the C3D_FrameBegin below doesn't conflict. */
 void c3d_clear_bottom_screen(void)
 {
-	if (!s_targetBottom)
+	if (!g_frame.targetBottom)
 		return;
 
-	if (s_inFrame)
+	if (g_frame.inFrame)
 	{
 		C3D_FrameEnd(0);
-		s_inFrame = false;
+		g_frame.inFrame = false;
 	}
 
 	int i;
 	for (i = 0; i < 3; i++)
 	{
 		C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
-		C3D_RenderTargetClear(s_targetBottom, C3D_CLEAR_ALL, 0x000000FF, 0xFFFFFF);
-		C3D_FrameDrawOn(s_targetBottom);
+		C3D_RenderTargetClear(g_frame.targetBottom, C3D_CLEAR_ALL, 0x000000FF, 0xFFFFFF);
+		C3D_FrameDrawOn(g_frame.targetBottom);
 		C3D_FrameEnd(0);
 	}
 
-	s_targetCurrent = nullptr;
-	s_hudDrawnThisFrame = false;
+	g_frame.targetCurrent = nullptr;
+	g_frame.hudDrawnThisFrame = false;
 }
 
 /* Level release: the persistent cache's buffers belong to the level
@@ -104,40 +104,40 @@ void c3d_clear_bottom_screen(void)
  * draw again, so the buffers are freed without waiting. */
 void c3d_release_level_cache(void)
 {
-	if (s_persistBytes == 0)
+	if (g_persist.bytes == 0)
 		return;
 	if (!aptShouldClose())
 	{
-		if (s_inFrame)
+		if (g_frame.inFrame)
 		{
 			C3D_FrameEnd(0);
-			s_inFrame = false;
+			g_frame.inFrame = false;
 		}
 		C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
 		C3D_FrameEnd(0);
 	}
-	persist_free_all();
+	g_persist.free_all();
 }
 
 void c3d_hud_end_bottom(void)
 {
-	if (!s_targetSaved)
+	if (!g_frame.targetSaved)
 		return;
-	C3D_FrameDrawOn(s_targetSaved);
-	s_targetCurrent = s_targetSaved;
-	s_targetSaved = nullptr;
+	C3D_FrameDrawOn(g_frame.targetSaved);
+	g_frame.targetCurrent = g_frame.targetSaved;
+	g_frame.targetSaved = nullptr;
 
 	/* Restore saved dimensions. */
-	render_info.ThisMode.w     = s_hudSavedThisModeW;
-	render_info.ThisMode.h     = s_hudSavedThisModeH;
-	render_info.window_size.cx = s_hudSavedWinCx;
-	render_info.window_size.cy = s_hudSavedWinCy;
+	render_info.ThisMode.w     = g_frame.hudSavedThisModeW;
+	render_info.ThisMode.h     = g_frame.hudSavedThisModeH;
+	render_info.window_size.cx = g_frame.hudSavedWinCx;
+	render_info.window_size.cy = g_frame.hudSavedWinCy;
 
 	/* Restore top-screen PICA portrait viewport (240×400). */
 	C3D_SetViewport(0, 0, 240, 400);
 
 	/* Re-bind shader state for the restored top target. */
-	C3D_BindProgram(&s_shaderProgram);
+	C3D_BindProgram(&g_shader.shaderProgram);
 	{
 		C3D_AttrInfo *ai = C3D_GetAttrInfo();
 		AttrInfo_Init(ai);
@@ -157,16 +157,16 @@ void c3d_transfer_eye(unsigned int eye)
 		/* Left eye finished. Switch the memo from record to lookup:
 		 * the right eye reuses recorded ranges with its own live
 		 * uniforms and draw order. */
-		if (s_memoMode == SMEMO_RECORD)
-			s_memoMode = SMEMO_LOOKUP;
+		if (g_frame.memoMode == SMEMO_RECORD)
+			g_frame.memoMode = SMEMO_LOOKUP;
 
 		/* Switch to right eye target */
-		C3D_RenderTargetClear(s_targetRight, C3D_CLEAR_ALL, 0x000000FF, 0xFFFFFF);
-		C3D_FrameDrawOn(s_targetRight);
-		s_targetCurrent = s_targetRight;
+		C3D_RenderTargetClear(g_frame.targetRight, C3D_CLEAR_ALL, 0x000000FF, 0xFFFFFF);
+		C3D_FrameDrawOn(g_frame.targetRight);
+		g_frame.targetCurrent = g_frame.targetRight;
 
 		/* Re-initialize GPU state for the new render target */
-		C3D_BindProgram(&s_shaderProgram);
+		C3D_BindProgram(&g_shader.shaderProgram);
 		{
 			C3D_AttrInfo *ai = C3D_GetAttrInfo();
 			AttrInfo_Init(ai);
@@ -182,16 +182,16 @@ void c3d_transfer_eye(unsigned int eye)
 		 * right-eye draw looks its own range up (hit = resubmit,
 		 * miss = convert live). No draw is ever skipped, so inset,
 		 * HUD and post-stereo draws are unaffected by construction.
-		 * Default (flag off): s_memoMode stays OFF, both eyes run
+		 * Default (flag off): g_frame.memoMode stays OFF, both eyes run
 		 * fully, exactly as before. */
 	}
 	if (eye == GFX_RIGHT)
 	{
 		/* Right eye done. Disarm the memo; post-stereo rendering
 		 * (missile camera, rear view, HUD overlays) draws normally. */
-		s_memoMode = SMEMO_OFF;
+		g_frame.memoMode = SMEMO_OFF;
 	}
-	s_stereoFrame = true;
+	g_frame.stereoFrame = true;
 }
 
 /* Gamma table for texture loading */

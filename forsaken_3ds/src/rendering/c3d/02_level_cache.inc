@@ -1,8 +1,9 @@
 /* ============================================================================
  * 02_level_cache.inc -- part of render_c3d.cpp (SINGLE TRANSLATION UNIT).
  *
- * Persistent level geometry (mono-frame level walls kept converted in
- * retained linear buffers), bind_vertex_buffer and the colour-to-float table.
+ * Persistent level geometry (PersistCache: mono-frame level walls kept
+ * converted in retained linear buffers), the vertex scratch and the
+ * colour-to-float table (VertexScratch), and bind_vertex_buffer.
  *
  * Not a standalone header: no include guard and no includes of its own. It is
  * #included in a fixed order from render_c3d.cpp, which says why.
@@ -22,7 +23,7 @@
 constexpr int PERSIST_BITS = 11;
 constexpr auto PERSIST_SIZE = (1u << PERSIST_BITS);
 constexpr auto PERSIST_MASK = (PERSIST_SIZE - 1u);
-/* Linear memory the cache always leaves free (see persist_store). */
+/* Linear memory the cache always leaves free (see PersistCache::store). */
 constexpr auto PERSIST_LINEAR_RESERVE = (2u * 1024u * 1024u);
 struct persist_entry_t {
 	uintptr_t ro;
@@ -32,16 +33,42 @@ struct persist_entry_t {
 	int count;
 	unsigned gen;
 };
-static persist_entry_t s_persist[PERSIST_SIZE];
-static unsigned s_persistBytes = 0;
-/* Runtime gate (owner policy 2026-11-14): persist pays in mono
- * (-8.6% measured) and is wall-flat in stereo, where its stills are
- * only LSB-equivalent across eyes. So it is active only in mono frames
- * (slider down; see the stereo_frame gate in FSBeginScene), refreshed at
- * every FSBeginScene; stereo keeps the memo-only path.
- * Buffers stay allocated across slider moves and simply go unused
- * in stereo (generation unchanged, still valid if mono resumes). */
-static int s_persistActive = 0;
+
+namespace {
+
+/* The retained level-wall buffers (one instance, g_persist): the open-
+ * addressed table of converted ranges, the linear memory they hold, and
+ * the per-frame gate. */
+class PersistCache {
+	public:
+	/* Out of line, as persist_find was: inlined, both copies would land
+	 * in draw_render_object. */
+	[[gnu::noinline]] persist_entry_t *find(const void *ro, int sub, int create);  // was persist_find
+	gpu_vertex_t *lookup(const void *ro, int sub, int *count);   // was persist_lookup
+	gpu_vertex_t *store(const void *ro, int sub,
+		const gpu_vertex_t *src, int count);                     // was persist_store
+	void free_all(void);                                         // was persist_free_all
+
+	unsigned bytes = 0;
+	/* Runtime gate (owner policy 2026-11-14): persist pays in mono
+	 * (-8.6% measured) and is wall-flat in stereo, where its stills are
+	 * only LSB-equivalent across eyes. So it is active only in mono frames
+	 * (slider down; see the stereo_frame gate in FSBeginScene), refreshed at
+	 * every FSBeginScene; stereo keeps the memo-only path.
+	 * Buffers stay allocated across slider moves and simply go unused
+	 * in stereo (generation unchanged, still valid if mono resumes). */
+	int active = 0;
+	/* Static: its own symbol, as the old table was. In the instance, find
+	 * needs an add for its offset on every probe (72 -> 75), or bytes and
+	 * active sit 48 KB in, past the reach of a load offset. */
+	static persist_entry_t entries[PERSIST_SIZE];
+};
+
+persist_entry_t PersistCache::entries[PERSIST_SIZE] = {};
+
+PersistCache g_persist;
+
+} // namespace
 
 static unsigned persist_hash(uintptr_t ro, int sub)
 {
@@ -54,12 +81,12 @@ static unsigned persist_hash(uintptr_t ro, int sub)
 	}
 }
 
-static persist_entry_t *persist_find(const void *ro, int sub, int create)
+persist_entry_t *PersistCache::find(const void *ro, int sub, int create)
 {
 	unsigned i = persist_hash((uintptr_t)ro, sub);
 	unsigned n;
 	for (n = 0; n < 32; n++) {
-		persist_entry_t *e = &s_persist[(i + n) & PERSIST_MASK];
+		persist_entry_t *e = &entries[(i + n) & PERSIST_MASK];
 		if (e->ro == (uintptr_t)ro && e->sub == sub)
 			return e;
 		if (create && e->buf == nullptr) {
@@ -71,9 +98,9 @@ static persist_entry_t *persist_find(const void *ro, int sub, int create)
 	return nullptr;
 }
 
-static gpu_vertex_t *persist_lookup(const void *ro, int sub, int *count)
+gpu_vertex_t *PersistCache::lookup(const void *ro, int sub, int *count)
 {
-	persist_entry_t *e = persist_find(ro, sub, 0);
+	persist_entry_t *e = find(ro, sub, 0);
 	if (e && e->buf && e->gen == smemo_persist_gen()) {
 		*count = e->count;
 		return e->buf;
@@ -83,15 +110,15 @@ static gpu_vertex_t *persist_lookup(const void *ro, int sub, int *count)
 
 /* Retain a freshly converted range. Returns the retained buffer or
  * NULL (pressure/alloc failure — caller submits from scratch). */
-static gpu_vertex_t *persist_store(const void *ro, int sub,
+gpu_vertex_t *PersistCache::store(const void *ro, int sub,
 								   const gpu_vertex_t *src, int count)
 {
-	persist_entry_t *e = persist_find(ro, sub, 1);
+	persist_entry_t *e = find(ro, sub, 1);
 	if (!e)
 		return nullptr;
 	if (e->cap < count) {
 		if (e->buf) {
-			s_persistBytes -= e->cap * sizeof(gpu_vertex_t);
+			bytes -= e->cap * sizeof(gpu_vertex_t);
 			linearFree(e->buf);
 			e->buf = nullptr;
 			e->cap = 0;
@@ -106,7 +133,7 @@ static gpu_vertex_t *persist_store(const void *ro, int sub,
 		if (!e->buf)
 			return nullptr;
 		e->cap = count;
-		s_persistBytes += count * sizeof(gpu_vertex_t);
+		bytes += count * sizeof(gpu_vertex_t);
 	}
 	memcpy(e->buf, src, count * sizeof(gpu_vertex_t));
 	e->count = count;
@@ -114,19 +141,19 @@ static gpu_vertex_t *persist_store(const void *ro, int sub,
 	return e->buf;
 }
 
-static void persist_free_all(void)
+void PersistCache::free_all(void)
 {
 	unsigned i;
 	for (i = 0; i < PERSIST_SIZE; i++) {
-		if (s_persist[i].buf) {
-			linearFree(s_persist[i].buf);
-			s_persist[i].buf = nullptr;
-			s_persist[i].cap = 0;
-			s_persist[i].count = 0;
-			s_persist[i].gen = 0;
+		if (entries[i].buf) {
+			linearFree(entries[i].buf);
+			entries[i].buf = nullptr;
+			entries[i].cap = 0;
+			entries[i].count = 0;
+			entries[i].gen = 0;
 		}
 	}
-	s_persistBytes = 0;
+	bytes = 0;
 }
 
 
@@ -140,7 +167,38 @@ static void persist_free_all(void)
  * CIA. On OG (22 MB linear heap) this is ~18% of the budget — tight
  * but validated working on real hardware. */
 constexpr auto GPU_SCRATCH_SIZE = (4 * 1024 * 1024);
-static gpu_vertex_t *s_scratch = nullptr;
+
+namespace {
+
+/* The vertex conversion scratch (one instance, g_scratch): the 4 MB linear
+ * buffer, how much of it this frame has used, and the colour-to-float
+ * table the conversion reads. */
+class VertexScratch {
+	public:
+	void c255_init(void);
+
+	gpu_vertex_t *scratch = nullptr;
+	int scratchUsed = 0;
+	int scratchMax = 0;
+
+	/* Byte-to-float color table: replaces 4 vdiv.f32 per converted vertex
+	 * (measured 7.4 ms/frame on Old 3DS, 12.3K verts/frame) with 4 L1D
+	 * reads. Bit-identical output: each entry IS ((float)b)/255.0f, the same
+	 * correctly-rounded quotient the loop computed, so pixels are unchanged
+	 * (pixel-verified). 1 KiB, stays hot in L1D.
+	 * Static: its own symbol, as the old table was, so the per-vertex
+	 * loops index it from its own base. In the instance it held a register
+	 * as g_scratch's base for the whole of draw_render_object and moved a
+	 * value to the stack in the per-texgroup flush loops. */
+	static float c255[256];
+	int c255_ok = 0;
+};
+
+float VertexScratch::c255[256] = {};
+
+VertexScratch g_scratch;
+
+} // namespace
 
 /* Point the vertex attribute buffer at v for the next draw. citro3d
  * re-sends the buffer config only when C3D_GetBufInfo() has marked it
@@ -155,23 +213,13 @@ static inline void bind_vertex_buffer(const gpu_vertex_t *v)
 	BufInfo_Init(bi);
 	BufInfo_Add(bi, v, sizeof(gpu_vertex_t), 3, 0x210);
 }
-static int s_scratchUsed = 0;
-static int s_scratchMax = 0;
 
-
-/* Byte-to-float color table: replaces 4 vdiv.f32 per converted vertex
- * (measured 7.4 ms/frame on Old 3DS, 12.3K verts/frame) with 4 L1D
- * reads. Bit-identical output: each entry IS ((float)b)/255.0f, the same
- * correctly-rounded quotient the loop computed, so pixels are unchanged
- * (pixel-verified). 1 KiB, stays hot in L1D. */
-static float s_c255[256];
-static int s_c255_ok = 0;
-static void c255_init(void)
+void VertexScratch::c255_init(void)
 {
 	int b;
-	if (s_c255_ok)
+	if (c255_ok)
 		return;
 	for (b = 0; b < 256; b++)
-		s_c255[b] = (float)b / 255.0f;
-	s_c255_ok = 1;
+		c255[b] = (float)b / 255.0f;
+	c255_ok = 1;
 }

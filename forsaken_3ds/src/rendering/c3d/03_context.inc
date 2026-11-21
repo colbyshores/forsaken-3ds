@@ -2,8 +2,8 @@
  * 03_context.inc -- part of render_c3d.cpp (SINGLE TRANSLATION UNIT).
  *
  * Engine-facing globals, forward declarations, texture material classes,
- * the citro3d context (c3d_context_init / exit) and frame presentation
- * (c3d_present).
+ * the TexEnv state (TexEnvState), the citro3d context (c3d_context_init /
+ * exit) and frame presentation (c3d_present).
  *
  * Not a standalone header: no include guard and no includes of its own. It is
  * #included in a fixed order from render_c3d.cpp, which says why.
@@ -18,8 +18,6 @@ gl_caps_t caps;
 /* Forward declarations */
 static void upload_matrices(void);
 struct texture_t;
-static void apply_texenv_for_texture(struct texture_t *texdata);
-static void apply_texenv_untextured(void);
 
 /* Pick a material class from the source texture filename. Forsaken's
  * atlas naming is consistent enough for prefix matching: thermal /
@@ -85,38 +83,6 @@ bool bSquareOnly = true;
  * additive blend in place instead of restoring opaque blending after it. */
 bool _additive_blend_active = false;
 
-/* Frame state tracking */
-static bool s_inFrame = false;
-
-/* TexEnv cache: skip redundant GPU state changes when consecutive
- * draws use the same texture or same untextured mode. */
-static void *s_lastBoundTexture = nullptr;  /* last texture_t* passed to C3D_TexBind */
-static bool  s_lastTexEnvTextured = false;  /* last TexEnv was textured vs vertex-only */
-
-/* Per-mesh ProcTex phase variation. draw_render_object writes a
- * per-renderObject seed; apply_texenv_for_texture reads it to pick a
- * phase bucket so two adjacent walls sharing the same base texture
- * get visually distinct grain. Folded into g_wall_detail — there's no
- * scenario where you'd want detail-grain on but the repeating version. */
-static u32  s_atlasSeed        = 0;
-static int  s_lastMatClass     = -1;
-static int  s_lastPhaseBucket  = -1;
-constexpr int ATLAS_PHASE_BUCKETS = 64;
-
-/* True while inside an orthographic draw_render_object (HUD, screen
- * polys, damage-flash overlay). apply_texenv_for_texture suppresses
- * AUX-mode ProcTex for those — wall grain on a fullscreen red damage
- * tint reads as garbage, same shape for HUD glyphs and menu icons. */
-static bool s_isOrthoDraw      = false;
-
-/* Sticky flag: caller-managed. Wraps world-space billboard / particle
- * batches (explosion sprites, smoke puffs, lens flares, weapon trails)
- * so apply_texenv_for_texture skips AUX-mode ProcTex on them too. The
- * orthographic auto-flag covers HUD/screen-poly draws; this covers
- * 3D-space sprites that *aren't* orthographic but still shouldn't get
- * wall grain. */
-static bool s_skipAuxProcTex   = false;
-
 /* Track the last TexEnv mode so the combiner stages are reconfigured
  * only when a draw needs a different mode. */
 enum texenv_mode_t {
@@ -125,7 +91,92 @@ enum texenv_mode_t {
 	TEXENV_MODE_AUX,         /* wall: diffuse + ADD_SIGNED ProcTex grain */
 	TEXENV_MODE_OBJECT,      /* model: diffuse + Phong specular */
 };
-static texenv_mode_t s_lastTexEnvMode = TEXENV_MODE_NONE;
+constexpr int ATLAS_PHASE_BUCKETS = 64;
+
+namespace {
+
+/* The TexEnv combiner state (one instance, g_texenv): what the last draw
+ * left bound and configured, the per-draw inputs that pick the next mode,
+ * the ProcTex wall-grain tables and the object fragment light. */
+class TexEnvState {
+	public:
+	void apply_for_texture(texture_t *texdata);  // was apply_texenv_for_texture
+	void apply_untextured(void);                 // was apply_texenv_untextured
+	void configure_object(void);                 // was configure_texenv_object
+
+	/* TexEnv cache: skip redundant GPU state changes when consecutive
+	 * draws use the same texture or same untextured mode. */
+	void *lastBoundTexture = nullptr;  /* last texture_t* passed to C3D_TexBind */
+	bool  lastTexEnvTextured = false;  /* last TexEnv was textured vs vertex-only */
+	texenv_mode_t lastTexEnvMode = TEXENV_MODE_NONE;
+
+	/* Per-mesh ProcTex phase variation. draw_render_object writes a
+	 * per-renderObject seed; apply_for_texture reads it to pick a
+	 * phase bucket so two adjacent walls sharing the same base texture
+	 * get visually distinct grain. Folded into g_wall_detail — there's no
+	 * scenario where you'd want detail-grain on but the repeating version. */
+	u32  atlasSeed        = 0;
+	int  lastMatClass     = -1;
+	int  lastPhaseBucket  = -1;
+
+	/* True while inside an orthographic draw_render_object (HUD, screen
+	 * polys, damage-flash overlay). apply_for_texture suppresses
+	 * AUX-mode ProcTex for those — wall grain on a fullscreen red damage
+	 * tint reads as garbage, same shape for HUD glyphs and menu icons. */
+	bool isOrthoDraw      = false;
+
+	/* Sticky flag: caller-managed. Wraps world-space billboard / particle
+	 * batches (explosion sprites, smoke puffs, lens flares, weapon trails)
+	 * so apply_for_texture skips AUX-mode ProcTex on them too. The
+	 * orthographic auto-flag covers HUD/screen-poly draws; this covers
+	 * 3D-space sprites that *aren't* orthographic but still shouldn't get
+	 * wall grain. */
+	bool skipAuxProcTex   = false;
+
+	bool objProcTexOn = false;  /* per-draw toggle */
+
+	/* Per-call eligibility gate for the OBJECT shine path. Defaults true
+	 * (every object draw gets shine). Set false by callers that want to
+	 * suppress shine for a specific model — currently used by models.cpp
+	 * for OWNER_BGOBJECT models (doors, vents, animated decorations)
+	 * where Phong specular reads as tacky on the large flat surfaces. */
+	bool objShineEligible = true;
+
+	/* The ProcTex wall-grain classes (01_state.inc says why), built once by
+	 * c3d_renderer_init. */
+	bool                 procTexReady = false;
+
+	/* PICA200 fragment-lighting for object Phong shading. Vshader outputs
+	 * a pseudo-normal-derived quaternion (outnq) per vertex; the hardware
+	 * uses it + the bound light env to compute FRAGMENT_PRIMARY_COLOR
+	 * (diffuse) and FRAGMENT_SECONDARY_COLOR (specular). The OBJECT
+	 * TexEnv mode reads SECONDARY for the moving shine highlight. */
+	bool          objLightReady = false;
+
+	/* The tables (8 KB) are static data members: each its own .bss symbol,
+	 * as the old file statics were. As instance members they would move
+	 * the instance into .data (the cache's -1 and true initialisers), and
+	 * objLight would sit 7 KB in, past the reach of a load offset. */
+	static C3D_ProcTex          wallProcTex[MAT_COUNT];
+	static C3D_ProcTexColorLut  wallProcColor[MAT_COUNT];
+	static C3D_ProcTexLut       wallProcNoise;   /* shared smoothstep */
+	static C3D_ProcTexLut       wallProcMap;     /* shared RGB map */
+	static C3D_LightEnv  objLightEnv;
+	static C3D_Light     objLight;
+	static C3D_LightLut  objLightLut;
+};
+
+C3D_ProcTex          TexEnvState::wallProcTex[MAT_COUNT] = {};
+C3D_ProcTexColorLut  TexEnvState::wallProcColor[MAT_COUNT] = {};
+C3D_ProcTexLut       TexEnvState::wallProcNoise = {};
+C3D_ProcTexLut       TexEnvState::wallProcMap = {};
+C3D_LightEnv  TexEnvState::objLightEnv = {};
+C3D_Light     TexEnvState::objLight = {};
+C3D_LightLut  TexEnvState::objLightLut = {};
+
+TexEnvState g_texenv;
+
+} // namespace
 
 /* Toggle: enable Phong-shine path for the next textured draw. Set by
  * mxload.cpp / mxaload.cpp around their draw_object calls so model + enemy
@@ -133,18 +184,12 @@ static texenv_mode_t s_lastTexEnvMode = TEXENV_MODE_NONE;
  * longer uses ProcTex.) */
 void c3d_set_object_proctex(bool enable)
 {
-	s_objProcTexOn = enable;
+	g_texenv.objProcTexOn = enable;
 }
 
-/* Per-call eligibility gate for the OBJECT shine path. Defaults true
- * (every object draw gets shine). Set false by callers that want to
- * suppress shine for a specific model — currently used by models.cpp
- * for OWNER_BGOBJECT models (doors, vents, animated decorations)
- * where Phong specular reads as tacky on the large flat surfaces. */
-static bool s_objShineEligible = true;
 void c3d_set_object_shine_eligible(bool enable)
 {
-	s_objShineEligible = enable;
+	g_texenv.objShineEligible = enable;
 }
 
 
@@ -180,38 +225,34 @@ void c3d_context_exit(void)
 	C3D_Fini();
 }
 
-/* Frame-rate counter. Updated once per swap, exposed via the
- * `forsaken_get_fps()` accessor so the HUD overlay can draw it. */
-static u32    s_fps_frames_in_win = 0;
-static u64    s_fps_window_start_ms = 0;
-static int    s_fps_current       = 0;
+int forsaken_get_fps(void) { return g_frame.fps_current; }
 
-int forsaken_get_fps(void) { return s_fps_current; }
-
-void c3d_present(void)
+void FrameState::present()
 {
-	if (s_inFrame)
+	if (inFrame)
 	{
 		C3D_FrameEnd(0);
-		s_inFrame = false;
+		inFrame = false;
 	}
 	/* Reset stereo state for next frame */
-	s_stereoFrame = false;
-	s_memoMode = SMEMO_OFF;
-	s_hudDrawnThisFrame = false;
+	stereoFrame = false;
+	memoMode = SMEMO_OFF;
+	hudDrawnThisFrame = false;
 
 	/* FPS measurement. Roll the count over a 1-second window so the
 	 * displayed value is stable. */
 	u64 now = osGetTime();
-	if (s_fps_window_start_ms == 0)
-		s_fps_window_start_ms = now;
-	s_fps_frames_in_win++;
-	u64 elapsed = now - s_fps_window_start_ms;
+	if (fps_window_start_ms == 0)
+		fps_window_start_ms = now;
+	fps_frames_in_win++;
+	u64 elapsed = now - fps_window_start_ms;
 	if (elapsed >= 1000)
 	{
 		/* @vfp-exempt R11 — FPS counter window update, once per measurement window (~1/s), not per frame. measured n/a. Verified 2026-10-25. */
-		s_fps_current = (int)((s_fps_frames_in_win * 1000ULL) / elapsed);
-		s_fps_window_start_ms = now;
-		s_fps_frames_in_win = 0;
+		fps_current = (int)((fps_frames_in_win * 1000ULL) / elapsed);
+		fps_window_start_ms = now;
+		fps_frames_in_win = 0;
 	}
 }
+
+void c3d_present(void) { g_frame.present(); }

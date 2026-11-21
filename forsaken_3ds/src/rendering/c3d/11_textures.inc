@@ -73,19 +73,32 @@ static void tile_rgba4(const u_int8_t *src, u_int16_t *dst, int w, int h)
  *
  * Single-pack CIAs (LOMEM-only or HIMEM-only) still work — the fallback
  * dir is tried if the preferred one isn't shipped. */
-static const char *s_hd_textures_dir = nullptr;
-static const char *s_hd_textures_fallback = nullptr;
+namespace {
 
-static void resolve_hd_textures_dirs(void)
+/* The HD texture pack directories (one instance, g_hdpacks): the preferred
+ * one and the fallback, chosen once by resolve(). */
+class HdTexturePacks {
+	public:
+	void resolve(void);  // was resolve_hd_textures_dirs
+
+	const char *dir = nullptr;
+	const char *fallback = nullptr;
+};
+
+HdTexturePacks g_hdpacks;
+
+} // namespace
+
+void HdTexturePacks::resolve(void)
 {
-	if (s_hd_textures_dir) return;
+	if (dir) return;
 	u64 region_size = osGetMemRegionSize(MEMREGION_APPLICATION);
 	if (region_size >= 96ull * 1024 * 1024) {
-		s_hd_textures_dir      = "hd_textures";
-		s_hd_textures_fallback = "hd_textures_lomem";
+		dir      = "hd_textures";
+		fallback = "hd_textures_lomem";
 	} else {
-		s_hd_textures_dir      = "hd_textures_lomem";
-		s_hd_textures_fallback = "hd_textures";
+		dir      = "hd_textures_lomem";
+		fallback = "hd_textures";
 	}
 }
 
@@ -131,19 +144,19 @@ static FILE *open_hd_texture(const char *path, char *hd_path, size_t size)
 	const char *key;
 	FILE *f;
 
-	resolve_hd_textures_dirs();
+	g_hdpacks.resolve();
 	key = hd_texture_key(path);
 	if (!key)
 		return nullptr;
 
-	hd_texture_path(hd_path, size, s_hd_textures_dir, key);
+	hd_texture_path(hd_path, size, g_hdpacks.dir, key);
 	f = fopen(hd_path, "rb");
 	if (!f)
 	{
 		/* Preferred dir isn't shipped — try the fallback. Defensive;
 		 * production CIAs always ship both packs, but this lets a
 		 * future single-pack variant work without code changes. */
-		hd_texture_path(hd_path, size, s_hd_textures_fallback, key);
+		hd_texture_path(hd_path, size, g_hdpacks.fallback, key);
 		f = fopen(hd_path, "rb");
 	}
 	return f;
@@ -193,7 +206,7 @@ static bool try_load_hd_texture(TEXTURE_HANDLE *t, const char *path,
 
 	/* Tex3DS imported the texture at whatever size the romfs pack
 	 * shipped (512² for N3DS via hd_textures/, 256² for OG via
-	 * hd_textures_lomem/ — picked at runtime by resolve_hd_textures_dirs).
+	 * hd_textures_lomem/ — picked at runtime by HdTexturePacks::resolve).
 	 * No further size munging needed. */
 
 	/* Bilinear-mipmap (GPU_NEAREST for mip selection): picks ONE mip level

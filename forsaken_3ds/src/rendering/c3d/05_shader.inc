@@ -44,27 +44,27 @@ bool c3d_renderer_init(void)
 	 * Diagnosed via 246 "render targets created" lines in forsaken_c3d.log
 	 * paired with 10+ "FSCreateIndexBuffer: linearAlloc FAILED" entries near
 	 * EOF, immediately preceding GPUCMD_AddInternal's full-buffer svcBreak. */
-	if (s_shaderReady) {
+	if (g_shader.shaderReady) {
 		return true;
 	}
-	s_shaderDVLB = DVLB_ParseFile((u32*)render_c3d_shbin, render_c3d_shbin_len);
-	if (!s_shaderDVLB)
+	g_shader.shaderDVLB = DVLB_ParseFile((u32*)render_c3d_shbin, render_c3d_shbin_len);
+	if (!g_shader.shaderDVLB)
 	{
 		return false;
 	}
 
-	shaderProgramInit(&s_shaderProgram);
-	if (shaderProgramSetVsh(&s_shaderProgram, &s_shaderDVLB->DVLE[0]) < 0) {
+	shaderProgramInit(&g_shader.shaderProgram);
+	if (shaderProgramSetVsh(&g_shader.shaderProgram, &g_shader.shaderDVLB->DVLE[0]) < 0) {
 		return false;
 	}
 
 	/* Allocate scratch buffer for vertex conversion */
-	s_scratch = (gpu_vertex_t*)linearAlloc(GPU_SCRATCH_SIZE);
-	if (!s_scratch) {
+	g_scratch.scratch = (gpu_vertex_t*)linearAlloc(GPU_SCRATCH_SIZE);
+	if (!g_scratch.scratch) {
 		return false;
 	}
-	s_scratchMax = GPU_SCRATCH_SIZE / sizeof(gpu_vertex_t);
-	s_scratchUsed = 0;
+	g_scratch.scratchMax = GPU_SCRATCH_SIZE / sizeof(gpu_vertex_t);
+	g_scratch.scratchUsed = 0;
 
 	/* Create render targets and link to display output.
 	 * Both left and right eye targets are created unconditionally —
@@ -77,26 +77,26 @@ bool c3d_renderer_init(void)
 			GX_TRANSFER_OUT_FORMAT(GX_TRANSFER_FMT_RGB8) |
 			GX_TRANSFER_SCALING(GX_TRANSFER_SCALE_NO);
 
-		s_targetLeft = C3D_RenderTargetCreate(240, 400, GPU_RB_RGBA8, GPU_RB_DEPTH24_STENCIL8);
-		if (!s_targetLeft) {
+		g_frame.targetLeft = C3D_RenderTargetCreate(240, 400, GPU_RB_RGBA8, GPU_RB_DEPTH24_STENCIL8);
+		if (!g_frame.targetLeft) {
 			return false;
 		}
-		C3D_RenderTargetSetOutput(s_targetLeft, GFX_TOP, GFX_LEFT, transferFlags);
+		C3D_RenderTargetSetOutput(g_frame.targetLeft, GFX_TOP, GFX_LEFT, transferFlags);
 
-		s_targetRight = C3D_RenderTargetCreate(240, 400, GPU_RB_RGBA8, GPU_RB_DEPTH24_STENCIL8);
-		if (!s_targetRight) {
+		g_frame.targetRight = C3D_RenderTargetCreate(240, 400, GPU_RB_RGBA8, GPU_RB_DEPTH24_STENCIL8);
+		if (!g_frame.targetRight) {
 			return false;
 		}
-		C3D_RenderTargetSetOutput(s_targetRight, GFX_TOP, GFX_RIGHT, transferFlags);
+		C3D_RenderTargetSetOutput(g_frame.targetRight, GFX_TOP, GFX_RIGHT, transferFlags);
 
 		/* Bottom screen (320×240, mono). Stored in GPU as 240×320 portrait
 		 * like the top. Used for gameplay HUD text so the stereo 3D image
 		 * above isn't cluttered. */
-		s_targetBottom = C3D_RenderTargetCreate(240, 320, GPU_RB_RGBA8, GPU_RB_DEPTH24_STENCIL8);
-		if (!s_targetBottom) {
+		g_frame.targetBottom = C3D_RenderTargetCreate(240, 320, GPU_RB_RGBA8, GPU_RB_DEPTH24_STENCIL8);
+		if (!g_frame.targetBottom) {
 			return false;
 		}
-		C3D_RenderTargetSetOutput(s_targetBottom, GFX_BOTTOM, GFX_LEFT, transferFlags);
+		C3D_RenderTargetSetOutput(g_frame.targetBottom, GFX_BOTTOM, GFX_LEFT, transferFlags);
 	}
 
 	/* Depth map scale 1.0, offset 1.0 (the values the earlier PICA200 GL shim used). */
@@ -107,11 +107,11 @@ bool c3d_renderer_init(void)
 	 * shaderInstanceGetUniformLocation / DVLE_GetUniformRegister return
 	 * -1 for fvec uniforms beyond projection/modelView even though they
 	 * appear in the binary's symbol table — works around that. */
-	s_loc_ambient     = UNIFORM_AMBIENT;
-	s_loc_light_count = UNIFORM_LIGHT_COUNT;
-	s_loc_lights      = UNIFORM_LIGHTS;
+	g_shader.loc_ambient     = UNIFORM_AMBIENT;
+	g_shader.loc_light_count = UNIFORM_LIGHT_COUNT;
+	g_shader.loc_lights      = UNIFORM_LIGHTS;
 
-	if (!s_procTexReady)
+	if (!g_texenv.procTexReady)
 	{
 		/* Shared LUTs — noise smoothstep + RGB map. Both are linear
 		 * identity ramps; per-class character comes from the noise
@@ -122,10 +122,10 @@ bool c3d_renderer_init(void)
 			int i;
 			for (i = 0; i <= 128; i++)
 				ramp[i] = (float)i / 128.0f;
-			ProcTexLut_FromArray(&s_wallProcNoise, ramp);
-			C3D_ProcTexLutBind(GPU_LUT_NOISE, &s_wallProcNoise);
-			ProcTexLut_FromArray(&s_wallProcMap, ramp);
-			C3D_ProcTexLutBind(GPU_LUT_RGBMAP, &s_wallProcMap);
+			ProcTexLut_FromArray(&g_texenv.wallProcNoise, ramp);
+			C3D_ProcTexLutBind(GPU_LUT_NOISE, &g_texenv.wallProcNoise);
+			ProcTexLut_FromArray(&g_texenv.wallProcMap, ramp);
+			C3D_ProcTexLutBind(GPU_LUT_RGBMAP, &g_texenv.wallProcMap);
 		}
 
 		/* Per-class noise coefs + color LUT. Color LUT uses 2 stops:
@@ -177,15 +177,15 @@ bool c3d_renderer_init(void)
 		 * subtle and symmetric. */
 
 		/* MAT_METAL — fine paint-grain + brushed sheen. */
-		C3D_ProcTexInit(&s_wallProcTex[MAT_METAL], 0, 2);
-		C3D_ProcTexClamp(&s_wallProcTex[MAT_METAL],
+		C3D_ProcTexInit(&g_texenv.wallProcTex[MAT_METAL], 0, 2);
+		C3D_ProcTexClamp(&g_texenv.wallProcTex[MAT_METAL],
 						 GPU_PT_REPEAT, GPU_PT_REPEAT);
-		C3D_ProcTexNoiseCoefs(&s_wallProcTex[MAT_METAL],
+		C3D_ProcTexNoiseCoefs(&g_texenv.wallProcTex[MAT_METAL],
 							  C3D_ProcTex_UV, 0.25f, 16.0f, 0.0f);
-		C3D_ProcTexCombiner(&s_wallProcTex[MAT_METAL], false,
+		C3D_ProcTexCombiner(&g_texenv.wallProcTex[MAT_METAL], false,
 							GPU_PT_ADD, GPU_PT_ADD);
-		C3D_ProcTexFilter(&s_wallProcTex[MAT_METAL], GPU_PT_LINEAR);
-		C3D_ProcTexNoiseEnable(&s_wallProcTex[MAT_METAL], true);
+		C3D_ProcTexFilter(&g_texenv.wallProcTex[MAT_METAL], GPU_PT_LINEAR);
+		C3D_ProcTexNoiseEnable(&g_texenv.wallProcTex[MAT_METAL], true);
 		{
 			u32 colors[4] = {
 				0xFF727272u,  /*  -7% */
@@ -193,20 +193,20 @@ bool c3d_renderer_init(void)
 				0xFF787878u,  /*  -3% */
 				0xFF8C8C8Cu,  /*  +5% */
 			};
-			ProcTexColorLut_Write(&s_wallProcColor[MAT_METAL],
+			ProcTexColorLut_Write(&g_texenv.wallProcColor[MAT_METAL],
 								  colors, 0, 4);
 		}
 
 		/* MAT_ROCK — pitted, cool/warm wear pattern. */
-		C3D_ProcTexInit(&s_wallProcTex[MAT_ROCK], 0, 2);
-		C3D_ProcTexClamp(&s_wallProcTex[MAT_ROCK],
+		C3D_ProcTexInit(&g_texenv.wallProcTex[MAT_ROCK], 0, 2);
+		C3D_ProcTexClamp(&g_texenv.wallProcTex[MAT_ROCK],
 						 GPU_PT_REPEAT, GPU_PT_REPEAT);
-		C3D_ProcTexNoiseCoefs(&s_wallProcTex[MAT_ROCK],
+		C3D_ProcTexNoiseCoefs(&g_texenv.wallProcTex[MAT_ROCK],
 							  C3D_ProcTex_UV, 0.31f, 13.0f, 0.0f);
-		C3D_ProcTexCombiner(&s_wallProcTex[MAT_ROCK], false,
+		C3D_ProcTexCombiner(&g_texenv.wallProcTex[MAT_ROCK], false,
 							GPU_PT_ADD, GPU_PT_ADD);
-		C3D_ProcTexFilter(&s_wallProcTex[MAT_ROCK], GPU_PT_LINEAR);
-		C3D_ProcTexNoiseEnable(&s_wallProcTex[MAT_ROCK], true);
+		C3D_ProcTexFilter(&g_texenv.wallProcTex[MAT_ROCK], GPU_PT_LINEAR);
+		C3D_ProcTexNoiseEnable(&g_texenv.wallProcTex[MAT_ROCK], true);
 		{
 			u32 colors[4] = {
 				0xFF70757Cu,  /* cool dark */
@@ -214,20 +214,20 @@ bool c3d_renderer_init(void)
 				0xFF767A80u,  /* cool mid */
 				0xFF8E8783u,  /* warm mid-light */
 			};
-			ProcTexColorLut_Write(&s_wallProcColor[MAT_ROCK],
+			ProcTexColorLut_Write(&g_texenv.wallProcColor[MAT_ROCK],
 								  colors, 0, 4);
 		}
 
 		/* MAT_ORGANIC — soft, faint green tint. */
-		C3D_ProcTexInit(&s_wallProcTex[MAT_ORGANIC], 0, 2);
-		C3D_ProcTexClamp(&s_wallProcTex[MAT_ORGANIC],
+		C3D_ProcTexInit(&g_texenv.wallProcTex[MAT_ORGANIC], 0, 2);
+		C3D_ProcTexClamp(&g_texenv.wallProcTex[MAT_ORGANIC],
 						 GPU_PT_REPEAT, GPU_PT_REPEAT);
-		C3D_ProcTexNoiseCoefs(&s_wallProcTex[MAT_ORGANIC],
+		C3D_ProcTexNoiseCoefs(&g_texenv.wallProcTex[MAT_ORGANIC],
 							  C3D_ProcTex_UV, 0.27f, 14.0f, 0.0f);
-		C3D_ProcTexCombiner(&s_wallProcTex[MAT_ORGANIC], false,
+		C3D_ProcTexCombiner(&g_texenv.wallProcTex[MAT_ORGANIC], false,
 							GPU_PT_ADD, GPU_PT_ADD);
-		C3D_ProcTexFilter(&s_wallProcTex[MAT_ORGANIC], GPU_PT_LINEAR);
-		C3D_ProcTexNoiseEnable(&s_wallProcTex[MAT_ORGANIC], true);
+		C3D_ProcTexFilter(&g_texenv.wallProcTex[MAT_ORGANIC], GPU_PT_LINEAR);
+		C3D_ProcTexNoiseEnable(&g_texenv.wallProcTex[MAT_ORGANIC], true);
 		{
 			u32 colors[4] = {
 				0xFF72766Eu,
@@ -235,22 +235,22 @@ bool c3d_renderer_init(void)
 				0xFF787C76u,
 				0xFF8C9088u,
 			};
-			ProcTexColorLut_Write(&s_wallProcColor[MAT_ORGANIC],
+			ProcTexColorLut_Write(&g_texenv.wallProcColor[MAT_ORGANIC],
 								  colors, 0, 4);
 		}
 
-		s_procTexReady = true;
+		g_texenv.procTexReady = true;
 	}
 
-	if (!s_objLightReady)
+	if (!g_texenv.objLightReady)
 	{
-		C3D_LightEnvInit(&s_objLightEnv);
+		C3D_LightEnvInit(&g_texenv.objLightEnv);
 
 		/* Phong-30 LUT — tight specular highlight so the shine reads
 		 * as a moving spot rather than a broad glow. */
-		LightLut_Phong(&s_objLightLut, 30.0f);
-		C3D_LightEnvLut(&s_objLightEnv, GPU_LUT_D0, GPU_LUTINPUT_LN,
-						false, &s_objLightLut);
+		LightLut_Phong(&g_texenv.objLightLut, 30.0f);
+		C3D_LightEnvLut(&g_texenv.objLightEnv, GPU_LUT_D0, GPU_LUTINPUT_LN,
+						false, &g_texenv.objLightLut);
 
 		/* Material — strong specular, modest diffuse. We don't sample
 		 * FRAGMENT_PRIMARY_COLOR (diffuse stays in the legacy TEX0 ×
@@ -263,37 +263,37 @@ bool c3d_renderer_init(void)
 				{ 0.0f, 0.0f, 0.0f },  /* specular1 */
 				{ 0.0f, 0.0f, 0.0f },  /* emission */
 			};
-			C3D_LightEnvMaterial(&s_objLightEnv, &s_objMaterial);
+			C3D_LightEnvMaterial(&g_texenv.objLightEnv, &s_objMaterial);
 		}
 
-		C3D_LightInit(&s_objLight, &s_objLightEnv);
-		C3D_LightColor(&s_objLight, 1.0f, 1.0f, 1.0f);
+		C3D_LightInit(&g_texenv.objLight, &g_texenv.objLightEnv);
+		C3D_LightColor(&g_texenv.objLight, 1.0f, 1.0f, 1.0f);
 
 		/* Positional light far up + forward — same convention as the
 		 * earlier wall light. Distance falloff is dot-based via the
 		 * LUT, not range-based, so absolute coords don't matter much. */
 		{
 			C3D_FVec pos = FVec4_New(500.0f, 500.0f, 200.0f, 1.0f);
-			C3D_LightPosition(&s_objLight, &pos);
+			C3D_LightPosition(&g_texenv.objLight, &pos);
 		}
 
-		s_objLightReady = true;
+		g_texenv.objLightReady = true;
 	}
 
-	s_shaderReady = true;
+	g_shader.shaderReady = true;
 	return true;
 }
 
 void c3d_renderer_cleanup(void)
 {
-	if (s_shaderReady)
+	if (g_shader.shaderReady)
 	{
-		shaderProgramFree(&s_shaderProgram);
-		s_shaderReady = false;
+		shaderProgramFree(&g_shader.shaderProgram);
+		g_shader.shaderReady = false;
 	}
-	if (s_shaderDVLB)
+	if (g_shader.shaderDVLB)
 	{
-		DVLB_Free(s_shaderDVLB);
-		s_shaderDVLB = nullptr;
+		DVLB_Free(g_shader.shaderDVLB);
+		g_shader.shaderDVLB = nullptr;
 	}
 }

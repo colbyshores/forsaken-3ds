@@ -70,7 +70,7 @@
 	if (batch_vertCount > 0) {
 		int has_persist = 0;
 		{ int pi; for (pi = batch_tg0; pi < group; pi++) if (tg_persist_buf[pi]) { has_persist = 1; break; } }
-		if ((has_persist || (s_memoMode == SMEMO_LOOKUP)) && !orthographic) {
+		if ((has_persist || (g_frame.memoMode == SMEMO_LOOKUP)) && !orthographic) {
 			int si;
 			int consumed = 0;
 			long run_off = 0;
@@ -79,7 +79,7 @@
 			for (si = batch_tg0; si < group && consumed < batch_vertCount; si++) {
 				if (tg_persist_buf[si]) {
 					if (run_open) {
-						bind_vertex_buffer(s_scratch + run_off);
+						bind_vertex_buffer(g_scratch.scratch + run_off);
 						C3D_DrawArrays(GPU_TRIANGLES, 0, run_cnt);
 						run_open = 0;
 					}
@@ -90,7 +90,7 @@
 				}
 				if (tg_memo_cnt[si] <= 0 || (run_open && tg_memo_off[si] != run_off + run_cnt)) {
 					if (run_open) {
-						bind_vertex_buffer(s_scratch + run_off);
+						bind_vertex_buffer(g_scratch.scratch + run_off);
 						C3D_DrawArrays(GPU_TRIANGLES, 0, run_cnt);
 						run_open = 0;
 					}
@@ -106,11 +106,11 @@
 				consumed += tg_memo_cnt[si];
 			}
 			if (run_open) {
-				bind_vertex_buffer(s_scratch + run_off);
+				bind_vertex_buffer(g_scratch.scratch + run_off);
 				C3D_DrawArrays(GPU_TRIANGLES, 0, run_cnt);
 			}
 		} else {
-			bind_vertex_buffer(s_scratch + batch_startOffset);
+			bind_vertex_buffer(g_scratch.scratch + batch_startOffset);
 			C3D_DrawArrays(GPU_TRIANGLES, 0, batch_vertCount);
 		}
 		if (batch_colourkey)
@@ -129,10 +129,10 @@
  * and matrices the split dropped. */
 [[gnu::always_inline]] static inline void draw_restore_after_frame_split(bool orthographic)
 {
-	if (s_memoMode != SMEMO_OFF)
-		s_memoMode = SMEMO_OFF;
-	s_memoSaved = SMEMO_OFF;	/* a suspended pass must not re-arm it */
-	C3D_BindProgram(&s_shaderProgram);
+	if (g_frame.memoMode != SMEMO_OFF)
+		g_frame.memoMode = SMEMO_OFF;
+	g_frame.memoSaved = SMEMO_OFF;	/* a suspended pass must not re-arm it */
+	C3D_BindProgram(&g_shader.shaderProgram);
 	{
 		C3D_AttrInfo *ai = C3D_GetAttrInfo();
 		AttrInfo_Init(ai);
@@ -140,9 +140,9 @@
 		AttrInfo_AddLoader(ai, 1, GPU_FLOAT, 4);
 		AttrInfo_AddLoader(ai, 2, GPU_FLOAT, 2);
 	}
-	s_lastBoundTexture = nullptr;
-	s_lastTexEnvTextured = false;
-	s_lastTexEnvMode = TEXENV_MODE_NONE;
+	g_texenv.lastBoundTexture = nullptr;
+	g_texenv.lastTexEnvTextured = false;
+	g_texenv.lastTexEnvMode = TEXENV_MODE_NONE;
 	draw_set_view_matrices(orthographic);
 }
 
@@ -154,10 +154,10 @@
 	d.pos[0] = v->x;
 	d.pos[1] = v->y;
 	d.pos[2] = v->z;
-	d.color[0] = s_c255[(v->color >> 16) & 0xFF];
-	d.color[1] = s_c255[(v->color >> 8) & 0xFF];
-	d.color[2] = s_c255[(v->color) & 0xFF];
-	d.color[3] = s_c255[(v->color >> 24) & 0xFF];
+	d.color[0] = g_scratch.c255[(v->color >> 16) & 0xFF];
+	d.color[1] = g_scratch.c255[(v->color >> 8) & 0xFF];
+	d.color[2] = g_scratch.c255[(v->color) & 0xFF];
+	d.color[3] = g_scratch.c255[(v->color >> 24) & 0xFF];
 	d.texcoord[0] = v->tu;
 	d.texcoord[1] = v->tv;
 }
@@ -167,10 +167,10 @@
 	d.pos[0] = v->x;
 	d.pos[1] = v->y;
 	d.pos[2] = v->z;
-	d.color[0] = s_c255[(v->color >> 16) & 0xFF];
-	d.color[1] = s_c255[(v->color >> 8) & 0xFF];
-	d.color[2] = s_c255[(v->color) & 0xFF];
-	d.color[3] = s_c255[(v->color >> 24) & 0xFF];
+	d.color[0] = g_scratch.c255[(v->color >> 16) & 0xFF];
+	d.color[1] = g_scratch.c255[(v->color >> 8) & 0xFF];
+	d.color[2] = g_scratch.c255[(v->color) & 0xFF];
+	d.color[3] = g_scratch.c255[(v->color >> 24) & 0xFF];
 	d.texcoord[0] = v->tu;
 	d.texcoord[1] = v->tv;
 }
@@ -185,16 +185,16 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 	 * It used to hash the renderObject pointer, which made every wall's
 	 * grain depend on the build's memory layout. 10_texenv.inc reads bits
 	 * 8..23. */
-	s_atlasSeed   = (u32)renderObject->atlasSeed << 8;
-	s_isOrthoDraw = orthographic;
-	c255_init();
+	g_texenv.atlasSeed   = (u32)renderObject->atlasSeed << 8;
+	g_texenv.isOrthoDraw = orthographic;
+	g_scratch.c255_init();
 
-	/* For object-mode draws (s_objProcTexOn set by mxload/mxaload),
+	/* For object-mode draws (g_texenv.objProcTexOn set by mxload/mxaload),
 	 * sample the lit ambient at the object's world position and blend
 	 * with the dominant nearby XLight to drive the Phong specular hue.
 	 * world_matrix's translation row holds the object's world pos. */
-	if (s_objProcTexOn && s_objLightReady && g_object_shine &&
-		s_objShineEligible && !orthographic) {
+	if (g_texenv.objProcTexOn && g_texenv.objLightReady && g_object_shine &&
+		g_texenv.objShineEligible && !orthographic) {
 		VECTOR pos;
 		pos.x = world_matrix._41;
 		pos.y = world_matrix._42;
@@ -208,7 +208,7 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 	 * state, uniforms and draw order all run live per eye, so inset
 	 * and HUD draws are unaffected by construction. */
 
-	if (!s_shaderReady || !renderObject || !renderObject->vertexBuffer || !s_scratch)
+	if (!g_shader.shaderReady || !renderObject || !renderObject->vertexBuffer || !g_scratch.scratch)
 		return false;
 
 	draw_set_view_matrices(orthographic);
@@ -266,10 +266,10 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 		/* R05: level walls consult the retained buffers first (both
 		 * eyes, any mode). A hit submits the retained buffer at flush
 		 * time and converts nothing. */
-		if (s_persistActive && !orthographic && renderObject->vertOwner == VERT_OWNER_LEVEL &&
+		if (g_persist.active && !orthographic && renderObject->vertOwner == VERT_OWNER_LEVEL &&
 			renderObject->memoEpochPass == SMEMO_PASS_UNSET) {
 			int pcnt = 0;
-			gpu_vertex_t *pbuf = persist_lookup(renderObject,
+			gpu_vertex_t *pbuf = g_persist.lookup(renderObject,
 				smemo_sub(sorted_order[group], 0, primitive_type), &pcnt);
 			if (pbuf) {
 				persist_hit = true;
@@ -278,7 +278,7 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 				totalVerts = pcnt;
 			}
 		}
-		if (!persist_hit && s_memoMode == SMEMO_LOOKUP && !orthographic &&
+		if (!persist_hit && g_frame.memoMode == SMEMO_LOOKUP && !orthographic &&
 			memo_reusable(renderObject)) {
 			memo_hit = smemo_lookup(renderObject,
 				smemo_sub(sorted_order[group], 0, primitive_type),
@@ -291,22 +291,22 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 		/* Mid-frame flush: if scratch is nearly full, flush pending batch
 		 * and split the frame to reset the scratch pointer. Hits convert
 		 * nothing and take no scratch, so only a live convert checks. */
-		if (!persist_hit && !memo_hit && s_scratchUsed + numIndices > s_scratchMax)
+		if (!persist_hit && !memo_hit && g_scratch.scratchUsed + numIndices > g_scratch.scratchMax)
 		{
-			if (s_inFrame)
+			if (g_frame.inFrame)
 			{
 				draw_flush_batch(batch_vertCount, batch_tg0, group, orthographic, batch_startOffset, batch_colourkey, batch_hasTexture, tg_memo_off, tg_memo_cnt, tg_persist_buf, tg_persist_cnt);
 				C3D_FrameSplit(0);
-				s_scratchUsed = 0;
+				g_scratch.scratchUsed = 0;
 				draw_restore_after_frame_split(orthographic);
 			}
-			if (s_scratchUsed + numIndices > s_scratchMax) {
+			if (g_scratch.scratchUsed + numIndices > g_scratch.scratchMax) {
 				tg_memo_cnt[group] = 0;
 				continue;
 			}
 		}
 
-		dst = s_scratch + s_scratchUsed;
+		dst = g_scratch.scratch + g_scratch.scratchUsed;
 
 		/* Convert live unless the memo/persist hit (VERIFY converts
 		 * anyway for the oracle compare below). */
@@ -350,7 +350,7 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 			{
 				LVERTEX *verts = (LVERTEX*)renderObject->vertexBuffer;
 				int numVerts = tg->numVerts;
-				if (s_scratchUsed + numVerts > s_scratchMax) {
+				if (g_scratch.scratchUsed + numVerts > g_scratch.scratchMax) {
 					tg_memo_cnt[group] = 0;
 					continue;
 				}
@@ -370,12 +370,12 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 			 * fill itself is unconditional on the live path so the
 			 * per-group flush (persist/mono mixes) can always read it. */
 			if (!orthographic) {
-				tg_memo_off[group] = dst - s_scratch;
+				tg_memo_off[group] = dst - g_scratch.scratch;
 				tg_memo_cnt[group] = totalVerts;
-				if (s_memoMode == SMEMO_RECORD && memo_reusable(renderObject)) {
+				if (g_frame.memoMode == SMEMO_RECORD && memo_reusable(renderObject)) {
 					smemo_record(renderObject,
 						smemo_sub(sorted_order[group], 0, primitive_type),
-						dst - s_scratch, totalVerts,
+						dst - g_scratch.scratch, totalVerts,
 						renderObject->memoEpochPass,
 						renderObject->memoEpochGroup,
 						renderObject->memoEpochResume);
@@ -383,9 +383,9 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 			}
 			/* R05: retain this conversion for level walls. On success the
 			 * flush submits the retained buffer instead of scratch. */
-			if (s_persistActive && !orthographic && renderObject->vertOwner == VERT_OWNER_LEVEL &&
+			if (g_persist.active && !orthographic && renderObject->vertOwner == VERT_OWNER_LEVEL &&
 				renderObject->memoEpochPass == SMEMO_PASS_UNSET) {
-				gpu_vertex_t *pbuf = persist_store(renderObject,
+				gpu_vertex_t *pbuf = g_persist.store(renderObject,
 					smemo_sub(sorted_order[group], 0, primitive_type),
 					dst, totalVerts);
 				if (pbuf) {
@@ -417,7 +417,7 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 		/* Start a new batch if needed — set GPU state */
 		if (batch_vertCount == 0)
 		{
-			batch_startOffset = s_scratchUsed;
+			batch_startOffset = g_scratch.scratchUsed;
 			batch_tg0 = group;
 			batch_texture     = (void*)tg->texture;
 			batch_colourkey   = tg->colourkey;
@@ -430,19 +430,19 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 					GPU_SRC_ALPHA, GPU_ONE_MINUS_SRC_ALPHA,
 					GPU_SRC_ALPHA, GPU_ONE_MINUS_SRC_ALPHA);
 
-			/* Texture binding with TexEnv cache. apply_texenv_*
+			/* Texture binding with TexEnv cache. g_texenv.apply_*
 			 * picks single-stage diffuse vs two-stage detail-add
 			 * based on the texture's material_class. */
 			if (eff_hasTexture)
-				apply_texenv_for_texture((texture_t*)tg->texture);
+				g_texenv.apply_for_texture((texture_t*)tg->texture);
 			else
-				apply_texenv_untextured();
+				g_texenv.apply_untextured();
 		}
 
 		/* Accumulate into current batch */
 		batch_vertCount += totalVerts;
 		if (!persist_hit && !memo_hit)	/* hits wrote no scratch */
-			s_scratchUsed += totalVerts;
+			g_scratch.scratchUsed += totalVerts;
 	}
 
 	/* Flush the final pending batch */
@@ -461,9 +461,9 @@ bool draw_object(RENDEROBJECT *renderObject)
  * not-eligible for AUX-mode ProcTex so wall grain doesn't apply. */
 bool draw_billboard_object(RENDEROBJECT *renderObject)
 {
-	s_skipAuxProcTex = true;
+	g_texenv.skipAuxProcTex = true;
 	bool ok = draw_render_object(renderObject, 0, false);
-	s_skipAuxProcTex = false;
+	g_texenv.skipAuxProcTex = false;
 	return ok;
 }
 

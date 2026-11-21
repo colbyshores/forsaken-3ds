@@ -95,9 +95,9 @@ static void upload_matrices(void)
 
 /* Ambient contribution. Zero matches the engine's XLight1Group baseline
  * (no global ambient term). Tunable per art direction. */
-static float s_ambient_r = 0.0f;
-static float s_ambient_g = 0.0f;
-static float s_ambient_b = 0.0f;
+float ShaderState::ambient_r = 0.0f;
+float ShaderState::ambient_g = 0.0f;
+float ShaderState::ambient_b = 0.0f;
 
 /* Zero all lighting uniforms. Called from FSBeginScene so each frame
  * starts clean — without this, UI / crate-menu / title-screen frames
@@ -105,12 +105,12 @@ static float s_ambient_b = 0.0f;
  * menu meshes. The gameplay path repopulates via c3d_upload_xlights. */
 void c3d_clear_xlights(void)
 {
-	if (s_loc_lights < 0) return;
-	if (s_loc_ambient >= 0)
-		C3D_FVUnifSet(GPU_VERTEX_SHADER, s_loc_ambient, 0.0f, 0.0f, 0.0f, 0.0f);
-	if (s_loc_light_count >= 0)
-		C3D_FVUnifSet(GPU_VERTEX_SHADER, s_loc_light_count, 0.0f, 0.0f, 0.0f, 0.0f);
-	C3D_FVec *dst = C3D_FVUnifWritePtr(GPU_VERTEX_SHADER, s_loc_lights, GPU_MAX_LIGHTS * 3);
+	if (g_shader.loc_lights < 0) return;
+	if (g_shader.loc_ambient >= 0)
+		C3D_FVUnifSet(GPU_VERTEX_SHADER, g_shader.loc_ambient, 0.0f, 0.0f, 0.0f, 0.0f);
+	if (g_shader.loc_light_count >= 0)
+		C3D_FVUnifSet(GPU_VERTEX_SHADER, g_shader.loc_light_count, 0.0f, 0.0f, 0.0f, 0.0f);
+	C3D_FVec *dst = C3D_FVUnifWritePtr(GPU_VERTEX_SHADER, g_shader.loc_lights, GPU_MAX_LIGHTS * 3);
 	memset(dst, 0, sizeof(C3D_FVec) * GPU_MAX_LIGHTS * 3);
 }
 
@@ -129,7 +129,7 @@ void c3d_clear_xlights(void)
  *  fix it but cost too much CPU on PICA200 at 60 Hz. */
 void c3d_upload_xlights(void)
 {
-	if (s_loc_lights < 0) return;
+	if (g_shader.loc_lights < 0) return;
 
 	C3D_FVec lights_buf[GPU_MAX_LIGHTS * 3];
 
@@ -196,16 +196,16 @@ void c3d_upload_xlights(void)
 		n_packed++;
 	}
 
-	if (s_loc_ambient >= 0) {
-		C3D_FVUnifSet(GPU_VERTEX_SHADER, s_loc_ambient,
-			s_ambient_r, s_ambient_g, s_ambient_b, 0.0f);
+	if (g_shader.loc_ambient >= 0) {
+		C3D_FVUnifSet(GPU_VERTEX_SHADER, g_shader.loc_ambient,
+			g_shader.ambient_r, g_shader.ambient_g, g_shader.ambient_b, 0.0f);
 	}
-	if (s_loc_light_count >= 0) {
-		C3D_FVUnifSet(GPU_VERTEX_SHADER, s_loc_light_count,
+	if (g_shader.loc_light_count >= 0) {
+		C3D_FVUnifSet(GPU_VERTEX_SHADER, g_shader.loc_light_count,
 			(float)GPU_MAX_LIGHTS, 0.0f, 0.0f, 0.0f);
 	}
 	{
-		C3D_FVec *dst = C3D_FVUnifWritePtr(GPU_VERTEX_SHADER, s_loc_lights, GPU_MAX_LIGHTS * 3);
+		C3D_FVec *dst = C3D_FVUnifWritePtr(GPU_VERTEX_SHADER, g_shader.loc_lights, GPU_MAX_LIGHTS * 3);
 		memcpy(dst, lights_buf, sizeof(lights_buf));
 	}
 }
@@ -230,7 +230,7 @@ void c3d_upload_xlights(void)
  * per frame — under 1% of OG 3DS frame budget. */
 void c3d_update_phong_tint_for_object_pos(VECTOR *world_pos)
 {
-	if (!s_objLightReady || !world_pos) return;
+	if (!g_texenv.objLightReady || !world_pos) return;
 
 	/* Sampled ambient at object position: baked level base + every
 	 * visible XLight's per-position contribution (linear falloff, same
@@ -281,5 +281,5 @@ void c3d_update_phong_tint_for_object_pos(VECTOR *world_pos)
 		g = ag + (lg - ag) * falloff;
 		b = ab + (lb - ab) * falloff;
 	}
-	C3D_LightColor(&s_objLight, r, g, b);
+	C3D_LightColor(&g_texenv.objLight, r, g, b);
 }

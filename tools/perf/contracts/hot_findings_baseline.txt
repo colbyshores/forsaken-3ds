@@ -214,8 +214,8 @@ R7|render_c3d.cpp|GetRealLightAmbientWorldSpace|float division in hot loop
 R7|render_c3d.cpp|GetRealLightAmbientWorldSpace|float division in hot loop
 R7|render_c3d.cpp|GetRealLightAmbientWorldSpace|float division in hot loop
 R7|render_c3d.cpp|GetRealLightAmbientWorldSpace|sqrtf in hot loop
-R7|render_c3d.cpp|apply_texenv_for_texture|float division inner_loop=false
-R7|render_c3d.cpp|apply_texenv_for_texture|float division inner_loop=false
+R7|render_c3d.cpp|apply_for_texture|float division inner_loop=false
+R7|render_c3d.cpp|apply_for_texture|float division inner_loop=false
 R7|render_c3d.cpp|c3d_update_phong_tint_for_object_pos|float division inner_loop=false
 R7|render_c3d.cpp|c3d_update_phong_tint_for_object_pos|float division inner_loop=false
 R7|render_c3d.cpp|c3d_update_phong_tint_for_object_pos|float division inner_loop=false
