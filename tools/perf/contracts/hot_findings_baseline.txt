@@ -88,7 +88,7 @@ R2|polys.cpp|SolidPolyDispGroupClipped|float-to-int cast in loop body
 R2|polys.cpp|SolidPolyDispGroupClipped|float-to-int cast in loop body
 R2|polys.cpp|SolidPolyDispGroupUnclipped|float-to-int cast in loop body
 R2|polys.cpp|SolidPolyDispGroupUnclipped|float-to-int cast in loop body
-R2|primary.cpp|ProcessPrimaryBullets|float-to-int cast in loop body
+R2|primary.cpp|process|float-to-int cast in loop body
 R2|render_c3d.cpp|GetRealLightAmbientWorldSpace|float-to-int cast in loop body
 R2|screenpolys.cpp|ScrPolyDispNonSolid|float-to-int cast in loop body
 R2|screenpolys.cpp|ScrPolyDispNonSolid|float-to-int cast in loop body
@@ -192,27 +192,27 @@ R7|oct2.cpp|RenderScene|float division inner_loop=false
 R7|oct2.cpp|RenderScene|float division inner_loop=false
 R7|polys.cpp|ProcessPolys|float division in hot loop
 R7|polys.cpp|ProcessPolys|float division in hot loop
-R7|primary.cpp|ProcessPrimaryBullets|float division in hot loop
-R7|primary.cpp|ProcessPrimaryBullets|float division in hot loop
-R7|primary.cpp|ProcessPrimaryBullets|float division in hot loop
-R7|primary.cpp|ProcessPrimaryBullets|float division in hot loop
-R7|primary.cpp|ProcessPrimaryBullets|float division in hot loop
-R7|primary.cpp|ProcessPrimaryBullets|float division in hot loop
-R7|primary.cpp|ProcessPrimaryBullets|float division in hot loop
-R7|primary.cpp|ProcessPrimaryBullets|float division in hot loop
-R7|primary.cpp|ProcessPrimaryBullets|float division in hot loop
-R7|primary.cpp|ProcessPrimaryBullets|float division in hot loop
-R7|primary.cpp|ProcessPrimaryBullets|float division in hot loop
-R7|primary.cpp|ProcessPrimaryBullets|float division in hot loop
-R7|primary.cpp|ProcessPrimaryBullets|float division in hot loop
-R7|primary.cpp|ProcessPrimaryBullets|float division in hot loop
-R7|primary.cpp|ProcessPrimaryBullets|float division in hot loop
-R7|primary.cpp|ProcessPrimaryBullets|float division in hot loop
-R7|primary.cpp|ProcessPrimaryBullets|float division in hot loop
-R7|primary.cpp|ProcessPrimaryBullets|float division in hot loop
-R7|primary.cpp|ProcessPrimaryBullets|float division in hot loop
-R7|primary.cpp|ProcessPrimaryBullets|float division in hot loop
-R7|primary.cpp|ProcessPrimaryBullets|float division in hot loop
+R7|primary.cpp|process|float division in hot loop
+R7|primary.cpp|process|float division in hot loop
+R7|primary.cpp|process|float division in hot loop
+R7|primary.cpp|process|float division in hot loop
+R7|primary.cpp|process|float division in hot loop
+R7|primary.cpp|process|float division in hot loop
+R7|primary.cpp|process|float division in hot loop
+R7|primary.cpp|process|float division in hot loop
+R7|primary.cpp|process|float division in hot loop
+R7|primary.cpp|process|float division in hot loop
+R7|primary.cpp|process|float division in hot loop
+R7|primary.cpp|process|float division in hot loop
+R7|primary.cpp|process|float division in hot loop
+R7|primary.cpp|process|float division in hot loop
+R7|primary.cpp|process|float division in hot loop
+R7|primary.cpp|process|float division in hot loop
+R7|primary.cpp|process|float division in hot loop
+R7|primary.cpp|process|float division in hot loop
+R7|primary.cpp|process|float division in hot loop
+R7|primary.cpp|process|float division in hot loop
+R7|primary.cpp|process|float division in hot loop
 R7|quat.cpp|From2Vectors|sqrtf inner_loop=false
 R7|quat.cpp|FromVector2|float division inner_loop=false
 R7|quat.cpp|FromVector|float division inner_loop=false

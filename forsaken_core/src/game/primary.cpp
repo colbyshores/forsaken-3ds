@@ -61,37 +61,122 @@ constexpr int SUPERNASHRAM_BLUE = 255;
 
 constexpr auto LASER_MINDAMAGERANGE = ( 10.0F * BLOCKSIZE );
 
+namespace {
+
+/* The primary weapons' private state (one instance, g_primary):
+ * - the PrimBulls[] used and free list heads, reset with the scene and
+ *   changed as each bullet is made and dies;
+ * - the local ship's firing state: its fire delays, the pulsar/pyrolite side
+ *   it fires from next (Toggle), the laser overheat latch and the trojax
+ *   charge sound, changed as it fires each frame;
+ * - the ammo it has used (InitAmmoUsed clears it);
+ * - the per-ship trojax charge sounds of the other ships (TrojaxOwnersID),
+ *   started and stopped as their ship updates arrive;
+ * - the pyrolite light and laser width shared by bullet creation and the
+ *   laser beam builders, and the pyrolite flame timer the per-frame
+ *   processing advances;
+ * - the invulnerability sparkle timer, and the weapons and ammo GodMode
+ *   copies on GivemeAllWeapons and gives back on LoseAllWeapons;
+ * - the constant tables only this file reads, as static members.
+ * The list heads, fire delays, ammo used, overheat latch and Toggle are
+ * saved and restored with the game. PrimBulls[], the weapon table, the
+ * ammo and weapons-got globals, PowerLevel and LaserTemperature stay
+ * global. */
+class PrimaryWeapons {
+	public:
+	void      init();
+	void      init_ammo_used();
+	u_int16_t find_free();
+	void      kill_used( u_int16_t i );
+	void      fire();
+	void      process();
+	u_int16_t init_one( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t BulletID, int8_t Weapon,
+						u_int16_t Group, VECTOR * Pos, VECTOR * Offset, VECTOR * Dir, VECTOR * Up,
+						int16_t PowerLevel, float PLevel, bool NetFlag );
+	void      create_laser_pulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16_t EndGroup );
+	void      create_nme_laser_pulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16_t EndGroup );
+	void      create_nme_power_laser_pulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16_t EndGroup );
+	void      fire_weapons( u_int8_t Ship );
+	void      check_charging( u_int16_t Ship, u_int32_t OldFlags, u_int32_t NewFlags );
+	void      give_all_weapons();
+	void      lose_all_weapons();
+	void      inv_effect( u_int16_t ShipHit, int16_t Num, u_int8_t RVal, u_int8_t GVal, u_int8_t BVal );
+	FILE *    save( FILE * fp );
+	FILE *    restore( FILE * fp );
+	void      kill_by_owner( u_int16_t OwnerType, u_int16_t Owner );
+
+	/* Public only so the count check after its definition can read it. */
+	static int8_t * DebugPrimStrings[];
+
+	private:
+	[[gnu::always_inline]] inline void FireShootPulsar( VECTOR & DownVector, VECTOR & LeftVector, VECTOR & Pos, VECTOR & Dir, VECTOR & UpVector );
+	[[gnu::always_inline]] inline void FireShootTrojax( VECTOR & DownVector, VECTOR & LeftVector, VECTOR & Pos, VECTOR & Dir, VECTOR & UpVector, float & Ammo );
+	[[gnu::always_inline]] inline void FireShootPyroliteRifle( VECTOR & DownVector, VECTOR & Pos, VECTOR & Dir, VECTOR & UpVector, float & Speed );
+	[[gnu::always_inline]] inline void FireShootSussGun( VECTOR & DownVector, VECTOR & Pos, VECTOR & Dir, VECTOR & UpVector, int16_t & Count );
+	[[gnu::always_inline]] inline void FireShootLaser( VECTOR & Pos, VECTOR & Dir, VECTOR & UpVector );
+	[[gnu::always_inline]] inline void FireShootNmeLightning( VECTOR & Pos, VECTOR & Dir, VECTOR & UpVector );
+	[[gnu::always_inline]] inline void FirePrimaryShoot( VECTOR & DownVector, VECTOR & LeftVector, VECTOR & Pos, VECTOR & Dir, VECTOR & UpVector, float & Ammo, int16_t & Count, float & Speed );
+	[[gnu::always_inline]] inline void FirePrimarySelect( int16_t & OnceOnlyFlag, float & Ammo );
+	[[gnu::always_inline]] inline void FirePrimaryTrojaxCharge( float & Old_PowerLevel, float & Freq );
+	[[gnu::always_inline]] inline void FirePrimaryOrbitPulsars( VECTOR & Pos, VECTOR & UpVector, VECTOR & DirVector, VECTOR & Rotation, int16_t & Count, u_int16_t & Model );
+
+	/* The per-ship charge sounds first (indexed by ship), then the list
+	 * heads and halfword scalars, so every halfword access keeps an
+	 * ldrh/strh immediate; the GodMode copies (cold) last. */
+	u_int32_t TrojaxOwnersID[ MAX_PLAYERS ] = {};
+	u_int16_t FirstPrimBullUsed = 0;
+	u_int16_t FirstPrimBullFree = 0;
+	int16_t   Toggle = 0;
+	int16_t   LaserOverheated = 0;
+	u_int32_t TrojaxChargeID = 0;
+	float     PrimaryFireDelay = 0.0F;
+	float     OrbitFireDelay = 0.0F;
+	float     PyroCount = 0.0F;
+	float     LaserDiameter = ( 40.0F * GLOBAL_SCALE );
+	float     GeneralAmmoUsed = 0.0F;
+	float     PyroliteAmmoUsed = 0.0F;
+	float     SussGunAmmoUsed = 0.0F;
+	float     InvulInterval = 1.0F;
+	float     InvulCount = 0.0F;
+	bool      PyroLightFlag = true;
+	BYTE      GodModeCopyOfPrimary = PULSAR;
+	BYTE      GodModeCopyOfSecondary = MUGMISSILE;
+	int16_t   GodModeCopyOfPowerLevel = 0;
+	int16_t   GodModeCopyOfSecondaryAmmo[ MAXSECONDARYWEAPONS ] = {};
+	int16_t   GodModeCopyOfSecondaryWeaponsGot[ MAXSECONDARYWEAPONS ] = {};
+	int16_t   GodModeCopyOfWeaponsGot[ MAXPRIMARYWEAPONS ] = {};
+	float     GodModeCopyOfGeneralAmmo = 0.0F;
+	float     GodModeCopyOfSussGunAmmo = 0.0F;
+	float     GodModeCopyOfPyroliteAmmo = 0.0F;
+	float     GodModeCopyOfNitroFuel = 0.0F;
+
+	static int16_t  PrimarySfxLookup[ MAXPRIMARYWEAPONS ];
+	static float    SussgunTable[ MAXPOWERLEVELS ];
+	static float    TrojaxFreqTable[];
+	static float    TrojaxChargeRateTable[];
+};
+
+} // namespace
+
 float	NmeDamageModifier = 0.75F;
 
 PRIMARYWEAPONBULLET	PrimBulls[MAXPRIMARYWEAPONBULLETS];
-u_int16_t	FirstPrimBullUsed;
-u_int16_t	FirstPrimBullFree;
-float	PrimaryFireDelay = 0.0F;
-float	OrbitFireDelay = 0.0F;
-float	LaserDiameter = ( 40.0F * GLOBAL_SCALE );
 float	PyroliteAmmo = 0.0F;	//MAXPYROLITEAMMO;
 float	SussGunAmmo = 0.0F;		//MAXSUSSGUNAMMO;
 float	GeneralAmmo = MAXGENERALAMMO;
 
-float	GeneralAmmoUsed = 0.0F;
-float	PyroliteAmmoUsed = 0.0F;
-float	SussGunAmmoUsed = 0.0F;
-
 float	GlobalFramelagAddition = 0.0F;
 
 float	LaserTemperature = 0.0F;
-int16_t	LaserOverheated = 0;
 float	PowerLevel;
-static	int16_t	Toggle = 0;
 int16_t	PrimaryWeaponsGot[ MAXPRIMARYWEAPONS ];
-float	SussgunTable[ MAXPOWERLEVELS ] = { 30720.0F, 25600.0F, 20480.0F }; //( 20480.0F + ( ( 5 - PrimBulls[ i ].PowerLevel ) * 2560.0F ) );
+float	PrimaryWeapons::SussgunTable[ MAXPOWERLEVELS ] = { 30720.0F, 25600.0F, 20480.0F }; //( 20480.0F + ( ( 5 - PrimBulls[ i ].PowerLevel ) * 2560.0F ) );
 u_int16_t	GlobalPrimBullsID = 0;
 int32_t	ColPerspective;
 int32_t	MyColPerspective;
 bool	GodModeOnceOnly = true;
-bool	PyroLightFlag = true;
 
-int8_t	*	DebugPrimStrings[] = {
+int8_t	*	PrimaryWeapons::DebugPrimStrings[] = {
 
 			(int8_t*)"Pulsar",
 			(int8_t*)"Trojax",
@@ -113,11 +198,8 @@ int8_t	*	DebugPrimStrings[] = {
 			(int8_t*)"Nme Pulsar Blue",
 
 };
-static_assert( sizeof( DebugPrimStrings ) / sizeof( DebugPrimStrings[ 0 ] ) == TOTALPRIMARYWEAPONS,
+static_assert( sizeof( PrimaryWeapons::DebugPrimStrings ) / sizeof( PrimaryWeapons::DebugPrimStrings[ 0 ] ) == TOTALPRIMARYWEAPONS,
 	"one DebugPrimStrings entry per primary weapon" );
-
-u_int32_t TrojaxChargeID = 0;
-u_int32_t TrojaxOwnersID[ MAX_PLAYERS ] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
 const char *PrimaryDescription[MAXPRIMARYWEAPONS] =
 {
@@ -142,7 +224,7 @@ bool PrimaryValid[ MAXPRIMARYWEAPONS ] =
 
 };
 
-int16_t PrimarySfxLookup[ MAXPRIMARYWEAPONS ] = {
+int16_t PrimaryWeapons::PrimarySfxLookup[ MAXPRIMARYWEAPONS ] = {
 
 	SFX_Select_Pulsar,
 	SFX_Select_Trojax,
@@ -589,7 +671,7 @@ PRIMARYWEAPONATTRIB	PrimaryWeaponAttribs[ TOTALPRIMARYWEAPONS ] = {
 	Input		:	nothing
 	Output		:	nothing
 ===================================================================*/
-void	InitPrimBulls(void)
+void PrimaryWeapons::init()
 {
 	u_int16_t	i;
 	FirstPrimBullUsed = INDEX_NONE;
@@ -662,7 +744,7 @@ void RestoreAmmo( void )
 	Input		:	Nothing
 	Output		:	Nothing
 ===================================================================*/
-void InitAmmoUsed( void )
+void PrimaryWeapons::init_ammo_used()
 {
 	int16_t	Count;
 
@@ -683,7 +765,7 @@ void InitAmmoUsed( void )
 	Input		:	nothing
 	Output		:	u_int16_t number of PrimBull free....
 ===================================================================*/
-u_int16_t	FindFreePrimBull(void)
+u_int16_t PrimaryWeapons::find_free()
 {
 	u_int16_t i;
 
@@ -719,7 +801,7 @@ u_int16_t	FindFreePrimBull(void)
 	Input		:	u_int16_t number of PrimBull free....
 	Output		:	nothing
 ===================================================================*/
-void	KillUsedPrimBull( u_int16_t i )
+void PrimaryWeapons::kill_used( u_int16_t i )
 {
 	u_int16_t	its_prev;
 	u_int16_t	its_next;
@@ -753,15 +835,15 @@ void	KillUsedPrimBull( u_int16_t i )
 	Input		:	nothing
 	Output		:	nothing
 ===================================================================*/
-float TrojaxFreqTable[] = {	0.6F, 0.8F, 1.0F };
+float PrimaryWeapons::TrojaxFreqTable[] = {	0.6F, 0.8F, 1.0F };
 
-float TrojaxChargeRateTable[] = { 1.0F, 1.5F, 2.0F };
+float PrimaryWeapons::TrojaxChargeRateTable[] = { 1.0F, 1.5F, 2.0F };
 
 constexpr int NO_AMMO_FIRERATE = 120;
 
 /* fire the selected primary weapon this frame (fire held, delay elapsed, ammo available) */
 /* PULSAR */
-[[gnu::always_inline]] static inline void FireShootPulsar( VECTOR & DownVector, VECTOR & LeftVector, VECTOR & Pos, VECTOR & Dir, VECTOR & UpVector )
+void PrimaryWeapons::FireShootPulsar( VECTOR & DownVector, VECTOR & LeftVector, VECTOR & Pos, VECTOR & Dir, VECTOR & UpVector )
 {
 	if( GeneralAmmo )
 	{
@@ -800,7 +882,7 @@ constexpr int NO_AMMO_FIRERATE = 120;
 }
 
 /* TROJAX */
-[[gnu::always_inline]] static inline void FireShootTrojax( VECTOR & DownVector, VECTOR & LeftVector, VECTOR & Pos, VECTOR & Dir, VECTOR & UpVector, float & Ammo )
+void PrimaryWeapons::FireShootTrojax( VECTOR & DownVector, VECTOR & LeftVector, VECTOR & Pos, VECTOR & Dir, VECTOR & UpVector, float & Ammo )
 {
 	if( GeneralAmmo )
 	{
@@ -851,7 +933,7 @@ constexpr int NO_AMMO_FIRERATE = 120;
 }
 
 /* PYROLITE_RIFLE */
-[[gnu::always_inline]] static inline void FireShootPyroliteRifle( VECTOR & DownVector, VECTOR & Pos, VECTOR & Dir, VECTOR & UpVector, float & Speed )
+void PrimaryWeapons::FireShootPyroliteRifle( VECTOR & DownVector, VECTOR & Pos, VECTOR & Dir, VECTOR & UpVector, float & Speed )
 {
 	if( PyroliteAmmo )
 	{
@@ -890,7 +972,7 @@ constexpr int NO_AMMO_FIRERATE = 120;
 }
 
 /* SUSS_GUN */
-[[gnu::always_inline]] static inline void FireShootSussGun( VECTOR & DownVector, VECTOR & Pos, VECTOR & Dir, VECTOR & UpVector, int16_t & Count )
+void PrimaryWeapons::FireShootSussGun( VECTOR & DownVector, VECTOR & Pos, VECTOR & Dir, VECTOR & UpVector, int16_t & Count )
 {
 	if( SussGunAmmo )
 	{
@@ -917,7 +999,7 @@ constexpr int NO_AMMO_FIRERATE = 120;
 }
 
 /* LASER */
-[[gnu::always_inline]] static inline void FireShootLaser( VECTOR & Pos, VECTOR & Dir, VECTOR & UpVector )
+void PrimaryWeapons::FireShootLaser( VECTOR & Pos, VECTOR & Dir, VECTOR & UpVector )
 {
 	if( GeneralAmmo && !LaserOverheated )
 	{
@@ -947,7 +1029,7 @@ constexpr int NO_AMMO_FIRERATE = 120;
 }
 
 /* NME_LIGHTNING */
-[[gnu::always_inline]] static inline void FireShootNmeLightning( VECTOR & Pos, VECTOR & Dir, VECTOR & UpVector )
+void PrimaryWeapons::FireShootNmeLightning( VECTOR & Pos, VECTOR & Dir, VECTOR & UpVector )
 {
 	if( GeneralAmmo && !LaserOverheated )
 	{
@@ -977,7 +1059,7 @@ constexpr int NO_AMMO_FIRERATE = 120;
 
 }
 
-[[gnu::always_inline]] static inline void FirePrimaryShoot( VECTOR & DownVector, VECTOR & LeftVector, VECTOR & Pos, VECTOR & Dir, VECTOR & UpVector, float & Ammo, int16_t & Count, float & Speed )
+void PrimaryWeapons::FirePrimaryShoot( VECTOR & DownVector, VECTOR & LeftVector, VECTOR & Pos, VECTOR & Dir, VECTOR & UpVector, float & Ammo, int16_t & Count, float & Speed )
 {
 	if( control.fire_primary )
 	{
@@ -1129,7 +1211,7 @@ constexpr int NO_AMMO_FIRERATE = 120;
 }
 
 /* a weapon-select key: switch to that primary weapon if the ship has it */
-[[gnu::always_inline]] static inline void FirePrimarySelect( int16_t & OnceOnlyFlag, float & Ammo )
+void PrimaryWeapons::FirePrimarySelect( int16_t & OnceOnlyFlag, float & Ammo )
 {
 	if( control.select_primary )
 	{
@@ -1204,7 +1286,7 @@ constexpr int NO_AMMO_FIRERATE = 120;
 }
 
 /* charge the Trojax while fire is held */
-[[gnu::always_inline]] static inline void FirePrimaryTrojaxCharge( float & Old_PowerLevel, float & Freq )
+void PrimaryWeapons::FirePrimaryTrojaxCharge( float & Old_PowerLevel, float & Freq )
 {
 	if( Ships[ WhoIAm ].Primary == TROJAX )
 	{
@@ -1241,7 +1323,7 @@ constexpr int NO_AMMO_FIRERATE = 120;
 }
 
 /* fire from the ship's orbit pulsars */
-[[gnu::always_inline]] static inline void FirePrimaryOrbitPulsars( VECTOR & Pos, VECTOR & UpVector, VECTOR & DirVector, VECTOR & Rotation, int16_t & Count, u_int16_t & Model )
+void PrimaryWeapons::FirePrimaryOrbitPulsars( VECTOR & Pos, VECTOR & UpVector, VECTOR & DirVector, VECTOR & Rotation, int16_t & Count, u_int16_t & Model )
 {
 	if( ( Ships[ WhoIAm ].NumMultiples ) )
 	{
@@ -1316,7 +1398,7 @@ constexpr int NO_AMMO_FIRERATE = 120;
 	}
 }
 
-void FirePrimary(void)
+void PrimaryWeapons::fire()
 {
 	static int16_t	OnceOnlyFlag = 0;
 	VECTOR	DownVector;
@@ -1474,8 +1556,6 @@ void FirePrimary(void)
 	Input		:	nothing
 	Output		:	nothing
 ===================================================================*/
-static float PyroCount = 0.0F;
-
 /* a primary bullet hits a secondary weapon (mine, missile). True: the bullet is finished for this frame (skip the rest of its update). */
 [[gnu::always_inline]] static inline bool PrimBullHitSecondary( u_int16_t & i, VECTOR & TempVector, VECTOR & NewDir, float & Damage, VECTOR & NewPos, u_int16_t & HitSecondary, VECTOR & MInt_Point, float & DistToInt, VECTOR & MoveOffsetVector, float & DistToCenter, bool & Killed )
 {
@@ -2834,7 +2914,7 @@ static float PyroCount = 0.0F;
 	}
 }
 
-void ProcessPrimaryBullets( void )
+void PrimaryWeapons::process()
 {
 	u_int16_t			i;
 	u_int16_t			nextprim;
@@ -2902,8 +2982,6 @@ void ProcessPrimaryBullets( void )
 			 * own player's setting, not this machine's. */
 			if( PrimBulls[i].OwnerType == OWNER_SHIP && PrimBulls[i].Owner == WhoIAm )
 			{
-				bool aim_assist_steer( VECTOR *pos, VECTOR *dir,
-											  u_int16_t group, int8_t weapon );
 				aim_assist_steer( &PrimBulls[i].Pos, &PrimBulls[i].Dir,
 								  PrimBulls[i].GroupImIn, PrimBulls[i].Weapon );
 			}
@@ -3581,7 +3659,7 @@ void CleanUpPrimBull( u_int16_t i, bool LightFlag  )
 				:	bool		NetFlag ( Send to everyone )
 	Output		:	nothing
 ===================================================================*/
-u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t BulletID, int8_t Weapon,
+u_int16_t PrimaryWeapons::init_one( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t BulletID, int8_t Weapon,
 						u_int16_t Group, VECTOR * Pos, VECTOR * Offset, VECTOR * Dir, VECTOR * Up,
 						int16_t PowerLevel, float PLevel, bool NetFlag )
 {
@@ -5469,7 +5547,7 @@ void CreateSteam( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 				:	u_int16_t		EndGroup
 	Output		:	Nothing
 ===================================================================*/
-void CreateLaserPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16_t EndGroup )
+void PrimaryWeapons::create_laser_pulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16_t EndGroup )
 {
 	u_int16_t	poly;
 	u_int16_t	light;
@@ -5646,7 +5724,7 @@ void CreateLaserPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16_t EndG
 				:	u_int16_t		EndGroup
 	Output		:	Nothing
 ===================================================================*/
-void CreateNmeLaserPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16_t EndGroup )
+void PrimaryWeapons::create_nme_laser_pulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16_t EndGroup )
 {
 	u_int16_t	poly;
 	u_int16_t	light;
@@ -5823,7 +5901,7 @@ void CreateNmeLaserPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16_t E
 				:	u_int16_t		EndGroup
 	Output		:	Nothing
 ===================================================================*/
-void CreateNmePowerLaserPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16_t EndGroup )
+void PrimaryWeapons::create_nme_power_laser_pulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16_t EndGroup )
 {
 	u_int16_t	poly;
 	u_int16_t	light;
@@ -6798,7 +6876,7 @@ void CreateDebugLine( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, u_int8_t Red,
 	Input		:	u_int16_t		Ship Number
 	Output		:	Nothing
 ===================================================================*/
-void FirePrimaryWeapons( u_int8_t Ship )
+void PrimaryWeapons::fire_weapons( u_int8_t Ship )
 {
 	int16_t	Count;
 	VECTOR	Pos;
@@ -7250,7 +7328,7 @@ void CreateSmallColSparks( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 				:	u_int16_t		New Flags
 	Output		:	Nothing
 ===================================================================*/
-void CheckCharging( u_int16_t Ship, u_int32_t OldFlags, u_int32_t NewFlags )
+void PrimaryWeapons::check_charging( u_int16_t Ship, u_int32_t OldFlags, u_int32_t NewFlags )
 {
 	float Freq;
 
@@ -7269,23 +7347,12 @@ float	CopyOfNitroFuel = 0.0F;
 BYTE	CopyOfOrbitals = 0;
 float	CopyOfOrbAmmo[ MAXMULTIPLES ];
 
-int16_t	GodModeCopyOfSecondaryAmmo[ MAXSECONDARYWEAPONS ];
-int16_t	GodModeCopyOfSecondaryWeaponsGot[ MAXSECONDARYWEAPONS ];
-int16_t	GodModeCopyOfWeaponsGot[ MAXPRIMARYWEAPONS ];
-BYTE	GodModeCopyOfPrimary = PULSAR;
-BYTE	GodModeCopyOfSecondary = MUGMISSILE;
-int16_t	GodModeCopyOfPowerLevel = 0;
-float	GodModeCopyOfGeneralAmmo = 0.0F;
-float	GodModeCopyOfSussGunAmmo = 0.0F;
-float	GodModeCopyOfPyroliteAmmo = 0.0F;
-float	GodModeCopyOfNitroFuel = 0.0F;
-
 /*===================================================================
 	Procedure	:	Give me all weapons
 	Input		:	Nothing
 	Output		:	Nothing
 ===================================================================*/
-void GivemeAllWeapons( void )
+void PrimaryWeapons::give_all_weapons()
 {
 	int16_t	Count;
 
@@ -7340,7 +7407,7 @@ void GivemeAllWeapons( void )
 	Input		:	Nothing
 	Output		:	Nothing
 ===================================================================*/
-void LoseAllWeapons( void )
+void PrimaryWeapons::lose_all_weapons()
 {
 	int16_t	Count;
 
@@ -8005,10 +8072,7 @@ void LoseSuperNashram( void )
 				:	u_int8_t		RVal, GVal, BVal	Colour
 	Output		:	Nothing
 ===================================================================*/
-float	InvulInterval = 1.0F;
-float	InvulCount = 0.0F;
-
-void CreateInvEffect( u_int16_t ShipHit, int16_t Num, u_int8_t RVal, u_int8_t GVal, u_int8_t BVal )
+void PrimaryWeapons::inv_effect( u_int16_t ShipHit, int16_t Num, u_int8_t RVal, u_int8_t GVal, u_int8_t BVal )
 {
 	u_int16_t  Poly;
 	float	Step;
@@ -8433,7 +8497,7 @@ int16_t GetAmmoPickupToGen( void )
 	Input		:	FILE	*	File Pointer
 	Output		:	FILE	*	Updated File Pointer
 ===================================================================*/
-FILE * SavePrimBulls( FILE * fp )
+FILE * PrimaryWeapons::save( FILE * fp )
 {
 	u_int16_t	i;
 	u_int16_t	TempIndex;
@@ -8538,7 +8602,7 @@ FILE * SavePrimBulls( FILE * fp )
 	Input		:	FILE	*	File Pointer
 	Output		:	FILE	*	Updated File Pointer
 ===================================================================*/
-FILE * LoadPrimBulls( FILE * fp )
+FILE * PrimaryWeapons::restore( FILE * fp )
 {
 	u_int16_t	i;
 	u_int16_t	TempIndex;
@@ -8772,7 +8836,7 @@ void TogglePrimaryWeapons( int8_t Primary )
 				:	u_int16_t	Owner
 	Output		:	Nothing
 ===================================================================*/
-void KillPrimBullsByOwner(  u_int16_t OwnerType, u_int16_t Owner )
+void PrimaryWeapons::kill_by_owner( u_int16_t OwnerType, u_int16_t Owner )
 {
 	u_int16_t	i, nextprim;
 
@@ -8791,3 +8855,25 @@ void KillPrimBullsByOwner(  u_int16_t OwnerType, u_int16_t Owner )
 	}
 }
 
+namespace { PrimaryWeapons g_primary; }
+
+void InitPrimBulls( void ) { g_primary.init(); }
+void InitAmmoUsed( void ) { g_primary.init_ammo_used(); }
+u_int16_t FindFreePrimBull( void ) { return g_primary.find_free(); }
+void KillUsedPrimBull( u_int16_t i ) { g_primary.kill_used( i ); }
+void FirePrimary( void ) { g_primary.fire(); }
+void ProcessPrimaryBullets( void ) { g_primary.process(); }
+u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t BulletID, int8_t Weapon,
+						u_int16_t Group, VECTOR * Pos, VECTOR * Offset, VECTOR * Dir, VECTOR * Up,
+						int16_t PowerLevel, float PLevel, bool NetFlag ) { return g_primary.init_one( OwnerType, OwnerID, BulletID, Weapon, Group, Pos, Offset, Dir, Up, PowerLevel, PLevel, NetFlag ); }
+void CreateLaserPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16_t EndGroup ) { g_primary.create_laser_pulse( i, Distance, Dir, EndGroup ); }
+void CreateNmeLaserPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16_t EndGroup ) { g_primary.create_nme_laser_pulse( i, Distance, Dir, EndGroup ); }
+void CreateNmePowerLaserPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16_t EndGroup ) { g_primary.create_nme_power_laser_pulse( i, Distance, Dir, EndGroup ); }
+void FirePrimaryWeapons( u_int8_t Ship ) { g_primary.fire_weapons( Ship ); }
+void CheckCharging( u_int16_t Ship, u_int32_t OldFlags, u_int32_t NewFlags ) { g_primary.check_charging( Ship, OldFlags, NewFlags ); }
+void GivemeAllWeapons( void ) { g_primary.give_all_weapons(); }
+void LoseAllWeapons( void ) { g_primary.lose_all_weapons(); }
+void CreateInvEffect( u_int16_t ShipHit, int16_t Num, u_int8_t RVal, u_int8_t GVal, u_int8_t BVal ) { g_primary.inv_effect( ShipHit, Num, RVal, GVal, BVal ); }
+FILE * SavePrimBulls( FILE * fp ) { return g_primary.save( fp ); }
+FILE * LoadPrimBulls( FILE * fp ) { return g_primary.restore( fp ); }
+void KillPrimBullsByOwner( u_int16_t OwnerType, u_int16_t Owner ) { g_primary.kill_by_owner( OwnerType, Owner ); }

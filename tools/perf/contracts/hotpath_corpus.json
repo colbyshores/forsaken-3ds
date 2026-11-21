@@ -114,9 +114,10 @@
     {
       "file": "primary.cpp",
       "symbols": [
-        "ProcessPrimaryBullets"
+        "ProcessPrimaryBullets",
+        "process"
       ],
-      "why": "per projectile per frame"
+      "why": "per projectile per frame; process is ProcessPrimaryBullets' body (PrimaryWeapons::process)"
     },
     {
       "file": "secondary.cpp",
