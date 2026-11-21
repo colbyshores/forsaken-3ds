@@ -75,10 +75,8 @@ u_int32_t TeamFlagMask[ MAX_TEAMS ] = {
 ===================================================================*/
 float	MaxMoveSpeed	=	MAXMOVESPEED;
 float	MoveAccell		=	MOVEACCELL;
-float	MoveDecell		=	MOVEDECELL;
 float	MaxTurboSpeed   =	MAXTURBOSPEED;
 float	TurboAccell		=	TURBOACCELL;
-float	TurboDecell		=	TURBODECELL;
 float	MaxTurnSpeed	=	MAXTURNSPEED;
 float	TurnAccell		=	TURNACCELL;
 float	TurnDecell		=	TURNDECELL;
@@ -90,11 +88,61 @@ float	BankAccell		=	BANKACCELL;
 float	BankDecell		=	BANKDECELL;
 float	Start_Shield	=	START_SHIELD;
 float	Start_Hull		=	START_HULL;
-float	AutoLevel		=	1.0F;
+
+namespace {
+
+/* The ship update's private state (one instance, g_ship_update):
+ * - MoveDecell, TurboDecell and AutoLevel, the movement tunables only this
+ *   file reads; SetBikeMods loads them with the exported ones as the local
+ *   ship enters and leaves water, and every ship's movement reads them each
+ *   frame;
+ * - the local ship's underwater ambience sound, random bubble and node
+ *   steam timers, changed each frame by ProcessShips (the ambience is also
+ *   stopped by CarryonDeathMove);
+ * - NumCollides, the collision count the local ship's collision resets and
+ *   the remote camera's collision walk counts;
+ * - HullCritical, the hull-critical warning latch DoDamage sets on a hit and
+ *   clears on death;
+ * - the bike tables and the mode jump tables, as static members.
+ * None of it is saved with the game. */
+class ShipUpdate {
+	public:
+	bool    process();
+	/* Out of line so ProcessShips calls it as it called DoDamage (host -O3
+	 * otherwise inlines it into the per-ship loop). */
+	[[gnu::noinline]] int16_t do_damage( bool OverrideInvul );
+	void    process_remote_camera();
+	void    remote_camera_mode0( GLOBALSHIP * ShipPnt , BYTE i );
+	void    set_bike_mods( u_int16_t Bike );
+	bool    carryon_death_move( GLOBALSHIP * ShipPnt, BYTE i );
+
+	private:
+	[[gnu::always_inline]] inline void ShipWater( VECTOR & ImpactPoint, VECTOR & Move_Off, VECTOR & StartPos, u_int16_t & OldGroup, float & ShieldModifier, OBJECT *& ShipObjPnt, bool & OldWaterOneshot );
+	[[gnu::always_inline]] inline void ShipBackgroundCollision( BYTE & i, VECTOR & Move_Off, BGOBJECT *& BGObject, bool & Object2Object, OBJECT *& ShipObjPnt, GLOBALSHIP *& ShipPnt );
+	[[gnu::always_inline]] inline void ShipFly( BYTE & i, VECTOR & ImpactPoint, float & Speed, VECTOR & Move_Off, VECTOR & Move_Dir, QUAT & StepQuat, VECTOR & Bob, VECTOR & StartPos, BGOBJECT *& BGObject, u_int16_t & OldGroup, VECTOR & ExtForce, bool & HasBeenExternal, float & ShieldModifier, bool & Object2Object, OBJECT *& ShipObjPnt, GLOBALSHIP *& ShipPnt, int & goalcheck, bool & OldWaterOneshot );
+	[[gnu::always_inline]] inline void ShipRemoteMovement( BYTE & i, VECTOR & Move_Off, QUAT & StepQuat, VECTOR & StartPos, OBJECT *& ShipObjPnt, GLOBALSHIP *& ShipPnt );
+
+	/* The per-ship tunables first, then the local ship's timers and
+	 * sound, then the halfword and byte scalars. */
+	float     MoveDecell = MOVEDECELL;
+	float     TurboDecell = TURBODECELL;
+	float     AutoLevel = 1.0F;
+	float     RandomBubbleTimer = 0.0F;
+	float     SteamTime = 0.0F;
+	u_int32_t UnderwaterSfxID = 0;
+	u_int16_t NumCollides = 0;
+	bool      HullCritical = false;
+
+	static BIKEMOD BikeMods[MAXBIKETYPES+3];
+	static void (* ModeControl[ ])( GLOBALSHIP * ShipPnt , BYTE i );
+	static void (* RemoteCameraModeControl[ ])( GLOBALSHIP * ShipPnt , BYTE i );
+};
+
+} // namespace
 
 constexpr float BikeMod = (2.0F);
 
-BIKEMOD	BikeMods[MAXBIKETYPES+3] = {
+BIKEMOD	ShipUpdate::BikeMods[MAXBIKETYPES+3] = {
 	{	// Default
 		MAXMOVESPEED,
 		MOVEACCELL,
@@ -515,17 +563,13 @@ int		ShieldHit = 0;
 /*===================================================================
 		Globals ...
 ===================================================================*/
-u_int32_t UnderwaterSfxID;
 float BountyTime = 0.0F;
 
 bool ShieldCritical = false;
-bool HullCritical = false;
 
 RENDERMATRIX  TempWorld;
 
 float	WhiteOut = 0.0F;
-float	RandomBubbleTimer = 0.0F;
-u_int16_t	NumCollides;
 
 SHIPCONTROL control;
 float	NitroFuel = 0.0F;
@@ -533,7 +577,6 @@ float	NitroFuelUsed = 0.0F;
 float AutoLevelRot( u_int16_t ship, float autolevel_rate );
 void BobShip( u_int16_t ship, VECTOR *bob );
 void	UpdateStartPos( void );
-float	SteamTime = 0.0F;
 bool	IsStartPosVacantVisibleGroup( int16_t i , u_int16_t startpos );
 bool SwitchedToWatchMode =false;
 
@@ -542,7 +585,7 @@ bool	RearCameraDisable = false;
 /*===================================================================
 	Function		:			Ship Control Mode Jump Table
 ===================================================================*/
-void (* ModeControl[ ])( GLOBALSHIP * ShipPnt , BYTE i ) = {
+void (* ShipUpdate::ModeControl[ ])( GLOBALSHIP * ShipPnt , BYTE i ) = {
 		ShipMode0,
 		ShipMode1,
 		ShipMode2,
@@ -553,7 +596,7 @@ void (* ModeControl[ ])( GLOBALSHIP * ShipPnt , BYTE i ) = {
 /*===================================================================
 	Function		:			RemoteCamera Control Mode Jump Table
 ===================================================================*/
-void (* RemoteCameraModeControl[ ])( GLOBALSHIP * ShipPnt , BYTE i ) = {
+void (* ShipUpdate::RemoteCameraModeControl[ ])( GLOBALSHIP * ShipPnt , BYTE i ) = {
 		RemoteCameraMode0,
 		RemoteCameraMode1,
 		RemoteCameraMode1,		// there is no remote camera mode 2 so just use mode 1...
@@ -659,7 +702,7 @@ void (* RemoteCameraModeControl[ ])( GLOBALSHIP * ShipPnt , BYTE i ) = {
 }
 
 /* the ship entering, leaving and moving through water (shield drain, splashes, wake) */
-[[gnu::always_inline]] static inline void ShipWater( VECTOR & ImpactPoint, VECTOR & Move_Off, VECTOR & StartPos, u_int16_t & OldGroup, float & ShieldModifier, OBJECT *& ShipObjPnt, bool & OldWaterOneshot )
+[[gnu::always_inline]] inline void ShipUpdate::ShipWater( VECTOR & ImpactPoint, VECTOR & Move_Off, VECTOR & StartPos, u_int16_t & OldGroup, float & ShieldModifier, OBJECT *& ShipObjPnt, bool & OldWaterOneshot )
 {
 	ShipObjPnt->Flags &= ~SHIP_InWater;
 	if( InWater( ShipObjPnt->Group , &ShipObjPnt->Pos , &ShieldModifier) )
@@ -735,7 +778,7 @@ void (* RemoteCameraModeControl[ ])( GLOBALSHIP * ShipPnt , BYTE i ) = {
 }
 
 /* the local ship against the level and its background objects */
-[[gnu::always_inline]] static inline void ShipBackgroundCollision( BYTE & i, VECTOR & Move_Off, BGOBJECT *& BGObject, bool & Object2Object, OBJECT *& ShipObjPnt, GLOBALSHIP *& ShipPnt )
+[[gnu::always_inline]] inline void ShipUpdate::ShipBackgroundCollision( BYTE & i, VECTOR & Move_Off, BGOBJECT *& BGObject, bool & Object2Object, OBJECT *& ShipObjPnt, GLOBALSHIP *& ShipPnt )
 {
 	if( !no_collision )
 	{
@@ -792,7 +835,7 @@ void (* RemoteCameraModeControl[ ])( GLOBALSHIP * ShipPnt , BYTE i ) = {
 }
 
 /* the local ship's flight this frame: stealth, nitro, movement, external forces, collisions, flags and water */
-[[gnu::always_inline]] static inline void ShipFly( BYTE & i, VECTOR & ImpactPoint, float & Speed, VECTOR & Move_Off, VECTOR & Move_Dir, QUAT & StepQuat, VECTOR & Bob, VECTOR & StartPos, BGOBJECT *& BGObject, u_int16_t & OldGroup, VECTOR & ExtForce, bool & HasBeenExternal, float & ShieldModifier, bool & Object2Object, OBJECT *& ShipObjPnt, GLOBALSHIP *& ShipPnt, int & goalcheck, bool & OldWaterOneshot )
+[[gnu::always_inline]] inline void ShipUpdate::ShipFly( BYTE & i, VECTOR & ImpactPoint, float & Speed, VECTOR & Move_Off, VECTOR & Move_Dir, QUAT & StepQuat, VECTOR & Bob, VECTOR & StartPos, BGOBJECT *& BGObject, u_int16_t & OldGroup, VECTOR & ExtForce, bool & HasBeenExternal, float & ShieldModifier, bool & Object2Object, OBJECT *& ShipObjPnt, GLOBALSHIP *& ShipPnt, int & goalcheck, bool & OldWaterOneshot )
 {
 	if( (i==MAX_PLAYERS) || (ShipObjPnt->Mode != DEATH_MODE && ShipObjPnt->Mode != LIMBO_MODE && ShipObjPnt->Mode != GAMEOVER_MODE) )
 	{
@@ -968,7 +1011,7 @@ void (* RemoteCameraModeControl[ ])( GLOBALSHIP * ShipPnt , BYTE i ) = {
 }
 
 /* another player's ship between network packets: carry on along its last known course */
-[[gnu::always_inline]] static inline void ShipRemoteMovement( BYTE & i, VECTOR & Move_Off, QUAT & StepQuat, VECTOR & StartPos, OBJECT *& ShipObjPnt, GLOBALSHIP *& ShipPnt )
+[[gnu::always_inline]] inline void ShipUpdate::ShipRemoteMovement( BYTE & i, VECTOR & Move_Off, QUAT & StepQuat, VECTOR & StartPos, OBJECT *& ShipObjPnt, GLOBALSHIP *& ShipPnt )
 {
 	if( !ShipPnt->JustRecievedPacket )
 	{
@@ -1027,7 +1070,7 @@ void (* RemoteCameraModeControl[ ])( GLOBALSHIP * ShipPnt , BYTE i ) = {
 	}
 }
 
-bool ProcessShips()
+bool ShipUpdate::process()
 {
 	BYTE	i;
 	VECTOR	ImpactPoint;
@@ -1558,7 +1601,7 @@ bool	ENV( MXLOADHEADER * Mxloadheader , MATRIX * Mat ,VECTOR * /*Pos*/)
 			Input : Nothing....Ships[WhoIAm].Damage must be set
 			Output: 0 no kill...1 last hit killed me...
 ===================================================================*/
-int16_t DoDamage( bool OverrideInvul )
+int16_t ShipUpdate::do_damage( bool OverrideInvul )
 {
 	u_int8_t	Message[ 128 ];
 	int16_t	MessageSFX = -1;
@@ -2216,7 +2259,7 @@ void WatchMode5( GLOBALSHIP * ShipPnt , BYTE /*i*/ )
 	Input		:	Nothing
 	Output		:	Nothing
 ===================================================================*/
-void Process_Remote_Camera( void )
+void ShipUpdate::process_remote_camera()
 {
 	( * RemoteCameraModeControl[ Ships[MAX_PLAYERS].Object.Mode ] )( &Ships[MAX_PLAYERS] , MAX_PLAYERS );		//go off and do his thing...
 }
@@ -2226,7 +2269,7 @@ void Process_Remote_Camera( void )
 	Input		:	int16_t which Ship
 	Output		:	Nothing
 ===================================================================*/
-void RemoteCameraMode0( GLOBALSHIP * ShipPnt , BYTE i )
+void ShipUpdate::remote_camera_mode0( GLOBALSHIP * ShipPnt , BYTE i )
 {
 	VECTOR	Move_Dir;
 	VECTOR	Move_Dir2;
@@ -2479,7 +2522,7 @@ void StartShipScreenShake( float Force )
 	Input		:	BikeNumber..
 	Output		:	nothing
 ===================================================================*/
-void SetBikeMods( u_int16_t Bike )
+void ShipUpdate::set_bike_mods( u_int16_t Bike )
 {
 	if( Bike >= MAXBIKETYPES+3 )
 		return;
@@ -2596,7 +2639,7 @@ bool Ship2ShipCollide( u_int16_t i , VECTOR * Move_Off )
 	}
 	return HasBeen;
 }
-bool CarryonDeathMove( GLOBALSHIP * ShipPnt,BYTE i)
+bool ShipUpdate::carryon_death_move( GLOBALSHIP * ShipPnt, BYTE i )
 {
 	VECTOR	Move_Off;
 	QUAT	StepQuat;
@@ -2680,19 +2723,37 @@ constexpr int BADTIMEKILLSOVER = 50; // if you go without a kill for this amoutn
 constexpr int CAMPINGTIME = 45; // how long you have to stay in 1 approx position...
 constexpr auto CAMPINGRANGE = ( BLOCKSIZE * 4.0F ); // Range for camping
 
-bool MultiSfxTaunt1Off = false;
+namespace {
 
-u_int16_t CurrentKillPos = 0;
-px_timer_t	KillMemoryTime[MAXKILLMEMORY];
+/* The local player's multiplayer taunt state (one instance, g_kill_taunts):
+ * when each of the last MAXKILLMEMORY kills was made (a ring AddKill writes
+ * as the player scores), the kill count last seen, whether the long-no-kill
+ * taunt has been armed, and where and since when the player has stayed put
+ * (camping). MultiSfxHandle reads and updates it each frame in a network
+ * game; InitMultiSfxHandle resets it when a game starts. */
+class KillTaunts {
+	public:
+	/* Out of line so ProcessShips calls it as it called MultiSfxHandle
+	 * (host -O3 otherwise inlines it there). */
+	[[gnu::noinline]] void handle();
+	void add_kill();
+	void init();
 
-px_timer_t	camping_time;
-VECTOR		CampingPos;
-bool	CampingPos1Off = false;
+	private:
+	/* The kill-time ring first (indexed each frame), then the camping timer
+	 * and position, then the halfword and byte scalars. */
+	px_timer_t KillMemoryTime[MAXKILLMEMORY] = {};
+	px_timer_t camping_time = {};
+	VECTOR     CampingPos = {};
+	u_int16_t  CurrentKillPos = 0;
+	int16_t    OldKills = 0;
+	bool       MultiSfxTaunt1Off = false;
+	bool       CampingPos1Off = false;
+};
 
+} // namespace
 
-int16_t OldKills = 0;
-
-void MultiSfxHandle( void )
+void KillTaunts::handle()
 {
 	int16_t	KillIndex;
 	bool	NewKill;
@@ -2772,7 +2833,7 @@ void MultiSfxHandle( void )
 	Input		:	Nothing..
 	Output		:	Nothing..
 ===================================================================*/
-void AddKill( void )
+void KillTaunts::add_kill()
 {
 	timer_run( &KillMemoryTime[CurrentKillPos] );
 	CurrentKillPos++;
@@ -2781,7 +2842,7 @@ void AddKill( void )
 }
 
 
-void InitMultiSfxHandle( void )
+void KillTaunts::init()
 {
 	int i;
 	for( i = 0 ; i < MAXKILLMEMORY ; i ++ )
@@ -3035,3 +3096,15 @@ FILE * LoadShips( FILE * fp )
 	return( fp );
 }
 
+namespace { ShipUpdate g_ship_update; }
+namespace { KillTaunts g_kill_taunts; }
+
+bool ProcessShips() { return g_ship_update.process(); }
+int16_t DoDamage( bool OverrideInvul ) { return g_ship_update.do_damage( OverrideInvul ); }
+void Process_Remote_Camera( void ) { g_ship_update.process_remote_camera(); }
+void RemoteCameraMode0( GLOBALSHIP * ShipPnt , BYTE i ) { g_ship_update.remote_camera_mode0( ShipPnt, i ); }
+void SetBikeMods( u_int16_t Bike ) { g_ship_update.set_bike_mods( Bike ); }
+bool CarryonDeathMove( GLOBALSHIP * ShipPnt, BYTE i ) { return g_ship_update.carryon_death_move( ShipPnt, i ); }
+void MultiSfxHandle( void ) { g_kill_taunts.handle(); }
+void AddKill( void ) { g_kill_taunts.add_kill(); }
+void InitMultiSfxHandle( void ) { g_kill_taunts.init(); }

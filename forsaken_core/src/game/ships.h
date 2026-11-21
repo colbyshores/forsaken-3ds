@@ -17,10 +17,12 @@
  * once PacketDelay runs out. DoDamage applies Ships[WhoIAm].Damage to the
  * local ship only and reports whether that hit killed it.
  *
- * The movement tunables (MaxMoveSpeed, TurnAccell, ...) are globals loaded by
+ * The movement tunables (MaxMoveSpeed, TurnAccell, ...) are loaded by
  * SetBikeMods from BikeMods[]: index 0 is the multiplayer default, 1 the
  * in-water set, and 2 + SelectedBike the single-player bike. ProcessShips
- * switches between them as the local ship enters and leaves water.
+ * switches between them as the local ship enters and leaves water. They are
+ * globals, except MoveDecell, TurboDecell and AutoLevel, which only
+ * ships.cpp reads and which are private to it.
  */
 
 #include "game/main.h"
@@ -130,10 +132,8 @@ extern RENDERMATRIX TempWorld;
 extern SHIPCONTROL control;
 extern float MaxMoveSpeed;
 extern float MoveAccell;
-extern float MoveDecell;
 extern float MaxTurboSpeed;
 extern float TurboAccell;
-extern float TurboDecell;
 extern float MaxTurnSpeed;
 extern float TurnAccell;
 extern float TurnDecell;

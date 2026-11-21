@@ -86,9 +86,10 @@
     {
       "file": "ships.cpp",
       "symbols": [
-        "ProcessShips"
+        "ProcessShips",
+        "process"
       ],
-      "why": "per player per frame"
+      "why": "per player per frame; process is ProcessShips' body (ShipUpdate::process)"
     },
     {
       "file": "enemies.cpp",

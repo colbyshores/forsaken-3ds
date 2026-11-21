@@ -92,8 +92,8 @@ R2|primary.cpp|process|float-to-int cast in loop body
 R2|render_c3d.cpp|GetRealLightAmbientWorldSpace|float-to-int cast in loop body
 R2|screenpolys.cpp|ScrPolyDispNonSolid|float-to-int cast in loop body
 R2|screenpolys.cpp|ScrPolyDispNonSolid|float-to-int cast in loop body
-R2|ships.cpp|ProcessShips|untyped-heuristic: float-to-int cast in loop body
-R2|ships.cpp|ProcessShips|untyped-heuristic: float-to-int cast in loop body
+R2|ships.cpp|process|untyped-heuristic: float-to-int cast in loop body
+R2|ships.cpp|process|untyped-heuristic: float-to-int cast in loop body
 R2|spotfx.cpp|save|float-to-int cast in loop body
 R2|spotfx.cpp|save|float-to-int cast in loop body
 R2|visi.cpp|find_visible|float-to-int cast in loop body
@@ -282,11 +282,11 @@ R7|screenpolys.cpp|update|float division inner_loop=false
 R7|screenpolys.cpp|UpdateDigit|float division inner_loop=false
 R7|screenpolys.cpp|UpdateDigit|float division inner_loop=false
 R7|secondary.cpp|process|float division inner_loop=false
-R7|ships.cpp|ProcessShips|float division in hot loop
-R7|ships.cpp|ProcessShips|float division in hot loop
-R7|ships.cpp|ProcessShips|float division in hot loop
-R7|ships.cpp|ProcessShips|float division in hot loop
-R7|ships.cpp|ProcessShips|float division in hot loop
+R7|ships.cpp|process|float division in hot loop
+R7|ships.cpp|process|float division in hot loop
+R7|ships.cpp|process|float division in hot loop
+R7|ships.cpp|process|float division in hot loop
+R7|ships.cpp|process|float division in hot loop
 R7|visi.cpp|find_visible|float division in hot loop
 R7|visi.cpp|find_visible|float division in hot loop
 R7|visi.cpp|find_visible|float division in hot loop
