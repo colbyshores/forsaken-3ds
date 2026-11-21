@@ -84,10 +84,6 @@ R2|polys.cpp|disp_group_unclipped|float-to-int cast in loop body
 R2|polys.cpp|save|float-to-int cast in loop body
 R2|polys.cpp|save|float-to-int cast in loop body
 R2|polys.cpp|save|float-to-int cast in loop body
-R2|polys.cpp|SolidPolyDispGroupClipped|float-to-int cast in loop body
-R2|polys.cpp|SolidPolyDispGroupClipped|float-to-int cast in loop body
-R2|polys.cpp|SolidPolyDispGroupUnclipped|float-to-int cast in loop body
-R2|polys.cpp|SolidPolyDispGroupUnclipped|float-to-int cast in loop body
 R2|primary.cpp|process|float-to-int cast in loop body
 R2|render_c3d.cpp|GetRealLightAmbientWorldSpace|float-to-int cast in loop body
 R2|screenpolys.cpp|ScrPolyDispNonSolid|float-to-int cast in loop body
@@ -109,9 +105,6 @@ R3|collision.cpp|QCollide|float comparison driving control flow in hot loop
 R3|collision.cpp|QCollide|float comparison driving control flow in hot loop
 R3|collision.cpp|QCollide|float comparison driving control flow in hot loop
 R3|models.cpp|disp|float comparison driving control flow in hot loop
-R4|new3d.cpp|spline|unsuffixed float literal promotes to double
-R4|new3d.cpp|spline|unsuffixed float literal promotes to double
-R4|new3d.cpp|spline|unsuffixed float literal promotes to double
 R4|new3d.cpp|spline|unsuffixed float literal promotes to double
 R7|2dpolys.cpp|process|float division in hot loop
 R7|2dpolys.cpp|process|float division in hot loop
@@ -167,8 +160,6 @@ R7|collision.cpp|background_collide|sqrtf in hot loop
 R7|collision.cpp|ray_plane_intersect|float division inner_loop=false
 R7|collision.cpp|object_collide|float division in hot loop
 R7|collision.cpp|QCollide|float division in hot loop
-R7|lights.cpp|XLight1Group|float division in hot loop
-R7|lights.cpp|XLight1Group|float division in hot loop
 R7|lights.cpp|XLight1Group|float division in hot loop
 R7|lights.cpp|XLight1Group|float division in hot loop
 R7|lights.cpp|XLight1Group|float division in hot loop
