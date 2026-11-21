@@ -933,7 +933,7 @@ int GetCurPrimAmmo( void )
 /* HUD shown only in normal (not watch) mode: the weapons-possessed bar and the other normal-mode panel items */
 [[gnu::always_inline]] static inline void DrawPanelNormalModeHud( int & current, int & left, int & right, int & top, int & energy, u_int8_t & Count, u_int8_t & r, u_int8_t & g, u_int8_t & b, char (&MessageBuff)[150] )
 {
-	if(ShowWeaponsPossessedOnHUD)
+	if(HudOpts.ShowWeaponsPossessedOnHUD)
 	{
 		// primaries using general ammo
 		for( Count = 0; Count < MAXPRIMARYWEAPONS; Count++ )
@@ -1033,7 +1033,7 @@ int GetCurPrimAmmo( void )
 	}
 
 	// Average Kills Per Minute
-	if(ShowKPMOnHUD)
+	if(HudOpts.ShowKPMOnHUD)
 	{
 		snprintf( MessageBuff, sizeof( MessageBuff ), "KPM: %.2f", (float)
 				(GetTotalKills(WhoIAm) - GetFriendlyKills(WhoIAm))
@@ -1125,14 +1125,14 @@ void DrawSimplePanel()
 			}
 
 			// Game Clock
-			if(ShowClockOnHUD)
+			if(HudOpts.ShowClockOnHUD)
 			{
 				snprintf( MessageBuff, sizeof( MessageBuff ), "%02d:%02d", (int)(LevelTimeTaken / 60), (int)((int)LevelTimeTaken % 60) );
 				Print4x5Text( &MessageBuff[0], FontWidth, render_info.window_size.cy - FontWidth*5, WHITE);
 			}
 
 			// Current Speed
-			if(ShowSpeedOnHUD)
+			if(HudOpts.ShowSpeedOnHUD)
 			{
 				if(SpeedInterval <= 0.0F)
 				{
@@ -1206,7 +1206,7 @@ void DrawSimplePanel()
 		}
 
 		// show long message history
-		if(ShowMessages)
+		if(HudOpts.ShowMessages)
 			MessageQuePrintAll();
 
 		// show last 3 recent messages
@@ -1225,10 +1225,10 @@ void DrawSimplePanel()
 
 			// if we have show stats activated (ex: you pressed the stats button)
 			// show statistics
-			else if ( ShowStatistics)
+			else if ( HudOpts.ShowStatistics)
 				ShowInGameStats();
 
-			else if( ShowNetworkInfo )
+			else if( HudOpts.ShowNetworkInfo )
 				DisplayNetworkInfo();
 		}
 	} // end of ( Panel )
@@ -3646,13 +3646,13 @@ bool MainGameRender(void)
 	}
 
 	// show the stats screen
-	if(ShowStats)
+	if(HudOpts.ShowStats)
 	{
 		ScoreDisplay();
 	}
 
 	// show regular view
-	else if( !FullRearView )
+	else if( !HudOpts.FullRearView )
 	{
 		CameraRendering = CamRendering::Main;
 		MainCamera.enable = 1;
@@ -4653,7 +4653,7 @@ bool Our_CalculateFrameRate(void)
 			(int) TotalFmPolysInUse,(int) TotalPolysInUse,(int) TotalScrPolysInUse, NumOfVertsTouched);
 		CenterPrint4x5Text( (char *) &buf[0], (FontHeight+3)*6, 2 );
 
-		if ( ! ShowWeaponKills ) //ShowNetworkInfo)
+		if ( ! HudOpts.ShowWeaponKills ) //ShowNetworkInfo)
 		{
 
 			// newtork info
@@ -4669,7 +4669,7 @@ bool Our_CalculateFrameRate(void)
 
 		}
 
-		if (ShowWeaponKills)
+		if (HudOpts.ShowWeaponKills)
 		{
 			// show all primary weapon kills
 			for( i = 0 ; i < MAXPRIMARYWEAPONS+1 ; i++ )

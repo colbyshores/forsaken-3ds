@@ -183,11 +183,6 @@ void ProcessMenuFlashText( void );
 void DisableCheats( void );
 
 /* Defined in controls.cpp; shared with the modules that use it. */
-extern bool FullRearView;
-extern bool ShowStats;
-extern bool ShowMessages;
-extern bool ShowStatistics;
-extern bool ShowNetworkInfo;
 extern bool flush_input;
 void clear_last_mouse_state(void);
 extern float FlashTextActive;

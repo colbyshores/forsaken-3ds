@@ -108,15 +108,8 @@ bool NeedFlagAtHome = true;
 bool CanCarryOwnFlag = false;
 bool OwnFlagTeleportsHome = true;
 
-bool ShowWeaponsPossessedOnHUD;
-bool ShowClockOnHUD;
-bool ShowKPMOnHUD;
-bool ShowSpeedOnHUD;
-bool ShowPlayersOnHUD;
-bool ShowPlayersOnHUDbyKills;
-bool ShowPlayerHealthAboveBikes;
-bool ScaleFontPlayerHealthAboveBikes;
-bool ShowPlayerHealthByScores;
+HudOptions HudOpts;
+
 
 int	NetUpdateIntervalCmdLine = 0;
 int	GoalScore = 5;
@@ -141,7 +134,6 @@ bool	quitting = false;
 MENU *LastMenu;
 int16_t	SelectedBike = 0; //MODEL_Borg;
 int16_t	NumTitleModelsToLoad;
-bool	ShowWeaponKills = false;
 u_int16_t	BackgroundModel[NUMOFTITLEMODELS];
 
 /*===================================================================
@@ -606,7 +598,6 @@ SLIDER FlagSfxSlider						= { 0, 10, 1, 10, 0, 0.0F };
 SLIDER WatchPlayerSelect				= { 0, MAX_PLAYERS+1, 1, 0, 0, 0.0F }; // which player's pov to watch
 SLIDER TextScaleSlider				= { 0, 5, 1, 1, 0, 0.0F, 0.0F, 0, false, nullptr, nullptr, SetTextScale };
 
-bool ShowTeamInfo;
 bool NoTeamSelect				= false;
 bool Autoleveling				= true;
 DebugView DebugViews;
@@ -1293,10 +1284,10 @@ MENU	MENU_NEW_DetailLevels = {
 		{ 0, 10, 200, 10, 0, (u_int8_t*)LT_MENU_NEW_DetailLevels0/*"DETAIL LEVELS"*/, FONT_Large, TEXTFLAG_CentreX | TEXTFLAG_CentreY,  nullptr, nullptr, nullptr, DrawFlatMenuItem, nullptr, 0  },
 
 		{ 10, 40, 150, 40, 0, (u_int8_t*)"MATURE CONTENT", FONT_Small, TEXTFLAG_CentreY,  &MatureContent,	nullptr,	SelectMultiToggle,	DrawFlatMenuToggle, nullptr, 0 },
-		{ 10, 56, 150, 56, 0, (u_int8_t*)LT_MENU_NEW_DetailLevels4/*"Team Info"*/, FONT_Small, TEXTFLAG_CentreY,		&ShowTeamInfo,			nullptr,	SelectFlatMenuToggle,	DrawFlatMenuToggle, nullptr, 0 },
+		{ 10, 56, 150, 56, 0, (u_int8_t*)LT_MENU_NEW_DetailLevels4/*"Team Info"*/, FONT_Small, TEXTFLAG_CentreY,		&HudOpts.ShowTeamInfo,			nullptr,	SelectFlatMenuToggle,	DrawFlatMenuToggle, nullptr, 0 },
 		{ 10, 72, 95, 72, 0, (u_int8_t*)LT_MENU_NEW_DetailLevels8/*"Water Detail"*/, FONT_Small, TEXTFLAG_AutoSelect | TEXTFLAG_CentreY,		&WaterDetailSlider,		nullptr,	SelectSlider,	DrawFlatMenuSlider, nullptr, 0 },
 		{ 10, 86, 150, 86, 0, (u_int8_t*)LT_MENU_NEW_DetailLevels14/*"Show Extra Info "*/, FONT_Small, TEXTFLAG_CentreY, &DebugViews.ShowInfo, nullptr, SelectFlatMenuToggle, DrawFlatMenuToggle, nullptr, 0 },
-		{ 10, 102, 150, 102, 0, (u_int8_t*)LT_MENU_NEW_DetailLevels15/*"Show Weapon Kills"*/, FONT_Small, TEXTFLAG_CentreY, &ShowWeaponKills, nullptr, SelectFlatMenuToggle, DrawFlatMenuToggle, nullptr, 0 },
+		{ 10, 102, 150, 102, 0, (u_int8_t*)LT_MENU_NEW_DetailLevels15/*"Show Weapon Kills"*/, FONT_Small, TEXTFLAG_CentreY, &HudOpts.ShowWeaponKills, nullptr, SelectFlatMenuToggle, DrawFlatMenuToggle, nullptr, 0 },
 		{ 10, 150, 150, 150, 0, (u_int8_t*)LT_MENU_NEW_DetailLevels16/*"Back"*/, FONT_Small, TEXTFLAG_CentreY,		nullptr,		nullptr,	MenuItemBack, DrawFlatMenuItem, nullptr, 0 },
 		{ -1, -1, 0, 0, 0, (u_int8_t*)"", 0, 0,  nullptr, nullptr, nullptr, nullptr, nullptr, 0 }
 
@@ -2190,7 +2181,7 @@ MENU	MENU_Controls = {
 MENU	MENU_Detail = {
 	(u_int8_t*)LT_MENU_Detail0 /*"Detail Levels"*/, nullptr, ExitDetailLevels, nullptr, 0,
 	{
-		{ 200, 180, 0, 0, 0, (u_int8_t*)LT_MENU_Detail4/*"Team Info"*/,     0, 0,  &ShowTeamInfo,     nullptr,SelectToggle,DrawToggle,nullptr, 0 },
+		{ 200, 180, 0, 0, 0, (u_int8_t*)LT_MENU_Detail4/*"Team Info"*/,     0, 0,  &HudOpts.ShowTeamInfo,     nullptr,SelectToggle,DrawToggle,nullptr, 0 },
 		{ 200, 196, 0, 0, 0, (u_int8_t*)"MATURE CONTENT      ", 0, 0, &MatureContent, nullptr, SelectMatureContentToggle, DrawMatureContentToggle,	nullptr, 0 },
 		{ 200, 212, 0, 0, 0, (u_int8_t*)LT_MENU_Detail12/*"Water Detail"*/, 0, 0,	&WaterDetailSlider,nullptr,SelectSlider,DrawSlider,nullptr, 0 },
 		{ 200, 228, 0, 0, 0, (u_int8_t*)LT_MENU_Detail13/*"gamma"*/,        0, 0,	&GammaSlider,      nullptr,SelectSlider,DrawSlider,nullptr, 0 },
@@ -2303,16 +2294,16 @@ MENU	MENU_Options = {
 		{ 200, 160, 0, 0, 0, (u_int8_t*)LT_MENU_Options3	/*"Detail Levels"*/,		0, 0, nullptr,						&MENU_Detail,			MenuChange,		MenuItemDrawName,	nullptr, 0 },
 		{ 200, 176, 0, 0, 0, (u_int8_t*)LT_MENU_Options4	/*"Show Frame Rate "*/,		0, 0, &DebugViews.ShowFrameRate,	nullptr,					SelectToggle,	DrawToggle,			nullptr, 0 },
 		{ 200, 192, 0, 0, 0, (u_int8_t*)LT_MENU_Options8	/*"Show Extra Info "*/,		0, 0, &DebugViews.ShowInfo,		nullptr,					SelectToggle,	DrawToggle,			nullptr, 0 },
-		{ 200, 208, 0, 0, 0, (u_int8_t*)LT_MENU_Options9	/*"Show Weapon Kills"*/,	0, 0, &ShowWeaponKills,			nullptr,					SelectToggle,	DrawToggle,			nullptr, 0 },
-		{ 200, 224, 0, 0, 0, (u_int8_t*)LT_MENU_Options13	/*"Show Players on HUD"*/,	0, 0, &ShowPlayersOnHUD,		nullptr,					SelectToggle,	DrawToggle,			nullptr, 0 },
-		{ 200, 240, 0, 0, 0, (u_int8_t*)"HUD Show Kills Only",	0, 0, &ShowPlayersOnHUDbyKills,nullptr,SelectToggle,DrawToggle,nullptr, 0 },
-		{ 200, 256, 0, 0, 0, (u_int8_t*)"HUD Show Inventory",	0, 0, &ShowWeaponsPossessedOnHUD,nullptr,SelectToggle,DrawToggle,nullptr, 0 },
-		{ 200, 272, 0, 0, 0, (u_int8_t*)"HUD Show Clock",	0, 0, &ShowClockOnHUD,nullptr,SelectToggle,DrawToggle,nullptr, 0 },
-		{ 200, 288, 0, 0, 0, (u_int8_t*)"HUD Show KPM",	0, 0, &ShowKPMOnHUD,nullptr,SelectToggle,DrawToggle,nullptr, 0 },
-		{ 200, 304, 0, 0, 0, (u_int8_t*)"HUD Show Speed",	0, 0, &ShowSpeedOnHUD,nullptr,SelectToggle,DrawToggle,nullptr, 0 },
-		{ 200, 320, 0, 0, 0, (u_int8_t*)"Show Health Above Bikes", 0, 0, &ShowPlayerHealthAboveBikes,nullptr,SelectToggle,DrawToggle,nullptr, 0 },
-		{ 200, 336, 0, 0, 0, (u_int8_t*)"Show Health By Scores", 0, 0, &ShowPlayerHealthByScores,nullptr,SelectToggle,DrawToggle,nullptr, 0 },
-		{ 200, 352, 0, 0, 0, (u_int8_t*)"Scale Font Above Bikes", 0, 0, &ScaleFontPlayerHealthAboveBikes,nullptr,SelectToggle,DrawToggle,nullptr, 0 },
+		{ 200, 208, 0, 0, 0, (u_int8_t*)LT_MENU_Options9	/*"Show Weapon Kills"*/,	0, 0, &HudOpts.ShowWeaponKills,			nullptr,					SelectToggle,	DrawToggle,			nullptr, 0 },
+		{ 200, 224, 0, 0, 0, (u_int8_t*)LT_MENU_Options13	/*"Show Players on HUD"*/,	0, 0, &HudOpts.ShowPlayersOnHUD,		nullptr,					SelectToggle,	DrawToggle,			nullptr, 0 },
+		{ 200, 240, 0, 0, 0, (u_int8_t*)"HUD Show Kills Only",	0, 0, &HudOpts.ShowPlayersOnHUDbyKills,nullptr,SelectToggle,DrawToggle,nullptr, 0 },
+		{ 200, 256, 0, 0, 0, (u_int8_t*)"HUD Show Inventory",	0, 0, &HudOpts.ShowWeaponsPossessedOnHUD,nullptr,SelectToggle,DrawToggle,nullptr, 0 },
+		{ 200, 272, 0, 0, 0, (u_int8_t*)"HUD Show Clock",	0, 0, &HudOpts.ShowClockOnHUD,nullptr,SelectToggle,DrawToggle,nullptr, 0 },
+		{ 200, 288, 0, 0, 0, (u_int8_t*)"HUD Show KPM",	0, 0, &HudOpts.ShowKPMOnHUD,nullptr,SelectToggle,DrawToggle,nullptr, 0 },
+		{ 200, 304, 0, 0, 0, (u_int8_t*)"HUD Show Speed",	0, 0, &HudOpts.ShowSpeedOnHUD,nullptr,SelectToggle,DrawToggle,nullptr, 0 },
+		{ 200, 320, 0, 0, 0, (u_int8_t*)"Show Health Above Bikes", 0, 0, &HudOpts.ShowPlayerHealthAboveBikes,nullptr,SelectToggle,DrawToggle,nullptr, 0 },
+		{ 200, 336, 0, 0, 0, (u_int8_t*)"Show Health By Scores", 0, 0, &HudOpts.ShowPlayerHealthByScores,nullptr,SelectToggle,DrawToggle,nullptr, 0 },
+		{ 200, 352, 0, 0, 0, (u_int8_t*)"Scale Font Above Bikes", 0, 0, &HudOpts.ScaleFontPlayerHealthAboveBikes,nullptr,SelectToggle,DrawToggle,nullptr, 0 },
 		{	-1 , -1, 0, 0, 0, (u_int8_t*)"" , 0, 0, nullptr, nullptr , nullptr , nullptr, nullptr, 0 }
 	}
 };
@@ -7728,20 +7719,20 @@ void GetGamePrefs( void )
 	VideoOpts.MissileCameraEnable              = config_get_bool( "MissileCameraEnable",		true );
 	RearCameraActive                 = config_get_bool( "RearCameraActive",			true );
 	VideoOpts.BikeEnginesOn                    = config_get_bool( "BikeEnginesOn",			true );
-	ShowWeaponsPossessedOnHUD		 = config_get_bool( "ShowWeaponsPossessedOnHUD", false );
+	HudOpts.ShowWeaponsPossessedOnHUD		 = config_get_bool( "ShowWeaponsPossessedOnHUD", false );
 	JoystickInput					 = config_get_bool( "JoystickInput", true );
-	ShowClockOnHUD				     = config_get_bool( "ShowClockOnHUD", true );
-	ShowKPMOnHUD				     = config_get_bool( "ShowKPMOnHUD", false );
-	ShowSpeedOnHUD				     = config_get_bool( "ShowSpeedOnHUD", true );
-	ShowPlayersOnHUD                 = config_get_bool( "ShowPlayersOnHUD",			true );
-	ShowPlayersOnHUDbyKills          = config_get_bool( "ShowPlayersOnHUDbyKills",		true );
-	ShowPlayerHealthAboveBikes       = config_get_bool( "ShowPlayerHealthAboveBikes", true );
-	ShowPlayerHealthByScores         = config_get_bool( "ShowPlayerHealthByScores", true );
-	ScaleFontPlayerHealthAboveBikes  = config_get_bool( "ScaleFontPlayerHealthAboveBikes", true );
+	HudOpts.ShowClockOnHUD				     = config_get_bool( "ShowClockOnHUD", true );
+	HudOpts.ShowKPMOnHUD				     = config_get_bool( "ShowKPMOnHUD", false );
+	HudOpts.ShowSpeedOnHUD				     = config_get_bool( "ShowSpeedOnHUD", true );
+	HudOpts.ShowPlayersOnHUD                 = config_get_bool( "ShowPlayersOnHUD",			true );
+	HudOpts.ShowPlayersOnHUDbyKills          = config_get_bool( "ShowPlayersOnHUDbyKills",		true );
+	HudOpts.ShowPlayerHealthAboveBikes       = config_get_bool( "ShowPlayerHealthAboveBikes", true );
+	HudOpts.ShowPlayerHealthByScores         = config_get_bool( "ShowPlayerHealthByScores", true );
+	HudOpts.ScaleFontPlayerHealthAboveBikes  = config_get_bool( "ScaleFontPlayerHealthAboveBikes", true );
 	VideoOpts.BikeExhausts                     = config_get_bool( "BikeExhausts",				true );
 	BountyBonus                      = config_get_bool( "BountyBonus",				true );
 	MyUseShortPackets                = config_get_bool( "UseShortPackets",			true );
-	ShowTeamInfo                     = config_get_bool( "ShowTeamInfo",				true );
+	HudOpts.ShowTeamInfo                     = config_get_bool( "ShowTeamInfo",				true );
 	render_info.fullscreen			 = config_get_bool( "FullScreen",				false );
 
 	memset( MyPickupValid, 0, sizeof(MyPickupValid) );
@@ -7898,21 +7889,21 @@ void SetGamePrefs( void )
 	config_set_bool( "MissileCameraEnable",		VideoOpts.MissileCameraEnable );
 	config_set_bool( "RearCameraActive",		RearCameraActive );
 	config_set_bool( "BikeEnginesOn",		VideoOpts.BikeEnginesOn );
-	config_set_bool( "ShowWeaponsPossessedOnHUD", ShowWeaponsPossessedOnHUD );
+	config_set_bool( "ShowWeaponsPossessedOnHUD", HudOpts.ShowWeaponsPossessedOnHUD );
 	config_set_bool( "JoystickInput", JoystickInput );
-	config_set_bool( "ShowClockOnHUD", ShowClockOnHUD );
-	config_set_bool( "ShowKPMOnHUD", ShowKPMOnHUD );
-	config_set_bool( "ShowSpeedOnHUD", ShowSpeedOnHUD );
-	config_set_bool( "ShowPlayersOnHUD",		ShowPlayersOnHUD );
-	config_set_bool( "ShowPlayersOnHUDbyKills",	ShowPlayersOnHUDbyKills );
-	config_set_bool( "ShowPlayerHealthAboveBikes", ShowPlayerHealthAboveBikes );
-	config_set_bool( "ShowPlayerHealthByScores", ShowPlayerHealthByScores );
-	config_set_bool( "ScaleFontPlayerHealthAboveBikes", ScaleFontPlayerHealthAboveBikes );
+	config_set_bool( "ShowClockOnHUD", HudOpts.ShowClockOnHUD );
+	config_set_bool( "ShowKPMOnHUD", HudOpts.ShowKPMOnHUD );
+	config_set_bool( "ShowSpeedOnHUD", HudOpts.ShowSpeedOnHUD );
+	config_set_bool( "ShowPlayersOnHUD",		HudOpts.ShowPlayersOnHUD );
+	config_set_bool( "ShowPlayersOnHUDbyKills",	HudOpts.ShowPlayersOnHUDbyKills );
+	config_set_bool( "ShowPlayerHealthAboveBikes", HudOpts.ShowPlayerHealthAboveBikes );
+	config_set_bool( "ShowPlayerHealthByScores", HudOpts.ShowPlayerHealthByScores );
+	config_set_bool( "ScaleFontPlayerHealthAboveBikes", HudOpts.ScaleFontPlayerHealthAboveBikes );
 	config_set_bool( "BikeExhausts",		VideoOpts.BikeExhausts );
 	config_set_bool( "BountyBonus",			BountyBonus );
 	config_set_bool( "RandomPickups",		MyRandomPickups );
 	config_set_bool( "UseShortPackets",		MyUseShortPackets );
-	config_set_bool( "ShowTeamInfo",		ShowTeamInfo );
+	config_set_bool( "ShowTeamInfo",		HudOpts.ShowTeamInfo );
 	config_set_bool( "FullScreen",			render_info.fullscreen );
 
 	config_set_bool( "AllowMugs",               MyPickupValid[ PICKUP_Mugs ] );

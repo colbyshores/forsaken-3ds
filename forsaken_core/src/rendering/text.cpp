@@ -603,13 +603,13 @@ void HudText::print_score_sort()
 
 	if( !TeamGame )
 	{
-		if( ShowPlayersOnHUD )
+		if( HudOpts.ShowPlayersOnHUD )
 		{
 			int top_offset = FontHeight; // initial gap
 			int line_height = FontHeight+1;
 
 			// calculate the width of the score column
-			if(ShowPlayersOnHUDbyKills)
+			if(HudOpts.ShowPlayersOnHUDbyKills)
 			{
 				for(i=0; i<MAX_PLAYERS; i++)
 				{
@@ -656,7 +656,7 @@ void HudText::print_score_sort()
 				left_offset += ( 8 * FontWidth );
 
 				// print real score
-				if(ShowPlayersOnHUDbyKills)
+				if(HudOpts.ShowPlayersOnHUDbyKills)
 					// kills - suicides - friendly
 					Printint16_t( GetKills(ShipID), left_offset, top_offset, GRAY );
 				else
@@ -675,7 +675,7 @@ void HudText::print_score_sort()
 						Print4x5TextSmall( &buf[0], left_offset, top_offset+((FontHeight-8.0F)/2.0F), ((GameStatus[ShipID] == STATUS_Left) ? DARKGRAY : GREEN) );
 
 						// Show % Health
-						if(ShowPlayerHealthByScores && GameStatus[ShipID] != STATUS_Left)
+						if(HudOpts.ShowPlayerHealthByScores && GameStatus[ShipID] != STATUS_Left)
 						{
 							snprintf( (char*) &buf[0], sizeof( buf ), "H:%d", (u_int16_t) ceilf(((PlayerHealths[ShipID].Shield + PlayerHealths[ShipID].Hull) /2.56F)));
 							Print4x5TextSmall( &buf[0], left_offset+60.0F, top_offset+((FontHeight-8.0F)/2.0F), ShipHealthColour[ShipID] );
@@ -752,7 +752,7 @@ void HudText::print_score_sort()
 		}
 
 		// show team info
-		if( ShowTeamInfo )
+		if( HudOpts.ShowTeamInfo )
 		{
 			e = pos + 1;
 			for( i = 0 ; i < MAX_PLAYERS ; i++ )

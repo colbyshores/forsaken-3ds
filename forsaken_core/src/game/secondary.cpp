@@ -5856,7 +5856,7 @@ void SecondaryWeapons::disp_hud_names()
 	}
 	else
 	{
-		if(ShowPlayerHealthAboveBikes)
+		if(HudOpts.ShowPlayerHealthAboveBikes)
 		{
 			// for all visible ships
 			for( Count = 0; Count < NumVisibleShips; Count++ )
@@ -5868,7 +5868,7 @@ void SecondaryWeapons::disp_hud_names()
 				snprintf( (char*) &buf[0] , sizeof( buf ),"%d", (u_int16_t) fast_ceilf((((PlayerHealths[Ship].Hull + PlayerHealths[Ship].Shield)/2.56F))));
 
 				// display using whatever scaled font player has chosen
-				if(ScaleFontPlayerHealthAboveBikes)
+				if(HudOpts.ScaleFontPlayerHealthAboveBikes)
 					Print4x5Text( &buf[0] , VisibleShipsPos[ Count ].ScreenX - 24, VisibleShipsPos[ Count ].ScreenY, ShipHealthColour[Ship] );
 				// display using small font
 				else

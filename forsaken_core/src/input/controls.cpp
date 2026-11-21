@@ -205,11 +205,6 @@ const char *ShipAxisSeperateText[NUM_SHIP_AXIS_ACTIONS * 2] = {
 
 float FlashTextActive = 0.0F;
 
-bool FullRearView = false;
-bool ShowStats = false;
-bool ShowMessages = false;	// display long list of chat messages
-bool ShowStatistics = false;	// display statistics in game
-bool ShowNetworkInfo = false;	// display enet info in game
 
 void MenuFlash::flash( const char * text, float activetime, u_int16_t sfx )
 {
@@ -621,24 +616,24 @@ void control_ship( USERCONFIG *conf, SHIPCONTROL *ctrl )
 	turn_sign = ( conf->invert_turn ) ? -1.0F : 1.0F;
 
 	if ( key_held( &conf->full_rear_view ) )
-		FullRearView = true;
+		HudOpts.FullRearView = true;
 	else
-		FullRearView = false;
+		HudOpts.FullRearView = false;
 
 	if( key_held( &conf->show_messages))
-		ShowMessages = true;
+		HudOpts.ShowMessages = true;
 	else
-		ShowMessages = false;
+		HudOpts.ShowMessages = false;
 
 	if( key_held( &conf->show_stats))
-		ShowStatistics = true;
+		HudOpts.ShowStatistics = true;
 	else
-		ShowStatistics = false;
+		HudOpts.ShowStatistics = false;
 
 	if( key_held( &conf->show_networkinfo))
-		ShowNetworkInfo = true;
+		HudOpts.ShowNetworkInfo = true;
 	else
-		ShowNetworkInfo = false;
+		HudOpts.ShowNetworkInfo = false;
 
 	if ( key_pressed( &conf->headlights ) )
 		Ships[WhoIAm].headlights = !Ships[WhoIAm].headlights;

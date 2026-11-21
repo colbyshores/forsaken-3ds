@@ -20,6 +20,29 @@
 #include "game/constants.h"
 #include "net/networking.h"
 
+/* HUD and in-game view toggles, one plain struct (no methods). The title menu
+ * tables point at these fields; config prefs persist them by string key. */
+struct HudOptions
+{
+	bool ShowWeaponsPossessedOnHUD = false;
+	bool ShowClockOnHUD = false;
+	bool ShowKPMOnHUD = false;
+	bool ShowSpeedOnHUD = false;
+	bool ShowWeaponKills = false;
+	bool ShowPlayerHealthAboveBikes = false;
+	bool ScaleFontPlayerHealthAboveBikes = false;
+	bool ShowPlayerHealthByScores = false;
+	bool ShowPlayersOnHUD = false;
+	bool ShowPlayersOnHUDbyKills = false;
+	bool ShowTeamInfo = false;
+	bool FullRearView = false;
+	bool ShowStats = false;
+	bool ShowMessages = false;
+	bool ShowStatistics = false;
+	bool ShowNetworkInfo = false;
+};
+extern HudOptions HudOpts;
+
 /* A start-up shortcut past the title menus (command-line host or join),
    or Notify for a pending message box. */
 enum class QuickStartMode : u_int8_t
@@ -575,10 +598,6 @@ extern VECTOR HoloRot;
 extern int KillMessageColour;
 extern int MatureContent;
 extern int HUDColour;
-extern bool ShowWeaponsPossessedOnHUD;
-extern bool ShowClockOnHUD;
-extern bool ShowKPMOnHUD;
-extern bool ShowSpeedOnHUD;
 extern VECTOR View;
 extern VECTOR Look;
 extern VECTOR Up;
@@ -607,7 +626,6 @@ extern bool ScreenSaving;
 extern MENU MENU_EditMacro1;
 extern MENU MENU_EditMacro2;
 extern MENU MENU_EditMacro3;
-extern bool ShowWeaponKills;
 extern int16_t SelectedBike;
 extern SLIDER TimeLimit;
 bool VduFinished( MENU *Menu );
@@ -617,8 +635,6 @@ extern int FlagMessageColour;
 extern SLIDER WatchPlayerSelect;
 extern int GoalScore;
 extern int PickupMessageColour;
-extern bool ShowPlayerHealthAboveBikes;
-extern bool ScaleFontPlayerHealthAboveBikes;
 extern int PlayerMessageColour;
 extern int BountyBonusInterval;
 extern int MilestoneMessagesColour;
@@ -655,11 +671,7 @@ void AddTitleMessage(TEXTMSG *TextMsg);
 extern int TauntMessageColour;
 extern int MyMessageColour;
 extern SLIDER FlagSfxSlider;
-extern bool ShowTeamInfo;
 extern SLIDER TextScaleSlider;
-extern bool ShowPlayerHealthByScores;
-extern bool ShowPlayersOnHUD;
-extern bool ShowPlayersOnHUDbyKills;
 bool RenderModeReset( void );
 void FadeHoloLight(float Brightness );
 extern float HoloLightBrightness;
