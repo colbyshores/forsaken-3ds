@@ -50,7 +50,10 @@
       "symbols": [
         "*"
       ],
-      "why": "per-group poly transform/clip/display batches"
+      "cold_symbols": [
+        "restore"
+      ],
+      "why": "per-group poly transform/clip/display batches; restore is the saved-game load (LoadPolys)"
     },
     {
       "file": "models.cpp",

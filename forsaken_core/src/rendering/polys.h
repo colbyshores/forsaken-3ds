@@ -7,11 +7,12 @@
  * screen, and the afterburner flames DoAfterBurnerEffects keeps per ship), as
  * opposed to the camera-facing sprites in 2dpolys.h. The pool is per level:
  * InitPolys (from InitScene) resets it. FindFreePoly / KillUsedPoly move an
- * entry between the free list and the used list (FirstPolyUsed, walked
- * through Prev). Each used poly must also be linked into its texture page with
- * AddPolyToTPage(GetTPage(*Frm_Info, 0)); KillUsedPoly unlinks it, so Frm_Info
- * must be valid when it is called. ProcessPolys advances laser / INVBITS
- * animation frames and the shield / INVBITS fades once per frame.
+ * entry between the free list and the used list (walked through Prev; the
+ * list heads are polys.cpp's PolyPool's). Each used poly must also be linked
+ * into its texture page with AddPolyToTPage(GetTPage(*Frm_Info, 0));
+ * KillUsedPoly unlinks it, so Frm_Info must be valid when it is called.
+ * ProcessPolys advances laser / INVBITS animation frames and the shield /
+ * INVBITS fades once per frame.
  *
  * Drawing is per page: Display*Polys walk PolyTPages from page 0 and call the
  * matching *PolyDisp* fill, which counts verts per page (pass 1), then writes
@@ -136,5 +137,4 @@ FILE * LoadPolys( FILE * fp );
 /* Defined in polys.cpp; shared with the modules that use it. */
 extern POLY Polys[ MAXPOLYS ];
 extern u_int32_t TotalPolysInUse;
-extern u_int16_t FirstPolyUsed;
 extern VECTOR ShieldVerts[ 4 ];

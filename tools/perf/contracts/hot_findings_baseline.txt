@@ -77,13 +77,13 @@ R2|lights.cpp|XLight1Group|float-to-int cast in loop body
 R2|lights.cpp|XLight1Group|float-to-int cast in loop body
 R2|lights.cpp|XLight1Group|float-to-int cast in loop body
 R2|lights.cpp|XLight1Group|float-to-int cast in loop body
-R2|polys.cpp|PolyDispGroupClipped|float-to-int cast in loop body
-R2|polys.cpp|PolyDispGroupClipped|float-to-int cast in loop body
-R2|polys.cpp|PolyDispGroupUnclipped|float-to-int cast in loop body
-R2|polys.cpp|PolyDispGroupUnclipped|float-to-int cast in loop body
-R2|polys.cpp|SavePolys|float-to-int cast in loop body
-R2|polys.cpp|SavePolys|float-to-int cast in loop body
-R2|polys.cpp|SavePolys|float-to-int cast in loop body
+R2|polys.cpp|disp_group_clipped|float-to-int cast in loop body
+R2|polys.cpp|disp_group_clipped|float-to-int cast in loop body
+R2|polys.cpp|disp_group_unclipped|float-to-int cast in loop body
+R2|polys.cpp|disp_group_unclipped|float-to-int cast in loop body
+R2|polys.cpp|save|float-to-int cast in loop body
+R2|polys.cpp|save|float-to-int cast in loop body
+R2|polys.cpp|save|float-to-int cast in loop body
 R2|polys.cpp|SolidPolyDispGroupClipped|float-to-int cast in loop body
 R2|polys.cpp|SolidPolyDispGroupClipped|float-to-int cast in loop body
 R2|polys.cpp|SolidPolyDispGroupUnclipped|float-to-int cast in loop body
@@ -190,8 +190,8 @@ R7|oct2.cpp|RenderCurrentCameraInStereo|float division inner_loop=false
 R7|oct2.cpp|RenderScene|float division inner_loop=false
 R7|oct2.cpp|RenderScene|float division inner_loop=false
 R7|oct2.cpp|RenderScene|float division inner_loop=false
-R7|polys.cpp|ProcessPolys|float division in hot loop
-R7|polys.cpp|ProcessPolys|float division in hot loop
+R7|polys.cpp|process|float division in hot loop
+R7|polys.cpp|process|float division in hot loop
 R7|primary.cpp|process|float division in hot loop
 R7|primary.cpp|process|float division in hot loop
 R7|primary.cpp|process|float division in hot loop

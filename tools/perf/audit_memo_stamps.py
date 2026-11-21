@@ -24,11 +24,13 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from gates_vfp import find_source  # noqa: E402  (files are keyed by basename)
 
-# file -> {function: expected SMEMO_PASS_* constant}
+# file -> {function: expected SMEMO_PASS_* constant}. A class member is keyed
+# Class::member (polys.cpp's fills are PolyPool members; PolyDispGroupClipped
+# and PolyDispGroupUnclipped are one-line forwarders to them).
 REQUIRED = {
     "polys.cpp": {
-        "PolyDispGroupClipped": "SMEMO_PASS_POLYS_CLIPPED",
-        "PolyDispGroupUnclipped": "SMEMO_PASS_POLYS_UNCLIPPED",
+        "PolyPool::disp_group_clipped": "SMEMO_PASS_POLYS_CLIPPED",
+        "PolyPool::disp_group_unclipped": "SMEMO_PASS_POLYS_UNCLIPPED",
     },
     "2dpolys.cpp": {
         "FmPolyDispGroupClipped": "SMEMO_PASS_FM_CLIPPED",
@@ -48,12 +50,13 @@ ALLOWLIST = {
 SCAN_FILES = ["polys.cpp", "2dpolys.cpp", "lines.cpp", "screenpolys.cpp",
               "transexe.cpp", "water.cpp", "mxaload.cpp", "mxload.cpp", "mload.cpp"]
 
-FUNC_RE = re.compile(r"^bool\s+([A-Za-z_]\w*)\s*\(", re.MULTILINE)
+FUNC_RE = re.compile(r"^bool\s+((?:[A-Za-z_]\w*::)?[A-Za-z_]\w*)\s*\(", re.MULTILINE)
 FILL_HINT_RE = re.compile(r"FSLockVertexBuffer|textureGroups\[|numTextureGroups\s*=\s*0")
 
 
 def function_bodies(text):
-    """Yield (name, body) using brace matching from each `bool name(`."""
+    """Yield (name, body) using brace matching from each `bool name(` or
+    `bool Class::name(`."""
     for m in FUNC_RE.finditer(text):
         brace = text.find("{", m.end())
         if brace < 0:
@@ -101,7 +104,8 @@ def main():
     for (fname, name), body in bodies.items():
         if (fname, name) in stamped or name in ALLOWLIST:
             continue
-        if "DispGroup" not in name and "DispSolid" not in name and "DispNonSolid" not in name:
+        if ("DispGroup" not in name and "DispSolid" not in name and "DispNonSolid" not in name
+                and "disp_group" not in name):
             continue
         if not FILL_HINT_RE.search(body):
             continue

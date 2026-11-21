@@ -29,17 +29,57 @@
 	Globals
 ===================================================================*/
 POLY		Polys[ MAXPOLYS ];
-u_int16_t		FirstPolyUsed;
-u_int16_t		FirstPolyFree;
 u_int32_t		TotalPolysInUse = 0;
-TPAGEINFO	PolyTPages[ MAXTPAGESPERTLOAD + 1 ];
+
+namespace {
+
+/* The Polys[] pool's private bookkeeping (one instance, g_polys):
+ * - the used and free list heads through Polys[];
+ * - each texture page's chain through the pool, which the fills walk and
+ *   fill in with that page's vertex counts;
+ * - ProcessPolys' scratch copy of the shield corners, scaled before they are
+ *   moved to the ship.
+ * Reset by InitPolys with the scene, changed as polys are found and killed
+ * (weapons, the title screen, the afterburners), walked each frame by
+ * ProcessPolys and by every fill, and saved with the game. Polys[] and
+ * TotalPolysInUse stay global (weapons, the title screen, oct2 and the saved
+ * game use them). */
+class PolyPool {
+	public:
+	void      init();
+	u_int16_t find_free();
+	void      kill_used( u_int16_t i );
+	void      process();
+	void      init_tpages();
+	void      add_to_tpage( u_int16_t i, int16_t TPage );
+	void      remove_from_tpage( u_int16_t i, int16_t TPage );
+	bool      display_group_clipped( RENDEROBJECT *renderObject, u_int16_t Group );
+	bool      display_group_unclipped( RENDEROBJECT *renderObject );
+	bool      disp_group_clipped( u_int16_t Group, RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * NextPoly );
+	bool      disp_group_unclipped( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * NextPoly );
+	FILE     *save( FILE * fp );
+	FILE     *restore( FILE * fp );
+
+	private:
+	/* Static, so it keeps its own address as the global did. As an instance
+	 * member at offset 0 it puts the list heads 408 bytes in, past
+	 * ldrh/strh's 255-byte reach (KillUsedPoly 55 -> 57 instructions). */
+	static TPAGEINFO PolyTPages[ MAXTPAGESPERTLOAD + 1 ];
+	u_int16_t FirstPolyUsed = 0;
+	u_int16_t FirstPolyFree = 0;
+	VECTOR    NewShieldVerts[ 4 ] = {};
+};
+
+TPAGEINFO PolyPool::PolyTPages[ MAXTPAGESPERTLOAD + 1 ];
+
+} // namespace
 
 /*===================================================================
 	Procedure	:	Init poly structures
 	Input		:	Nothing
 	Output		:	Nothing
 ===================================================================*/
-void InitPolys( void )
+void PolyPool::init()
 {
 	int i;
 
@@ -68,7 +108,7 @@ void InitPolys( void )
 	Input		:	Nothing
 	Output		:	u_int16_t	Number of the free Poly
 ===================================================================*/
-u_int16_t FindFreePoly( void )
+u_int16_t PolyPool::find_free()
 {
 	u_int16_t i;
 
@@ -92,7 +132,7 @@ u_int16_t FindFreePoly( void )
 	Input		:	u_int16_t		Number of Poly to free....
 	Output		:	Nothing
 ===================================================================*/
-void KillUsedPoly( u_int16_t i )
+void PolyPool::kill_used( u_int16_t i )
 {
 	u_int16_t	its_prev;
 	u_int16_t	its_next;
@@ -125,9 +165,7 @@ VECTOR	ShieldVerts[ 4 ] = {
 			{ ( +128.0F * GLOBAL_SCALE ), ( +128.0F * GLOBAL_SCALE ), ( 300.0F * GLOBAL_SCALE ) },
 			{ ( -128.0F * GLOBAL_SCALE ), ( +128.0F * GLOBAL_SCALE ), ( 300.0F * GLOBAL_SCALE ) } };
 
-VECTOR	NewShieldVerts[ 4 ];
-
-void ProcessPolys( void )
+void PolyPool::process()
 {
 	u_int16_t	i;
 	u_int16_t	nextpoly;
@@ -378,11 +416,26 @@ void ProcessPolys( void )
 constexpr auto MAX_AFTERBURNER_LENGTH = ( 512.0F * GLOBAL_SCALE );
 constexpr auto AFTERBURNER_INC = ( 30.0F * GLOBAL_SCALE );
 
-static	u_int16_t	TurboIndex[ MAX_PLAYERS ];
-static	float	TurboLength[ MAX_PLAYERS ];
-static	float	FlameDiameter = ( 128.0F * GLOBAL_SCALE );
+namespace {
 
-void InitAfterBurners( void )
+/* Each ship's afterburner flame (one instance, g_afterburners): the Polys[]
+ * entry it is drawn with and its current length. Reset by InitAfterBurners
+ * with the scene; DoAfterBurnerEffects grows, shrinks and kills each flame
+ * every frame from the ship's SHIP_Turbo flag. */
+class AfterBurners {
+	public:
+	void init();
+	void update();
+
+	private:
+	u_int16_t TurboIndex[ MAX_PLAYERS ] = {};
+	float     TurboLength[ MAX_PLAYERS ] = {};
+	float     FlameDiameter = ( 128.0F * GLOBAL_SCALE );
+};
+
+} // namespace
+
+void AfterBurners::init()
 {
 	int16_t	Count;
 
@@ -393,7 +446,7 @@ void InitAfterBurners( void )
 	}
 }
 
-void DoAfterBurnerEffects( void )
+void AfterBurners::update()
 {
 	VECTOR	DirVector;
 	VECTOR	LeftVector;
@@ -527,7 +580,7 @@ void DoAfterBurnerEffects( void )
 	Input		:	Nothing
 	Output		:	Nothing
 ===================================================================*/
-void InitPolyTPages( void )
+void PolyPool::init_tpages()
 {
 	u_int16_t	i;
 
@@ -543,7 +596,7 @@ void InitPolyTPages( void )
 				:	u_int16_t		TPage to add to
 	Output		:	Nothing
 ===================================================================*/
-void AddPolyToTPage( u_int16_t i, int16_t TPage )
+void PolyPool::add_to_tpage( u_int16_t i, int16_t TPage )
 {
 	if( TPage == -1 ) TPage = MAXTPAGESPERTLOAD;
 
@@ -564,7 +617,7 @@ void AddPolyToTPage( u_int16_t i, int16_t TPage )
 				:	u_int16_t		TPage to remove from
 	Output		:	Nothing
 ===================================================================*/
-void RemovePolyFromTPage( u_int16_t i, int16_t TPage )
+void PolyPool::remove_from_tpage( u_int16_t i, int16_t TPage )
 {
 	if( TPage == -1 ) TPage = MAXTPAGESPERTLOAD;
 
@@ -586,7 +639,7 @@ void RemovePolyFromTPage( u_int16_t i, int16_t TPage )
 	Polys[ i ].NextInTPage = INDEX_NONE;
 }
 
-bool DisplayGroupClippedPolys(RENDEROBJECT *renderObject, u_int16_t Group )
+bool PolyPool::display_group_clipped(RENDEROBJECT *renderObject, u_int16_t Group )
 {
 	int16_t	TPage;
 	u_int16_t	i;
@@ -609,7 +662,7 @@ bool DisplayGroupClippedPolys(RENDEROBJECT *renderObject, u_int16_t Group )
 	return( false );
 }
 
-bool DisplayGroupUnclippedPolys( RENDEROBJECT *renderObject )
+bool PolyPool::display_group_unclipped( RENDEROBJECT *renderObject )
 {
 	int16_t	TPage;
 	u_int16_t	i;
@@ -642,7 +695,7 @@ bool DisplayGroupUnclippedPolys( RENDEROBJECT *renderObject )
 	Output		:	true if a batch was filled and should be drawn
 ===================================================================*/
 
-bool PolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * NextPoly )
+bool PolyPool::disp_group_clipped( u_int16_t Group, RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * NextPoly )
 {
 	/* opt5b memo epoch: stamp this fill's content identity. */
 	renderObject->memoEpochPass = SMEMO_PASS_POLYS_CLIPPED;
@@ -878,7 +931,7 @@ bool PolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int16_t 
 				:	u_int16_t	*					Current Poly (in/out)
 	Output		:	true if a batch was filled and should be drawn
 ===================================================================*/
-bool PolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * NextPoly )
+bool PolyPool::disp_group_unclipped( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * NextPoly )
 {
 	/* opt5b memo epoch: whole-scene fill (no single group). */
 	renderObject->memoEpochPass = SMEMO_PASS_POLYS_UNCLIPPED;
@@ -1108,7 +1161,7 @@ bool PolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u_int1
 	Input		:	FILE	*	File Pointer
 	Output		:	FILE	*	Updated File Pointer
 ===================================================================*/
-FILE * SavePolys( FILE * fp )
+FILE * PolyPool::save( FILE * fp )
 {
 	u_int16_t	i;
 	int16_t	Frm_Info_Index;
@@ -1176,7 +1229,7 @@ FILE * SavePolys( FILE * fp )
 	Input		:	FILE	*	File Pointer
 	Output		:	FILE	*	Updated File Pointer
 ===================================================================*/
-FILE * LoadPolys( FILE * fp )
+FILE * PolyPool::restore( FILE * fp )
 {
 	u_int16_t	i;
 	int16_t	Frm_Info_Index;
@@ -1245,3 +1298,29 @@ FILE * LoadPolys( FILE * fp )
 
 	return( fp );
 }
+
+namespace {
+PolyPool     g_polys;
+AfterBurners g_afterburners;
+}
+
+void InitPolys( void ) { g_polys.init(); }
+/* Out of line, as they were before the class: weapons, the title screen,
+ * ProcessPolys and the per-frame afterburners call them per poly, so
+ * inlining them (or branching through to a clone) would bulk up those
+ * callers. */
+[[gnu::noinline]] u_int16_t FindFreePoly( void ) { return g_polys.find_free(); }
+[[gnu::noinline]] void KillUsedPoly( u_int16_t i ) { g_polys.kill_used( i ); }
+void ProcessPolys( void ) { g_polys.process(); }
+void InitAfterBurners( void ) { g_afterburners.init(); }
+void DoAfterBurnerEffects( void ) { g_afterburners.update(); }
+void InitPolyTPages( void ) { g_polys.init_tpages(); }
+void AddPolyToTPage( u_int16_t i, int16_t TPage ) { g_polys.add_to_tpage( i, TPage ); }
+/* Out of line, as it was: KillUsedPoly calls it for every poly it kills. */
+[[gnu::noinline]] void RemovePolyFromTPage( u_int16_t i, int16_t TPage ) { g_polys.remove_from_tpage( i, TPage ); }
+bool DisplayGroupClippedPolys( RENDEROBJECT *renderObject, u_int16_t Group ) { return g_polys.display_group_clipped( renderObject, Group ); }
+bool DisplayGroupUnclippedPolys( RENDEROBJECT *renderObject ) { return g_polys.display_group_unclipped( renderObject ); }
+bool PolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * NextPoly ) { return g_polys.disp_group_clipped( Group, renderObject, TPage, NextPoly ); }
+bool PolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * NextPoly ) { return g_polys.disp_group_unclipped( renderObject, TPage, NextPoly ); }
+FILE * SavePolys( FILE * fp ) { return g_polys.save( fp ); }
+FILE * LoadPolys( FILE * fp ) { return g_polys.restore( fp ); }
