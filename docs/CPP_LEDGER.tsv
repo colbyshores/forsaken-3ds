@@ -33,17 +33,17 @@ camera	forsaken_core/src/game/camera.cpp	cpp	c7aa8fe	cdc2f72 RemoteCameraSet (pr
 checkenemy	forsaken_core/src/game/checkenemy.cpp	cpp	e438230	todo	test_checkhitenemy	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
 compobjects	forsaken_core/src/game/compobjects.cpp	cpp	f151bc2	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
 demo	forsaken_core/src/game/demo.cpp	cpp	5d340cc	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
-enemies	forsaken_core/src/game/enemies.cpp	cpp	e5af6fc	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+enemies	forsaken_core/src/game/enemies.cpp	cpp	e5af6fc	a4ceb07 EnemyPool (private part)	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
 extforce	forsaken_core/src/game/extforce.cpp	cpp	c321b0d	8c89172 ExternalForceSet (private part)	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	exported ExternalForces[] remains a global
 goal	forsaken_core/src/game/goal.cpp	cpp	61d7466	bf3c5d4 GoalZones (full)	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	exported TeamFlag[] remains a global
 main	forsaken_core/src/game/main.cpp	cpp	3568753	todo	-	A/B REQUIRED (C->C++ front end changes codegen)	was C (platform/backend TU) until the extern "C" removal
-models	forsaken_core/src/game/models.cpp	cpp	222509b	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+models	forsaken_core/src/game/models.cpp	cpp	222509b	099cde6 ModelPool+EngineSpeeds (private part)	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
 oct2	forsaken_core/src/game/oct2.cpp	cpp	4f65e74	todo	-	PASS fid-ab-20261116 (tier3)	
 pickups	forsaken_core/src/game/pickups.cpp	cpp	5ab8bbd	94844c0 PickupPool (private part)	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
 primary	forsaken_core/src/game/primary.cpp	cpp	60819fb	219474c PrimaryWeapons (private part)	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	BEHAVIOUR FIX pending A/B: ModelHeaders/MxaModelHeaders extern were arrays over heap pointers since the Q3 refactor (OWNER_MODELSPOTFX bullets read SpotFX from the wrong base)
 restart	forsaken_core/src/game/restart.cpp	cpp	9d21b80	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
 secondary	forsaken_core/src/game/secondary.cpp	cpp	4eda836	11a0674 SecondaryWeapons (private part)	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
-ships	forsaken_core/src/game/ships.cpp	cpp	6e3a4c6	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+ships	forsaken_core/src/game/ships.cpp	cpp	6e3a4c6	eeee920 ShipUpdate+KillTaunts (private part)	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
 singleplayer	forsaken_core/src/game/singleplayer.cpp	cpp	b1a6bc2	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
 skin	forsaken_core/src/game/skin.cpp	cpp	b1c7b01	d958578 SkinViews (private part)	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
 spotfx	forsaken_core/src/game/spotfx.cpp	cpp	57e292f	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
@@ -59,11 +59,11 @@ quat	forsaken_core/src/math/quat.cpp	cpp	bf5252c	done 610fa35	test_quat	P1 trans
 sphere	forsaken_core/src/math/sphere.cpp	cpp	26191fa	todo	test_sphere,test_checkhitenemy	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
 multiplayer	forsaken_core/src/net/multiplayer.cpp	cpp	7a9548f	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
 networking	forsaken_core/src/net/networking.cpp	cpp	df67b8d	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
-2dpolys	forsaken_core/src/rendering/2dpolys.cpp	cpp	279d155	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+2dpolys	forsaken_core/src/rendering/2dpolys.cpp	cpp	279d155	b39a456 FmPolyPool (private part)	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
 2dtextures	forsaken_core/src/rendering/2dtextures.cpp	cpp	5905126	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
 lights	forsaken_core/src/rendering/lights.cpp	cpp	a65ed11	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
 lines	forsaken_core/src/rendering/lines.cpp	cpp	a55c06e	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
-polys	forsaken_core/src/rendering/polys.cpp	cpp	9634a58	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+polys	forsaken_core/src/rendering/polys.cpp	cpp	9634a58	1cdfe05 PolyPool+AfterBurners (private part)	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
 rtlight	forsaken_core/src/rendering/rtlight.cpp	cpp	ce745ae	13a1278 RealTimeLights	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
 screenpolys	forsaken_core/src/rendering/screenpolys.cpp	cpp	75cc934	ad99661 ScrPolyPool+CountdownClock (private part)	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
 stereomemo	forsaken_core/src/rendering/stereomemo.cpp	cpp	3bd8416	todo	test_stereomemo	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
@@ -79,7 +79,7 @@ timer	forsaken_core/src/util/timer.cpp	cpp	12e46c1	todo	-	transitive (ramqan ben
 util	forsaken_core/src/util/util.cpp	cpp	6836f6b	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
 xmem	forsaken_core/src/util/xmem.cpp	cpp	12e46c1	b1b83e4 XMemTracker XMem (full)	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
 bsp	forsaken_core/src/world/bsp.cpp	cpp	697102f	409ff80 BspRay (private part)	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
-collision	forsaken_core/src/world/collision.cpp	cpp	372c223	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+collision	forsaken_core/src/world/collision.cpp	cpp	372c223	f22ee24 CollisionQuery+FeelerSweep (private part)	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
 node	forsaken_core/src/world/node.cpp	cpp	63f93d5	b1905a5 NodeRoutes (private part)	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
 visi	forsaken_core/src/world/visi.cpp	cpp	386542d	11b4ee0 Visibility (private part)	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
 music_3ds	forsaken_3ds/src/audio/music_3ds.cpp	cpp	3568753	done c58f4b1	-	P2: on-device listen pending (start, loop, level change, title)	was C (platform/backend TU) until the extern "C" removal
