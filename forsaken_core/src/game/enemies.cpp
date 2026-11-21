@@ -461,9 +461,37 @@ int16_t		NumInitEnemies;
 int16_t		NumKilledEnemies = 0;
 ENEMY		Enemies[ MAXENEMIES ];
 ENEMY	*	EnemyGroups[ MAXGROUPS ];
-u_int16_t		NumEnemiesPerGroup[ MAXGROUPS ];
 ENEMY	*	FirstEnemyUsed = nullptr;
-ENEMY	*	FirstEnemyFree = nullptr;
+
+namespace {
+
+/* The Enemies[] pool's private bookkeeping (one instance, g_enemypool): the
+ * free-list head and the per-group counts. Reset with the level, changed as
+ * enemies are made, die and move between groups, and saved with the game.
+ * Enemies[], FirstEnemyUsed and EnemyGroups[] stay global (the AI, weapons,
+ * models and collision walk them). */
+class EnemyPool {
+	public:
+	void   init();
+	ENEMY *find_free();
+#ifdef DEBUG_ON
+	void   kill_used( ENEMY * Object, const char *in_file, int in_line );
+#else
+	void   kill_used( ENEMY * Object );
+#endif
+	void   release_all();
+	void   setup_groups();
+	void   add_to_group( ENEMY * Enemy, u_int16_t Group );
+	void   remove_from_group( ENEMY * Enemy, u_int16_t Group );
+	bool   save( FILE * fp );
+	bool   restore( FILE * fp );
+
+	private:
+	u_int16_t NumEnemiesPerGroup[ MAXGROUPS ] = {};
+	ENEMY *   FirstEnemyFree = nullptr;
+};
+
+} // namespace
 
 ANIM_SEQ	PulseTurretSeqs[] = {
 	{ 0.0F * ANIM_SECOND, 0.0F * ANIM_SECOND },	// Closed
@@ -3975,7 +4003,7 @@ float ObjectAutoLevelRot( OBJECT * Object, float autolevel_rate )
 	Input		:	nothing
 	Output		:	nothing
 ===================================================================*/
-void InitEnemies( void )
+void EnemyPool::init()
 {
 	u_int16_t	i;
 
@@ -4009,7 +4037,7 @@ void InitEnemies( void )
 	Input		:	nothing
 	Output		:	ENEMY	*	Object ( NULL if not available )
 ===================================================================*/
-ENEMY * FindFreeEnemy( void )
+ENEMY * EnemyPool::find_free()
 {
 	ENEMY * Object;
 
@@ -4055,9 +4083,9 @@ ENEMY * FindFreeEnemy( void )
 	Output		:	nothing
 ===================================================================*/
 #ifdef DEBUG_ON
-void KillUsedEnemyDebugOn( ENEMY * Object, const char *in_file, int in_line )
+void EnemyPool::kill_used( ENEMY * Object, const char *in_file, int in_line )
 #else
-void KillUsedEnemy( ENEMY * Object )
+void EnemyPool::kill_used( ENEMY * Object )
 #endif
 {
 	ENEMY	*	PrevObject;
@@ -4205,7 +4233,7 @@ void KillUsedEnemy( ENEMY * Object )
 	Input		:	Nothing
 	Output		:	Nothing
 ===================================================================*/
-void ReleaseAllEnemies( void )
+void EnemyPool::release_all()
 {
 	ENEMY	*	Object;
 	ENEMY	*	NextObject;
@@ -7813,7 +7841,7 @@ bool Ship2EnemyCollide( u_int16_t i , VECTOR * Move_Off )
 	Input		:	Nothing
 	Output		:	Nothing
 ===================================================================*/
-void SetupEnemyGroups( void )
+void EnemyPool::setup_groups()
 {
 	int16_t	Count;
 
@@ -7830,7 +7858,7 @@ void SetupEnemyGroups( void )
 				:	u_int16_t		Group
 	Output		:	Nothing
 ===================================================================*/
-void AddEnemyToGroup( ENEMY * Enemy, u_int16_t Group )
+void EnemyPool::add_to_group( ENEMY * Enemy, u_int16_t Group )
 {
 	Enemy->PrevInGroup = nullptr;
 	Enemy->NextInGroup = EnemyGroups[ Group ];
@@ -7845,7 +7873,7 @@ void AddEnemyToGroup( ENEMY * Enemy, u_int16_t Group )
 				:	u_int16_t		Group
 	Output		:	Nothing
 ===================================================================*/
-void RemoveEnemyFromGroup( ENEMY * Enemy, u_int16_t Group )
+void EnemyPool::remove_from_group( ENEMY * Enemy, u_int16_t Group )
 {
 	if( Enemy->PrevInGroup ) Enemy->PrevInGroup->NextInGroup = Enemy->NextInGroup;
 	else EnemyGroups[ Group ] = Enemy->NextInGroup;
@@ -9143,7 +9171,7 @@ bool FindPointAboveGround( VECTOR * Pos , u_int16_t Group , VECTOR * NewPos , u_
 	Input		:		FILE * fp
 	Output		:		bool true/false
 ===================================================================*/
-bool Enemy_Save( FILE * fp )
+bool EnemyPool::save( FILE * fp )
 {
 	int i;
 	int e;
@@ -9345,7 +9373,7 @@ bool Enemy_Save( FILE * fp )
 	Input		:		FILE * fp
 	Output		:		bool true/false
 ===================================================================*/
-bool Enemy_Load( FILE * fp )
+bool EnemyPool::restore( FILE * fp )
 {
 	int i;
 	int e;
@@ -9894,3 +9922,19 @@ bool Gun_Load( BYTE HowManyGuns , GUNOBJECT * GO , FILE * fp )
 	}
 	return true;
 }
+
+namespace { EnemyPool g_enemypool; }
+
+void InitEnemies( void ) { g_enemypool.init(); }
+ENEMY * FindFreeEnemy( void ) { return g_enemypool.find_free(); }
+#ifdef DEBUG_ON
+void KillUsedEnemyDebugOn( ENEMY * Object, const char *in_file, int in_line ) { g_enemypool.kill_used( Object, in_file, in_line ); }
+#else
+void KillUsedEnemy( ENEMY * Object ) { g_enemypool.kill_used( Object ); }
+#endif
+void ReleaseAllEnemies( void ) { g_enemypool.release_all(); }
+void SetupEnemyGroups( void ) { g_enemypool.setup_groups(); }
+void AddEnemyToGroup( ENEMY * Enemy, u_int16_t Group ) { g_enemypool.add_to_group( Enemy, Group ); }
+void RemoveEnemyFromGroup( ENEMY * Enemy, u_int16_t Group ) { g_enemypool.remove_from_group( Enemy, Group ); }
+bool Enemy_Save( FILE * fp ) { return g_enemypool.save( fp ); }
+bool Enemy_Load( FILE * fp ) { return g_enemypool.restore( fp ); }
