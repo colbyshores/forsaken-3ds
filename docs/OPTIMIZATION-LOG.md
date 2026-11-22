@@ -2671,3 +2671,99 @@ draw_billboard_object in GL shared backend, memcpy_unaligned/trace
 helpers in util.c, luasocket 3.x loader removal, non-Linux host
 branches (MACOSX/MINGW/DXMOUSE/STATIC/MUDFLAP) deleted. Linux now
 links (projectx); 3DS release + gates green.
+
+---
+
+## 2026-11-21 — RAMqan bench: baselines + three renderer experiments (Old 3DS)
+
+Harness: `harness/current` worktree (ATM_PROFILING build, thin .3dsx + SDMC
+romfs fallback), device `old3ds-lan167` (OG, 268 MHz, L2-off, 64 MB region),
+bench = ramqan slot 19, 30 warmup + 240 measured frames, budget 14084 us.
+Frame time = full aptMainLoop iteration (includes the vblank wait).
+
+### Baselines (master ea97b53d + instrumentation)
+
+| config | avg_us | p50_us | max_us | over_budget | draws/fr | verts/fr | full_clears/fr | linear_free_end |
+|---|---|---|---|---|---|---|---|---|
+| mono (slider pinned off) | 34162 | 32000 | 57207 | 240/240 | 58.9 | 11853 | 2.31 | 887 KB |
+| stereo (slider pinned on) | 44569 | 32000 | 70171 | 240/240 | 109.3 | 18453 | 4.57 | 835 KB |
+
+Stereo memo on the stereo run: 12144 hits / 27023 misses (31% hit).
+sync_us (C3D_FrameSync vblank wait) = 7.5 ms/frame mono — the frame is
+CPU-bound (~26 ms work) with the GPU work largely hidden behind the wait.
+
+### Experiments (mono, knobs in harness Makefile)
+
+1. CLEAR_MEMO=1 — camera full clear skipped when the scene-start/eye-switch
+   clear already wiped the same target with identical values and nothing
+   drew since (memo dirtied by every draw/partial clear).
+   full_clears 554 -> 277 (277 skips). avg_us 34162 -> 34159: WALL NEUTRAL
+   (GPU clear cost absorbed by the vblank wait). Pixels identical by
+   construction. Not merged (no wall win); knob kept in harness.
+2. FLARE_ONCE=1 — lens-flare generators run only on 2D passes that can draw
+   flares (not the bottom-HUD pass). draws/fr 58.9 -> 57.4, verts/fr
+   -310. avg_us 34162 -> 34087: WALL NEUTRAL (within noise band
+   34087-34349 observed across runs). Not merged; knob kept.
+ 3. RECLAIM_BUFS=1 — RenderBufs[1] (no consumer in the tree) not allocated;
+    RenderBufs[0] sized 32767 -> 800 verts (line batcher caps at 400 lines
+    = 800 verts, lines.cpp). linear_free_kb_end 887 -> 2002 KB (+1.09 MB).
+    Wall neutral. MERGED to perf/ramqan-2026-11-21 (memory win, zero
+    behavioral risk).
+   Hardware validation of the unconditional production change (Old 3DS,
+   ramqan slot 19 mono, same checkpoint): paired memory runs membase vs
+   memcand, linear_free_kb_end 887 -> 2002 KB (+1115 KB), avg_us 34230 vs
+   34449 (within the 0.8% noise band). Line-batcher boundary with the
+   800-vert buffer, lines spawned in the camera group at bench entry
+   (ATM_LINE_TEST): 400 lines -> line_batches 270, line_verts 216000
+   (exactly one 800-vert batch per frame x 270 frames); 401 lines ->
+   540 batches, 216540 verts (800 + 2 per frame). Every line accounted
+   exactly once across the batch split.
+
+Scratch binding: scratch_binds == draws (every C3D_DrawArrays needs its own
+C3D_GetBufInfo per citro3d semantics — the dirty mark is cleared by the
+draw). No reduction possible without citro3d API change; batching already
+minimizes draw count. No experiment run.
+
+### Steam-vent audit (2026-11-22, same bench, pose = autoboot spawn)
+
+Build IDs (harness ATM builds): A-counters (counters only), B-ventskip
+(omit hidden-tag billboard quads at submission), C-worldskip (suppress all
+world draw submissions; HUD and clears kept). Pose: autoboot spawn, ramqan
+slot 19, mono, 30 warmup + 240 measured frames (~9.6 s window). Raw
+captures: host /tmp/kilo/vent_A_result.txt, vent_B_r1.txt, vent_C_r1.txt,
+vent_Ap_frames.txt (270-row per-frame CSV).
+
+- ramqan.fx contains no SPOTFX_Steam emitters; the vent visuals are Flame
+  (grp 45 cluster near spawn, grp 6), FireWall (grp 5/24) and Smoke (grp
+  4/14/25/28) emitters.
+- SpotFXTimed admits: 1670 via IsGroupVisible, 201 via VisibleOverlap only
+  (emitter group hidden from the camera). 191 hidden-tagged puffs spawned,
+  ~10.6 live per frame, updated every frame (~0.4 ms/frame total FmPoly
+  update, all puffs).
+- Zero tagged hidden puffs reached the billboard fill: FmPolyInFill rejects
+  hidden-group, non-DONTCLIP polys in both the clipped and unclipped
+  passes, so hidden vent billboards are never submitted. B therefore
+  skipped 0 quads and measured 34.087-34.225 ms — identical to A within
+  the noise band. The GPU receives no billboards for hidden vents.
+- C (all world draws suppressed): avg 32.147 ms vs A 34.224-34.500 ms —
+  2.08-2.35 ms of elapsed frame time recovered with HUD, clears and pacing
+  active. Submitted triangles fell 933668 -> 62108. GPU world work is
+  ~2.4 ms of the 34.5 ms frame; the remainder is CPU simulation/prep plus
+  the ~7.7 ms vblank wait. GPU duration itself remains unverified by this
+  elapsed-time comparison (no GPU timer on this build).
+
+### Verdict
+
+All three experiments are wall-time neutral on the mono bench: the frame is
+dominated by ~26 ms of CPU gameplay/render-prep work plus a ~7.5 ms vblank
+wait that absorbs GPU-side savings. Only the memory reclaim (1.09 MB linear)
+is a measured win and is merged. A/B/A bracket: mono avg across four
+independent runs spanned 34087-34349 us (0.8%), so sub-1% deltas are noise.
+Fidelity: clear-memo and flare-once are pixel-identical by construction
+(filtered/skipped work); owner play test not required for the merged change
+(allocation-size only). The steam-vent audit found zero hidden-vent billboard
+submissions at the spawn pose (visibility gate already excludes them), so
+there is no GPU-side vent cost to reclaim; the all-world-draw control bounds
+total GPU world work at 2.08-2.35 ms elapsed. The Ramqan slowdown is
+CPU-side and remains unattributed. Hot corpus remains provisional — this
+bench is the first hardware capture; corpus update is a follow-up.
