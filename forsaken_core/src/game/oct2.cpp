@@ -4350,9 +4350,13 @@ void InitRenderBufs()
 	int i;
 	DebugPrintf("InitRenderBufs\n");
 	ReleaseRenderBufs();
-	// just vertex data
-	FSCreateDynamicVertexBuffer(&RenderBufs[0], BATCH_BUFFER_VERTS);
-	FSCreateDynamicVertexBuffer(&RenderBufs[1], BATCH_BUFFER_VERTS);
+	/* Slot 1 has no consumer anywhere in the tree (ExecuteLines uses slot
+	 * 0 only), and the line batcher caps every batch at 400 lines = 800
+	 * verts (lines.cpp Execute), so slot 0 does not need the full
+	 * dynamic-buffer capacity. Reclaims ~1.5 MB of linear heap versus
+	 * the previous 32767-vertex pair (measured +1.09 MB linear headroom
+	 * at bench teardown, Old 3DS, ramqan mono bench 2026-11-21). */
+	FSCreateDynamicVertexBuffer(&RenderBufs[0], 800);
 	// index data as well
 	FSCreateDynamicVertexBuffer(&RenderBufs[2], BATCH_BUFFER_VERTS);
 	FSCreateDynamicIndexBuffer(&RenderBufs[2], BATCH_BUFFER_VERTS * 3);
