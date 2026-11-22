@@ -1,9 +1,12 @@
 /* input_3ds.cpp -- input.h for the 3DS: HID buttons and sticks
  *
  * The 3DS presents as one joystick. handle_events runs once per frame: it
- * reads HID, writes the circle pad to axes 0/1 and the C-stick to the axes
- * the remap settings choose, each scaled to the engine's +-100 range by its
- * own sensitivity with the axis deadzone (Swap Sticks exchanges their roles); drives joystick button slots 0-15 from the user-rebindable
+ * reads HID and routes the analog sticks to fixed engine axes — the circle
+ * pad drives movement (thrust on the MoveForward axis, strafe on the
+ * SlideLeft axis) and the C-stick drives look (yaw on RotateLeft, pitch on
+ * RotateUp), each scaled to the engine's +-100 range and gated by the axis
+ * deadzone; Swap Sticks exchanges the two sticks' roles. It drives joystick
+ * button slots 0-15 from the user-rebindable
  * bindings in controls_3ds.cpp (slot = controls_action_t); reports the D-pad
  * as POV hat 0; and fakes SDL key codes (RETURN, ESCAPE, arrows) for the
  * menus in input_buffer and _3ds_key_state. config.cpp maps those slots and
@@ -146,10 +149,6 @@ mouse_state_t* read_mouse(void)
  * We do the same: map ±155 to ±100. */
 constexpr auto CPAD_SCALE = (100.0f / 155.0f);
 
-/* Keep a scaled stick value inside the engine's ±100 axis range, so a
- * sensitivity above 1.0 steepens the curve without overflowing it. */
-long clamp_axis(long v) { return v > 100 ? 100 : (v < -100 ? -100 : v); }
-
 bool HidPoller::poll()
 {
 	circlePosition cpad;
@@ -239,41 +238,30 @@ bool HidPoller::poll()
 	hidCircleRead(&cpad);
 	hidCstickRead(&cstick);
 
-	/* Circle pad and C-stick each drive a pair of engine axes, scaled to
-	 * ±100 with per-stick sensitivity. By default both target the look
-	 * axes (0=yaw, 1=pitch): the C-stick only writes when deflected past
-	 * the deadzone, so at rest it leaves the circle pad in charge and the
-	 * two never fight. Swap Sticks exchanges the two sticks' axis roles. */
+	/* The circle pad drives movement and the C-stick drives look; Swap
+	 * Sticks exchanges the two. The engine axes are fixed in config.cpp:
+	 *   AXIS_XAxis  -> RotateLeft  (yaw)     AXIS_ZAxis  -> MoveForward
+	 *   AXIS_YAxis  -> RotateUp    (pitch)   AXIS_RxAxis -> SlideLeft (strafe)
+	 * Signs match the digital buttons in control_ship(): stick up = forward,
+	 * stick right = strafe right, stick right = look right, stick up = look
+	 * up. Values are scaled to the engine's +-100 range and gated by the
+	 * axis deadzone (the engine applies no deadzone of its own). */
 	{
-		float pad_sens  = controls_3ds_cpad_sensitivity();
-		float cs_sens   = controls_3ds_cstick_sensitivity();
-		int   swap      = controls_3ds_swap_sticks();
-		int   cs_x_axis = controls_3ds_cstick_axis_x();
-		int   cs_y_axis = controls_3ds_cstick_axis_y();
-
-		long ax0 = clamp_axis((long)(cpad.dx   * CPAD_SCALE * pad_sens));
-		long ax1 = clamp_axis((long)(-cpad.dy  * CPAD_SCALE * pad_sens));  /* invert Y */
-		long sx  = clamp_axis((long)(cstick.dx  * CPAD_SCALE * cs_sens));
-		long sy  = clamp_axis((long)(-cstick.dy * CPAD_SCALE * cs_sens));
-		if (controls_3ds_cstick_invert_x()) sx = -sx;
-		if (controls_3ds_cstick_invert_y()) sy = -sy;
-
-		/* With swap, the circle pad drives the C-stick's axes and vice versa. */
-		int pad_x_axis = swap ? cs_x_axis : 0;
-		int pad_y_axis = swap ? cs_y_axis : 1;
-		int csx_axis   = swap ? 0 : cs_x_axis;
-		int csy_axis   = swap ? 1 : cs_y_axis;
-
+		int swap = controls_3ds_swap_sticks();
+		const circlePosition *mv = swap ? &cstick : &cpad;   /* movement stick */
+		const circlePosition *lk = swap ? &cpad   : &cstick; /* look stick     */
 		deadzone = JoystickInfo[0].Axis[0].deadzone;
+
+		long fwd    = (long)( mv->dy  * CPAD_SCALE);  /* up (-dy) -> forward      */
+		long strafe = (long)( mv->dx  * CPAD_SCALE);  /* right    -> strafe right */
+		long yaw    = (long)( lk->dx  * CPAD_SCALE);  /* right    -> look right   */
+		long pitch  = (long)( -lk->dy * CPAD_SCALE);  /* up (-dy) -> look up      */
+
 		memset(joy_axis_state[0], 0, sizeof(joy_axis_state[0]));
-		if (pad_x_axis >= 0 && pad_x_axis < MAX_JOYSTICK_AXIS && abs(ax0) > deadzone)
-			joy_axis_state[0][pad_x_axis] = ax0;
-		if (pad_y_axis >= 0 && pad_y_axis < MAX_JOYSTICK_AXIS && abs(ax1) > deadzone)
-			joy_axis_state[0][pad_y_axis] = ax1;
-		if (csx_axis >= 0 && csx_axis < MAX_JOYSTICK_AXIS && abs(sx) > deadzone)
-			joy_axis_state[0][csx_axis] = sx;
-		if (csy_axis >= 0 && csy_axis < MAX_JOYSTICK_AXIS && abs(sy) > deadzone)
-			joy_axis_state[0][csy_axis] = sy;
+		if (abs(fwd)    > deadzone) joy_axis_state[0][AXIS_ZAxis]  = fwd;
+		if (abs(strafe) > deadzone) joy_axis_state[0][AXIS_RxAxis] = strafe;
+		if (abs(yaw)    > deadzone) joy_axis_state[0][AXIS_XAxis]  = yaw;
+		if (abs(pitch)  > deadzone) joy_axis_state[0][AXIS_YAxis]  = pitch;
 	}
 
 	/* ---- buttons ---- */

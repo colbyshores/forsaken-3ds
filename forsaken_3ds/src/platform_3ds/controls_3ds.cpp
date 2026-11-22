@@ -100,26 +100,6 @@ const char * const k_action_labels[CTRL_NUM_ACTIONS] = {
 	"Slide Down",
 };
 
-/* Stick sensitivity is stored in controls.cfg as a whole percent (100 = 1.0)
- * and kept in the struct as a float multiplier. Clamp so a hand-edited or
- * corrupted file can't zero a stick out or make it uncontrollably fast. */
-constexpr float SENS_MIN = 0.10F;
-constexpr float SENS_MAX = 2.00F;
-constexpr float SENS_STEP = 0.10F;
-
-float sens_from_percent(int pct)
-{
-	float v = (float)pct / 100.0F;
-	if (v < SENS_MIN) v = SENS_MIN;
-	if (v > SENS_MAX) v = SENS_MAX;
-	return v;
-}
-
-int percent_from_sens(float s)
-{
-	return (int)(s * 100.0F + 0.5F);
-}
-
 /* The bindings in use (one instance, g_buttons), loaded from and saved to
  * CFG_PATH, and the platform whose defaults "Reset to Default" restores. */
 class ButtonMap {
@@ -174,16 +154,8 @@ void ButtonMap::apply_defaults(bool is_n3ds)
 	 * slide down/up). These rows let the player additionally map them to
 	 * face buttons. */
 
-	/* C-stick defaults: drive the look axes (0=yaw, 1=pitch) like the
-	 * circle pad, non-inverted, neutral sensitivity, sticks not swapped —
-	 * so the New 3DS C-stick / OG Circle Pad Pro looks out of the box. */
-	controls.cstick_axis_x   = 0;
-	controls.cstick_axis_y   = 1;
-	controls.cstick_invert_x = 0;
-	controls.cstick_invert_y = 0;
-	controls.cstick_sensitivity = 1.0F;
-	controls.cpad_sensitivity   = 1.0F;
-	controls.swap_sticks        = 0;
+	/* Sticks are not swapped by default: circle pad moves, C-stick looks. */
+	controls.swap_sticks = 0;
 }
 
 void ButtonMap::parse_line(char *line)
@@ -213,13 +185,7 @@ void ButtonMap::parse_line(char *line)
 			return;
 		}
 	}
-	if      (strcasecmp(key, "cstick_axis_x")   == 0) controls.cstick_axis_x   = atoi(val);
-	else if (strcasecmp(key, "cstick_axis_y")   == 0) controls.cstick_axis_y   = atoi(val);
-	else if (strcasecmp(key, "cstick_invert_x") == 0) controls.cstick_invert_x = atoi(val) ? 1 : 0;
-	else if (strcasecmp(key, "cstick_invert_y") == 0) controls.cstick_invert_y = atoi(val) ? 1 : 0;
-	else if (strcasecmp(key, "cstick_sens")     == 0) controls.cstick_sensitivity = sens_from_percent(atoi(val));
-	else if (strcasecmp(key, "cpad_sens")       == 0) controls.cpad_sensitivity   = sens_from_percent(atoi(val));
-	else if (strcasecmp(key, "swap_sticks")     == 0) controls.swap_sticks        = atoi(val) ? 1 : 0;
+	if      (strcasecmp(key, "swap_sticks") == 0) controls.swap_sticks = atoi(val) ? 1 : 0;
 }
 
 void ButtonMap::init(bool is_n3ds)
@@ -250,13 +216,7 @@ void ButtonMap::save() const
 	for (i = 0; i < CTRL_NUM_ACTIONS; i++) {
 		fprintf(f, "%s=%s\n", k_action_names[i], button_name(controls.button[i]));
 	}
-	fprintf(f, "cstick_axis_x=%d\n",   controls.cstick_axis_x);
-	fprintf(f, "cstick_axis_y=%d\n",   controls.cstick_axis_y);
-	fprintf(f, "cstick_invert_x=%d\n", controls.cstick_invert_x);
-	fprintf(f, "cstick_invert_y=%d\n", controls.cstick_invert_y);
-	fprintf(f, "cstick_sens=%d\n",     percent_from_sens(controls.cstick_sensitivity));
-	fprintf(f, "cpad_sens=%d\n",       percent_from_sens(controls.cpad_sensitivity));
-	fprintf(f, "swap_sticks=%d\n",     controls.swap_sticks);
+	fprintf(f, "swap_sticks=%d\n", controls.swap_sticks);
 	fclose(f);
 }
 
@@ -279,22 +239,14 @@ ButtonMap g_buttons;
  * because the bottom screen can't show every row at once.
  *
  * ROW_AIM_ASSIST adjusts Config.aim_assist_strength (0.00..1.00, 0.05
- * steps); Save & Exit persists it via write_config. The C-stick rows
- * drive the New 3DS C-stick / OG Circle Pad Pro: axis routing (0..3),
- * inversion, and sensitivity (10..200%); Swap Sticks exchanges the
- * circle pad and C-stick axis roles. All persist to controls.cfg. */
+ * steps); Save & Exit persists it via write_config. ROW_SWAP toggles Swap
+ * Sticks (circle pad <-> C-stick roles). All persist to controls.cfg. */
 constexpr int ROW_AIM_ASSIST  = CTRL_NUM_ACTIONS + 0;
-constexpr int ROW_CSTICK_X    = CTRL_NUM_ACTIONS + 1;
-constexpr int ROW_CSTICK_Y    = CTRL_NUM_ACTIONS + 2;
-constexpr int ROW_CSTICK_INVX = CTRL_NUM_ACTIONS + 3;
-constexpr int ROW_CSTICK_INVY = CTRL_NUM_ACTIONS + 4;
-constexpr int ROW_CSTICK_SENS = CTRL_NUM_ACTIONS + 5;
-constexpr int ROW_PAD_SENS    = CTRL_NUM_ACTIONS + 6;
-constexpr int ROW_SWAP        = CTRL_NUM_ACTIONS + 7;
-constexpr int ROW_RESET       = CTRL_NUM_ACTIONS + 8;
-constexpr int ROW_SAVE        = CTRL_NUM_ACTIONS + 9;
-constexpr int ROW_CANCEL      = CTRL_NUM_ACTIONS + 10;
-constexpr int MENU_ROWS       = CTRL_NUM_ACTIONS + 11;
+constexpr int ROW_SWAP        = CTRL_NUM_ACTIONS + 1;
+constexpr int ROW_RESET       = CTRL_NUM_ACTIONS + 2;
+constexpr int ROW_SAVE        = CTRL_NUM_ACTIONS + 3;
+constexpr int ROW_CANCEL      = CTRL_NUM_ACTIONS + 4;
+constexpr int MENU_ROWS       = CTRL_NUM_ACTIONS + 5;
 
 /* The aim-assist row reads/writes the USERCONFIG value the engine uses at
  * runtime; write_config persists it to the main config file
@@ -342,27 +294,7 @@ class RemapMenu {
 /* Rows that fit on the 240px bottom screen below the 3-line header. */
 constexpr int MENU_VISIBLE = 20;
 
-/* Engine-axis labels for the C-stick routing rows. 0/1 are the look axes
- * the circle pad drives; 2/3 are the aux axes (unbound by default). */
-const char *axis_name(int axis)
-{
-	switch (axis) {
-	case 0: return "Yaw";
-	case 1: return "Pitch";
-	case 2: return "Aux 1";
-	case 3: return "Aux 2";
-	default: return "?";
-	}
-}
-
 const char *on_off(int v) { return v ? "ON" : "OFF"; }
-
-float clamp_sens(float v)
-{
-	if (v < SENS_MIN) v = SENS_MIN;
-	if (v > SENS_MAX) v = SENS_MAX;
-	return v;
-}
 
 /* Build the "label value" text for one menu row (no selection marker). */
 void format_row(int row, char *buf, size_t n)
@@ -375,24 +307,6 @@ void format_row(int row, char *buf, size_t n)
 	switch (row) {
 	case ROW_AIM_ASSIST:
 		snprintf(buf, n, "%-15s <%3d%%>", "Aim Assist", (int)(aim_assist_current() * 100.0F + 0.5F));
-		break;
-	case ROW_CSTICK_X:
-		snprintf(buf, n, "%-15s %s", "C-Stick X", axis_name(c.cstick_axis_x));
-		break;
-	case ROW_CSTICK_Y:
-		snprintf(buf, n, "%-15s %s", "C-Stick Y", axis_name(c.cstick_axis_y));
-		break;
-	case ROW_CSTICK_INVX:
-		snprintf(buf, n, "%-15s %s", "C-Stick Inv X", on_off(c.cstick_invert_x));
-		break;
-	case ROW_CSTICK_INVY:
-		snprintf(buf, n, "%-15s %s", "C-Stick Inv Y", on_off(c.cstick_invert_y));
-		break;
-	case ROW_CSTICK_SENS:
-		snprintf(buf, n, "%-15s <%3d%%>", "C-Stick Sens", percent_from_sens(c.cstick_sensitivity));
-		break;
-	case ROW_PAD_SENS:
-		snprintf(buf, n, "%-15s <%3d%%>", "Pad Sens", percent_from_sens(c.cpad_sensitivity));
 		break;
 	case ROW_SWAP:
 		snprintf(buf, n, "%-15s %s", "Swap Sticks", on_off(c.swap_sticks));
@@ -410,12 +324,6 @@ void adjust_row(int row, int dir)
 	controls_3ds_t &c = g_buttons.edit();
 	switch (row) {
 	case ROW_AIM_ASSIST:  aim_assist_adjust(dir * AIM_ASSIST_STEP); break;
-	case ROW_CSTICK_X:    c.cstick_axis_x = (c.cstick_axis_x + dir + 4) % 4; break;
-	case ROW_CSTICK_Y:    c.cstick_axis_y = (c.cstick_axis_y + dir + 4) % 4; break;
-	case ROW_CSTICK_INVX: c.cstick_invert_x = dir > 0 ? 1 : 0; break;
-	case ROW_CSTICK_INVY: c.cstick_invert_y = dir > 0 ? 1 : 0; break;
-	case ROW_CSTICK_SENS: c.cstick_sensitivity = clamp_sens(c.cstick_sensitivity + dir * SENS_STEP); break;
-	case ROW_PAD_SENS:    c.cpad_sensitivity   = clamp_sens(c.cpad_sensitivity + dir * SENS_STEP); break;
 	case ROW_SWAP:        c.swap_sticks = dir > 0 ? 1 : 0; break;
 	default: break;   /* action rows and the reset/save/cancel rows */
 	}
@@ -492,10 +400,6 @@ bool RemapMenu::handle_input(u32 kDown)
 	} else if (kDown & KEY_A) {
 		if (selected < CTRL_NUM_ACTIONS) {
 			rebinding = true;
-		} else if (selected == ROW_CSTICK_INVX) {
-			g_buttons.edit().cstick_invert_x ^= 1;
-		} else if (selected == ROW_CSTICK_INVY) {
-			g_buttons.edit().cstick_invert_y ^= 1;
 		} else if (selected == ROW_SWAP) {
 			g_buttons.edit().swap_sticks ^= 1;
 		} else if (selected == ROW_RESET) {
@@ -507,8 +411,7 @@ bool RemapMenu::handle_input(u32 kDown)
 		} else if (selected == ROW_CANCEL) {
 			cancel_and_close();
 		}
-		/* A on the value rows (aim assist, C-stick axis/sens) is a no-op —
-		 * use LEFT/RIGHT to adjust them. */
+		/* A on the Aim Assist value row is a no-op — use LEFT/RIGHT. */
 	} else if (kDown & KEY_START) {
 		save_and_close();
 	} else if (kDown & KEY_B) {
@@ -559,12 +462,6 @@ u32 controls_3ds_button(controls_action_t action)
 	return g_buttons.button(action);
 }
 
-int controls_3ds_cstick_axis_x(void)   { return g_buttons.get().cstick_axis_x; }
-int controls_3ds_cstick_axis_y(void)   { return g_buttons.get().cstick_axis_y; }
-int controls_3ds_cstick_invert_x(void) { return g_buttons.get().cstick_invert_x; }
-int controls_3ds_cstick_invert_y(void) { return g_buttons.get().cstick_invert_y; }
-float controls_3ds_cstick_sensitivity(void) { return g_buttons.get().cstick_sensitivity; }
-float controls_3ds_cpad_sensitivity(void)   { return g_buttons.get().cpad_sensitivity; }
 int controls_3ds_swap_sticks(void)     { return g_buttons.get().swap_sticks; }
 
 bool controls_3ds_menu_is_open(void) { return g_menu.is_open(); }

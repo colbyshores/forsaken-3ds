@@ -10,8 +10,9 @@
  * binds; the two must stay in lockstep. The remap menu is not modal: the
  * pause menu opens it, oct2.cpp draws it each frame on the bottom screen,
  * and controls_3ds_handle_input swallows HID input while it is open.
- * C-stick / Circle Pad Pro fields (axis routing, inversion, sensitivity,
- * stick swap) are routed by input_3ds.cpp and edited in the same overlay.
+ * The analog sticks have one option, Swap Sticks (circle pad <-> C-stick
+ * roles), edited in the same overlay; the stick->axis routing itself is
+ * fixed (circle pad = movement, C-stick = look) in input_3ds.cpp.
  */
 
 #include "util/platform.h"
@@ -54,24 +55,12 @@ struct controls_3ds_t {
 	 * KEY_L, KEY_R, KEY_START, KEY_SELECT). 0 = unbound. */
 	u32 button[CTRL_NUM_ACTIONS];
 
-	/* C-stick mapping. The engine sees axis 0=yaw, 1=pitch from the
-	 * circle pad; the C-stick (New 3DS nub or OG Circle Pad Pro — same
-	 * ir:rst path) is routed into the engine axes chosen here, and
-	 * inversion flips pitch/yaw direction. Defaults put the C-stick on
-	 * the look axes (0/1) so it works out of the box. */
-	int cstick_axis_x;       /* 0..3 = engine axis index for stick X */
-	int cstick_axis_y;       /* 0..3 = engine axis index for stick Y */
-	int cstick_invert_x;     /* 0 or 1 */
-	int cstick_invert_y;     /* 0 or 1 */
-
-	/* Per-stick sensitivity multipliers applied to the raw +-100 axis
-	 * output before the engine's own per-axis sensitivity. 1.0 = neutral. */
-	float cstick_sensitivity;
-	float cpad_sensitivity;
-
-	/* 1 = the circle pad and the C-stick exchange axis roles (the circle
-	 * pad drives the C-stick's axes and vice versa). */
-	int swap_sticks;
+	/* Analog stick mapping is fixed: the circle pad drives movement
+	 * (thrust + strafe) and the C-stick drives look (yaw + pitch), routed
+	 * in input_3ds.cpp into the engine axes bound in config.cpp. The only
+	 * stick option is swap_sticks, which exchanges the two sticks' roles
+	 * (so the C-stick moves and the circle pad looks). */
+	int swap_sticks;         /* 1 = circle pad and C-stick exchange roles */
 };
 
 /* Initialize bindings: load defaults (platform-aware), then overlay
@@ -90,13 +79,7 @@ void controls_3ds_reset_defaults(void);
 /* Get current KEY_* mask for an action. 0 if unbound. */
 u32  controls_3ds_button(controls_action_t action);
 
-/* C-stick getters for the input poll. */
-int  controls_3ds_cstick_axis_x(void);
-int  controls_3ds_cstick_axis_y(void);
-int  controls_3ds_cstick_invert_x(void);
-int  controls_3ds_cstick_invert_y(void);
-float controls_3ds_cstick_sensitivity(void);
-float controls_3ds_cpad_sensitivity(void);
+/* Stick option getter for the input poll. */
 int  controls_3ds_swap_sticks(void);
 
 /* Modal bottom-screen rebind menu. Takes over the bottom screen

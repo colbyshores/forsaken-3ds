@@ -1246,6 +1246,17 @@ void DefaultJoystickSettings( USERCONFIG *u )
 			 * scheme (L/R = prev/next primary, U/D = slide up/down); the
 			 * 10-15 face-button binds default unbound in controls_3ds.cpp
 			 * and are opt-in. */
+			/* Analog stick axes. The circle pad drives movement and the
+			 * C-stick drives look (Swap Sticks exchanges them), all routed
+			 * in input_3ds.cpp into these engine axes:
+			 *   axis 0 XAxis -> RotateLeft  (look yaw,   C-stick X)
+			 *   axis 1 YAxis -> RotateUp    (look pitch, C-stick Y)
+			 *   axis 2 ZAxis -> MoveForward (thrust,     circle pad Y)
+			 *   axis 3 RxAxis-> SlideLeft   (strafe,     circle pad X)
+			 * Signs are chosen in input_3ds.cpp so up=forward, right=strafe
+			 * right, matching the digital buttons in control_ship(). */
+			JoystickInfo[ j ].Axis[ AXIS_ZAxis  ].action = SHIPACTION_MoveForward;
+			JoystickInfo[ j ].Axis[ AXIS_RxAxis ].action = SHIPACTION_SlideLeft;
 			AddButton( j, 0,  &u->fire_primary );
 			AddButton( j, 1,  &u->fire_secondary );
 			AddButton( j, 2,  &u->move_forward );
