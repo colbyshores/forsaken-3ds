@@ -238,8 +238,9 @@ bool HidPoller::poll()
 	hidCircleRead(&cpad);
 	hidCstickRead(&cstick);
 
-	/* The circle pad drives movement and the C-stick drives look; Swap
-	 * Sticks exchanges the two. The engine axes are fixed in config.cpp:
+	/* By default the C-stick (next to the face buttons) drives movement and
+	 * the circle pad drives look; Swap Sticks exchanges the two. The engine
+	 * axes are fixed in config.cpp:
 	 *   AXIS_XAxis  -> RotateLeft  (yaw)     AXIS_ZAxis  -> MoveForward
 	 *   AXIS_YAxis  -> RotateUp    (pitch)   AXIS_RxAxis -> SlideLeft (strafe)
 	 * Signs match the digital buttons in control_ship(): stick up = forward,
@@ -248,14 +249,14 @@ bool HidPoller::poll()
 	 * axis deadzone (the engine applies no deadzone of its own). */
 	{
 		int swap = controls_3ds_swap_sticks();
-		const circlePosition *mv = swap ? &cstick : &cpad;   /* movement stick */
-		const circlePosition *lk = swap ? &cpad   : &cstick; /* look stick     */
+		const circlePosition *mv = swap ? &cpad   : &cstick; /* movement stick */
+		const circlePosition *lk = swap ? &cstick : &cpad;   /* look stick     */
 		deadzone = JoystickInfo[0].Axis[0].deadzone;
 
-		long fwd    = (long)( mv->dy  * CPAD_SCALE);  /* up (-dy) -> forward      */
-		long strafe = (long)( mv->dx  * CPAD_SCALE);  /* right    -> strafe right */
-		long yaw    = (long)( lk->dx  * CPAD_SCALE);  /* right    -> look right   */
-		long pitch  = (long)( -lk->dy * CPAD_SCALE);  /* up (-dy) -> look up      */
+		long fwd    = (long)( -mv->dy * CPAD_SCALE);  /* up -> forward      */
+		long strafe = (long)(  mv->dx * CPAD_SCALE);  /* right -> strafe right */
+		long yaw    = (long)(  lk->dx * CPAD_SCALE);  /* right -> look right   */
+		long pitch  = (long)( -lk->dy * CPAD_SCALE);  /* up -> look up         */
 
 		memset(joy_axis_state[0], 0, sizeof(joy_axis_state[0]));
 		if (abs(fwd)    > deadzone) joy_axis_state[0][AXIS_ZAxis]  = fwd;

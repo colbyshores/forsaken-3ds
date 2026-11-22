@@ -12,7 +12,7 @@
  * and controls_3ds_handle_input swallows HID input while it is open.
  * The analog sticks have one option, Swap Sticks (circle pad <-> C-stick
  * roles), edited in the same overlay; the stick->axis routing itself is
- * fixed (circle pad = movement, C-stick = look) in input_3ds.cpp.
+ * fixed (C-stick = movement, circle pad = look) in input_3ds.cpp.
  */
 
 #include "util/platform.h"
@@ -55,11 +55,11 @@ struct controls_3ds_t {
 	 * KEY_L, KEY_R, KEY_START, KEY_SELECT). 0 = unbound. */
 	u32 button[CTRL_NUM_ACTIONS];
 
-	/* Analog stick mapping is fixed: the circle pad drives movement
-	 * (thrust + strafe) and the C-stick drives look (yaw + pitch), routed
+	/* Analog stick mapping is fixed: the C-stick drives movement
+	 * (thrust + strafe) and the circle pad drives look (yaw + pitch), routed
 	 * in input_3ds.cpp into the engine axes bound in config.cpp. The only
 	 * stick option is swap_sticks, which exchanges the two sticks' roles
-	 * (so the C-stick moves and the circle pad looks). */
+	 * (so the circle pad moves and the C-stick looks). */
 	int swap_sticks;         /* 1 = circle pad and C-stick exchange roles */
 };
 

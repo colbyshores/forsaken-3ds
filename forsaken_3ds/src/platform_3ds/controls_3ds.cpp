@@ -154,7 +154,7 @@ void ButtonMap::apply_defaults(bool is_n3ds)
 	 * slide down/up). These rows let the player additionally map them to
 	 * face buttons. */
 
-	/* Sticks are not swapped by default: circle pad moves, C-stick looks. */
+	/* Sticks are not swapped by default: C-stick moves, circle pad looks. */
 	controls.swap_sticks = 0;
 }
 
